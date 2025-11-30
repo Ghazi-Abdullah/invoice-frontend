@@ -1,0 +1,179 @@
+{
+  "app": {
+    "name": "نظام الفواتير",
+    "description": "نظام متكامل لإدارة الفواتير"
+  },
+  "nav": {
+    "dashboard": "لوحة التحكم",
+    "invoices": "الفواتير",
+    "clients": "العملاء",
+    "reports": "التقارير",
+    "settings": "الإعدادات"
+  },
+  "auth": {
+    "login": "تسجيل الدخول",
+    "register": "إنشاء حساب",
+    "logout": "تسجيل الخروج",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "confirm_password": "تأكيد كلمة المرور",
+    "remember_me": "تذكرني",
+    "forgot_password": "نسيت كلمة المرور؟"
+  },
+  "dashboard": {
+    "title": "لوحة التحكم",
+    "welcome": "مرحباً بك في نظام إدارة الفواتير",
+    "total_invoices": "إجمالي الفواتير",
+    "total_clients": "إجمالي العملاء",
+    "paid_invoices": "الفواتير المدفوعة",
+    "total_revenue": "إجمالي الإيرادات",
+    "new_clients": "عملاء جدد",
+    "collection_rate": "معدل التحصيل",
+    "quick_stats": "إحصائيات سريعة",
+    "live_updates": "تحديثات حية"
+  },
+  "invoices": {
+    "title": "الفواتير",
+    "subtitle": "إدارة وعرض كافة الفواتير",
+    "create_new": "إنشاء فاتورة جديدة",
+    "no_invoices": "لا توجد فواتير",
+    "start_creating": "ابدأ بإنشاء أول فاتورة",
+    "delete_confirm": "هل أنت متأكد من حذف الفاتورة {number}؟",
+    "delete_error": "فشل في حذف الفاتورة",
+    "create_invoice": "إنشاء فاتورة",
+    "edit_invoice": "تعديل الفاتورة",
+    "delete": "حذف الفاتورة",
+    "number": "رقم الفاتورة",
+    "issueDate": "تاريخ الإصدار",
+    "dueDate": "تاريخ الاستحقاق",
+    "status": "الحالة",
+    "items": "العناصر",
+    "description": "الوصف",
+    "quantity": "الكمية",
+    "unitPrice": "سعر الوحدة",
+    "total": "الإجمالي",
+    "subtotal": "الإجمالي الفرعي",
+    "tax": "الضريبة",
+    "totalAmount": "الإجمالي الكلي",
+    "notes": "ملاحظات",
+    "notesPlaceholder": "أدخل ملاحظات...",
+    "statuses": {
+      "draft": "مسودة",
+      "sent": "مرسلة",
+      "paid": "مدفوعة",
+      "overdue": "متأخرة"
+    },
+    "details": {
+      "title": "تفاصيل الفاتورة",
+      "subtitle": "عرض كافة تفاصيل الفاتورة",
+      "clientInfo": "معلومات العميل",
+      "datesInfo": "تواريخ الفاتورة",
+      "items": "عناصر الفاتورة",
+      "notFound": "لا توجد فاتورة",
+      "notFoundDesc": "لم يتم العثور على الفاتورة المطلوبة",
+      "notSpecified": "غير محدد",
+      "daysRemaining": "الأيام المتبقية",
+      "expired": "منتهية",
+      "today": "اليوم",
+      "tomorrow": "غداً"
+    },
+    "actions": {
+      "markSent": "تعيين كمرسلة",
+      "markPaid": "تعيين كمدفوعة",
+      "print": "طباعة",
+      "downloadPDF": "تنزيل PDF"
+    },
+    "messages": {
+      "statusUpdated": "تم تحديث حالة الفاتورة بنجاح",
+      "statusUpdateFailed": "فشل في تحديث حالة الفاتورة",
+      "invalidId": "معرف الفاتورة غير صالح",
+      "notFound": "لم يتم العثور على الفاتورة",
+      "loadFailed": "حدث خطأ أثناء تحميل الفاتورة",
+      "fillAllItems": "يرجى تعبئة جميع حقول العناصر بشكل صحيح",
+      "updateFailed": "فشل في تحديث الفاتورة",
+      "pdfComingSoon": "سيتم توفير ملف PDF قريباً"
+    }
+  },
+  "clients": {
+    "title": "العملاء",
+    "subtitle": "إدارة العملاء",
+    "choose_client": "اختيار عميل",
+    "no_clients": "لا يوجد عملاء بعد",
+    "addClient": "إضافة عميل",
+    "add_new": "إضافة عميل جديد",
+    "searchPlaceholder": "بحث العملاء...",
+    "view": "عرض",
+    "editClient": "تعديل عميل",
+    "delete": "حذف",
+    "deleteConfirm": "هل أنت متأكد من حذف العميل {name}؟",
+    "contactInfo": "معلومات الاتصال",
+    "companyInfo": "معلومات الشركة",
+    "clientInfoAndInvoices": "معلومات العميل والفواتير المرتبطة",
+    "clientDetails": "تفاصيل العميل",
+    "address": "العنوان",
+    "phone": "الهاتف",
+    "company": "الشركة",
+    "taxNumber": "الرقم الضريبي",
+    "joined": "انضم في",
+    "notProvided": "غير مقدم",
+    "lastUpdated": "آخر تحديث",
+    "clientInvoices": "فواتير العميل",
+    "statistics": "الإحصائيات",
+    "noInvoicesForClient": "لا توجد فواتير لهذا العميل",
+    "form": {
+      "name": "الاسم",
+      "namePlaceholder": "أدخل اسم العميل",
+      "email": "البريد الإلكتروني",
+      "emailPlaceholder": "أدخل البريد الإلكتروني",
+      "phone": "الهاتف",
+      "phonePlaceholder": "أدخل رقم الهاتف",
+      "companyName": "اسم الشركة",
+      "companyNamePlaceholder": "أدخل اسم الشركة",
+      "taxNumber": "الرقم الضريبي",
+      "taxNumberPlaceholder": "أدخل الرقم الضريبي",
+      "address": "العنوان",
+      "addressPlaceholder": "أدخل العنوان"
+    },
+    "stats": {
+      "total_clients": "إجمالي العملاء",
+      "newThisMonth": "جدد هذا الشهر",
+      "active": "عملاء نشطين",
+      "avgInvoices": "متوسط الفواتير",
+      "growth": "معدل النمو",
+      "distribution": "توزيع العملاء"
+    }
+  },
+  "buttons": {
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "view": "عرض",
+    "create": "إنشاء",
+    "search": "بحث",
+    "quick_actions": "إجراءات سريعة",
+    "addItem": "إضافة عنصر",
+    "remove": "إزالة"
+  },
+  "common": {
+    "loading": "جاري التحميل...",
+    "saving": "جاري الحفظ...",
+    "update": "تحديث",
+    "retry": "إعادة المحاولة",
+    "revenue": "إجمالي الإيرادات",
+    "active": "نشط",
+    "currency": "ر.س"
+  },
+  "messages": {
+    "welcome": "مرحباً {name}!",
+    "success": "تمت العملية بنجاح",
+    "error": "حدث خطأ",
+    "fill_all_fields": "الرجاء تعبئة جميع الحقول",
+    "invoice_created": "تم إنشاء الفاتورة بنجاح",
+    "create_invoice_error": "فشل في إنشاء الفاتورة",
+    "load_clients_error": "فشل في تحميل العملاء"
+  },
+  "errors": {
+    "saveClientFailed": "فشل في حفظ العميل"
+  }
+}

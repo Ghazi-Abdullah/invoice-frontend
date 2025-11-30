@@ -1,0 +1,27 @@
+/*@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';*/
+
+/* في ملف CSS الرئيسي (مثل src/style.css) */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* تنسيقات للغة العربية */
+[dir='rtl'] {
+  font-family: 'Noto Sans Arabic', sans-serif;
+}
+
+/* تنسيقات للغة الإنجليزية */
+[dir='ltr'] {
+  font-family: 'Inter', sans-serif;
+}
+
+/* تنسيقات عامة للاتجاه */
+[dir='rtl'] .space-x-2 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 1;
+}
+
+[dir='ltr'] .space-x-2 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 0;
+}
