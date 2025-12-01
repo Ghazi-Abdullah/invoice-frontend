@@ -50,7 +50,14 @@ const routes = [
       { path: '/invoices', name: 'Invoices', component: Invoices },
       { path: '/invoices/create', name: 'CreateInvoice', component: CreateInvoice },
       { path: '/invoices/:id/edit', name: 'EditInvoice', component: EditInvoice },
-      { path: '/invoices/:id', name: 'InvoiceDetails', component: InvoiceDetails }
+      { path: '/invoices/:id', name: 'InvoiceDetails', component: InvoiceDetails },
+
+      {
+        path: '/reports',
+        name: 'Reports',
+        component: () => import('../views/Reports/Index.vue'),
+        meta: { requiresAuth: true }
+      }
     ]
   }
 ]

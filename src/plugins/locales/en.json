@@ -33,6 +33,18 @@
     "live_updates": "Live Updates"
   },
   "invoices": {
+    "": "",
+    "invoiceDetails": "Invoice Details",
+    "viewDetails": "View all invoice details",
+    "noInvoice": "No Invoice",
+    "notFound": "The requested invoice was not found",
+    "invoice": "Invoice",
+    "clientInfo": "Client Information",
+    "dates": "Invoice Dates",
+    "markAsSent": "Mark as Sent",
+    "markAsPaid": "Mark as Paid",
+    "print": "Print",
+    "downloadPDF": "Download PDF",
     "this_month": "This Month",
     "average": "Average",
     "view_all": "View All Invoices",
@@ -40,8 +52,8 @@
     "paid": "Paid",
     "payment_rate": "Payment Rate",
     "choose_client_first": "Choose Client First",
-    "create": "Create",
-    "add_new": "Add New",
+    "create": "Create Invoice",
+    "add_new": "Add New Invoice",
     "title": "Invoices",
     "subtitle": "Manage and view all invoices",
     "create_new": "Create New Invoice",
@@ -55,7 +67,6 @@
     "number": "Invoice Number",
     "issueDate": "Issue Date",
     "dueDate": "Due Date",
-    "status": "Status",
     "items": "Items",
     "description": "Description",
     "quantity": "Quantity",
@@ -66,8 +77,40 @@
     "totalAmount": "Total Amount",
     "notes": "Notes",
     "notesPlaceholder": "Add notes...",
+    "notSpecified": "Not specified",
+    "expired": "Expired",
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "days": "days",
+    "statusUpdated": "Invoice status updated successfully",
+    "statusUpdateFailed": "Failed to update invoice status",
+    "pdfComingSoon": "PDF download coming soon",
+    "invalidId": "Invalid invoice ID",
+    "loadFailed": "Failed to load invoice",
+    "table": {
+      "invoice_number": "invoice number",
+      "client": "client",
+      "date": "date",
+      "overdue": "Overdue",
+      "due_date": "due date",
+      "amount": "amount",
+      "status": "status",
+      "actions": "actions"
+    },
     "statuses": {
       "draft": "Draft",
+      "sent": "Sent",
+      "paid": "Paid",
+      "overdue": "Overdue"
+    },
+    "status": {
+      "draft": "Draft",
+      "sent": "Sent",
+      "paid": "Paid",
+      "overdue": "Overdue"
+    },
+    "stats": {
+      "total": "Total",
       "sent": "Sent",
       "paid": "Paid",
       "overdue": "Overdue"
@@ -104,6 +147,11 @@
     }
   },
   "clients": {
+    "clientInfo": "Client Information",
+    "noEmail": "No email",
+    "addClientDescription": "Add a new client to the system",
+    "addNewClient": "Add New Client",
+    "fillBasicInfo": "Fill in the basic client information",
     "summary": "Summary",
     "recent_activity": "Recent Activity",
     "view_all": "View All Clients",
@@ -133,6 +181,13 @@
     "clientInvoices": "Client Invoices",
     "statistics": "Statistics",
     "noInvoicesForClient": "No invoices for this client",
+    "quickTips": "Quick Tips",
+    "tip1": "• Make sure the email is correct for sending invoices",
+    "tip2": "• Enter phone number for quick communication with the client",
+    "tip3": "• Tax number is important for tax invoices",
+    "tip4": "• Address helps in delivering paper invoices if necessary",
+    "createSuccess": "Client added successfully",
+    "createError": "Failed to add client",
     "form": {
       "name": "Name",
       "namePlaceholder": "Enter client name",
@@ -171,6 +226,14 @@
     "remove": "Remove"
   },
   "common": {
+    "back": "Back",
+    "edit": "Edit",
+    "error": "Error",
+    "backToClients": "Back to Clients",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving...",
+    "update": "Update",
     "from_last_month": "From Last Month",
     "quick_stats": "Quick Stats",
     "new_clients": "New Clients",
@@ -194,8 +257,6 @@
     "showing": "Showing",
     "of": "of",
     "loading": "Loading...",
-    "saving": "Saving...",
-    "update": "Update",
     "retry": "Try Again",
     "revenue": "Total Revenue",
     "active": "Active",
@@ -214,5 +275,24 @@
   },
   "errors": {
     "saveClientFailed": "Failed to save client"
+  },
+  "filters": {
+    "search_placeholder": "Search",
+    "all_dates": "All Dates",
+    "all_statuses": "All Statuses",
+    "this_month": "This Month",
+    "last_month": "Last Month",
+    "this_year": "This Year"
+  },
+  "actions": {
+    "view": "View",
+    "edit": "Edit",
+    "delete": "Delete"
+  },
+  "pagination": {
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page",
+    "of": "of"
   }
 }

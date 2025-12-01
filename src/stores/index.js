@@ -2,12 +2,14 @@ import { createStore } from 'vuex'
 import auth from './modules/auth'
 import clients from './modules/clients'
 import invoices from './modules/invoices'
+import report from './modules/report'
 
 export default createStore({
   modules: {
     auth,
     clients,
-    invoices
+    invoices,
+    report,
   }
 })
 
