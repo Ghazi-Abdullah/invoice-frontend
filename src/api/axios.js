@@ -1,124 +1,4 @@
 import axios from 'axios'
-import { toast } from 'vue3-toastify'
-
-// إنشاء axios instance مع الإعدادات الأساسية
-const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000/api',
-  headers: {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
-    'X-Requested-With': 'XMLHttpRequest'
-  },
-  timeout: 10000, // 10 ثانية timeout
-  withCredentials: true // إذا كنت تستخدم cookies
-})
-
-// Request Interceptor
-axiosInstance.interceptors.request.use(
-  (config) => {
-    // إضافة التوكن من localStorage إذا موجود
-    const token = localStorage.getItem('token')
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
-      console.log('🔐 Token added to request headers')
-    }
-
-    // تسجيل الطلب للتصحيح
-    console.log(`🚀 ${config.method.toUpperCase()} ${config.url}`, config.data || '')
-    return config
-  },
-  (error) => {
-    console.error('❌ Request error:', error)
-    return Promise.reject(error)
-  }
-)
-
-// Response Interceptor
-axiosInstance.interceptors.response.use(
-  (response) => {
-    console.log(`✅ ${response.status} ${response.config.url}`)
-
-    // عرض رسائل النجاح إذا كانت موجودة
-    if (response.data?.message && response.config.method !== 'get') {
-      toast.success(response.data.message, {
-        position: 'top-right',
-        autoClose: 3000,
-        rtl: true
-      })
-    }
-
-    return response
-  },
-  (error) => {
-    console.error(`❌ ${error.response?.status || 'Network'} Error: ${error.config?.url}`)
-
-    let errorMessage = 'حدث خطأ في الاتصال'
-
-    if (error.response) {
-      // Server responded with error
-      const status = error.response.status
-
-      switch (status) {
-        case 401:
-          errorMessage = 'غير مصرح لك بالوصول'
-          // مسح بيانات المصادقة
-          localStorage.removeItem('user')
-          localStorage.removeItem('token')
-          // توجيه إلى صفحة تسجيل الدخول
-          if (window.location.pathname !== '/login') {
-            window.location.href = '/login'
-          }
-          break
-
-        case 403:
-          errorMessage = 'ليس لديك صلاحية للوصول'
-          break
-
-        case 404:
-          errorMessage = 'الصفحة غير موجودة'
-          break
-
-        case 422:
-          errorMessage = 'بيانات غير صحيحة'
-          if (error.response.data?.errors) {
-            const errors = error.response.data.errors
-            errorMessage = Object.values(errors).flat().join(', ')
-          }
-          break
-
-        case 500:
-          errorMessage = 'حدث خطأ في الخادم'
-          break
-
-        default:
-          errorMessage = error.response.data?.message || 'حدث خطأ غير متوقع'
-      }
-
-      console.log('📡 Server error response:', error.response.data)
-    } else if (error.request) {
-      // No response received
-      errorMessage = 'لا يمكن الاتصال بالخادم. تحقق من اتصالك بالإنترنت'
-      console.log('🌐 No response from server')
-    } else {
-      // Something else happened
-      errorMessage = error.message || 'حدث خطأ غير متوقع'
-      console.log('⚠️ Request setup error:', error.message)
-    }
-
-    // عرض رسالة الخطأ باستخدام toast
-    toast.error(errorMessage, {
-      position: 'top-right',
-      autoClose: 5000,
-      rtl: true
-    })
-
-    return Promise.reject(error)
-  }
-)
-
-export default axiosInstance
-
-/*import axios from 'axios'
 
 const api = axios.create({
   baseURL: 'http://localhost:8000/api',
@@ -126,21 +6,40 @@ const api = axios.create({
     'Content-Type': 'application/json',
     'Accept': 'application/json',
     'X-Requested-With': 'XMLHttpRequest'
-  }
+  },
+  timeout: 10000 // 10 ثواني
 })
 
 // Request Interceptor
 api.interceptors.request.use(
   (config) => {
+    console.log('🚀 Request URL:', config.method?.toUpperCase(), config.baseURL + config.url)
+    console.log('📝 Request Headers:', config.headers)
+    console.log('📦 Request Data:', config.data)
+
     const userInfo = localStorage.getItem('userInfo')
     if (userInfo) {
-      const token = JSON.parse(userInfo).token
-      config.headers.Authorization = `Bearer ${token}`
-      console.log('🔐 Adding auth token to request')
+      try {
+        const parsed = JSON.parse(userInfo)
+        const token = parsed.token
+
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`
+          console.log('🔐 Token added to headers:', token.substring(0, 20) + '...')
+        } else {
+          console.warn('⚠️ No token found in userInfo')
+        }
+      } catch (error) {
+        console.error('❌ Error parsing userInfo:', error)
+      }
+    } else {
+      console.warn('⚠️ No userInfo found in localStorage')
     }
+
     return config
   },
   (error) => {
+    console.error('❌ Request interceptor error:', error)
     return Promise.reject(error)
   }
 )
@@ -148,29 +47,88 @@ api.interceptors.request.use(
 // Response Interceptor
 api.interceptors.response.use(
   (response) => {
-    console.log('✅ API Response:', response.config.url, response.status)
+    console.log('✅ API Response Success:', {
+      url: response.config.url,
+      status: response.status,
+      statusText: response.statusText,
+      data: response.data
+    })
     return response
   },
   (error) => {
-    console.error('❌ API Error:', error.response?.status, error.config?.url)
+    console.error('❌ API Error Details:', {
+      url: error.config?.url,
+      method: error.config?.method,
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      data: error.response?.data,
+      message: error.message,
+      code: error.code
+    })
+
+    // Log the full error for debugging
+    console.error('🔍 Full error object:', error)
 
     if (error.response?.status === 401) {
-      console.log('🚪 Unauthorized - redirecting to login')
+      console.log('🚪 Unauthorized (401) - clearing localStorage')
       localStorage.removeItem('userInfo')
-      window.location.href = '/login'
+
+      // إرسال حدث لتحديث حالة المصادقة
+      window.dispatchEvent(new CustomEvent('auth-changed', {
+        detail: { isAuthenticated: false }
+      }))
+
+      // توجيه إلى صفحة تسجيل الدخول
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login'
+      }
     }
 
-    const errorMessage = error.response?.data?.message || 'حدث خطأ'
-    window.dispatchEvent(new CustomEvent('show-toast', {
-      detail: {
-        type: 'error',
-        message: errorMessage
-      }
-    }))
+    if (error.response?.status === 404) {
+      console.error('🔍 Endpoint not found (404):', error.config?.url)
+    }
+
+    if (error.code === 'ECONNABORTED') {
+      console.error('⏰ Request timeout')
+    }
+
+    if (!error.response) {
+      console.error('🌐 Network error - check CORS or server connection')
+    }
+
+    const errorMessage = error.response?.data?.message || error.message || 'حدث خطأ في الاتصال بالخادم'
+
+    // استخدام Vue Toast إذا كان متاحاً
+    if (window.vueApp && window.vueApp.$toast) {
+      window.vueApp.$toast.error(errorMessage, {
+        position: "top-right",
+        autoClose: 5000,
+      })
+    } else {
+      // استخدام CustomEvent كبديل
+      window.dispatchEvent(new CustomEvent('show-toast', {
+        detail: {
+          type: 'error',
+          message: errorMessage
+        }
+      }))
+    }
 
     return Promise.reject(error)
   }
 )
 
+// دالة مساعدة لاختبار الاتصال
+api.testConnection = async () => {
+  try {
+    console.log('🔍 Testing API connection...')
+    const response = await api.get('/test', { timeout: 5000 })
+    console.log('✅ API Connection Test Successful:', response.data)
+    return { success: true, data: response.data }
+  } catch (error) {
+    console.error('❌ API Connection Test Failed:', error.message)
+    return { success: false, error: error.message }
+  }
+}
+
 export default api
-*/

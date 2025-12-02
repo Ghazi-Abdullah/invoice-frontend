@@ -175,7 +175,7 @@ export default {
         totalInvoices: 0,
         paidInvoices: 0,
         overdueInvoices: 0,
-      }
+      },
     }
   },
   methods: {
@@ -226,27 +226,23 @@ export default {
         await this.$store.dispatch('invoices/fetchInvoices')
 
         const allInvoices = this.$store.state.invoices.invoices.data || []
-        this.clientInvoices = allInvoices.filter(
-          (inv) => inv.client_id === this.client.id
-        )
+        this.clientInvoices = allInvoices.filter((inv) => inv.client_id === this.client.id)
 
         // Calculate stats
         this.stats.totalInvoices = this.clientInvoices.length
-        this.stats.paidInvoices = this.clientInvoices.filter(
-          (inv) => inv.status === 'paid'
-        ).length
+        this.stats.paidInvoices = this.clientInvoices.filter((inv) => inv.status === 'paid').length
         this.stats.overdueInvoices = this.clientInvoices.filter(
-          (inv) => inv.status === 'overdue'
+          (inv) => inv.status === 'overdue',
         ).length
       } catch (error) {
         console.error('Failed to load client details:', error)
       } finally {
         this.loading = false
       }
-    }
+    },
   },
   mounted() {
     this.loadClientDetails()
-  }
+  },
 }
 </script>
