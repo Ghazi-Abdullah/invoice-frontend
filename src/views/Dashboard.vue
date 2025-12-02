@@ -10,35 +10,24 @@
             </div>
           </div>
           <div class="flex items-center space-x-4">
-            <div class="relative">
-              <input
-                type="text"
-                :placeholder="$t('buttons.search')"
-                class="w-64 pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-              <div class="absolute inset-y-0 left-0 pl-3 flex items-center">
-                <svg
-                  class="h-5 w-5 text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  />
-                </svg>
-              </div>
-            </div>
+            <button @click="loadDashboardData" class="btn btn-primary">
+              {{ $t('buttons.refresh') }}
+            </button>
           </div>
         </div>
       </div>
     </div>
 
+    <!-- Loading State -->
+    <div v-if="loading" class="flex justify-center items-center h-64">
+      <div class="text-center">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+        <p class="mt-4 text-gray-600">{{ $t('messages.loading') }}...</p>
+      </div>
+    </div>
+
     <!-- Main Dashboard Content -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div v-else class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <!-- Welcome Section -->
       <div class="mb-8">
         <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ $t('dashboard.title') }}</h1>
@@ -48,9 +37,7 @@
       <!-- Stats Grid -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <!-- Total Invoices Card -->
-        <div
-          class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-all duration-300"
-        >
+        <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm font-medium text-gray-600">{{ $t('dashboard.total_invoices') }}</p>
@@ -79,9 +66,7 @@
         </div>
 
         <!-- Total Clients Card -->
-        <div
-          class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-all duration-300"
-        >
+        <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm font-medium text-gray-600">{{ $t('dashboard.total_clients') }}</p>
@@ -110,9 +95,7 @@
         </div>
 
         <!-- Paid Invoices Card -->
-        <div
-          class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-all duration-300"
-        >
+        <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm font-medium text-gray-600">{{ $t('invoices.paid') }}</p>
@@ -146,9 +129,7 @@
         </div>
 
         <!-- Revenue Card -->
-        <div
-          class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-all duration-300"
-        >
+        <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm font-medium text-gray-600">{{ $t('dashboard.total_revenue') }}</p>
@@ -289,42 +270,47 @@
             </div>
           </div>
 
-          <!-- Recent Activity (Real Data) -->
+          <!-- Recent Clients -->
           <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
             <div class="flex items-center justify-between mb-6">
               <h2 class="text-xl font-bold text-gray-900">{{ $t('clients.recent_activity') }}</h2>
-              <span class="text-blue-600 text-sm font-medium">{{
-                $t('messages.live_updates')
-              }}</span>
+              <router-link
+                to="/clients"
+                class="text-blue-600 hover:text-blue-700 text-sm font-medium"
+              >
+                {{ $t('buttons.view_all') }}
+              </router-link>
             </div>
-            <div class="space-y-4">
-              <div v-if="recentClients.length === 0" class="text-center py-8">
-                <svg
-                  class="w-12 h-12 text-gray-300 mx-auto mb-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                  />
-                </svg>
-                <p class="text-gray-500">{{ $t('clients.no_clients_yet') }}</p>
-                <router-link
-                  to="/clients/create"
-                  class="text-blue-600 hover:text-blue-700 text-sm font-medium mt-2 inline-block"
-                >
-                  {{ $t('clients.add_first_client') }}
-                </router-link>
-              </div>
 
+            <div v-if="recentClients.length === 0" class="text-center py-8">
+              <svg
+                class="w-12 h-12 text-gray-300 mx-auto mb-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                />
+              </svg>
+              <p class="text-gray-500">{{ $t('clients.no_clients_yet') }}</p>
+              <router-link
+                to="/clients/create"
+                class="text-blue-600 hover:text-blue-700 text-sm font-medium mt-2 inline-block"
+              >
+                {{ $t('clients.add_first_client') }}
+              </router-link>
+            </div>
+
+            <div v-else class="space-y-4">
               <div
                 v-for="client in recentClients"
                 :key="client.id"
-                class="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg border border-gray-200"
+                class="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors cursor-pointer"
+                @click="$router.push(`/clients/${client.id}`)"
               >
                 <div
                   class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-sm"
@@ -337,7 +323,7 @@
                     {{ client.email || $t('clients.notProvided') }}
                   </p>
                   <p class="text-gray-500 text-xs mt-1">
-                    {{ $t('clients.jopped') }}: {{ formatDate(client.created_at) }}
+                    {{ $t('clients.joined') }}: {{ formatDate(client.created_at) }}
                   </p>
                 </div>
                 <div class="text-right">
@@ -346,9 +332,6 @@
                   >
                     {{ $t('common.active') }}
                   </span>
-                  <p class="text-gray-500 text-xs mt-1">
-                    {{ client.phone || $t('clients.notProvided') }}
-                  </p>
                 </div>
               </div>
             </div>
@@ -357,36 +340,63 @@
 
         <!-- Right Column - 1/3 width -->
         <div class="space-y-8">
-          <!-- Recent Clients Summary -->
+          <!-- Recent Invoices -->
           <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
-            <h2 class="text-xl font-bold text-gray-900 mb-6">{{ $t('clients.summary') }}</h2>
-            <div class="space-y-4">
-              <div class="grid grid-cols-2 gap-4">
-                <div class="bg-blue-50 p-4 rounded-lg text-center">
-                  <p class="text-2xl font-bold text-blue-600">{{ stats.totalClients }}</p>
-                  <p class="text-blue-800 text-sm">{{ $t('clients.stats.total') }}</p>
-                </div>
-                <div class="bg-green-50 p-4 rounded-lg text-center">
-                  <p class="text-2xl font-bold text-green-600">{{ stats.newClientsThisMonth }}</p>
-                  <p class="text-green-800 text-sm">{{ $t('clients.stats.newThisMonth') }}</p>
-                </div>
-              </div>
+            <div class="flex items-center justify-between mb-6">
+              <h2 class="text-xl font-bold text-gray-900">{{ $t('invoices.recent_invoices') }}</h2>
+              <router-link
+                to="/invoices"
+                class="text-blue-600 hover:text-blue-700 text-sm font-medium"
+              >
+                {{ $t('buttons.view_all') }}
+              </router-link>
+            </div>
 
-              <div class="border-t border-gray-200 pt-4">
-                <h3 class="font-semibold text-gray-900 mb-3">
-                  {{ $t('clients.stats.distribution') }}
-                </h3>
-                <div class="space-y-3">
-                  <div class="flex justify-between items-center">
-                    <span class="text-gray-600 text-sm">{{
-                      $t('clients.stats.active_clients')
-                    }}</span>
-                    <span class="font-semibold">{{ stats.totalClients }}</span>
-                  </div>
-                  <div class="flex justify-between items-center">
-                    <span class="text-gray-600 text-sm">{{ $t('clients.stats.growth') }}</span>
-                    <span class="text-green-600 font-semibold">+{{ stats.clientsGrowth }}%</span>
-                  </div>
+            <div v-if="recentInvoices.length === 0" class="text-center py-8">
+              <svg
+                class="w-12 h-12 text-gray-300 mx-auto mb-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z"
+                />
+              </svg>
+              <p class="text-gray-500">{{ $t('invoices.no_invoices_yet') }}</p>
+              <router-link
+                to="/invoices/create"
+                class="text-blue-600 hover:text-blue-700 text-sm font-medium mt-2 inline-block"
+              >
+                {{ $t('invoices.create_first') }}
+              </router-link>
+            </div>
+
+            <div v-else class="space-y-4">
+              <div
+                v-for="invoice in recentInvoices"
+                :key="invoice.id"
+                class="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors cursor-pointer"
+                @click="$router.push(`/invoices/${invoice.id}`)"
+              >
+                <div>
+                  <p class="font-semibold text-gray-900">{{ invoice.invoice_number }}</p>
+                  <p class="text-gray-600 text-sm mt-1">{{ invoice.client?.name || 'N/A' }}</p>
+                  <p class="text-gray-500 text-xs mt-1">
+                    {{ $t('invoices.due_date') }}: {{ formatDate(invoice.due_date) }}
+                  </p>
+                </div>
+                <div class="text-right">
+                  <p class="font-bold text-gray-900">{{ formatCurrency(invoice.total_amount) }}</p>
+                  <span
+                    :class="getStatusClass(invoice.status)"
+                    class="inline-block px-2 py-1 text-xs rounded-full mt-1"
+                  >
+                    {{ $t(`invoices.status.${invoice.status}`) }}
+                  </span>
                 </div>
               </div>
             </div>
@@ -416,29 +426,6 @@
               </div>
             </div>
           </div>
-
-          <!-- System Status -->
-          <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
-            <h3 class="text-lg font-bold text-gray-900 mb-4">{{ $t('common.system_status') }}</h3>
-            <div class="space-y-3">
-              <div class="flex items-center justify-between">
-                <span class="text-gray-600">{{ $t('common.database') }}</span>
-                <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
-                  {{ $t('common.connected') }}
-                </span>
-              </div>
-              <div class="flex items-center justify-between">
-                <span class="text-gray-600">{{ $t('common.server') }}</span>
-                <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
-                  {{ $t('common.running') }}
-                </span>
-              </div>
-              <div class="flex items-center justify-between">
-                <span class="text-gray-600">{{ $t('common.last_update') }}</span>
-                <span class="text-gray-500 text-xs">{{ currentTime }}</span>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -450,59 +437,41 @@ export default {
   name: 'Dashboard',
   data() {
     return {
-      currentTime: new Date().toLocaleTimeString('ar-SA'),
+      loading: true,
+      recentClients: [],
+      recentInvoices: [],
+      stats: {
+        totalClients: 0,
+        totalInvoices: 0,
+        paidInvoices: 0,
+        revenue: 0,
+        thisMonthInvoices: 0,
+        newClientsThisMonth: 0,
+        averageInvoice: 0,
+        collectionRate: 0,
+        clientsGrowth: 10,
+        paymentRate: 0,
+      },
     }
   },
-  computed: {
-    stats() {
-      const clientStats = {
-        totalClients: this.$store.getters['clients/totalClients'],
-        newClientsThisMonth: 0,
-        clientsGrowth: 10,
-      }
-
-      const invoiceStats = this.$store.getters['invoices/invoiceStats']
-
-      return {
-        totalInvoices: invoiceStats.total,
-        ...clientStats,
-        paidInvoices: invoiceStats.paid,
-        revenue: invoiceStats.totalAmount,
-        paymentRate:
-          invoiceStats.total > 0 ? Math.round((invoiceStats.paid / invoiceStats.total) * 100) : 0,
-        thisMonthInvoices: 0,
-        averageInvoice:
-          invoiceStats.total > 0 ? (invoiceStats.totalAmount / invoiceStats.total).toFixed(2) : 0,
-        collectionRate:
-          invoiceStats.total > 0 ? Math.round((invoiceStats.paid / invoiceStats.total) * 100) : 0,
-      }
-    },
-    recentClients() {
-      const clientsData = this.$store.state.clients.clients.data
-      if (!clientsData || !Array.isArray(clientsData)) {
-        return []
-      }
-
-      return clientsData.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, 5)
-    },
+  mounted() {
+    this.loadDashboardData()
   },
   methods: {
     formatCurrency(amount) {
       return new Intl.NumberFormat('ar-SA', {
         style: 'currency',
         currency: 'SAR',
-      }).format(amount)
+      }).format(amount || 0)
     },
-
     formatDate(dateString) {
-      if (!dateString) return this.$t('clients.notProvided')
+      if (!dateString) return this.$t('common.not_provided')
       return new Date(dateString).toLocaleDateString('ar-SA', {
         year: 'numeric',
         month: 'short',
         day: 'numeric',
       })
     },
-
     getInitials(name) {
       if (!name) return '?'
       return name
@@ -512,23 +481,96 @@ export default {
         .toUpperCase()
         .substring(0, 2)
     },
-
-    async loadStats() {
+    getStatusClass(status) {
+      const classes = {
+        paid: 'bg-green-100 text-green-800',
+        sent: 'bg-blue-100 text-blue-800',
+        draft: 'bg-gray-100 text-gray-800',
+        overdue: 'bg-red-100 text-red-800',
+      }
+      return classes[status] || 'bg-gray-100 text-gray-800'
+    },
+    async loadDashboardData() {
+      this.loading = true
       try {
-        await this.$store.dispatch('clients/fetchClients')
-        await this.$store.dispatch('invoices/fetchInvoices')
+        console.log('🔄 جلب بيانات Dashboard...')
+
+        // جلب العملاء
+        console.log('📋 جلب العملاء...')
+        const clientsResponse = await this.$store.dispatch('clients/fetchClients')
+        console.log('📦 استجابة العملاء:', clientsResponse)
+
+        // جلب الفواتير
+        console.log('🧾 جلب الفواتير...')
+        const invoicesResponse = await this.$store.dispatch('invoices/fetchInvoices')
+        console.log('📦 استجابة الفواتير:', invoicesResponse)
+
+        // تحديث البيانات
+        this.updateDashboardData()
       } catch (error) {
-        console.error('Error loading dashboard stats:', error)
+        console.error('❌ خطأ في تحميل بيانات Dashboard:', error)
+        this.$toast.error(this.$t('messages.load_error'))
+      } finally {
+        this.loading = false
       }
     },
-  },
-  mounted() {
-    this.loadStats()
+    updateDashboardData() {
+      // الحصول على البيانات من الـ store
+      const clients = this.$store.state.clients.clients.data || []
+      const invoices = this.$store.state.invoices.invoices.data || []
 
-    // تحديث الوقت كل دقيقة
-    setInterval(() => {
-      this.currentTime = new Date().toLocaleTimeString('ar-SA')
-    }, 60000)
+      console.log('📊 العملاء من الـ store:', clients)
+      console.log('📊 الفواتير من الـ store:', invoices)
+
+      // تحديث العملاء الأخيرة
+      this.recentClients = [...clients]
+        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+        .slice(0, 5)
+
+      // تحديث الفواتير الأخيرة
+      this.recentInvoices = [...invoices]
+        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+        .slice(0, 5)
+
+      // حساب الإحصائيات
+      this.calculateStats(clients, invoices)
+    },
+    calculateStats(clients, invoices) {
+      const now = new Date()
+      const thisMonth = now.getMonth()
+      const thisYear = now.getFullYear()
+
+      // إحصائيات العملاء
+      this.stats.totalClients = clients.length
+      this.stats.newClientsThisMonth = clients.filter((client) => {
+        const clientDate = new Date(client.created_at)
+        return clientDate.getMonth() === thisMonth && clientDate.getFullYear() === thisYear
+      }).length
+
+      // إحصائيات الفواتير
+      this.stats.totalInvoices = invoices.length
+      this.stats.paidInvoices = invoices.filter((inv) => inv.status === 'paid').length
+      this.stats.revenue = invoices.reduce((sum, inv) => sum + parseFloat(inv.total_amount || 0), 0)
+      this.stats.thisMonthInvoices = invoices.filter((invoice) => {
+        const invoiceDate = new Date(invoice.created_at)
+        return invoiceDate.getMonth() === thisMonth && invoiceDate.getFullYear() === thisYear
+      }).length
+
+      // معدلات
+      this.stats.paymentRate =
+        this.stats.totalInvoices > 0
+          ? Math.round((this.stats.paidInvoices / this.stats.totalInvoices) * 100)
+          : 0
+
+      this.stats.averageInvoice =
+        this.stats.totalInvoices > 0
+          ? (this.stats.revenue / this.stats.totalInvoices).toFixed(2)
+          : 0
+
+      this.stats.collectionRate = this.stats.paymentRate
+
+      console.log('📈 الإحصائيات المحسوبة:', this.stats)
+    },
   },
 }
 </script>
@@ -552,6 +594,19 @@ export default {
 
 .gap-8 {
   gap: 2rem;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @media (max-width: 768px) {

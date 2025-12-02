@@ -1,51 +1,7 @@
 import './assets/main.css'
 
 import { createApp } from 'vue'
-import { createStore } from 'vuex'
-import App from './App.vue'
-import router from './router'
-import i18n from './plugins/i18n'
-
-import Vue3Toastify from 'vue3-toastify'
-import 'vue3-toastify/dist/index.css'
-import { toast } from 'vue3-toastify'
-
-import auth from './stores/modules/auth'
-
-const store = createStore({
-  modules: {
-    auth
-  }
-})
-
-const app = createApp(App)
-
-app.use(store)
-app.use(i18n)
-app.use(router)
-app.use(Vue3Toastify, {
-  autoClose: 3000,
-  position: 'top-right',
-  theme: 'colored',
-  rtl: true
-})
-
-app.config.globalProperties.$toast = toast
-
-app.mount('#app')
-
-export { toast }
-
-console.log('✅ App initialized successfully')
-
-
-console.log('✅ App initialized successfully') // للتأكد من التشغيل
-
-
-/*import './assets/main.css'
-
-import { createApp } from 'vue'
-import { createPinia } from 'pinia'
+import store from '@/stores'
 import vue3Toastify from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css'
 
@@ -53,12 +9,36 @@ import App from './App.vue'
 import router from './router'
 import i18n from './plugins/i18n'
 
-// إنشاء التطبيق والمخازن
 const app = createApp(App)
-const pinia = createPinia()
 
-// ترتيب تركيب الإضافات
-app.use(pinia)
+// تخزين reference للتطبيق للنافذة لاستخدامه في axios interceptor
+window.vueApp = app
+
+// استخدام Vuex
+app.use(store)
+
+// تهيئة حالة المصادقة
+store.dispatch('auth/initialize').then(() => {
+  console.log('✅ Auth initialized')
+
+  // اختبار الاتصال بعد تهيئة المصادقة
+  setTimeout(async () => {
+    const isAuthenticated = store.getters['auth/isAuthenticated']
+    console.log('🔐 Authentication status:', isAuthenticated)
+
+    if (isAuthenticated) {
+      console.log('👤 Current user:', store.getters['auth/currentUser'])
+      console.log('🔑 Token exists:', !!store.state.auth.token)
+
+      // اختبار الاتصال بالـ API
+      const api = await import('@/api/axios')
+      await api.default.testConnection()
+    }
+  }, 500)
+}).catch(err => {
+  console.error('❌ Auth initialization failed:', err)
+})
+
 app.use(i18n)
 app.use(router)
 app.use(vue3Toastify, {
@@ -67,5 +47,6 @@ app.use(vue3Toastify, {
   theme: 'colored'
 })
 
-// تحميل التطبيق
-app.mount('#app')*/
+app.mount('#app')
+
+console.log('✅ App initialized successfully')

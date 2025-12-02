@@ -1,41 +1,41 @@
 <template>
   <div class="login-container">
     <div class="login-card">
-      <h2>تسجيل الدخول</h2>
+      <h2>{{ $t('auth.login') }}</h2>
 
       <form @submit.prevent="login" class="login-form">
         <div class="form-group">
-          <label for="email">البريد الإلكتروني</label>
+          <label for="email">{{ $t('auth.email') }}</label>
           <input
             type="email"
             id="email"
             v-model="credentials.email"
             required
             class="form-input"
-            placeholder="ادخل بريدك الإلكتروني"
+            :placeholder="$t('auth.email_placeholder')"
           />
         </div>
 
         <div class="form-group">
-          <label for="password">كلمة المرور</label>
+          <label for="password">{{ $t('auth.password') }}</label>
           <input
             type="password"
             id="password"
             v-model="credentials.password"
             required
             class="form-input"
-            placeholder="ادخل كلمة المرور"
+            :placeholder="$t('auth.password_placeholder')"
           />
         </div>
 
         <button type="submit" :disabled="loading" class="btn btn-primary login-btn">
-          {{ loading ? 'جاري التسجيل...' : 'تسجيل الدخول' }}
+          {{ loading ? $t('auth.logging_in') : $t('auth.login') }}
         </button>
       </form>
 
       <p class="register-link">
-        ليس لديك حساب؟
-        <router-link to="/register">سجل الآن</router-link>
+        {{ $t('auth.no_account') }}
+        <router-link to="/register">{{ $t('auth.register_here') }}</router-link>
       </p>
     </div>
   </div>
@@ -61,24 +61,25 @@ export default {
         const response = await this.$store.dispatch('auth/login', this.credentials)
         console.log('✅ Login successful:', response.data)
 
-        // تأكد من أن البيانات محفوظة في localStorage
-        console.log('📦 LocalStorage userInfo:', localStorage.getItem('userInfo'))
+        // الانتظار قليلاً لضمان تحديث الحالة
+        await new Promise((resolve) => setTimeout(resolve, 100))
 
-        // تأكد من أن الحالة محدثة في store
-        console.log('🛍️ AuthStore state:', {
-          user: this.$store.state.auth.user,
-          token: this.$store.state.auth.token,
-          isAuthenticated: this.$store.getters['auth/isAuthenticated'],
-        })
+        // التحقق من حالة المصادقة
+        const isAuthenticated = this.$store.getters['auth/isAuthenticated']
+        console.log('✅ After login - isAuthenticated:', isAuthenticated)
 
-        // توجيه إلى Dashboard بعد نجاح التسجيل
-        setTimeout(() => {
+        if (isAuthenticated) {
           this.$router.push('/dashboard')
-        }, 100)
+        } else {
+          throw new Error('Authentication failed after login')
+        }
       } catch (error) {
         console.error('❌ Login failed:', error)
-        console.log('🔍 Error details:', error.response?.data)
-        alert('فشل في تسجيل الدخول: ' + (error.response?.data?.message || error.message))
+        const errorMsg = error.response?.data?.message || error.message
+        this.$toast.error(this.$t('auth.login_failed') + ': ' + errorMsg, {
+          position: 'top-right',
+          autoClose: 3000,
+        })
       } finally {
         this.loading = false
       }
