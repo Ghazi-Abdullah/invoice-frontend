@@ -1,8 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import store from '@/stores'
+<<<<<<< HEAD
 
 // Layouts
 import AppLayout from '@/layouts/AppLayout.vue'
+=======
+>>>>>>> 52f35b6ba5d8a545a94d197e783b869a4e34c3b7
 
 // Auth Views
 import Login from '@/views/Login.vue'
@@ -10,17 +13,6 @@ import Register from '@/views/Register.vue'
 
 // Dashboard Views
 import Dashboard from '@/views/Dashboard.vue'
-
-// Client Views
-import Clients from '@/views/Clients.vue'
-import ClientDetails from '@/views/ClientDetails.vue'
-import CreateClient from '@/views/CreateClient.vue'
-
-// Invoice Views
-import Invoices from '@/views/invoices/Index.vue'
-import CreateInvoice from '@/views/invoices/Create.vue'
-import EditInvoice from '@/views/invoices/Edit.vue'
-import InvoiceDetails from '@/views/invoices/Show.vue'
 
 const routes = [
   // Auth Routes
@@ -37,9 +29,18 @@ const routes = [
     meta: { requiresGuest: true }
   },
 
-  // Protected Routes with AppLayout
+  // Dashboard Route
+  {
+    path: '/dashboard',
+    name: 'Dashboard',
+    component: Dashboard,
+    meta: { requiresAuth: true }
+  },
+
+  // Protected Routes - سيتم تحميلها بشكل متأخر
   {
     path: '/',
+<<<<<<< HEAD
     component: AppLayout,
     meta: { requiresAuth: true },
     redirect: '/dashboard', // ✅ توجيه تلقائي للداشبورد
@@ -59,7 +60,60 @@ const routes = [
         meta: { requiresAuth: true }
       }
     ]
+=======
+    redirect: '/dashboard',
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/clients',
+    name: 'Clients',
+    component: () => import('@/views/Clients.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/clients/create',
+    name: 'CreateClient',
+    component: () => import('@/views/CreateClient.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/clients/:id',
+    name: 'ClientDetails',
+    component: () => import('@/views/ClientDetails.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/invoices',
+    name: 'Invoices',
+    component: () => import('@/views/invoices/Index.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/invoices/create',
+    name: 'CreateInvoice',
+    component: () => import('@/views/invoices/Create.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/invoices/:id/edit',
+    name: 'EditInvoice',
+    component: () => import('@/views/invoices/Edit.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/invoices/:id',
+    name: 'InvoiceDetails',
+    component: () => import('@/views/invoices/Show.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/reports',
+    name: 'Reports',
+    component: () => import('@/views/Reports/Index.vue'),
+    meta: { requiresAuth: true }
+>>>>>>> 52f35b6ba5d8a545a94d197e783b869a4e34c3b7
   }
+
 ]
 
 const router = createRouter({
@@ -69,6 +123,13 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const isAuthenticated = store.getters['auth/isAuthenticated']
+
+  console.log('Router guard:', {
+    to: to.name,
+    requiresAuth: to.meta.requiresAuth,
+    requiresGuest: to.meta.requiresGuest,
+    isAuthenticated
+  })
 
   if (to.meta.requiresAuth && !isAuthenticated) {
     next('/login')

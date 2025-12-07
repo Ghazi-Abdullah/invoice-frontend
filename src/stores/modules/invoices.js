@@ -13,8 +13,9 @@ const state = {
 }
 
 const getters = {
-  totalInvoices: (state) => state.invoices.meta?.total || 0,
-  hasInvoices: (state) => state.invoices.data?.length > 0,
+  allInvoices: (state) => state.invoices.data || [],
+  totalInvoices: (state) => state.invoices.data?.length || 0,
+  hasInvoices: (state) => (state.invoices.data?.length || 0) > 0,
   paginationInfo: (state) => ({
     currentPage: state.invoices.meta?.current_page || 1,
     lastPage: state.invoices.meta?.last_page || 1,
@@ -22,7 +23,7 @@ const getters = {
     total: state.invoices.meta?.total || 0
   }),
   invoiceStats: (state) => {
-    const invoices = state.invoices.data
+    const invoices = state.invoices.data || []
     return {
       total: invoices.length,
       draft: invoices.filter(inv => inv.status === 'draft').length,
@@ -52,11 +53,6 @@ const mutations = {
   },
   ADD_INVOICE(state, invoice) {
     state.invoices.data.unshift(invoice)
-    state.invoices.meta = {
-      ...state.invoices.meta,
-      total: (state.invoices.meta.total || 0) + 1,
-      from: (state.invoices.meta.from || 0) + 1
-    }
   },
   UPDATE_INVOICE(state, updatedInvoice) {
     const index = state.invoices.data.findIndex(inv => inv.id === updatedInvoice.id)
@@ -70,10 +66,6 @@ const mutations = {
   },
   REMOVE_INVOICE(state, id) {
     state.invoices.data = state.invoices.data.filter(inv => inv.id !== parseInt(id))
-    state.invoices.meta = {
-      ...state.invoices.meta,
-      total: (state.invoices.meta.total || 1) - 1
-    }
   },
   UPDATE_INVOICE_STATUS(state, { id, status }) {
     const invoice = state.invoices.data.find(inv => inv.id === parseInt(id))
@@ -88,55 +80,69 @@ const mutations = {
 }
 
 const actions = {
+
   async fetchInvoices({ commit }, params = {}) {
     commit('SET_LOADING', true)
     commit('SET_ERROR', null)
 
     try {
-      console.log('🔄 Fetching invoices from API...', params)
+      console.log('🔄 جلب الفواتير من API...', params)
       const response = await api.get('/invoices', { params })
-      console.log('📦 Full Invoices API Response:', response.data)
+      console.log('📦 استجابة API للفواتير:', response.data)
+
+      let invoicesData = []
+      let metaData = {}
 
       if (response.data && response.data.success) {
-        const apiData = response.data.data
+        const responseData = response.data.data
 
-        if (apiData && Array.isArray(apiData.data)) {
-          commit('SET_INVOICES', {
-            data: apiData.data,
-            meta: {
-              current_page: apiData.current_page,
-              last_page: apiData.last_page,
-              per_page: apiData.per_page,
-              total: apiData.total,
-              from: apiData.from,
-              to: apiData.to
-            }
-          })
-        } else if (Array.isArray(apiData)) {
-          commit('SET_INVOICES', {
-            data: apiData,
-            meta: {
-              current_page: 1,
-              last_page: 1,
-              per_page: apiData.length,
-              total: apiData.length
-            }
-          })
+        // التعامل مع هيكل البيانات المختلف
+        if (responseData && Array.isArray(responseData.data)) {
+          // الحالة: استجابة Laravel Pagination
+          invoicesData = responseData.data
+          metaData = {
+            current_page: responseData.current_page || 1,
+            last_page: responseData.last_page || 1,
+            per_page: responseData.per_page || 10,
+            total: responseData.total || 0,
+            from: responseData.from || 0,
+            to: responseData.to || 0
+          }
+        } else if (Array.isArray(responseData)) {
+          // الحالة: مصفوفة مباشرة
+          invoicesData = responseData
+          metaData = {
+            current_page: 1,
+            last_page: 1,
+            per_page: responseData.length,
+            total: responseData.length
+          }
         } else {
-          console.warn('⚠️ Unexpected invoices API structure:', response.data)
-          commit('SET_INVOICES', { data: [], meta: {} })
+          // هيكل غير متوقع
+          console.warn('⚠️ هيكل بيانات غير متوقع للفواتير:', response.data)
+          invoicesData = []
+          metaData = {}
         }
       } else {
-        console.warn('⚠️ Invoices API response not successful:', response.data)
-        commit('SET_INVOICES', { data: [], meta: {} })
+        console.warn('⚠️ استجابة API للفواتير غير ناجحة:', response.data)
+        invoicesData = []
+        metaData = {}
       }
 
-      console.log('✅ Final invoices in store:', state.invoices)
+      commit('SET_INVOICES', {
+        data: invoicesData,
+        meta: metaData
+      })
+
+      console.log('✅ الفواتير المخزنة في store:', state.invoices)
       return state.invoices
     } catch (error) {
       const errorMsg = error.response?.data?.message || error.message
       commit('SET_ERROR', errorMsg)
-      console.error('❌ Error fetching invoices:', error)
+      console.error('❌ خطأ في جلب الفواتير:', error)
+
+      // إرجاع حالة فارغة في حالة الخطأ
+      commit('SET_INVOICES', { data: [], meta: {} })
       throw error
     } finally {
       commit('SET_LOADING', false)
@@ -148,22 +154,21 @@ const actions = {
     commit('SET_ERROR', null)
 
     try {
-      console.log(`🔄 Fetching invoice ${id} from API...`)
+      console.log(`🔄 جلب فاتورة ${id} من API...`)
       const response = await api.get(`/invoices/${id}`)
-      console.log('📦 Invoice API Response:', response.data)
+      console.log('📦 تفاصيل الفاتورة:', response.data)
 
       if (response.data && response.data.success) {
         const invoiceData = response.data.data
-        console.log('✅ Invoice data to commit:', invoiceData)
         commit('SET_CURRENT_INVOICE', invoiceData)
         return invoiceData
       } else {
-        throw new Error('Failed to fetch invoice details')
+        throw new Error('فشل في جلب تفاصيل الفاتورة')
       }
     } catch (error) {
       const errorMsg = error.response?.data?.message || error.message
       commit('SET_ERROR', errorMsg)
-      console.error('❌ Error fetching invoice:', error)
+      console.error('❌ خطأ في جلب الفاتورة:', error)
       throw error
     } finally {
       commit('SET_LOADING', false)
@@ -175,18 +180,24 @@ const actions = {
     commit('SET_ERROR', null)
 
     try {
-      console.log('🔄 Creating invoice:', invoiceData)
+      console.log('🔄 إنشاء فاتورة جديدة:', invoiceData)
       const response = await api.post('/invoices', invoiceData)
-      console.log('✅ Invoice created:', response.data)
+      console.log('✅ فاتورة تم إنشاؤها:', response.data)
 
       if (response.data && response.data.success) {
-        commit('ADD_INVOICE', response.data.data)
-        return response.data.data
+        const newInvoice = response.data.data
+        commit('ADD_INVOICE', newInvoice)
+        return {
+          success: true,
+          data: newInvoice
+        }
+      } else {
+        throw new Error('فشل في إنشاء الفاتورة')
       }
     } catch (error) {
       const errorMsg = error.response?.data?.message || error.message
       commit('SET_ERROR', errorMsg)
-      console.error('❌ Error creating invoice:', error)
+      console.error('❌ خطأ في إنشاء الفاتورة:', error)
       throw error
     } finally {
       commit('SET_LOADING', false)
@@ -198,18 +209,24 @@ const actions = {
     commit('SET_ERROR', null)
 
     try {
-      console.log(`🔄 Updating invoice ${id}:`, invoiceData)
+      console.log(`🔄 تحديث فاتورة ${id}:`, invoiceData)
       const response = await api.put(`/invoices/${id}`, invoiceData)
-      console.log('✏️ Invoice updated:', response.data)
+      console.log('✏️ فاتورة تم تحديثها:', response.data)
 
       if (response.data && response.data.success) {
-        commit('UPDATE_INVOICE', response.data.data)
-        return response.data.data
+        const updatedInvoice = response.data.data
+        commit('UPDATE_INVOICE', updatedInvoice)
+        return {
+          success: true,
+          data: updatedInvoice
+        }
+      } else {
+        throw new Error('فشل في تحديث الفاتورة')
       }
     } catch (error) {
       const errorMsg = error.response?.data?.message || error.message
       commit('SET_ERROR', errorMsg)
-      console.error('❌ Error updating invoice:', error)
+      console.error('❌ خطأ في تحديث الفاتورة:', error)
       throw error
     } finally {
       commit('SET_LOADING', false)
@@ -221,16 +238,19 @@ const actions = {
     commit('SET_ERROR', null)
 
     try {
-      console.log(`🗑️ Deleting invoice ${id}...`)
-      await api.delete(`/invoices/${id}`)
-      console.log('✅ Invoice deleted:', id)
+      console.log(`🗑️ حذف فاتورة ${id}...`)
+      const response = await api.delete(`/invoices/${id}`)
+      console.log('✅ فاتورة تم حذفها:', response.data)
 
       commit('REMOVE_INVOICE', id)
-      return true
+      return {
+        success: true,
+        message: 'تم حذف الفاتورة بنجاح'
+      }
     } catch (error) {
       const errorMsg = error.response?.data?.message || error.message
       commit('SET_ERROR', errorMsg)
-      console.error('❌ Error deleting invoice:', error)
+      console.error('❌ خطأ في حذف الفاتورة:', error)
       throw error
     } finally {
       commit('SET_LOADING', false)
@@ -242,18 +262,23 @@ const actions = {
     commit('SET_ERROR', null)
 
     try {
-      console.log(`🔄 Updating invoice ${id} status to:`, status)
+      console.log(`🔄 تحديث حالة فاتورة ${id} إلى:`, status)
       const response = await api.patch(`/invoices/${id}/status`, { status })
-      console.log('✅ Invoice status updated:', response.data)
+      console.log('✅ حالة الفاتورة تم تحديثها:', response.data)
 
       if (response.data && response.data.success) {
         commit('UPDATE_INVOICE_STATUS', { id, status })
-        return response.data.data
+        return {
+          success: true,
+          data: response.data.data
+        }
+      } else {
+        throw new Error('فشل في تحديث حالة الفاتورة')
       }
     } catch (error) {
       const errorMsg = error.response?.data?.message || error.message
       commit('SET_ERROR', errorMsg)
-      console.error('❌ Error updating invoice status:', error)
+      console.error('❌ خطأ في تحديث حالة الفاتورة:', error)
       throw error
     } finally {
       commit('SET_LOADING', false)
