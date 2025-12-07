@@ -294,5 +294,108 @@
     "next": "Next",
     "page": "Page",
     "of": "of"
+  },
+  "reports": {
+    "title": "Reports",
+    "subtitle": "Comprehensive statistics and insights for your business",
+    "quick_stats": {
+      "total_invoices": "Total Invoices",
+      "total_amount": "Total Amount",
+      "total_paid": "Total Paid",
+      "total_due": "Total Due",
+      "total_clients": "Total Clients",
+      "overdue_invoices": "Overdue Invoices"
+    },
+    "report_types": "Report Types",
+    "types": {
+      "invoices": "Invoices Report",
+      "clients": "Clients Report",
+      "revenue": "Revenue Report",
+      "overdue": "Overdue Invoices"
+    },
+    "type_descriptions": {
+      "invoices": "View all invoices with details",
+      "clients": "Analyze client data",
+      "revenue": "Track revenue and collections",
+      "overdue": "Invoices past due date"
+    },
+    "filters": "Filters",
+    "filter_labels": {
+      "date_range": "Date Range",
+      "start_date": "Start Date",
+      "end_date": "End Date",
+      "status": "Invoice Status",
+      "client": "Client",
+      "period": "Period",
+      "search": "Search"
+    },
+    "periods": {
+      "daily": "Daily",
+      "weekly": "Weekly",
+      "monthly": "Monthly",
+      "yearly": "Yearly"
+    },
+    "statuses": {
+      "all": "All Statuses",
+      "draft": "Draft",
+      "sent": "Sent",
+      "paid": "Paid",
+      "overdue": "Overdue",
+      "partially_paid": "Partially Paid"
+    },
+    "buttons": {
+      "export_pdf": "Export PDF",
+      "export_excel": "Export Excel",
+      "apply_filters": "Apply Filters",
+      "reset_filters": "Reset",
+      "try_again": "Try Again",
+      "search": "Search..."
+    },
+    "charts": {
+      "by_status": "Invoices by Status",
+      "monthly_revenue": "Monthly Revenue"
+    },
+    "table": {
+      "detailed_data": "Detailed Data",
+      "showing": "Showing",
+      "to": "to",
+      "of": "of",
+      "items": "Items",
+      "page": "Page",
+      "of_pages": "of",
+      "no_data": "No data to display",
+      "no_data_hint": "Try changing filters or selecting a different period"
+    },
+    "info_cards": {
+      "last_update": "Last Update",
+      "total_data": "Total Data",
+      "loading_time": "Loading Time"
+    },
+    "loading": "Loading data...",
+    "exporting": "Exporting report...",
+    "export_success": "Report exported successfully",
+    "export_error": "Failed to export report",
+    "load_success": "Data loaded successfully",
+    "load_error": "Error fetching data",
+    "columns": {
+      "invoice_number": "Invoice Number",
+      "client": "Client",
+      "issue_date": "Issue Date",
+      "due_date": "Due Date",
+      "total": "Total",
+      "status": "Status",
+      "client_name": "Client Name",
+      "client_email": "Client Email",
+      "invoices_count": "Invoices Count",
+      "total_amount": "Total Amount",
+      "amount_paid": "Amount Paid",
+      "amount_due": "Amount Due",
+      "month": "Month",
+      "collected": "Collected",
+      "outstanding": "Outstanding",
+      "days_overdue": "Days Overdue",
+      "amount": "Amount"
+    },
+    "currency": "SAR"
   }
 }

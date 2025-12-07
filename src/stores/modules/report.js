@@ -4,10 +4,8 @@ const state = {
   reports: {
     invoices: null,
     clients: null,
-    sales: null,
     revenue: null,
     overdue: null,
-    dashboard: null,
   },
   loading: false,
   error: null,
@@ -34,73 +32,86 @@ const actions = {
     commit('CLEAR_ERROR')
 
     try {
+      // إزالة /api من البداية لأن axios يضيفها تلقائياً
       let endpoint
       switch (reportType) {
         case 'invoices':
-          endpoint = '/reports/invoices'
+          endpoint = 'reports/invoices'
           break
         case 'clients':
-          endpoint = '/reports/clients'
-          break
-        case 'sales':
-          endpoint = '/reports/sales'
+          endpoint = 'reports/invoices/clients'
           break
         case 'revenue':
-          endpoint = '/reports/revenue'
+          endpoint = 'reports/invoices/revenue'
           break
         case 'overdue':
-          endpoint = '/reports/overdue-invoices'
-          break
-        case 'dashboard':
-          endpoint = '/dashboard/stats'
+          endpoint = 'reports/invoices/overdue'
           break
         default:
           throw new Error('نوع التقرير غير معروف')
       }
 
+      console.log('📡 Fetching report:', endpoint, 'with filters:', filters)
+
       const response = await api.get(endpoint, { params: filters })
+      console.log('📦 API Response:', response.data)
 
       if (response.data.success) {
-        commit('SET_REPORT_DATA', { reportType, data: response.data.data })
+        const reportData = {
+          ...response.data.data,
+          stats: response.data.data.stats || {
+            total_invoices: response.data.data.total_invoices || 0,
+            total_amount: response.data.data.total_amount || 0,
+            total_paid: response.data.data.total_paid || 0,
+            total_due: response.data.data.total_due || 0,
+            total_clients: response.data.data.total_clients || 0,
+          }
+        }
+
+        commit('SET_REPORT_DATA', { reportType, data: reportData })
+        return reportData
       } else {
         throw new Error(response.data.message || 'فشل في جلب بيانات التقرير')
       }
-
-      return response.data.data
     } catch (error) {
-      commit('SET_ERROR', error.response?.data?.message || error.message)
+      const errorMsg = error.response?.data?.message || error.message
+      console.error('❌ Error fetching report:', errorMsg)
+      commit('SET_ERROR', errorMsg)
       throw error
     } finally {
       commit('SET_LOADING', false)
     }
   },
 
-  async exportReport({ commit }, { reportType, format, data }) {
+  async exportReportFile({ commit }, { reportType, format, filters = {} }) {
     commit('SET_LOADING', true)
     commit('CLEAR_ERROR')
 
     try {
-      const endpoint = `/reports/export/${format}`
-      const response = await api.post(endpoint, {
-        report_type: reportType,
-        data: data,
+      const endpoint = `reports/invoices/export/${reportType}/${format}`
+      console.log('📤 Exporting:', endpoint, 'format:', format)
+
+      const response = await api.get(endpoint, {
+        responseType: 'blob',
+        params: filters
       })
 
-      if (response.data.success) {
-        // تحميل الملف
-        const link = document.createElement('a')
-        link.href = response.data.download_url
-        link.download = `${reportType}_report_${new Date().toISOString().split('T')[0]}.${format}`
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
-      } else {
-        throw new Error(response.data.message || 'فشل في تصدير التقرير')
-      }
+      // تحميل الملف
+      const url = window.URL.createObjectURL(new Blob([response.data]))
+      const link = document.createElement('a')
+      const timestamp = new Date().toISOString().split('T')[0]
+      link.href = url
+      link.download = `${reportType}_report_${timestamp}.${format}`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(url)
 
-      return response.data
+      return { success: true }
     } catch (error) {
-      commit('SET_ERROR', error.response?.data?.message || error.message)
+      const errorMsg = error.response?.data?.message || error.message
+      console.error('❌ Export error:', errorMsg)
+      commit('SET_ERROR', errorMsg)
       throw error
     } finally {
       commit('SET_LOADING', false)
@@ -118,11 +129,9 @@ const getters = {
     return state.reports[reportType]
   },
   isLoading: (state) => state.loading,
-  error: (state) => state.error,
-  dashboardStats: (state) => state.reports.dashboard,
+  reportError: (state) => state.error,
   invoicesReport: (state) => state.reports.invoices,
   clientsReport: (state) => state.reports.clients,
-  salesReport: (state) => state.reports.sales,
   revenueReport: (state) => state.reports.revenue,
   overdueReport: (state) => state.reports.overdue,
 }
