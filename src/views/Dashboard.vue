@@ -6,13 +6,11 @@
         <div class="flex justify-between items-center py-4">
           <div class="flex items-center">
             <div class="flex-shrink-0">
-              <h1 class="text-2xl font-bold text-gray-900">{{ $t('app.name') }}</h1>
+              <h1 class="text-2xl font-bold text-gray-900">نظام الفواتير</h1>
             </div>
           </div>
           <div class="flex items-center space-x-4">
-            <button @click="loadDashboardData" class="btn btn-primary">
-              {{ $t('buttons.refresh') }}
-            </button>
+            <button @click="loadDashboardData" class="btn btn-primary">تحديث البيانات</button>
           </div>
         </div>
       </div>
@@ -22,7 +20,7 @@
     <div v-if="loading" class="flex justify-center items-center h-64">
       <div class="text-center">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-        <p class="mt-4 text-gray-600">{{ $t('messages.loading') }}...</p>
+        <p class="mt-4 text-gray-600">جاري التحميل...</p>
       </div>
     </div>
 
@@ -30,8 +28,8 @@
     <div v-else class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <!-- Welcome Section -->
       <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ $t('dashboard.title') }}</h1>
-        <p class="text-gray-600 text-lg">{{ $t('dashboard.welcome') }}</p>
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">لوحة التحكم</h1>
+        <p class="text-gray-600 text-lg">مرحباً بك {{ user?.name }}</p>
       </div>
 
       <!-- Stats Grid -->
@@ -40,11 +38,11 @@
         <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-sm font-medium text-gray-600">{{ $t('dashboard.total_invoices') }}</p>
+              <p class="text-sm font-medium text-gray-600">إجمالي الفواتير</p>
               <p class="text-2xl font-bold text-gray-900 mt-2">{{ stats.totalInvoices }}</p>
               <div class="flex items-center mt-2">
                 <span class="text-green-600 text-sm font-medium">+12%</span>
-                <span class="text-gray-500 text-sm mr-2">{{ $t('common.from_last_month') }}</span>
+                <span class="text-gray-500 text-sm mr-2">من الشهر الماضي</span>
               </div>
             </div>
             <div class="p-3 bg-blue-50 rounded-lg">
@@ -69,11 +67,11 @@
         <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-sm font-medium text-gray-600">{{ $t('dashboard.total_clients') }}</p>
+              <p class="text-sm font-medium text-gray-600">إجمالي العملاء</p>
               <p class="text-2xl font-bold text-gray-900 mt-2">{{ stats.totalClients }}</p>
               <div class="flex items-center mt-2">
                 <span class="text-green-600 text-sm font-medium">+{{ stats.clientsGrowth }}%</span>
-                <span class="text-gray-500 text-sm mr-2">{{ $t('common.from_last_month') }}</span>
+                <span class="text-gray-500 text-sm mr-2">من الشهر الماضي</span>
               </div>
             </div>
             <div class="p-3 bg-green-50 rounded-lg">
@@ -98,7 +96,7 @@
         <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-sm font-medium text-gray-600">{{ $t('invoices.paid') }}</p>
+              <p class="text-sm font-medium text-gray-600">الفواتير المدفوعة</p>
               <p class="text-2xl font-bold text-gray-900 mt-2">{{ stats.paidInvoices }}</p>
               <div class="w-full bg-gray-200 rounded-full h-2 mt-3">
                 <div
@@ -106,9 +104,7 @@
                   :style="{ width: stats.paymentRate + '%' }"
                 ></div>
               </div>
-              <p class="text-gray-500 text-sm mt-2">
-                {{ $t('invoices.payment_rate') }} {{ stats.paymentRate }}%
-              </p>
+              <p class="text-gray-500 text-sm mt-2">نسبة السداد {{ stats.paymentRate }}%</p>
             </div>
             <div class="p-3 bg-purple-50 rounded-lg">
               <svg
@@ -132,13 +128,13 @@
         <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-sm font-medium text-gray-600">{{ $t('dashboard.total_revenue') }}</p>
+              <p class="text-sm font-medium text-gray-600">إجمالي الإيرادات</p>
               <p class="text-2xl font-bold text-gray-900 mt-2">
                 {{ formatCurrency(stats.revenue) }}
               </p>
               <div class="flex items-center mt-2">
                 <span class="text-green-600 text-sm font-medium">+15%</span>
-                <span class="text-gray-500 text-sm mr-2">{{ $t('common.from_last_month') }}</span>
+                <span class="text-gray-500 text-sm mr-2">من الشهر الماضي</span>
               </div>
             </div>
             <div class="p-3 bg-orange-50 rounded-lg">
@@ -166,7 +162,7 @@
         <div class="lg:col-span-2 space-y-8">
           <!-- Quick Actions -->
           <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
-            <h2 class="text-xl font-bold text-gray-900 mb-6">{{ $t('buttons.quick_actions') }}</h2>
+            <h2 class="text-xl font-bold text-gray-900 mb-6">إجراءات سريعة</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <router-link
                 to="/invoices/create"
@@ -188,8 +184,8 @@
                   </svg>
                 </div>
                 <div>
-                  <h3 class="font-semibold text-gray-900">{{ $t('invoices.create') }}</h3>
-                  <p class="text-gray-600 text-sm">{{ $t('invoices.add_new') }}</p>
+                  <h3 class="font-semibold text-gray-900">إنشاء فاتورة</h3>
+                  <p class="text-gray-600 text-sm">أضف فاتورة جديدة</p>
                 </div>
               </router-link>
 
@@ -213,8 +209,8 @@
                   </svg>
                 </div>
                 <div>
-                  <h3 class="font-semibold text-gray-900">{{ $t('clients.addClient') }}</h3>
-                  <p class="text-gray-600 text-sm">{{ $t('clients.add_new') }}</p>
+                  <h3 class="font-semibold text-gray-900">إضافة عميل</h3>
+                  <p class="text-gray-600 text-sm">أضف عميل جديد</p>
                 </div>
               </router-link>
 
@@ -238,8 +234,8 @@
                   </svg>
                 </div>
                 <div>
-                  <h3 class="font-semibold text-gray-900">{{ $t('invoices.view_all') }}</h3>
-                  <p class="text-gray-600 text-sm">{{ $t('invoices.view_manage') }}</p>
+                  <h3 class="font-semibold text-gray-900">عرض الفواتير</h3>
+                  <p class="text-gray-600 text-sm">عرض وإدارة الفواتير</p>
                 </div>
               </router-link>
 
@@ -263,8 +259,8 @@
                   </svg>
                 </div>
                 <div>
-                  <h3 class="font-semibold text-gray-900">{{ $t('clients.view_all') }}</h3>
-                  <p class="text-gray-600 text-sm">{{ $t('clients.view_manage') }}</p>
+                  <h3 class="font-semibold text-gray-900">عرض العملاء</h3>
+                  <p class="text-gray-600 text-sm">عرض وإدارة العملاء</p>
                 </div>
               </router-link>
             </div>
@@ -273,12 +269,12 @@
           <!-- Recent Clients -->
           <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
             <div class="flex items-center justify-between mb-6">
-              <h2 class="text-xl font-bold text-gray-900">{{ $t('clients.recent_activity') }}</h2>
+              <h2 class="text-xl font-bold text-gray-900">العملاء الحديثين</h2>
               <router-link
                 to="/clients"
                 class="text-blue-600 hover:text-blue-700 text-sm font-medium"
               >
-                {{ $t('buttons.view_all') }}
+                عرض الكل
               </router-link>
             </div>
 
@@ -296,12 +292,12 @@
                   d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
                 />
               </svg>
-              <p class="text-gray-500">{{ $t('clients.no_clients_yet') }}</p>
+              <p class="text-gray-500">لا يوجد عملاء بعد</p>
               <router-link
                 to="/clients/create"
                 class="text-blue-600 hover:text-blue-700 text-sm font-medium mt-2 inline-block"
               >
-                {{ $t('clients.add_first_client') }}
+                أضف أول عميل
               </router-link>
             </div>
 
@@ -320,17 +316,17 @@
                 <div class="flex-1">
                   <p class="font-semibold text-gray-900">{{ client.name }}</p>
                   <p class="text-gray-600 text-sm mt-1">
-                    {{ client.email || $t('clients.notProvided') }}
+                    {{ client.email || 'غير متوفر' }}
                   </p>
                   <p class="text-gray-500 text-xs mt-1">
-                    {{ $t('clients.joined') }}: {{ formatDate(client.created_at) }}
+                    تاريخ الإضافة: {{ formatDate(client.created_at) }}
                   </p>
                 </div>
                 <div class="text-right">
                   <span
                     class="inline-block px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full"
                   >
-                    {{ $t('common.active') }}
+                    نشط
                   </span>
                 </div>
               </div>
@@ -343,12 +339,12 @@
           <!-- Recent Invoices -->
           <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
             <div class="flex items-center justify-between mb-6">
-              <h2 class="text-xl font-bold text-gray-900">{{ $t('invoices.recent_invoices') }}</h2>
+              <h2 class="text-xl font-bold text-gray-900">الفواتير الحديثة</h2>
               <router-link
                 to="/invoices"
                 class="text-blue-600 hover:text-blue-700 text-sm font-medium"
               >
-                {{ $t('buttons.view_all') }}
+                عرض الكل
               </router-link>
             </div>
 
@@ -366,12 +362,12 @@
                   d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z"
                 />
               </svg>
-              <p class="text-gray-500">{{ $t('invoices.no_invoices_yet') }}</p>
+              <p class="text-gray-500">لا يوجد فواتير بعد</p>
               <router-link
                 to="/invoices/create"
                 class="text-blue-600 hover:text-blue-700 text-sm font-medium mt-2 inline-block"
               >
-                {{ $t('invoices.create_first') }}
+                إنشاء أول فاتورة
               </router-link>
             </div>
 
@@ -384,9 +380,11 @@
               >
                 <div>
                   <p class="font-semibold text-gray-900">{{ invoice.invoice_number }}</p>
-                  <p class="text-gray-600 text-sm mt-1">{{ invoice.client?.name || 'N/A' }}</p>
+                  <p class="text-gray-600 text-sm mt-1">
+                    {{ invoice.client?.name || 'غير معروف' }}
+                  </p>
                   <p class="text-gray-500 text-xs mt-1">
-                    {{ $t('invoices.due_date') }}: {{ formatDate(invoice.due_date) }}
+                    تاريخ الاستحقاق: {{ formatDate(invoice.due_date) }}
                   </p>
                 </div>
                 <div class="text-right">
@@ -395,7 +393,7 @@
                     :class="getStatusClass(invoice.status)"
                     class="inline-block px-2 py-1 text-xs rounded-full mt-1"
                   >
-                    {{ $t(`invoices.status.${invoice.status}`) }}
+                    {{ getStatusText(invoice.status) }}
                   </span>
                 </div>
               </div>
@@ -406,22 +404,22 @@
           <div
             class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl shadow-lg p-6 text-white"
           >
-            <h3 class="text-lg font-bold mb-4">{{ $t('common.quick_stats') }}</h3>
+            <h3 class="text-lg font-bold mb-4">إحصائيات سريعة</h3>
             <div class="space-y-3">
               <div class="flex items-center justify-between">
-                <span class="text-blue-100">{{ $t('invoices.this_month') }}</span>
+                <span class="text-blue-100">هذا الشهر</span>
                 <span class="font-semibold">{{ stats.thisMonthInvoices }}</span>
               </div>
               <div class="flex items-center justify-between">
-                <span class="text-blue-100">{{ $t('common.new_clients') }}</span>
+                <span class="text-blue-100">عملاء جدد</span>
                 <span class="font-semibold">{{ stats.newClientsThisMonth }}</span>
               </div>
               <div class="flex items-center justify-between">
-                <span class="text-blue-100">{{ $t('invoices.average') }}</span>
+                <span class="text-blue-100">متوسط الفاتورة</span>
                 <span class="font-semibold">{{ formatCurrency(stats.averageInvoice) }}</span>
               </div>
               <div class="flex items-center justify-between">
-                <span class="text-blue-100">{{ $t('common.collection_rate') }}</span>
+                <span class="text-blue-100">نسبة التحصيل</span>
                 <span class="font-semibold">{{ stats.collectionRate }}%</span>
               </div>
             </div>
@@ -437,7 +435,7 @@ export default {
   name: 'Dashboard',
   data() {
     return {
-      loading: true,
+      loading: false,
       recentClients: [],
       recentInvoices: [],
       stats: {
@@ -454,23 +452,33 @@ export default {
       },
     }
   },
+  computed: {
+    user() {
+      return this.$store.state.auth.user
+    },
+  },
   mounted() {
     this.loadDashboardData()
   },
   methods: {
     formatCurrency(amount) {
-      return new Intl.NumberFormat('ar-SA', {
-        style: 'currency',
-        currency: 'SAR',
-      }).format(amount || 0)
+      if (!amount) return '0.00 ر.س'
+      const num = parseFloat(amount)
+      if (isNaN(num)) return '0.00 ر.س'
+      return num.toFixed(2) + ' ر.س'
     },
     formatDate(dateString) {
-      if (!dateString) return this.$t('common.not_provided')
-      return new Date(dateString).toLocaleDateString('ar-SA', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-      })
+      if (!dateString) return 'غير محدد'
+      try {
+        const date = new Date(dateString)
+        return date.toLocaleDateString('ar-SA', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+        })
+      } catch (error) {
+        return 'تاريخ غير صالح'
+      }
     },
     getInitials(name) {
       if (!name) return '?'
@@ -490,47 +498,54 @@ export default {
       }
       return classes[status] || 'bg-gray-100 text-gray-800'
     },
+    getStatusText(status) {
+      const texts = {
+        paid: 'مدفوعة',
+        sent: 'مرسلة',
+        draft: 'مسودة',
+        overdue: 'متأخرة',
+      }
+      return texts[status] || status
+    },
     async loadDashboardData() {
       this.loading = true
       try {
-        console.log('🔄 جلب بيانات Dashboard...')
+        console.log('🔄 جلب بيانات لوحة التحكم...')
 
         // جلب العملاء
         console.log('📋 جلب العملاء...')
-        const clientsResponse = await this.$store.dispatch('clients/fetchClients')
-        console.log('📦 استجابة العملاء:', clientsResponse)
+        await this.$store.dispatch('clients/fetchClients')
 
         // جلب الفواتير
         console.log('🧾 جلب الفواتير...')
-        const invoicesResponse = await this.$store.dispatch('invoices/fetchInvoices')
-        console.log('📦 استجابة الفواتير:', invoicesResponse)
+        await this.$store.dispatch('invoices/fetchInvoices')
 
         // تحديث البيانات
         this.updateDashboardData()
       } catch (error) {
-        console.error('❌ خطأ في تحميل بيانات Dashboard:', error)
-        this.$toast.error(this.$t('messages.load_error'))
+        console.error('❌ خطأ في تحميل بيانات لوحة التحكم:', error)
+        this.$toast.error('فشل في تحميل البيانات')
       } finally {
         this.loading = false
       }
     },
     updateDashboardData() {
       // الحصول على البيانات من الـ store
-      const clients = this.$store.state.clients.clients.data || []
-      const invoices = this.$store.state.invoices.invoices.data || []
+      const clients = this.$store.getters['clients/clients']
+      const invoices = this.$store.getters['invoices/invoices']
 
       console.log('📊 العملاء من الـ store:', clients)
       console.log('📊 الفواتير من الـ store:', invoices)
 
       // تحديث العملاء الأخيرة
-      this.recentClients = [...clients]
-        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-        .slice(0, 5)
+      this.recentClients = Array.isArray(clients)
+        ? [...clients].sort((a, b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, 5)
+        : []
 
       // تحديث الفواتير الأخيرة
-      this.recentInvoices = [...invoices]
-        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-        .slice(0, 5)
+      this.recentInvoices = Array.isArray(invoices)
+        ? [...invoices].sort((a, b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, 5)
+        : []
 
       // حساب الإحصائيات
       this.calculateStats(clients, invoices)
@@ -540,20 +555,43 @@ export default {
       const thisMonth = now.getMonth()
       const thisYear = now.getFullYear()
 
+      // تأكد أن clients و invoices هي مصفوفات
+      const clientsArray = Array.isArray(clients) ? clients : []
+      const invoicesArray = Array.isArray(invoices) ? invoices : []
+
       // إحصائيات العملاء
-      this.stats.totalClients = clients.length
-      this.stats.newClientsThisMonth = clients.filter((client) => {
-        const clientDate = new Date(client.created_at)
-        return clientDate.getMonth() === thisMonth && clientDate.getFullYear() === thisYear
+      this.stats.totalClients = clientsArray.length
+
+      // حساب العملاء الجدد هذا الشهر
+      this.stats.newClientsThisMonth = clientsArray.filter((client) => {
+        try {
+          const clientDate = new Date(client.created_at)
+          return clientDate.getMonth() === thisMonth && clientDate.getFullYear() === thisYear
+        } catch (error) {
+          return false
+        }
       }).length
 
       // إحصائيات الفواتير
-      this.stats.totalInvoices = invoices.length
-      this.stats.paidInvoices = invoices.filter((inv) => inv.status === 'paid').length
-      this.stats.revenue = invoices.reduce((sum, inv) => sum + parseFloat(inv.total_amount || 0), 0)
-      this.stats.thisMonthInvoices = invoices.filter((invoice) => {
-        const invoiceDate = new Date(invoice.created_at)
-        return invoiceDate.getMonth() === thisMonth && invoiceDate.getFullYear() === thisYear
+      this.stats.totalInvoices = invoicesArray.length
+
+      // الفواتير المدفوعة
+      this.stats.paidInvoices = invoicesArray.filter((inv) => inv.status === 'paid').length
+
+      // إجمالي الإيرادات
+      this.stats.revenue = invoicesArray.reduce((sum, inv) => {
+        const amount = parseFloat(inv.total_amount || 0)
+        return isNaN(amount) ? sum : sum + amount
+      }, 0)
+
+      // الفواتير هذا الشهر
+      this.stats.thisMonthInvoices = invoicesArray.filter((invoice) => {
+        try {
+          const invoiceDate = new Date(invoice.created_at)
+          return invoiceDate.getMonth() === thisMonth && invoiceDate.getFullYear() === thisYear
+        } catch (error) {
+          return false
+        }
       }).length
 
       // معدلات
@@ -564,7 +602,7 @@ export default {
 
       this.stats.averageInvoice =
         this.stats.totalInvoices > 0
-          ? (this.stats.revenue / this.stats.totalInvoices).toFixed(2)
+          ? parseFloat((this.stats.revenue / this.stats.totalInvoices).toFixed(2))
           : 0
 
       this.stats.collectionRate = this.stats.paymentRate

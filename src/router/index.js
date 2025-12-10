@@ -1,64 +1,81 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import store from '@/stores'
 
-// Layouts
-import AppLayout from '@/layouts/AppLayout.vue'
-
-// Auth Views
-import Login from '@/views/Login.vue'
-import Register from '@/views/Register.vue'
-
-// Dashboard Views
-import Dashboard from '@/views/Dashboard.vue'
-
-// Client Views
-import Clients from '@/views/Clients.vue'
-import ClientDetails from '@/views/ClientDetails.vue'
-import CreateClient from '@/views/CreateClient.vue'
-
-// Invoice Views
-import Invoices from '@/views/invoices/Index.vue'
-import CreateInvoice from '@/views/invoices/Create.vue'
-import EditInvoice from '@/views/invoices/Edit.vue'
-import InvoiceDetails from '@/views/invoices/Show.vue'
-
 const routes = [
-  // Auth Routes
+  {
+    path: '/',
+    redirect: '/dashboard'
+  },
   {
     path: '/login',
     name: 'Login',
-    component: Login,
-    meta: { requiresGuest: true }
+    component: () => import('../views/Login.vue'),
+    meta: { guest: true }
   },
   {
     path: '/register',
     name: 'Register',
-    component: Register,
-    meta: { requiresGuest: true }
+    component: () => import('../views/Register.vue'),
+    meta: { guest: true }
   },
-
-  // Protected Routes with AppLayout
   {
-    path: '/',
-    component: AppLayout,
-    meta: { requiresAuth: true },
-    redirect: '/dashboard', // ✅ توجيه تلقائي للداشبورد
-    children: [
-      { path: 'dashboard', name: 'Dashboard', component: Dashboard },
-      { path: 'clients', name: 'Clients', component: Clients },
-      { path: 'clients/create', name: 'CreateClient', component: CreateClient },
-      { path: 'clients/:id', name: 'ClientDetails', component: ClientDetails },
-      { path: 'invoices', name: 'Invoices', component: Invoices },
-      { path: 'invoices/create', name: 'CreateInvoice', component: CreateInvoice },
-      { path: 'invoices/:id/edit', name: 'EditInvoice', component: EditInvoice },
-      { path: 'invoices/:id', name: 'InvoiceDetails', component: InvoiceDetails },
-      {
-        path: 'reports',
-        name: 'Reports',
-        component: () => import('@/views/Reports/Index.vue'),
-        meta: { requiresAuth: true }
-      }
-    ]
+    path: '/dashboard',
+    name: 'Dashboard',
+    component: () => import('../views/Dashboard.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/invoices',
+    name: 'Invoices',
+    component: () => import('../views/invoices/Index.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/invoices/create',
+    name: 'CreateInvoice',
+    component: () => import('../views/invoices/Create.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/invoices/:id',
+    name: 'InvoiceDetails',
+    component: () => import('../views/invoices/Show.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/invoices/:id/edit',
+    name: 'EditInvoice',
+    component: () => import('../views/invoices/Edit.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/clients',
+    name: 'Clients',
+    component: () => import('../views/Clients.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/reports',
+    name: 'Reports',
+    component: () => import('../views/Reports/Index.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/permissions',
+    name: 'PermissionManagement',
+    component: () => import('../views/PermissionManagement.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true }
+  },
+  {
+    path: '/users',
+    name: 'UserManagement',
+    component: () => import('../views/UserManagement.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true }
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'NotFound',
+    component: () => import('../views/NotFound.vue')
   }
 ]
 
@@ -67,16 +84,44 @@ const router = createRouter({
   routes
 })
 
-router.beforeEach((to, from, next) => {
-  const isAuthenticated = store.getters['auth/isAuthenticated']
+// Navigation guard للتحقق من المصادقة والصلاحيات
+router.beforeEach(async (to, from, next) => {
+  const token = localStorage.getItem('token')
 
-  if (to.meta.requiresAuth && !isAuthenticated) {
-    next('/login')
-  } else if (to.meta.requiresGuest && isAuthenticated) {
-    next('/dashboard')
-  } else {
-    next()
+  // إذا كان المستخدم غير مسجل
+  if (!token && to.meta.requiresAuth) {
+    return next('/login')
   }
+
+  // إذا كان المستخدم مسجل ويحاول الدخول لصفحات الضيوف
+  if (token && to.meta.guest) {
+    return next('/dashboard')
+  }
+
+  // إذا كان المستخدم مسجل
+  if (token) {
+    // تحميل بيانات المستخدم إذا لم تكن محملة
+    if (!store.state.auth.user) {
+      try {
+        await store.dispatch('auth/fetchUser')
+      } catch (error) {
+        store.commit('auth/LOGOUT')
+        return next('/login')
+      }
+    }
+
+    // التحقق من صلاحيات الأدمن
+    if (to.meta.requiresAdmin) {
+      const user = store.state.auth.user
+      const isAdmin = user?.roles?.some(role => role.name === 'admin') || false
+
+      if (!isAdmin) {
+        return next('/dashboard')
+      }
+    }
+  }
+
+  next()
 })
 
 export default router
