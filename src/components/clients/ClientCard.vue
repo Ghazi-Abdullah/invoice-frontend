@@ -26,7 +26,7 @@
                 d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
               />
             </svg>
-            <span>{{ client.email || $t('clients.noEmail') }}</span>
+            <span>{{ client.email || 'لا يوجد بريد إلكتروني' }}</span>
           </div>
         </div>
       </div>
@@ -63,8 +63,8 @@
             </svg>
           </div>
           <div class="info-content">
-            <p class="info-label">{{ $t('clients.phone') }}</p>
-            <p class="info-value">{{ client.phone || $t('clients.notProvided') }}</p>
+            <p class="info-label">الهاتف</p>
+            <p class="info-value">{{ client.phone || 'غير متوفر' }}</p>
           </div>
         </div>
 
@@ -86,8 +86,8 @@
             </svg>
           </div>
           <div class="info-content">
-            <p class="info-label">{{ $t('clients.company') }}</p>
-            <p class="info-value">{{ client.company_name || $t('clients.notProvided') }}</p>
+            <p class="info-label">الشركة</p>
+            <p class="info-value">{{ client.company_name || 'غير متوفر' }}</p>
           </div>
         </div>
 
@@ -109,8 +109,8 @@
             </svg>
           </div>
           <div class="info-content">
-            <p class="info-label">{{ $t('clients.taxNumber') }}</p>
-            <p class="info-value">{{ client.tax_number || $t('clients.notProvided') }}</p>
+            <p class="info-label">الرقم الضريبي</p>
+            <p class="info-value">{{ client.tax_number || 'غير متوفر' }}</p>
           </div>
         </div>
 
@@ -132,51 +132,21 @@
             </svg>
           </div>
           <div class="info-content">
-            <p class="info-label">{{ $t('clients.joined') }}</p>
+            <p class="info-label">تاريخ التسجيل</p>
             <p class="info-value">{{ formatDate(client.created_at) }}</p>
           </div>
         </div>
       </div>
 
       <!-- العنوان -->
-      <div v-if="client.address" class="address-section">
-        <div class="address-header">
-          <svg
-            class="w-4 h-4 text-gray-600 mt-0.5 flex-shrink-0"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-            />
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-            />
-          </svg>
-          <span class="address-label">{{ $t('clients.address') }}</span>
-        </div>
-        <p class="address-text">{{ client.address }}</p>
-      </div>
+      <AddressSection :address="client.address" />
 
       <!-- أزرار سريعة -->
       <div class="card-footer">
-        <div class="last-updated">
-          {{ $t('clients.lastUpdated') }}: {{ formatDate(client.updated_at) }}
-        </div>
+        <div class="last-updated">آخر تحديث: {{ formatDate(client.updated_at) }}</div>
         <div class="action-buttons">
-          <button @click="$emit('view', client)" class="btn-view">
-            {{ $t('clients.viewDetails') }}
-          </button>
-          <button @click="$emit('edit', client)" class="btn-edit">
-            {{ $t('clients.edit') }}
-          </button>
+          <button @click="$emit('view', client)" class="btn-view">عرض التفاصيل</button>
+          <button @click="$emit('edit', client)" class="btn-edit">تعديل</button>
         </div>
       </div>
     </div>
@@ -184,16 +154,14 @@
 </template>
 
 <script>
-import { ref, computed } from 'vue'
-import { useI18n } from 'vue-i18n'
-
-// استيراد المكونات المساعدة فقط (بدون الأيقونات)
 import ActionMenu from './ActionMenu.vue'
+import AddressSection from './AddressSection.vue'
 
 export default {
   name: 'ClientCard',
   components: {
     ActionMenu,
+    AddressSection,
   },
   props: {
     client: {
@@ -202,53 +170,46 @@ export default {
     },
   },
   emits: ['view', 'edit', 'delete'],
-  setup(props, { emit }) {
-    const { t } = useI18n()
-    const showActions = ref(false)
-
-    // الحسابات
-    const clientInitials = computed(() => {
-      if (!props.client.name) return '?'
-      return props.client.name
+  data() {
+    return {
+      showActions: false,
+    }
+  },
+  computed: {
+    clientInitials() {
+      if (!this.client.name) return '?'
+      return this.client.name
         .split(' ')
         .map((n) => n[0])
         .join('')
         .toUpperCase()
         .substring(0, 2)
-    })
+    },
 
-    const avatarColor = computed(() => {
+    avatarColor() {
       const colors = ['blue', 'green', 'purple', 'orange', 'red', 'indigo']
-      const nameHash = props.client.name.split('').reduce((a, b) => {
+      const nameHash = this.client.name.split('').reduce((a, b) => {
         a = (a << 5) - a + b.charCodeAt(0)
         return a & a
       }, 0)
       return colors[Math.abs(nameHash) % colors.length]
-    })
-
-    // الدوال
-    const formatDate = (dateString) => {
+    },
+  },
+  methods: {
+    formatDate(dateString) {
       if (!dateString) return '-'
-      return new Date(dateString).toLocaleDateString(undefined, {
+      return new Date(dateString).toLocaleDateString('ar-SA', {
         year: 'numeric',
         month: 'short',
         day: 'numeric',
       })
-    }
+    },
 
-    const handleDelete = () => {
-      if (confirm(t('clients.deleteConfirm', { name: props.client.name }))) {
-        emit('delete', props.client)
+    handleDelete() {
+      if (confirm(`هل أنت متأكد من حذف العميل "${this.client.name}"؟`)) {
+        this.$emit('delete', this.client)
       }
-    }
-
-    return {
-      showActions,
-      clientInitials,
-      avatarColor,
-      formatDate,
-      handleDelete,
-    }
+    },
   },
 }
 </script>
@@ -327,22 +288,6 @@ export default {
 
 .info-value {
   @apply text-gray-900 font-medium truncate;
-}
-
-.address-section {
-  @apply mt-4 p-4 bg-gray-50/50 rounded-xl border border-gray-200/50;
-}
-
-.address-header {
-  @apply flex items-center space-x-2 mb-2;
-}
-
-.address-label {
-  @apply text-sm font-medium text-gray-700;
-}
-
-.address-text {
-  @apply text-sm text-gray-700 leading-relaxed;
 }
 
 .card-footer {

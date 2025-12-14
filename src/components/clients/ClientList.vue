@@ -12,11 +12,11 @@
           stroke-linecap="round"
           stroke-linejoin="round"
           stroke-width="2"
-          d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283-.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+          d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
         />
       </svg>
-      <h3 class="text-lg font-medium text-gray-900 mb-2">{{ $t('clients.noClients') }}</h3>
-      <p class="text-gray-500">{{ $t('clients.noClientsDescription') }}</p>
+      <h3 class="text-lg font-medium text-gray-900 mb-2">لا يوجد عملاء</h3>
+      <p class="text-gray-500">لم يتم إضافة أي عملاء بعد</p>
       <button
         @click="$emit('add')"
         class="mt-4 inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
@@ -29,7 +29,7 @@
             d="M12 6v6m0 0v6m0-6h6m-6 0H6"
           />
         </svg>
-        {{ $t('clients.addClient') }}
+        إضافة عميل جديد
       </button>
     </div>
 
@@ -41,32 +41,32 @@
             <th
               class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
             >
-              {{ $t('clients.title') }}
+              العميل
             </th>
             <th
               class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
             >
-              {{ $t('auth.email') }}
+              البريد الإلكتروني
             </th>
             <th
               class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
             >
-              {{ $t('clients.phone') }}
+              الهاتف
             </th>
             <th
               class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
             >
-              {{ $t('clients.company') }}
+              الشركة
             </th>
             <th
               class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
             >
-              {{ $t('clients.joined') }}
+              تاريخ التسجيل
             </th>
             <th
               class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
             >
-              {{ $t('buttons.quick_actions') }}
+              الإجراءات السريعة
             </th>
           </tr>
         </thead>
@@ -75,7 +75,7 @@
             <td colspan="6" class="px-6 py-8 text-center">
               <div class="flex justify-center items-center">
                 <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                <span class="mr-3 text-gray-600">{{ $t('common.loading') }}</span>
+                <span class="mr-3 text-gray-600">جاري التحميل...</span>
               </div>
             </td>
           </tr>
@@ -98,30 +98,30 @@
                 <div>
                   <div class="text-sm font-medium text-gray-900">{{ client.name }}</div>
                   <div class="text-sm text-gray-500">
-                    {{ client.tax_number || $t('clients.notProvided') }}
+                    {{ client.tax_number || 'غير متوفر' }}
                   </div>
                 </div>
               </div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
               <div class="text-sm text-gray-900">
-                {{ client.email || $t('clients.notProvided') }}
+                {{ client.email || 'غير متوفر' }}
               </div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
               <div class="text-sm text-gray-900">
-                {{ client.phone || $t('clients.notProvided') }}
+                {{ client.phone || 'غير متوفر' }}
               </div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
               <div class="text-sm text-gray-900">
-                {{ client.company_name || $t('clients.notProvided') }}
+                {{ client.company_name || 'غير متوفر' }}
               </div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
               <div class="text-sm text-gray-900">{{ formatDate(client.created_at) }}</div>
               <div class="text-sm text-gray-500">
-                {{ $t('clients.lastUpdated') }}: {{ formatDate(client.updated_at) }}
+                آخر تحديث: {{ formatDate(client.updated_at) }}
               </div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -130,19 +130,19 @@
                   @click="$emit('view', client)"
                   class="text-blue-600 hover:text-blue-900 px-3 py-1 rounded hover:bg-blue-50 transition-colors"
                 >
-                  {{ $t('buttons.view') }}
+                  عرض
                 </button>
                 <button
                   @click="$emit('edit', client)"
                   class="text-green-600 hover:text-green-900 px-3 py-1 rounded hover:bg-green-50 transition-colors"
                 >
-                  {{ $t('buttons.edit') }}
+                  تعديل
                 </button>
                 <button
                   @click="$emit('delete', client)"
                   class="text-red-600 hover:text-red-900 px-3 py-1 rounded hover:bg-red-50 transition-colors"
                 >
-                  {{ $t('buttons.delete') }}
+                  حذف
                 </button>
               </div>
             </td>
@@ -154,19 +154,26 @@
 </template>
 
 <script>
-import { computed } from 'vue'
-
 export default {
   name: 'ClientList',
   props: {
-    clients: { type: Array, required: true },
-    loading: { type: Boolean, default: false },
+    clients: {
+      type: Array,
+      required: true,
+    },
+    loading: {
+      type: Boolean,
+      default: false,
+    },
   },
   emits: ['edit', 'delete', 'view', 'add'],
-  setup(props) {
-    const clientsData = computed(() => props.clients || [])
-
-    const getInitials = (name) => {
+  computed: {
+    clientsData() {
+      return this.clients || []
+    },
+  },
+  methods: {
+    getInitials(name) {
       if (!name) return '?'
       return name
         .split(' ')
@@ -174,18 +181,16 @@ export default {
         .join('')
         .toUpperCase()
         .substring(0, 2)
-    }
+    },
 
-    const formatDate = (dateString) => {
+    formatDate(dateString) {
       if (!dateString) return '-'
       return new Date(dateString).toLocaleDateString('ar-SA', {
         year: 'numeric',
         month: 'short',
         day: 'numeric',
       })
-    }
-
-    return { clientsData, getInitials, formatDate }
+    },
   },
 }
 </script>

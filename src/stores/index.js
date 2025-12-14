@@ -1,37 +1,52 @@
 import { createStore } from 'vuex'
 import auth from './modules/auth'
-import clients from './modules/clients'
 import invoices from './modules/invoices'
+import clients from './modules/clients'
 import report from './modules/report'
+import permissions from './modules/permissions'
 
-export default createStore({
+const store = createStore({
   modules: {
     auth,
-    clients,
     invoices,
+    clients,
     report,
+    permissions
+  },
+
+  state: {
+    loading: false,
+    error: null
+  },
+
+  mutations: {
+    SET_LOADING(state, loading) {
+      state.loading = loading
+    },
+    SET_ERROR(state, error) {
+      state.error = error
+    },
+    CLEAR_ERROR(state) {
+      state.error = null
+    }
+  },
+
+  actions: {
+    setLoading({ commit }, loading) {
+      commit('SET_LOADING', loading)
+    },
+    setError({ commit }, error) {
+      commit('SET_ERROR', error)
+    },
+    clearError({ commit }) {
+      commit('CLEAR_ERROR')
+    }
+  },
+
+  getters: {
+    loading: state => state.loading,
+    error: state => state.error
   }
 })
 
-
-
-// src/store/index.js
-/*import { createStore } from 'vuex'
-
-import auth from './modules/auth'
-import invoices from './modules/invoices'
-import clients from './modules/clients'
-
-export default createStore({
-  modules: {
-    auth,
-    invoices,
-    clients
-  }
-})*/
-
-/*import { createPinia } from 'pinia'
-
-const pinia = createPinia()
-
-export default pinia*/
+export default store

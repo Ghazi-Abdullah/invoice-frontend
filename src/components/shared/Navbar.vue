@@ -15,13 +15,11 @@
               <span class="text-white font-bold text-lg">IS</span>
             </div>
             <div class="flex flex-col">
-              <span
-                class="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent"
-              >
-                {{ $t('app.name') }}
+              <span class="text-2xl font-bold text-gray-900">
+                نظام الفواتير
               </span>
               <span class="text-xs text-gray-500 font-medium mt-[-2px]">
-                {{ $t('app.description') }}
+                Invoice System
               </span>
             </div>
           </router-link>
@@ -56,19 +54,59 @@
                     : 'text-gray-400 group-hover:text-gray-600'
                 "
               />
-              <span>{{ $t(item.translationKey) }}</span>
+              <span>{{ item.text }}</span>
+            </span>
+          </router-link>
+
+          <!-- رابط إدارة المستخدمين (يظهر فقط للمسؤولين) -->
+          <router-link
+            v-if="hasPermission('manage_users') || hasPermission('manage_permissions')"
+            to="/users"
+            class="relative px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-300 group"
+            :class="{
+              'text-blue-700 bg-white shadow-lg shadow-blue-500/10 border border-blue-200/50':
+                $route.path === '/users',
+              'text-gray-600 hover:text-gray-900 hover:bg-white/50': $route.path !== '/users',
+            }"
+          >
+            <span
+              class="relative z-10 flex items-center space-x-2"
+              :class="isRTL ? 'space-x-reverse' : ''"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-1.907a10 10 0 01-2.172 3.238" />
+              </svg>
+              <span>المستخدمين</span>
+            </span>
+          </router-link>
+
+          <!-- رابط إدارة الصلاحيات (يظهر فقط للمسؤولين) -->
+          <router-link
+            v-if="hasPermission('manage_permissions')"
+            to="/permissions"
+            class="relative px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-300 group"
+            :class="{
+              'text-blue-700 bg-white shadow-lg shadow-blue-500/10 border border-blue-200/50':
+                $route.path === '/permissions',
+              'text-gray-600 hover:text-gray-900 hover:bg-white/50': $route.path !== '/permissions',
+            }"
+          >
+            <span
+              class="relative z-10 flex items-center space-x-2"
+              :class="isRTL ? 'space-x-reverse' : ''"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+              <span>الصلاحيات</span>
             </span>
           </router-link>
         </div>
 
         <!-- الجزء الأيمن -->
         <div class="flex items-center space-x-6" :class="isRTL ? 'space-x-reverse' : ''">
-          <!-- مبدل اللغة -->
-          <LanguageSwitcher />
-
-          <!-- فاصل -->
-          <div class="h-8 w-px bg-gradient-to-b from-transparent via-gray-300 to-transparent"></div>
-
           <!-- معلومات المستخدم -->
           <div
             v-if="isAuthenticated"
@@ -88,7 +126,7 @@
                 {{ user?.name }}
               </span>
               <span class="text-xs text-gray-500 mt-1">
-                {{ $t('messages.welcome', { name: user?.name }) }}
+                {{ user?.roles?.[0]?.name || 'مستخدم' }}
               </span>
             </div>
 
@@ -111,7 +149,7 @@
                   d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
                 />
               </svg>
-              <span class="hidden sm:block">{{ $t('auth.logout') }}</span>
+              <span class="hidden sm:block">تسجيل الخروج</span>
             </button>
           </div>
         </div>
@@ -122,9 +160,7 @@
 
 <script>
 import { mapState, mapGetters, mapActions } from 'vuex'
-import LanguageSwitcher from '@/components/LanguageSwitcher.vue' // ⬅️ أضف هذا الاستيراد
 
-// الأيقونات
 const DashboardIcon = {
   template:
     '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>',
@@ -144,26 +180,21 @@ const ReportIcon = {
 
 export default {
   name: 'Navbar',
-  components: {
-    LanguageSwitcher,
-  },
   data() {
     return {
       navItems: [
-        { to: '/dashboard', translationKey: 'nav.dashboard', icon: DashboardIcon },
-        { to: '/invoices', translationKey: 'nav.invoices', icon: InvoiceIcon },
-        { to: '/clients', translationKey: 'nav.clients', icon: ClientIcon },
-        { to: '/reports', translationKey: 'nav.reports', icon: ReportIcon },
+        { to: '/dashboard', text: 'لوحة التحكم', icon: DashboardIcon },
+        { to: '/invoices', text: 'الفواتير', icon: InvoiceIcon },
+        { to: '/clients', text: 'العملاء', icon: ClientIcon },
+        { to: '/reports', text: 'التقارير', icon: ReportIcon },
       ],
+      isRTL: true
     }
   },
   computed: {
     ...mapState('auth', ['user']),
     ...mapGetters('auth', ['isAuthenticated']),
-
-    isRTL() {
-      return this.$i18n.locale === 'ar'
-    },
+    ...mapGetters('permissions', ['hasPermission']),
   },
   methods: {
     ...mapActions('auth', ['logout']),
@@ -180,14 +211,12 @@ export default {
 
     handleLogout() {
       this.logout()
-      window.location.href = '/login'
+      this.$router.push('/login')
     },
   },
   mounted() {
-    // للتصحيح
-    console.log('Navbar locale:', this.$i18n.locale)
-    console.log('Translation test - app.name:', this.$t('app.name'))
-    console.log('Translation test - nav.dashboard:', this.$t('nav.dashboard'))
-  },
+    console.log('User roles:', this.user?.roles)
+    console.log('Has manage_permissions:', this.hasPermission('manage_permissions'))
+  }
 }
 </script>
