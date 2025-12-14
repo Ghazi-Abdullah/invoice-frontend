@@ -1,4 +1,5 @@
 <template>
+<<<<<<< HEAD
 <<<<<<< Updated upstream
   <div class="min-h-screen bg-gray-50/30">
     <!-- قسم التصحيح الموسع -->
@@ -50,6 +51,10 @@
     </div>
 
     <!-- باقي محتوى الصفحة -->
+=======
+  <div class="min-h-screen bg-gray-50">
+    <!-- Header -->
+>>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73
     <div class="bg-white border-b border-gray-200">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
@@ -67,8 +72,8 @@
               </svg>
             </div>
             <div>
-              <h1 class="text-3xl font-bold text-gray-900">{{ $t('clients.title') }}</h1>
-              <p class="text-gray-600 mt-1">{{ $t('clients.subtitle') }}</p>
+              <h1 class="text-3xl font-bold text-gray-900">العملاء</h1>
+              <p class="text-gray-600 mt-1">إدارة قاعدة عملائك بسهولة</p>
             </div>
           </div>
 =======
@@ -115,10 +120,14 @@
                 d="M12 6v6m0 0v6m0-6h6m-6 0H6"
               />
             </svg>
+<<<<<<< HEAD
             <span>{{ $t('clients.addClient') }}</span>
 =======
             <i class="fas fa-redo-alt mr-2"></i> {{ $t('common.refresh') }}
 >>>>>>> Stashed changes
+=======
+            <span>إضافة عميل جديد</span>
+>>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73
           </button>
         </div>
       </div>
@@ -130,7 +139,7 @@
       <!-- حالة التحميل -->
       <div v-if="loading" class="text-center py-12">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-        <p class="text-gray-600 mt-4">{{ $t('common.loading') }}</p>
+        <p class="text-gray-600 mt-4">جاري التحميل...</p>
       </div>
 
       <!-- حالة الخطأ -->
@@ -140,7 +149,40 @@
           @click="loadClients()"
           class="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
         >
-          {{ $t('common.retry') }}
+          إعادة المحاولة
+        </button>
+      </div>
+
+      <!-- حالة عدم وجود عملاء -->
+      <div v-else-if="!loading && clientsData.length === 0" class="text-center py-12">
+        <svg
+          class="w-24 h-24 text-gray-300 mx-auto mb-4"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+          />
+        </svg>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">لا يوجد عملاء</h3>
+        <p class="text-gray-500 mb-4">لم يتم إضافة أي عملاء بعد</p>
+        <button
+          @click="showClientForm = true"
+          class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+            />
+          </svg>
+          إضافة عميل جديد
         </button>
       </div>
 
@@ -152,6 +194,7 @@
           @edit="handleEditClient"
           @delete="handleDeleteClient"
           @view="handleViewClient"
+          @add="showClientForm = true"
         />
       </div>
 =======
@@ -357,24 +400,25 @@ export default {
     }
   },
   computed: {
+<<<<<<< HEAD
 <<<<<<< Updated upstream
     clientsStore() {
       return this.$store.state.clients
     },
 
+=======
+>>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73
     clientsData() {
-      console.log('📊 Accessing clients data:', this.$store.state.clients.clients)
+      console.log('📊 Accessing clients data from store...')
+      const clients = this.$store.state.clients.clients
+      console.log('📊 Raw clients data:', clients)
 
-      if (
-        this.$store.state.clients.clients &&
-        this.$store.state.clients.clients.data &&
-        Array.isArray(this.$store.state.clients.clients.data)
-      ) {
-        console.log('✅ Found clients data:', this.$store.state.clients.clients.data)
-        return this.$store.state.clients.clients.data
+      if (Array.isArray(clients)) {
+        console.log('✅ Found clients as array:', clients)
+        return clients
       }
 
-      console.log('❌ No clients data found in expected structure')
+      console.log('❌ No clients found or not an array')
       return []
 =======
     clients() {
@@ -417,10 +461,6 @@ export default {
       return pages
 >>>>>>> Stashed changes
     },
-
-    hasClients() {
-      return this.clientsData.length > 0
-    },
   },
   mounted() {
     this.loadClients()
@@ -439,17 +479,18 @@ export default {
       this.loading = true
 <<<<<<< Updated upstream
       this.error = null
+      console.log('🚀 Starting to load clients...')
+
       try {
-        console.log('🚀 Starting to load clients...')
-        await this.$store.dispatch('clients/fetchClients', {
-          page: 1,
-          per_page: 10,
-          search: this.searchQuery,
-          sort: this.sortBy,
-        })
+        await this.$store.dispatch('clients/fetchClients')
         console.log('✅ Load clients completed')
+
+        // التحقق من البيانات بعد التحميل
+        console.log('📋 After loading - clients:', this.$store.state.clients.clients)
+        console.log('📋 After loading - loading state:', this.$store.state.clients.loading)
       } catch (error) {
         console.error('❌ Failed to load clients:', error)
+<<<<<<< HEAD
         this.error = error.message
 =======
       try {
@@ -457,16 +498,18 @@ export default {
       } catch (error) {
         this.$toast.error(this.$t('common.loadError'))
 >>>>>>> Stashed changes
+=======
+        if (error.response) {
+          console.error('❌ Error response:', error.response.data)
+          console.error('❌ Error status:', error.response.status)
+        }
+        this.error = error.message || 'فشل في تحميل العملاء'
+>>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73
       } finally {
         this.loading = false
       }
     },
 <<<<<<< Updated upstream
-
-    forceReload() {
-      console.log('🔄 Manual reload triggered')
-      this.loadClients()
-    },
 
     handleEditClient(client) {
       this.editingClient = client
@@ -474,15 +517,18 @@ export default {
     },
 
     handleViewClient(client) {
-      this.viewingClient = client
+      this.$router.push(`/clients/${client.id}`)
     },
 
     async handleDeleteClient(client) {
-      if (confirm(this.$t('clients.deleteConfirm', { name: client.name }))) {
+      if (confirm(`هل أنت متأكد من حذف العميل "${client.name}"؟`)) {
         try {
           await this.$store.dispatch('clients/deleteClient', client.id)
+          this.$toast.success('تم حذف العميل بنجاح')
+          this.loadClients() // إعادة تحميل القائمة
         } catch (error) {
           console.error('❌ Failed to delete client:', error)
+          this.$toast.error('فشل في حذف العميل')
         }
 =======
     async refreshClients() {
@@ -521,6 +567,7 @@ export default {
     goToPage(page) {
       this.currentPage = page
       this.loadClients()
+      this.$toast.success('تم حفظ العميل بنجاح')
     },
   },
 }

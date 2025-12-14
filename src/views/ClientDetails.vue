@@ -54,6 +54,7 @@
                 <span class="text-gray-600">{{ $t('clients.address') }}:</span>
                 <span class="font-medium">{{ client.address || $t('common.notAvailable') }}</span>
               </div>
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 =======
               <div class="flex justify-between">
@@ -69,6 +70,16 @@
                 }}</span>
               </div>
 >>>>>>> Stashed changes
+=======
+              <div class="flex justify-between">
+                <span class="text-gray-600">اسم الشركة:</span>
+                <span class="font-medium">{{ client.company_name || 'غير متوفر' }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">الرقم الضريبي:</span>
+                <span class="font-medium">{{ client.tax_number || 'غير متوفر' }}</span>
+              </div>
+>>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73
             </div>
           </div>
 
@@ -87,6 +98,7 @@
                 <span class="text-gray-600">{{ $t('clients.overdueInvoices') }}:</span>
                 <span class="font-medium">{{ stats.overdueInvoices }}</span>
               </div>
+<<<<<<< HEAD
 <<<<<<< Updated upstream
             </div>
           </div>
@@ -98,18 +110,32 @@
               </div>
               <div class="flex justify-between">
                 <span class="text-gray-600">{{ $t('clients.updatedAt') }}:</span>
+=======
+              <div class="flex justify-between">
+                <span class="text-gray-600">تاريخ التسجيل:</span>
+                <span class="font-medium">{{ formatDate(client.created_at) }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">آخر تحديث:</span>
+>>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73
                 <span class="font-medium">{{ formatDate(client.updated_at) }}</span>
               </div>
             </div>
           </div>
         </div>
 
+<<<<<<< HEAD
         <!-- Control Buttons -->
         <div class="flex justify-end space-x-3 mt-6">
+=======
+        <!-- أزرار التحكم -->
+        <div class="flex justify-end space-x-3 space-x-reverse mt-6">
+>>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73
           <button
             @click="$router.push('/clients')"
             class="px-4 py-2 text-gray-700 hover:text-gray-900 font-medium"
           >
+<<<<<<< HEAD
             {{ $t('common.back') }}
           </button>
           <button
@@ -121,10 +147,21 @@
           </button>
         </div>
 >>>>>>> Stashed changes
+=======
+            رجوع
+          </button>
+          <button
+            @click="editClient"
+            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            تعديل العميل
+          </button>
+        </div>
+>>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73
       </div>
 
       <!-- Invoices Table -->
-      <div v-if="client" class="bg-white shadow rounded-lg">
+      <div v-if="client && clientInvoices.length > 0" class="bg-white shadow rounded-lg">
         <div class="px-6 py-4 border-b border-gray-200">
           <h3 class="text-lg font-semibold text-gray-900">{{ $t('clients.clientInvoices') }}</h3>
         </div>
@@ -165,17 +202,7 @@
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-              <tr v-if="clientInvoices.length === 0">
-                <td colspan="6" class="px-6 py-8 text-center text-gray-500">
-                  لا توجد فواتير لهذا العميل
-                </td>
-              </tr>
-              <tr
-                v-else
-                v-for="invoice in clientInvoices"
-                :key="invoice.id"
-                class="hover:bg-gray-50"
-              >
+              <tr v-for="invoice in clientInvoices" :key="invoice.id" class="hover:bg-gray-50">
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="text-sm font-medium text-gray-900">{{ invoice.invoice_number }}</div>
                 </td>
@@ -187,7 +214,7 @@
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="text-sm font-medium text-gray-900">
-                    {{ invoice.total_amount }} ر.س
+                    {{ formatCurrency(invoice.total_amount) }}
                   </div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
@@ -208,6 +235,7 @@
           </table>
         </div>
       </div>
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 =======
 
@@ -226,6 +254,41 @@
         </router-link>
       </div>
 >>>>>>> Stashed changes
+=======
+
+      <!-- حالة عدم وجود فواتير -->
+      <div v-else-if="client && !loading" class="bg-white shadow rounded-lg p-8 text-center">
+        <svg
+          class="w-16 h-16 text-gray-300 mx-auto mb-4"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+          />
+        </svg>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">لا توجد فواتير</h3>
+        <p class="text-gray-500 mb-4">لا توجد فواتير مسجلة لهذا العميل بعد</p>
+        <router-link
+          to="/invoices/create"
+          class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+            />
+          </svg>
+          إنشاء فاتورة جديدة
+        </router-link>
+      </div>
+>>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73
     </div>
   </div>
 </template>
@@ -257,7 +320,13 @@ export default {
     },
 
     formatDate(dateString) {
+      if (!dateString) return '-'
       return new Date(dateString).toLocaleDateString('ar-SA')
+    },
+
+    formatCurrency(amount) {
+      if (!amount) return '0.00 ر.س'
+      return parseFloat(amount).toFixed(2) + ' ر.س'
     },
 
     getStatusText(status) {
@@ -281,26 +350,43 @@ export default {
       return `${baseClasses} ${statusClasses[status] || 'bg-gray-100 text-gray-800'}`
     },
 
+    editClient() {
+      this.$router.push(`/clients/${this.client.id}/edit`)
+    },
+
     async loadClientDetails() {
       this.loading = true
       try {
         const clientId = this.$route.params.id
+<<<<<<< HEAD
 <<<<<<< Updated upstream
+=======
+        console.log(`🚀 Loading client details for ID: ${clientId}`)
+>>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73
 
         // Fetch client details
 =======
 >>>>>>> Stashed changes
         this.client = await this.$store.dispatch('clients/fetchClient', clientId)
+        console.log('✅ Client loaded:', this.client)
 
         // Fetch all invoices to filter by client
         await this.$store.dispatch('invoices/fetchInvoices')
 
+<<<<<<< HEAD
 <<<<<<< Updated upstream
         const allInvoices = this.$store.state.invoices.invoices.data || []
 =======
         const allInvoices = this.$store.getters['invoices/invoices'] || []
 >>>>>>> Stashed changes
+=======
+        const allInvoices =
+          this.$store.state.invoices.invoices.data || this.$store.state.invoices.invoices || []
+        console.log('📋 All invoices:', allInvoices)
+
+>>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73
         this.clientInvoices = allInvoices.filter((inv) => inv.client_id === this.client.id)
+        console.log('✅ Client invoices:', this.clientInvoices)
 
         // Calculate stats
         this.stats.totalInvoices = this.clientInvoices.length
@@ -309,18 +395,26 @@ export default {
           (inv) => inv.status === 'overdue',
         ).length
       } catch (error) {
+<<<<<<< HEAD
         console.error('Failed to load client details:', error)
 <<<<<<< Updated upstream
 =======
         this.$toast.error(this.$t('common.loadError'))
         this.$router.push('/clients')
 >>>>>>> Stashed changes
+=======
+        console.error('❌ Failed to load client details:', error)
+        if (error.response) {
+          console.error('❌ Error response:', error.response.data)
+        }
+>>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73
       } finally {
         this.loading = false
       }
     },
   },
   mounted() {
+    console.log('🏁 ClientDetails component mounted')
     this.loadClientDetails()
   },
 }

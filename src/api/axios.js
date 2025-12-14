@@ -1,10 +1,14 @@
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 // api.js
 =======
 >>>>>>> Stashed changes
+=======
+// src/api/axios.js
+>>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73
 import axios from 'axios'
-import { toast } from 'vue3-toastify'
 
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 // إنشاء axios instance مع الإعدادات الأساسية
 const axiosInstance = axios.create({
@@ -21,11 +25,21 @@ const instance = axios.create({
 <<<<<<< Updated upstream
   timeout: 10000, // 10 ثانية timeout
   withCredentials: true // إذا كنت تستخدم cookies
+=======
+const instance = axios.create({
+  // تأكد من أن baseURL لا ينتهي بـ /api
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000',
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+  }
+>>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73
 })
 
-// Request Interceptor
-axiosInstance.interceptors.request.use(
+// إضافة interceptor لطباعة logs للمساعدة في debugging
+instance.interceptors.request.use(
   (config) => {
+<<<<<<< HEAD
     // إضافة التوكن من localStorage إذا موجود
 =======
   timeout: 30000 // 30 ثانية
@@ -35,105 +49,40 @@ axiosInstance.interceptors.request.use(
 instance.interceptors.request.use(
   (config) => {
 >>>>>>> Stashed changes
+=======
+    console.log(`🚀 ${config.method.toUpperCase()} ${config.baseURL}${config.url}`, config.data || '')
+>>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73
     const token = localStorage.getItem('token')
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
-      console.log('🔐 Token added to request headers')
     }
-
-    // تسجيل الطلب للتصحيح
-    console.log(`🚀 ${config.method.toUpperCase()} ${config.url}`, config.data || '')
     return config
   },
   (error) => {
-    console.error('❌ Request error:', error)
     return Promise.reject(error)
   }
 )
 
-// Response Interceptor
-axiosInstance.interceptors.response.use(
+// إضافة interceptor للردود
+instance.interceptors.response.use(
   (response) => {
     console.log(`✅ ${response.status} ${response.config.url}`)
-
-    // عرض رسائل النجاح إذا كانت موجودة
-    if (response.data?.message && response.config.method !== 'get') {
-      toast.success(response.data.message, {
-        position: 'top-right',
-        autoClose: 3000,
-        rtl: true
-      })
-    }
-
     return response
   },
   (error) => {
-    console.error(`❌ ${error.response?.status || 'Network'} Error: ${error.config?.url}`)
-
-    let errorMessage = 'حدث خطأ في الاتصال'
-
     if (error.response) {
-      // Server responded with error
-      const status = error.response.status
-
-      switch (status) {
-        case 401:
-          errorMessage = 'غير مصرح لك بالوصول'
-          // مسح بيانات المصادقة
-          localStorage.removeItem('user')
-          localStorage.removeItem('token')
-          // توجيه إلى صفحة تسجيل الدخول
-          if (window.location.pathname !== '/login') {
-            window.location.href = '/login'
-          }
-          break
-
-        case 403:
-          errorMessage = 'ليس لديك صلاحية للوصول'
-          break
-
-        case 404:
-          errorMessage = 'الصفحة غير موجودة'
-          break
-
-        case 422:
-          errorMessage = 'بيانات غير صحيحة'
-          if (error.response.data?.errors) {
-            const errors = error.response.data.errors
-            errorMessage = Object.values(errors).flat().join(', ')
-          }
-          break
-
-        case 500:
-          errorMessage = 'حدث خطأ في الخادم'
-          break
-
-        default:
-          errorMessage = error.response.data?.message || 'حدث خطأ غير متوقع'
-      }
-
+      console.log(`❌ ${error.response.status} Error: ${error.config.url}`)
       console.log('📡 Server error response:', error.response.data)
     } else if (error.request) {
-      // No response received
-      errorMessage = 'لا يمكن الاتصال بالخادم. تحقق من اتصالك بالإنترنت'
-      console.log('🌐 No response from server')
+      console.log('❌ No response received:', error.request)
     } else {
-      // Something else happened
-      errorMessage = error.message || 'حدث خطأ غير متوقع'
-      console.log('⚠️ Request setup error:', error.message)
+      console.log('❌ Request error:', error.message)
     }
-
-    // عرض رسالة الخطأ باستخدام toast
-    toast.error(errorMessage, {
-      position: 'top-right',
-      autoClose: 5000,
-      rtl: true
-    })
-
     return Promise.reject(error)
   }
 )
 
+<<<<<<< HEAD
 export default axiosInstance
 
 /*import axios from 'axios'
@@ -238,3 +187,6 @@ api.interceptors.response.use(
 )
 
 export default api
+=======
+export default instance
+>>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73

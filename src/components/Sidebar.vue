@@ -1,4 +1,5 @@
 <template>
+<<<<<<< HEAD
   <div class="flex min-h-screen bg-gray-100" :class="isRTL ? 'flex-row-reverse' : ''">
     <!-- Sidebar -->
     <aside class="w-64 bg-gray-800 text-white shadow-lg overflow-y-auto">
@@ -155,30 +156,144 @@
                 </button>
               </div>
             </div>
+=======
+  <aside class="fixed right-0 top-0 h-full w-64 bg-gray-800 text-white shadow-lg overflow-y-auto">
+    <div class="p-6">
+      <!-- Logo -->
+      <div class="flex items-center space-x-3 space-x-reverse mb-8">
+        <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+          <i class="fas fa-file-invoice text-xl"></i>
+        </div>
+        <h1 class="text-xl font-bold">نظام الفواتير</h1>
+      </div>
+
+      <!-- User Info -->
+      <div v-if="user" class="mb-8">
+        <div class="flex items-center space-x-3 space-x-reverse">
+          <div class="w-12 h-12 bg-gray-700 rounded-full flex items-center justify-center">
+            <i class="fas fa-user text-lg"></i>
+          </div>
+          <div>
+            <p class="font-medium">{{ user.name }}</p>
+            <p class="text-sm text-gray-400">{{ user.email }}</p>
+            <div v-if="user.roles" class="mt-1">
+              <span class="inline-block px-2 py-1 text-xs bg-blue-600 rounded">
+                {{ user.roles[0]?.name || 'مستخدم' }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation -->
+      <nav class="space-y-2">
+        <router-link
+          to="/dashboard"
+          class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg hover:bg-gray-700 transition"
+          :class="{ 'bg-gray-700': $route.path === '/dashboard' }"
+        >
+          <i class="fas fa-home"></i>
+          <span>لوحة التحكم</span>
+        </router-link>
+
+        <router-link
+          to="/invoices"
+          class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg hover:bg-gray-700 transition"
+          :class="{ 'bg-gray-700': $route.path.includes('/invoices') }"
+        >
+          <i class="fas fa-file-invoice"></i>
+          <span>الفواتير</span>
+        </router-link>
+
+        <router-link
+          to="/clients"
+          class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg hover:bg-gray-700 transition"
+          :class="{ 'bg-gray-700': $route.path === '/clients' }"
+        >
+          <i class="fas fa-users"></i>
+          <span>العملاء</span>
+        </router-link>
+
+        <router-link
+          to="/reports"
+          class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg hover:bg-gray-700 transition"
+          :class="{ 'bg-gray-700': $route.path === '/reports' }"
+        >
+          <i class="fas fa-chart-bar"></i>
+          <span>التقارير</span>
+        </router-link>
+
+        <!-- Admin Links -->
+        <div v-if="isAdmin">
+          <div class="pt-4 mt-4 border-t border-gray-700">
+            <p class="text-xs text-gray-400 mb-2 px-3">إدارة النظام</p>
+
+            <router-link
+              to="/permissions"
+              class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg hover:bg-gray-700 transition"
+              :class="{ 'bg-gray-700': $route.path === '/permissions' }"
+            >
+              <i class="fas fa-shield-alt"></i>
+              <span>إدارة الصلاحيات</span>
+            </router-link>
+
+            <router-link
+              to="/users"
+              class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg hover:bg-gray-700 transition"
+              :class="{ 'bg-gray-700': $route.path === '/users' }"
+            >
+              <i class="fas fa-user-cog"></i>
+              <span>إدارة المستخدمين</span>
+            </router-link>
+>>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73
           </div>
         </div>
       </nav>
 
+<<<<<<< HEAD
       <!-- Main Router View -->
       <main class="flex-1 p-6">
         <router-view />
       </main>
     </div>
   </div>
+=======
+      <!-- Logout -->
+      <div class="pt-8 mt-8 border-t border-gray-700">
+        <button
+          @click="logout"
+          class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg hover:bg-red-600 transition w-full text-right"
+        >
+          <i class="fas fa-sign-out-alt"></i>
+          <span>تسجيل الخروج</span>
+        </button>
+      </div>
+    </div>
+  </aside>
+>>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73
 </template>
 
 <script>
 import { computed } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
+<<<<<<< HEAD
 
 export default {
   name: 'DefaultLayout',
+=======
+import { toast } from 'vue3-toastify'
+
+export default {
+  name: 'Sidebar',
+
+>>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73
   setup() {
     const store = useStore()
     const router = useRouter()
 
     const user = computed(() => store.state.auth.user)
+<<<<<<< HEAD
     const isAdmin = computed(
       () => user.value?.roles?.some((role) => role.name === 'admin') || false,
     )
@@ -193,23 +308,45 @@ export default {
     })
     const menus = computed(() => store.state.auth.menus || [])
     const isRTL = computed(() => true) // دعم RTL دائمًا
+=======
+    const isAdmin = computed(() => {
+      return user.value?.roles?.some((role) => role.name === 'admin') || false
+    })
+>>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73
 
     const logout = async () => {
       try {
         await store.dispatch('auth/logout')
         router.push('/login')
+<<<<<<< HEAD
       } catch (error) {
         console.error('Logout error:', error)
       }
     }
 
     return { user, isAdmin, userInitials, menus, isRTL, logout }
+=======
+        toast.success('تم تسجيل الخروج بنجاح')
+      } catch (error) {
+        toast.error('فشل تسجيل الخروج')
+      }
+    }
+
+    return {
+      user,
+      isAdmin,
+      logout,
+    }
+>>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73
   },
 }
 </script>
 
 <style scoped>
+<<<<<<< HEAD
 /* لضمان ظهور الروابط النشطة */
+=======
+>>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73
 .router-link-active {
   @apply bg-gray-700;
 }

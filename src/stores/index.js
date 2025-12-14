@@ -1,19 +1,56 @@
 import { createStore } from 'vuex'
 <<<<<<< Updated upstream
 import auth from './modules/auth'
-import clients from './modules/clients'
 import invoices from './modules/invoices'
+import clients from './modules/clients'
 import report from './modules/report'
+import permissions from './modules/permissions'
 
-export default createStore({
+const store = createStore({
   modules: {
     auth,
-    clients,
     invoices,
+    clients,
     report,
+    permissions
+  },
+
+  state: {
+    loading: false,
+    error: null
+  },
+
+  mutations: {
+    SET_LOADING(state, loading) {
+      state.loading = loading
+    },
+    SET_ERROR(state, error) {
+      state.error = error
+    },
+    CLEAR_ERROR(state) {
+      state.error = null
+    }
+  },
+
+  actions: {
+    setLoading({ commit }, loading) {
+      commit('SET_LOADING', loading)
+    },
+    setError({ commit }, error) {
+      commit('SET_ERROR', error)
+    },
+    clearError({ commit }) {
+      commit('CLEAR_ERROR')
+    }
+  },
+
+  getters: {
+    loading: state => state.loading,
+    error: state => state.error
   }
 })
 
+<<<<<<< HEAD
 
 
 // src/store/index.js
@@ -72,3 +109,6 @@ export default createStore({
   }
 })
 >>>>>>> Stashed changes
+=======
+export default store
+>>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73

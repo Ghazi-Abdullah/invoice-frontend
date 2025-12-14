@@ -1,63 +1,70 @@
+<!-- src/views/Register.vue -->
 <template>
 <<<<<<< Updated upstream
   <div class="register-container">
-    <div class="register-card">
-      <h2>إنشاء حساب جديد</h2>
+    <div class="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
+      <h2 class="text-2xl font-bold mb-6 text-center">إنشاء حساب جديد</h2>
 
-      <form @submit.prevent="register" class="register-form">
-        <div class="form-group">
-          <label for="name">الاسم الكامل</label>
+      <form @submit.prevent="handleRegister">
+        <div class="mb-4">
+          <label class="block text-gray-700 mb-2">الاسم</label>
           <input
+            v-model="form.name"
             type="text"
-            id="name"
-            v-model="userData.name"
             required
-            class="form-input"
-            placeholder="ادخل اسمك الكامل"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="أدخل اسمك"
           />
         </div>
 
-        <div class="form-group">
-          <label for="email">البريد الإلكتروني</label>
+        <div class="mb-4">
+          <label class="block text-gray-700 mb-2">البريد الإلكتروني</label>
           <input
+            v-model="form.email"
             type="email"
-            id="email"
-            v-model="userData.email"
             required
-            class="form-input"
-            placeholder="ادخل بريدك الإلكتروني"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="example@email.com"
           />
         </div>
 
-        <div class="form-group">
-          <label for="password">كلمة المرور</label>
+        <div class="mb-4">
+          <label class="block text-gray-700 mb-2">كلمة المرور</label>
           <input
+            v-model="form.password"
             type="password"
-            id="password"
-            v-model="userData.password"
             required
-            class="form-input"
-            placeholder="ادخل كلمة المرور"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="••••••••"
           />
         </div>
 
-        <div class="form-group">
-          <label for="password_confirmation">تأكيد كلمة المرور</label>
+        <div class="mb-6">
+          <label class="block text-gray-700 mb-2">تأكيد كلمة المرور</label>
           <input
+            v-model="form.password_confirmation"
             type="password"
-            id="password_confirmation"
-            v-model="userData.password_confirmation"
             required
-            class="form-input"
-            placeholder="أعد إدخال كلمة المرور"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="••••••••"
           />
         </div>
 
-        <button type="submit" :disabled="loading" class="btn btn-primary register-btn">
-          {{ loading ? 'جاري إنشاء الحساب...' : 'إنشاء الحساب' }}
+        <div v-if="error" class="mb-4 p-3 bg-red-100 text-red-700 rounded">
+          {{ error }}
+        </div>
+
+        <button
+          type="submit"
+          :disabled="loading"
+          class="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50"
+        >
+          <span v-if="loading">جاري إنشاء الحساب...</span>
+          <span v-else>إنشاء حساب</span>
         </button>
       </form>
 
+<<<<<<< HEAD
       <p class="login-link">
         لديك حساب بالفعل؟
         <router-link to="/login">سجل الدخول</router-link>
@@ -148,6 +155,13 @@
         </div>
       </form>
 >>>>>>> Stashed changes
+=======
+      <div class="mt-4 text-center">
+        <router-link to="/login" class="text-blue-600 hover:text-blue-800">
+          لديك حساب بالفعل؟ سجل الدخول
+        </router-link>
+      </div>
+>>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73
     </div>
   </div>
 </template>
@@ -157,24 +171,33 @@ export default {
   name: 'Register',
   data() {
     return {
-      userData: {
+      form: {
         name: '',
         email: '',
         password: '',
         password_confirmation: '',
       },
       loading: false,
+      error: '',
     }
   },
   methods: {
-    async register() {
+    async handleRegister() {
       this.loading = true
+      this.error = ''
 
 <<<<<<< Updated upstream
       try {
-        await this.$store.dispatch('auth/register', this.userData)
-        this.$router.push('/dashboard')
+        // استخدم Vuex بدلاً من Pinia
+        const result = await this.$store.dispatch('auth/register', this.form)
+
+        if (result.success) {
+          this.$router.push('/dashboard')
+        } else {
+          this.error = result.error || 'فشل التسجيل'
+        }
       } catch (error) {
+<<<<<<< HEAD
         console.error('Registration failed:', error)
         alert('فشل في إنشاء الحساب: ' + (error.response?.data?.message || error.message))
 =======
@@ -197,6 +220,10 @@ export default {
       } catch (error) {
         this.error = error.message || this.$t('auth.registerFailed')
 >>>>>>> Stashed changes
+=======
+        this.error = 'حدث خطأ. حاول مرة أخرى'
+        console.error('Register error:', error)
+>>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73
       } finally {
         this.loading = false
       }
@@ -204,54 +231,3 @@ export default {
   },
 }
 </script>
-
-<style scoped>
-.register-container {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 20px;
-}
-
-.register-card {
-  background: white;
-  padding: 40px;
-  border-radius: 10px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-  width: 100%;
-  max-width: 400px;
-}
-
-h2 {
-  text-align: center;
-  margin-bottom: 30px;
-  color: #333;
-}
-
-.register-form {
-  margin-bottom: 20px;
-}
-
-.register-btn {
-  width: 100%;
-  padding: 12px;
-  font-size: 16px;
-}
-
-.login-link {
-  text-align: center;
-  margin-top: 20px;
-  color: #666;
-}
-
-.login-link a {
-  color: #667eea;
-  text-decoration: none;
-}
-
-.login-link a:hover {
-  text-decoration: underline;
-}
-</style>

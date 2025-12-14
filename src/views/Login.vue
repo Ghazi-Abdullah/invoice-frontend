@@ -1,39 +1,47 @@
 <template>
 <<<<<<< Updated upstream
   <div class="login-container">
-    <div class="login-card">
-      <h2>{{ $t('auth.login') }}</h2>
+    <div class="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
+      <h2 class="text-2xl font-bold mb-6 text-center">تسجيل الدخول</h2>
 
-      <form @submit.prevent="login" class="login-form">
-        <div class="form-group">
-          <label for="email">{{ $t('auth.email') }}</label>
+      <form @submit.prevent="handleLogin">
+        <div class="mb-4">
+          <label class="block text-gray-700 mb-2">البريد الإلكتروني</label>
           <input
+            v-model="form.email"
             type="email"
-            id="email"
-            v-model="credentials.email"
             required
-            class="form-input"
-            :placeholder="$t('auth.email_placeholder')"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="example@email.com"
           />
         </div>
 
-        <div class="form-group">
-          <label for="password">{{ $t('auth.password') }}</label>
+        <div class="mb-6">
+          <label class="block text-gray-700 mb-2">كلمة المرور</label>
           <input
+            v-model="form.password"
             type="password"
-            id="password"
-            v-model="credentials.password"
             required
-            class="form-input"
-            :placeholder="$t('auth.password_placeholder')"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="••••••••"
           />
         </div>
 
-        <button type="submit" :disabled="loading" class="btn btn-primary login-btn">
-          {{ loading ? $t('auth.logging_in') : $t('auth.login') }}
+        <div v-if="error" class="mb-4 p-3 bg-red-100 text-red-700 rounded">
+          {{ error }}
+        </div>
+
+        <button
+          type="submit"
+          :disabled="loading"
+          class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+        >
+          <span v-if="loading">جاري تسجيل الدخول...</span>
+          <span v-else>تسجيل الدخول</span>
         </button>
       </form>
 
+<<<<<<< HEAD
       <p class="register-link">
         {{ $t('auth.no_account') }}
         <router-link to="/register">{{ $t('auth.register_here') }}</router-link>
@@ -119,48 +127,68 @@
         </div>
       </form>
 >>>>>>> Stashed changes
+=======
+      <div class="mt-4 text-center">
+        <router-link to="/register" class="text-blue-600 hover:text-blue-800">
+          إنشاء حساب جديد
+        </router-link>
+      </div>
+>>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73
     </div>
   </div>
 </template>
 
 <script>
+import { mapActions } from 'vuex'
+
 export default {
   name: 'Login',
   data() {
     return {
-      credentials: {
+      form: {
         email: '',
         password: '',
       },
       loading: false,
+      error: '',
     }
   },
   methods: {
+<<<<<<< HEAD
 <<<<<<< Updated upstream
     async login() {
 =======
     async handleLogin() {
 >>>>>>> Stashed changes
+=======
+    ...mapActions({
+      login: 'auth/login',
+    }),
+
+    async handleLogin() {
+>>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73
       this.loading = true
+      this.error = ''
 
       try {
+<<<<<<< HEAD
 <<<<<<< Updated upstream
         const response = await this.$store.dispatch('auth/login', this.credentials)
         console.log('✅ Login successful:', response.data)
+=======
+        const result = await this.login({
+          email: this.form.email,
+          password: this.form.password,
+        })
+>>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73
 
-        // الانتظار قليلاً لضمان تحديث الحالة
-        await new Promise((resolve) => setTimeout(resolve, 100))
-
-        // التحقق من حالة المصادقة
-        const isAuthenticated = this.$store.getters['auth/isAuthenticated']
-        console.log('✅ After login - isAuthenticated:', isAuthenticated)
-
-        if (isAuthenticated) {
+        if (result.success) {
           this.$router.push('/dashboard')
         } else {
-          throw new Error('Authentication failed after login')
+          this.error = result.error || 'فشل تسجيل الدخول'
         }
       } catch (error) {
+<<<<<<< HEAD
         console.error('❌ Login failed:', error)
         const errorMsg = error.response?.data?.message || error.message
         this.$toast.error(this.$t('auth.login_failed') + ': ' + errorMsg, {
@@ -179,6 +207,10 @@ export default {
       } catch (error) {
         this.error = error.message || this.$t('auth.loginFailed')
 >>>>>>> Stashed changes
+=======
+        this.error = 'حدث خطأ. حاول مرة أخرى'
+        console.error('Login error:', error)
+>>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73
       } finally {
         this.loading = false
       }
@@ -186,79 +218,3 @@ export default {
   },
 }
 </script>
-
-<style scoped>
-.login-container {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 20px;
-}
-
-.login-card {
-  background: white;
-  padding: 40px;
-  border-radius: 10px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-  width: 100%;
-  max-width: 400px;
-}
-
-h2 {
-  text-align: center;
-  margin-bottom: 30px;
-  color: #333;
-}
-
-.login-form {
-  margin-bottom: 20px;
-}
-
-.form-group {
-  margin-bottom: 20px;
-}
-
-label {
-  display: block;
-  margin-bottom: 5px;
-  color: #333;
-  font-weight: 500;
-}
-
-.form-input {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  font-size: 16px;
-  transition: border-color 0.3s;
-}
-
-.form-input:focus {
-  outline: none;
-  border-color: #667eea;
-}
-
-.login-btn {
-  width: 100%;
-  padding: 12px;
-  font-size: 16px;
-}
-
-.register-link {
-  text-align: center;
-  margin-top: 20px;
-  color: #666;
-}
-
-.register-link a {
-  color: #667eea;
-  text-decoration: none;
-}
-
-.register-link a:hover {
-  text-decoration: underline;
-}
-</style>

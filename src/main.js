@@ -1,26 +1,22 @@
 import './assets/main.css'
 
 import { createApp } from 'vue'
-<<<<<<< HEAD
-=======
-import store from '@/stores'
-import vue3Toastify from 'vue3-toastify'
-import 'vue3-toastify/dist/index.css'
-
->>>>>>> 52f35b6ba5d8a545a94d197e783b869a4e34c3b7
 import App from './App.vue'
 import router from './router'
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 import i18n from './plugins/i18n'
 
 <<<<<<< HEAD
+=======
+import store from './stores'
+>>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73
 import Vue3Toastify, { toast } from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css'
 
-import store from './stores'
-
 const app = createApp(App)
 
+<<<<<<< HEAD
 =======
 import store from './stores'
 import i18n from './plugins/i18n' // تأكد أن هذا موجود ويصدّر createI18n
@@ -56,9 +52,12 @@ app.component('font-awesome-icon', FontAwesomeIcon)
 
 // Vuex + Router
 >>>>>>> Stashed changes
+=======
+// استخدام Vuex و Router
+>>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73
 app.use(store)
-app.use(i18n)
 app.use(router)
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 =======
 app.use(i18n)  // ⬅️ ربط i18n
@@ -66,21 +65,33 @@ app.use(i18n)  // ⬅️ ربط i18n
 
 // Toastify
 >>>>>>> Stashed changes
+=======
+
+// استخدام Toastify
+>>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73
 app.use(Vue3Toastify, {
   autoClose: 3000,
   position: 'top-right',
   theme: 'colored',
-  rtl: true
+  rtl: true,
 })
 
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 =======
 // دالة التحقق من الصلاحيات
+=======
+// دالة مساعدة للتحقق من الصلاحيات
+>>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73
 app.config.globalProperties.$hasPermission = function (permission) {
   const user = this.$store.state.auth.user
   if (!user) return false
 
+<<<<<<< HEAD
   // admin له كل الصلاحيات
+=======
+  // Admin لديه كل الصلاحيات
+>>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73
   if (user.roles?.some(role => role.name === 'admin')) {
     return true
   }
@@ -88,61 +99,23 @@ app.config.globalProperties.$hasPermission = function (permission) {
   return user.permissions?.includes(permission) || false
 }
 
+<<<<<<< HEAD
 // دالة هل المستخدم Admin؟
+=======
+>>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73
 app.config.globalProperties.$isAdmin = function () {
   const user = this.$store.state.auth.user
   return user?.roles?.some(role => role.name === 'admin') || false
 }
 
+<<<<<<< HEAD
 // ربط $toast
 >>>>>>> Stashed changes
+=======
+>>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73
 app.config.globalProperties.$toast = toast
 
 // تشغيل التطبيق
 app.mount('#app')
 
-export { toast }
-
-=======
-const app = createApp(App)
-
-// تخزين reference للتطبيق للنافذة لاستخدامه في axios interceptor
-window.vueApp = app
-
-// استخدام Vuex
-app.use(store)
-
-// تهيئة حالة المصادقة
-store.dispatch('auth/initialize').then(() => {
-  console.log('✅ Auth initialized')
-
-  // اختبار الاتصال بعد تهيئة المصادقة
-  setTimeout(async () => {
-    const isAuthenticated = store.getters['auth/isAuthenticated']
-    console.log('🔐 Authentication status:', isAuthenticated)
-
-    if (isAuthenticated) {
-      console.log('👤 Current user:', store.getters['auth/currentUser'])
-      console.log('🔑 Token exists:', !!store.state.auth.token)
-
-      // اختبار الاتصال بالـ API
-      const api = await import('@/api/axios')
-      await api.default.testConnection()
-    }
-  }, 500)
-}).catch(err => {
-  console.error('❌ Auth initialization failed:', err)
-})
-
-app.use(i18n)
-app.use(router)
-app.use(vue3Toastify, {
-  autoClose: 3000,
-  position: 'top-right',
-  theme: 'colored'
-})
-
-app.mount('#app')
-
->>>>>>> 52f35b6ba5d8a545a94d197e783b869a4e34c3b7
-console.log('✅ App initialized successfully')
+console.log('✅ تم تهيئة التطبيق بنجاح')

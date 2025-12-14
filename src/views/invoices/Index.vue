@@ -5,8 +5,8 @@
       <div class="mb-8">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between">
           <div>
-            <h1 class="text-3xl font-bold text-gray-900">{{ $t('invoices.title') }}</h1>
-            <p class="text-gray-600 mt-2">{{ $t('invoices.subtitle') }}</p>
+            <h1 class="text-3xl font-bold text-gray-900">الفواتير</h1>
+            <p class="text-gray-600 mt-2">إدارة جميع فواتيرك في مكان واحد</p>
           </div>
           <div class="mt-4 md:mt-0">
             <router-link
@@ -21,7 +21,7 @@
                   d="M12 6v6m0 0v6m0-6h6m-6 0H6"
                 />
               </svg>
-              {{ $t('invoices.create_new') }}
+              إنشاء فاتورة جديدة
             </router-link>
           </div>
         </div>
@@ -47,7 +47,7 @@
               </svg>
             </div>
             <div>
-              <p class="text-sm font-medium text-gray-600">{{ $t('invoices.stats.total') }}</p>
+              <p class="text-sm font-medium text-gray-600">إجمالي الفواتير</p>
               <p class="text-2xl font-bold text-gray-900">{{ invoiceStats.total }}</p>
             </div>
           </div>
@@ -71,7 +71,7 @@
               </svg>
             </div>
             <div>
-              <p class="text-sm font-medium text-gray-600">{{ $t('invoices.stats.paid') }}</p>
+              <p class="text-sm font-medium text-gray-600">مدفوعة</p>
               <p class="text-2xl font-bold text-gray-900">{{ invoiceStats.paid }}</p>
             </div>
           </div>
@@ -95,7 +95,7 @@
               </svg>
             </div>
             <div>
-              <p class="text-sm font-medium text-gray-600">{{ $t('invoices.stats.sent') }}</p>
+              <p class="text-sm font-medium text-gray-600">مرسلة</p>
               <p class="text-2xl font-bold text-gray-900">{{ invoiceStats.sent }}</p>
             </div>
           </div>
@@ -119,7 +119,7 @@
               </svg>
             </div>
             <div>
-              <p class="text-sm font-medium text-gray-600">{{ $t('invoices.stats.overdue') }}</p>
+              <p class="text-sm font-medium text-gray-600">متأخرة</p>
               <p class="text-2xl font-bold text-gray-900">
                 {{ invoiceStats.overdue }}
               </p>
@@ -143,11 +143,11 @@
                 class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 @change="applyFilters"
               >
-                <option value="">{{ $t('filters.all_statuses') }}</option>
-                <option value="draft">{{ $t('invoices.status.draft') }}</option>
-                <option value="sent">{{ $t('invoices.status.sent') }}</option>
-                <option value="paid">{{ $t('invoices.status.paid') }}</option>
-                <option value="overdue">{{ $t('invoices.status.overdue') }}</option>
+                <option value="">جميع الحالات</option>
+                <option value="draft">مسودة</option>
+                <option value="sent">مرسلة</option>
+                <option value="paid">مدفوعة</option>
+                <option value="overdue">متأخرة</option>
               </select>
 
               <!-- Date Filter -->
@@ -156,10 +156,10 @@
                 class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 @change="applyFilters"
               >
-                <option value="">{{ $t('filters.all_dates') }}</option>
-                <option value="this_month">{{ $t('filters.this_month') }}</option>
-                <option value="last_month">{{ $t('filters.last_month') }}</option>
-                <option value="this_year">{{ $t('filters.this_year') }}</option>
+                <option value="">جميع التواريخ</option>
+                <option value="this_month">هذا الشهر</option>
+                <option value="last_month">الشهر الماضي</option>
+                <option value="this_year">هذه السنة</option>
               </select>
             </div>
 
@@ -169,7 +169,7 @@
                 type="text"
                 v-model="filters.search"
                 @input="onSearchInput"
-                :placeholder="$t('filters.search_placeholder')"
+                placeholder="بحث برقم الفاتورة أو اسم العميل..."
                 class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
               <div class="absolute inset-y-0 left-0 pl-3 flex items-center">
@@ -199,37 +199,37 @@
                 <th
                   class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
-                  {{ $t('invoices.table.invoice_number') }}
+                  رقم الفاتورة
                 </th>
                 <th
                   class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
-                  {{ $t('invoices.table.client') }}
+                  العميل
                 </th>
                 <th
                   class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
-                  {{ $t('invoices.table.date') }}
+                  التاريخ
                 </th>
                 <th
                   class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
-                  {{ $t('invoices.table.due_date') }}
+                  تاريخ الاستحقاق
                 </th>
                 <th
                   class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
-                  {{ $t('invoices.table.amount') }}
+                  المبلغ
                 </th>
                 <th
                   class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
-                  {{ $t('invoices.table.status') }}
+                  الحالة
                 </th>
                 <th
                   class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
-                  {{ $t('invoices.table.actions') }}
+                  الإجراءات
                 </th>
               </tr>
             </thead>
@@ -238,7 +238,7 @@
                 <td colspan="7" class="px-6 py-8 text-center">
                   <div class="flex justify-center items-center">
                     <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                    <span class="mr-3 text-gray-600">{{ $t('common.loading') }}</span>
+                    <span class="mr-3 text-gray-600">جاري التحميل...</span>
                   </div>
                 </td>
               </tr>
@@ -258,8 +258,8 @@
                       d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z"
                     />
                   </svg>
-                  <p class="text-lg text-gray-600 mb-2">{{ $t('invoices.no_invoices') }}</p>
-                  <p class="text-gray-500 text-sm mb-4">{{ $t('invoices.start_creating') }}</p>
+                  <p class="text-lg text-gray-600 mb-2">لا توجد فواتير</p>
+                  <p class="text-gray-500 text-sm mb-4">ابدأ بإنشاء فاتورتك الأولى</p>
                   <router-link
                     to="/invoices/create"
                     class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
@@ -272,7 +272,7 @@
                         d="M12 6v6m0 0v6m0-6h6m-6 0H6"
                       />
                     </svg>
-                    {{ $t('invoices.create_new') }}
+                    إنشاء فاتورة جديدة
                   </router-link>
                 </td>
               </tr>
@@ -293,10 +293,10 @@
                     </div>
                     <div>
                       <div class="text-sm font-medium text-gray-900">
-                        {{ invoice.client?.name || $t('common.not_provided') }}
+                        {{ invoice.client?.name || 'غير محدد' }}
                       </div>
                       <div class="text-sm text-gray-500">
-                        {{ invoice.client?.email || $t('common.not_provided') }}
+                        {{ invoice.client?.email || 'غير محدد' }}
                       </div>
                     </div>
                   </div>
@@ -322,23 +322,23 @@
                     <router-link
                       :to="`/invoices/${invoice.id}`"
                       class="text-blue-600 hover:text-blue-900 px-2 py-1 rounded hover:bg-blue-50 transition-colors"
-                      :title="$t('actions.view')"
+                      title="عرض"
                     >
-                      {{ $t('actions.view') }}
+                      عرض
                     </router-link>
                     <router-link
                       :to="`/invoices/${invoice.id}/edit`"
                       class="text-green-600 hover:text-green-900 px-2 py-1 rounded hover:bg-green-50 transition-colors"
-                      :title="$t('actions.edit')"
+                      title="تعديل"
                     >
-                      {{ $t('actions.edit') }}
+                      تعديل
                     </router-link>
                     <button
                       @click="deleteInvoice(invoice)"
                       class="text-red-600 hover:text-red-900 px-2 py-1 rounded hover:bg-red-50 transition-colors"
-                      :title="$t('actions.delete')"
+                      title="حذف"
                     >
-                      {{ $t('actions.delete') }}
+                      حذف
                     </button>
                   </div>
                 </td>
@@ -361,13 +361,13 @@
                     : 'text-gray-400 bg-gray-100 cursor-not-allowed',
                 ]"
               >
-                {{ $t('pagination.previous') }}
+                السابق
               </button>
 
               <span class="text-sm text-gray-700">
-                {{ $t('pagination.page') }}
+                صفحة
                 <span class="font-medium">{{ paginationInfo.currentPage }}</span>
-                {{ $t('pagination.of') }}
+                من
                 <span class="font-medium">{{ paginationInfo.lastPage }}</span>
               </span>
 
@@ -381,7 +381,7 @@
                     : 'text-gray-400 bg-gray-100 cursor-not-allowed',
                 ]"
               >
-                {{ $t('pagination.next') }}
+                التالي
               </button>
             </div>
           </div>
@@ -394,6 +394,7 @@
 <script>
 export default {
   name: 'InvoicesIndex',
+
   data() {
     return {
       filters: {
@@ -405,19 +406,27 @@ export default {
       loading: false,
     }
   },
+
   computed: {
-    // Vuex Getters
     invoiceStats() {
       return (
-        this.$store.getters['invoices/invoiceStats'] || { total: 0, paid: 0, sent: 0, overdue: 0 }
+        this.$store.getters['invoices/stats'] || {
+          total: 0,
+          paid: 0,
+          sent: 0,
+          overdue: 0,
+        }
       )
     },
+
     hasInvoices() {
-      return this.$store.getters['invoices/hasInvoices'] || false
+      const invoices = this.$store.getters['invoices/invoices']
+      return invoices && invoices.length > 0
     },
+
     paginationInfo() {
       return (
-        this.$store.getters['invoices/paginationInfo'] || {
+        this.$store.state.invoices.pagination || {
           currentPage: 1,
           lastPage: 1,
           perPage: 10,
@@ -425,13 +434,17 @@ export default {
         }
       )
     },
+
     invoices() {
-      return this.$store.state.invoices.invoices.data || []
+      const invoices = this.$store.getters['invoices/invoices']
+      return Array.isArray(invoices) ? invoices : []
     },
+
     storeLoading() {
       return this.$store.state.invoices.loading || false
     },
   },
+
   methods: {
     formatDate(dateString) {
       if (!dateString) return '-'
@@ -450,10 +463,10 @@ export default {
 
     getStatusText(status) {
       const statusMap = {
-        draft: this.$t('invoices.status.draft'),
-        sent: this.$t('invoices.status.sent'),
-        paid: this.$t('invoices.status.paid'),
-        overdue: this.$t('invoices.status.overdue'),
+        draft: 'مسودة',
+        sent: 'مرسلة',
+        paid: 'مدفوعة',
+        overdue: 'متأخرة',
       }
       return statusMap[status] || status
     },
@@ -494,10 +507,11 @@ export default {
           }
         })
 
-        console.log('🔄 Fetching invoices with params:', params)
+        console.log('🔄 جلب الفواتير:', params)
         await this.$store.dispatch('invoices/fetchInvoices', params)
       } catch (error) {
-        console.error('❌ Failed to fetch invoices:', error)
+        console.error('❌ فشل في جلب الفواتير:', error)
+        this.$toast.error('فشل في جلب الفواتير')
       } finally {
         this.loading = false
       }
@@ -508,12 +522,10 @@ export default {
     },
 
     onSearchInput() {
-      // إلغاء المؤقت السابق
       if (this.searchTimeout) {
         clearTimeout(this.searchTimeout)
       }
 
-      // إنشاء مؤقت جديد للبحث
       this.searchTimeout = setTimeout(() => {
         this.fetchInvoices(1)
       }, 500)
@@ -526,21 +538,23 @@ export default {
     },
 
     async deleteInvoice(invoice) {
-      if (confirm(this.$t('invoices.delete_confirm', { number: invoice.invoice_number }))) {
+      if (confirm(`هل أنت متأكد من حذف الفاتورة "${invoice.invoice_number}"؟`)) {
         try {
           await this.$store.dispatch('invoices/deleteInvoice', invoice.id)
-          // إعادة تحميل الفواتير بعد الحذف
+          this.$toast.success('تم حذف الفاتورة بنجاح')
           this.fetchInvoices(this.paginationInfo.currentPage)
         } catch (error) {
-          console.error('Failed to delete invoice:', error)
-          alert(this.$t('invoices.delete_error'))
+          console.error('فشل في حذف الفاتورة:', error)
+          this.$toast.error('فشل في حذف الفاتورة')
         }
       }
     },
   },
+
   mounted() {
     this.fetchInvoices()
   },
+
   watch: {
     storeLoading(newLoading) {
       this.loading = newLoading
