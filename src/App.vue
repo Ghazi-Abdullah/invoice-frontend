@@ -1,24 +1,34 @@
 <template>
   <div id="app">
+<<<<<<< Updated upstream
     <ToastContainer />
     <main class="main-content">
       <Navbar v-if="showNavbar" />
       <router-view />
     </main>
+=======
+    <DefaultLayout v-if="$store.state.auth.token && $store.state.auth.user" />
+    <router-view v-else />
+>>>>>>> Stashed changes
   </div>
 </template>
 
 <script>
+<<<<<<< Updated upstream
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useStore } from 'vuex' // ⬅️ استبدل useAuthStore بـ useStore
 import Navbar from './components/shared/Navbar.vue'
 import ToastContainer from './components/shared/ToastContainer.vue'
 import { useI18n } from 'vue-i18n'
+=======
+import DefaultLayout from '@/layouts/DefaultLayout.vue'
+>>>>>>> Stashed changes
 
 export default {
   name: 'App',
   components: {
+<<<<<<< Updated upstream
     Navbar,
     ToastContainer,
   },
@@ -39,10 +49,19 @@ export default {
 
     return {
       showNavbar,
+=======
+    DefaultLayout,
+  },
+  mounted() {
+    // التحقق من التوثيق عند تحميل التطبيق
+    if (this.$store.state.auth.token) {
+      this.$store.dispatch('auth/checkAuth')
+>>>>>>> Stashed changes
     }
   },
 }
 </script>
+<<<<<<< Updated upstream
 
 <style>
 * {
@@ -133,3 +152,5 @@ body {
   border-color: #3498db;
 }
 </style>
+=======
+>>>>>>> Stashed changes

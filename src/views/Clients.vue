@@ -1,4 +1,5 @@
 <template>
+<<<<<<< Updated upstream
   <div class="min-h-screen bg-gray-50/30">
     <!-- قسم التصحيح الموسع -->
     <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-4">
@@ -70,11 +71,42 @@
               <p class="text-gray-600 mt-1">{{ $t('clients.subtitle') }}</p>
             </div>
           </div>
+=======
+  <div class="container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-6">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-800">{{ $t('clients.title') }}</h1>
+        <p class="text-gray-600 mt-1">{{ $t('clients.subtitle') }}</p>
+      </div>
+      <div class="flex space-x-3">
+        <button
+          v-if="$store.getters['auth/hasPermission']('create_client')"
+          @click="$router.push('/clients/create')"
+          class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center"
+        >
+          <i class="fas fa-plus mr-2"></i> {{ $t('clients.create') }}
+        </button>
+      </div>
+    </div>
+>>>>>>> Stashed changes
 
+    <!-- Search and Filter -->
+    <div class="bg-white p-4 rounded-lg shadow mb-6">
+      <div class="flex flex-col md:flex-row md:items-center md:space-x-4">
+        <div class="flex-1">
+          <input
+            type="text"
+            v-model="searchQuery"
+            :placeholder="$t('common.search')"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+        <div class="mt-4 md:mt-0">
           <button
-            @click="showClientForm = true"
-            class="mt-4 sm:mt-0 px-6 py-3 bg-gradient-to-br from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all duration-300 transform hover:scale-105 flex items-center space-x-2"
+            @click="refreshClients"
+            class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg flex items-center"
           >
+<<<<<<< Updated upstream
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 stroke-linecap="round"
@@ -84,11 +116,15 @@
               />
             </svg>
             <span>{{ $t('clients.addClient') }}</span>
+=======
+            <i class="fas fa-redo-alt mr-2"></i> {{ $t('common.refresh') }}
+>>>>>>> Stashed changes
           </button>
         </div>
       </div>
     </div>
 
+<<<<<<< Updated upstream
     <!-- المحتوى الرئيسي -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <!-- حالة التحميل -->
@@ -118,40 +154,210 @@
           @view="handleViewClient"
         />
       </div>
+=======
+    <!-- Loading State -->
+    <div v-if="loading" class="text-center py-12">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+      <p class="mt-4 text-gray-600">{{ $t('common.loading') }}</p>
+>>>>>>> Stashed changes
     </div>
 
-    <!-- نموذج إضافة/تعديل عميل -->
-    <ClientForm
-      :show="showClientForm"
-      :client="editingClient"
-      @close="handleCloseForm"
-      @saved="handleClientSaved"
-    />
+    <!-- Clients Table -->
+    <div v-else class="bg-white rounded-lg shadow overflow-hidden">
+      <div v-if="filteredClients.length === 0" class="text-center py-12">
+        <i class="fas fa-users text-gray-300 text-4xl mb-4"></i>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">{{ $t('clients.noClients') }}</h3>
+        <p class="text-gray-500 mb-4">{{ $t('clients.noClientsMessage') }}</p>
+        <button
+          v-if="$store.getters['auth/hasPermission']('create_client')"
+          @click="$router.push('/clients/create')"
+          class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
+        >
+          <i class="fas fa-plus mr-2"></i> {{ $t('clients.create') }}
+        </button>
+      </div>
+
+      <table v-else class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              {{ $t('clients.name') }}
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              {{ $t('auth.email') }}
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              {{ $t('clients.phone') }}
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              {{ $t('clients.company') }}
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              {{ $t('common.status') }}
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              {{ $t('common.actions') }}
+            </th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr v-for="client in filteredClients" :key="client.id">
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="flex items-center">
+                <div class="flex-shrink-0 h-10 w-10">
+                  <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                    <span class="text-blue-600 font-semibold">{{ getInitials(client.name) }}</span>
+                  </div>
+                </div>
+                <div class="ml-4">
+                  <div class="text-sm font-medium text-gray-900">
+                    {{ client.name }}
+                  </div>
+                </div>
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              {{ client.email || $t('common.notAvailable') }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              {{ client.phone || $t('common.notAvailable') }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              {{ client.company_name || $t('common.notAvailable') }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span
+                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
+              >
+                {{ $t('common.active') }}
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+              <button
+                @click="$router.push(`/clients/${client.id}`)"
+                class="text-blue-600 hover:text-blue-900 mr-3"
+              >
+                <i class="fas fa-eye mr-1"></i> {{ $t('common.view') }}
+              </button>
+              <button
+                v-if="$store.getters['auth/hasPermission']('edit_client')"
+                @click="$router.push(`/clients/${client.id}/edit`)"
+                class="text-green-600 hover:text-green-900 mr-3"
+              >
+                <i class="fas fa-edit mr-1"></i> {{ $t('common.edit') }}
+              </button>
+              <button
+                v-if="$store.getters['auth/hasPermission']('delete_client')"
+                @click="confirmDeleteClient(client)"
+                class="text-red-600 hover:text-red-900"
+              >
+                <i class="fas fa-trash mr-1"></i> {{ $t('common.delete') }}
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Pagination -->
+      <div
+        v-if="pagination.total > pagination.per_page"
+        class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6"
+      >
+        <div class="flex-1 flex justify-between sm:hidden">
+          <button
+            @click="previousPage"
+            :disabled="pagination.current_page === 1"
+            class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+          >
+            {{ $t('common.previous') }}
+          </button>
+          <button
+            @click="nextPage"
+            :disabled="pagination.current_page === pagination.last_page"
+            class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+          >
+            {{ $t('common.next') }}
+          </button>
+        </div>
+        <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+          <div>
+            <p class="text-sm text-gray-700">
+              {{ $t('common.showing') }}
+              <span class="font-medium">{{ pagination.from }}</span>
+              {{ $t('common.to') }}
+              <span class="font-medium">{{ pagination.to }}</span>
+              {{ $t('common.of') }}
+              <span class="font-medium">{{ pagination.total }}</span>
+              {{ $t('common.results') }}
+            </p>
+          </div>
+          <div>
+            <nav
+              class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
+              aria-label="Pagination"
+            >
+              <button
+                @click="previousPage"
+                :disabled="pagination.current_page === 1"
+                class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+              >
+                <span class="sr-only">{{ $t('common.previous') }}</span>
+                <i class="fas fa-chevron-left"></i>
+              </button>
+              <button
+                v-for="page in pages"
+                :key="page"
+                @click="goToPage(page)"
+                :class="[
+                  'relative inline-flex items-center px-4 py-2 border text-sm font-medium',
+                  page === pagination.current_page
+                    ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
+                    : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50',
+                ]"
+              >
+                {{ page }}
+              </button>
+              <button
+                @click="nextPage"
+                :disabled="pagination.current_page === pagination.last_page"
+                class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+              >
+                <span class="sr-only">{{ $t('common.next') }}</span>
+                <i class="fas fa-chevron-right"></i>
+              </button>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import ClientList from '@/components/clients/ClientList.vue'
-import ClientForm from '@/components/clients/ClientForm.vue'
-
 export default {
   name: 'Clients',
-  components: {
-    ClientList,
-    ClientForm,
-  },
   data() {
     return {
-      showClientForm: false,
-      editingClient: null,
-      viewingClient: null,
-      searchQuery: '',
-      sortBy: 'newest',
       loading: false,
-      error: null,
+      searchQuery: '',
+      currentPage: 1,
+      perPage: 10,
     }
   },
   computed: {
+<<<<<<< Updated upstream
     clientsStore() {
       return this.$store.state.clients
     },
@@ -170,15 +376,68 @@ export default {
 
       console.log('❌ No clients data found in expected structure')
       return []
+=======
+    clients() {
+      return this.$store.getters['clients/clients']
+    },
+    pagination() {
+      return this.$store.getters['clients/pagination'] || {}
+    },
+    filteredClients() {
+      if (!this.searchQuery) {
+        return this.clients
+      }
+      const query = this.searchQuery.toLowerCase()
+      return this.clients.filter((client) => {
+        return (
+          (client.name && client.name.toLowerCase().includes(query)) ||
+          (client.email && client.email.toLowerCase().includes(query)) ||
+          (client.phone && client.phone.includes(query)) ||
+          (client.company_name && client.company_name.toLowerCase().includes(query))
+        )
+      })
+    },
+    pages() {
+      const pages = []
+      const totalPages = this.pagination.last_page || 1
+      const currentPage = this.pagination.current_page || 1
+
+      // Show maximum 5 page buttons
+      let startPage = Math.max(1, currentPage - 2)
+      let endPage = Math.min(totalPages, startPage + 4)
+
+      if (endPage - startPage < 4) {
+        startPage = Math.max(1, endPage - 4)
+      }
+
+      for (let i = startPage; i <= endPage; i++) {
+        pages.push(i)
+      }
+
+      return pages
+>>>>>>> Stashed changes
     },
 
     hasClients() {
       return this.clientsData.length > 0
     },
   },
+  mounted() {
+    this.loadClients()
+  },
   methods: {
+    getInitials(name) {
+      if (!name) return '?'
+      return name
+        .split(' ')
+        .map((n) => n[0])
+        .join('')
+        .toUpperCase()
+        .substring(0, 2)
+    },
     async loadClients() {
       this.loading = true
+<<<<<<< Updated upstream
       this.error = null
       try {
         console.log('🚀 Starting to load clients...')
@@ -192,10 +451,17 @@ export default {
       } catch (error) {
         console.error('❌ Failed to load clients:', error)
         this.error = error.message
+=======
+      try {
+        await this.$store.dispatch('clients/fetchClients')
+      } catch (error) {
+        this.$toast.error(this.$t('common.loadError'))
+>>>>>>> Stashed changes
       } finally {
         this.loading = false
       }
     },
+<<<<<<< Updated upstream
 
     forceReload() {
       console.log('🔄 Manual reload triggered')
@@ -218,22 +484,44 @@ export default {
         } catch (error) {
           console.error('❌ Failed to delete client:', error)
         }
+=======
+    async refreshClients() {
+      await this.loadClients()
+      this.$toast.success(this.$t('common.refreshed'))
+    },
+    confirmDeleteClient(client) {
+      if (confirm(this.$t('common.confirmDelete'))) {
+        this.deleteClient(client.id)
+>>>>>>> Stashed changes
       }
     },
-
-    handleCloseForm() {
-      this.showClientForm = false
-      this.editingClient = null
+    async deleteClient(id) {
+      this.loading = true
+      try {
+        await this.$store.dispatch('clients/deleteClient', id)
+        this.$toast.success(this.$t('clients.deleteSuccess'))
+      } catch (error) {
+        this.$toast.error(error.message || this.$t('common.deleteError'))
+      } finally {
+        this.loading = false
+      }
     },
-
-    handleClientSaved() {
-      this.handleCloseForm()
+    previousPage() {
+      if (this.pagination.current_page > 1) {
+        this.currentPage = this.pagination.current_page - 1
+        this.loadClients()
+      }
+    },
+    nextPage() {
+      if (this.pagination.current_page < this.pagination.last_page) {
+        this.currentPage = this.pagination.current_page + 1
+        this.loadClients()
+      }
+    },
+    goToPage(page) {
+      this.currentPage = page
       this.loadClients()
     },
-  },
-  mounted() {
-    console.log('🏁 Clients component mounted')
-    this.loadClients()
   },
 }
 </script>

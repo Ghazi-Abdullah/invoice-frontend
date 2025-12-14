@@ -5,15 +5,16 @@
       <div class="mb-8">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between">
           <div>
-            <h1 class="text-3xl font-bold text-gray-900">تفاصيل العميل</h1>
-            <p class="text-gray-600 mt-2">معلومات العميل والفواتير المرتبطة</p>
+            <h1 class="text-3xl font-bold text-gray-900">{{ $t('clients.clientDetails') }}</h1>
+            <p class="text-gray-600 mt-2">{{ $t('clients.clientDetailsDescription') }}</p>
           </div>
           <div class="mt-4 md:mt-0">
             <router-link
               to="/clients"
               class="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
             >
-              رجوع إلى العملاء
+              <i class="fas fa-arrow-left mr-2"></i>
+              {{ $t('common.backToClients') }}
             </router-link>
           </div>
         </div>
@@ -37,47 +38,95 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">معلومات الاتصال</h3>
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">
+              {{ $t('clients.contactInfo') }}
+            </h3>
             <div class="space-y-2">
               <div class="flex justify-between">
-                <span class="text-gray-600">البريد الإلكتروني:</span>
-                <span class="font-medium">{{ client.email || 'غير متوفر' }}</span>
+                <span class="text-gray-600">{{ $t('auth.email') }}:</span>
+                <span class="font-medium">{{ client.email || $t('common.notAvailable') }}</span>
               </div>
               <div class="flex justify-between">
-                <span class="text-gray-600">الهاتف:</span>
-                <span class="font-medium">{{ client.phone || 'غير متوفر' }}</span>
+                <span class="text-gray-600">{{ $t('clients.phone') }}:</span>
+                <span class="font-medium">{{ client.phone || $t('common.notAvailable') }}</span>
               </div>
               <div class="flex justify-between">
-                <span class="text-gray-600">العنوان:</span>
-                <span class="font-medium">{{ client.address || 'غير متوفر' }}</span>
+                <span class="text-gray-600">{{ $t('clients.address') }}:</span>
+                <span class="font-medium">{{ client.address || $t('common.notAvailable') }}</span>
               </div>
+<<<<<<< Updated upstream
+=======
+              <div class="flex justify-between">
+                <span class="text-gray-600">{{ $t('clients.company') }}:</span>
+                <span class="font-medium">{{
+                  client.company_name || $t('common.notAvailable')
+                }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">{{ $t('clients.taxNumber') }}:</span>
+                <span class="font-medium">{{
+                  client.tax_number || $t('common.notAvailable')
+                }}</span>
+              </div>
+>>>>>>> Stashed changes
             </div>
           </div>
 
           <div>
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">الإحصائيات</h3>
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">{{ $t('clients.stats') }}</h3>
             <div class="space-y-2">
               <div class="flex justify-between">
-                <span class="text-gray-600">إجمالي الفواتير:</span>
+                <span class="text-gray-600">{{ $t('clients.totalInvoices') }}:</span>
                 <span class="font-medium">{{ stats.totalInvoices }}</span>
               </div>
               <div class="flex justify-between">
-                <span class="text-gray-600">الفواتير المدفوعة:</span>
+                <span class="text-gray-600">{{ $t('clients.paidInvoices') }}:</span>
                 <span class="font-medium">{{ stats.paidInvoices }}</span>
               </div>
               <div class="flex justify-between">
-                <span class="text-gray-600">الفواتير المتأخرة:</span>
+                <span class="text-gray-600">{{ $t('clients.overdueInvoices') }}:</span>
                 <span class="font-medium">{{ stats.overdueInvoices }}</span>
+              </div>
+<<<<<<< Updated upstream
+            </div>
+          </div>
+        </div>
+=======
+              <div class="flex justify-between">
+                <span class="text-gray-600">{{ $t('clients.registeredAt') }}:</span>
+                <span class="font-medium">{{ formatDate(client.created_at) }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">{{ $t('clients.updatedAt') }}:</span>
+                <span class="font-medium">{{ formatDate(client.updated_at) }}</span>
               </div>
             </div>
           </div>
         </div>
+
+        <!-- Control Buttons -->
+        <div class="flex justify-end space-x-3 mt-6">
+          <button
+            @click="$router.push('/clients')"
+            class="px-4 py-2 text-gray-700 hover:text-gray-900 font-medium"
+          >
+            {{ $t('common.back') }}
+          </button>
+          <button
+            v-if="$store.getters['auth/hasPermission']('edit_client')"
+            @click="editClient"
+            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            <i class="fas fa-edit mr-2"></i> {{ $t('common.edit') }}
+          </button>
+        </div>
+>>>>>>> Stashed changes
       </div>
 
       <!-- Invoices Table -->
       <div v-if="client" class="bg-white shadow rounded-lg">
         <div class="px-6 py-4 border-b border-gray-200">
-          <h3 class="text-lg font-semibold text-gray-900">فواتير العميل</h3>
+          <h3 class="text-lg font-semibold text-gray-900">{{ $t('clients.clientInvoices') }}</h3>
         </div>
         <div class="overflow-x-auto">
           <table class="w-full">
@@ -86,32 +135,32 @@
                 <th
                   class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
-                  رقم الفاتورة
+                  {{ $t('invoices.invoiceNumber') }}
                 </th>
                 <th
                   class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
-                  التاريخ
+                  {{ $t('invoices.issueDate') }}
                 </th>
                 <th
                   class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
-                  الاستحقاق
+                  {{ $t('invoices.dueDate') }}
                 </th>
                 <th
                   class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
-                  المبلغ
+                  {{ $t('common.amount') }}
                 </th>
                 <th
                   class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
-                  الحالة
+                  {{ $t('common.status') }}
                 </th>
                 <th
                   class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
-                  الإجراءات
+                  {{ $t('common.actions') }}
                 </th>
               </tr>
             </thead>
@@ -151,7 +200,7 @@
                     :to="`/invoices/${invoice.id}`"
                     class="text-blue-600 hover:text-blue-900"
                   >
-                    عرض
+                    <i class="fas fa-eye mr-1"></i> {{ $t('common.view') }}
                   </router-link>
                 </td>
               </tr>
@@ -159,6 +208,24 @@
           </table>
         </div>
       </div>
+<<<<<<< Updated upstream
+=======
+
+      <!-- حالة عدم وجود فواتير -->
+      <div v-else-if="client && !loading" class="bg-white shadow rounded-lg p-8 text-center">
+        <i class="fas fa-file-invoice text-gray-300 text-4xl mb-4"></i>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">{{ $t('clients.noInvoices') }}</h3>
+        <p class="text-gray-500 mb-4">{{ $t('clients.noInvoicesMessage') }}</p>
+        <router-link
+          v-if="$store.getters['auth/hasPermission']('create_invoice')"
+          to="/invoices/create"
+          class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          <i class="fas fa-plus mr-2"></i>
+          {{ $t('invoices.create') }}
+        </router-link>
+      </div>
+>>>>>>> Stashed changes
     </div>
   </div>
 </template>
@@ -195,10 +262,10 @@ export default {
 
     getStatusText(status) {
       const statusMap = {
-        draft: 'مسودة',
-        sent: 'مرسلة',
-        paid: 'مدفوعة',
-        overdue: 'متأخرة',
+        draft: this.$t('invoices.statuses.draft'),
+        sent: this.$t('invoices.statuses.sent'),
+        paid: this.$t('invoices.statuses.paid'),
+        overdue: this.$t('invoices.statuses.overdue'),
       }
       return statusMap[status] || status
     },
@@ -218,14 +285,21 @@ export default {
       this.loading = true
       try {
         const clientId = this.$route.params.id
+<<<<<<< Updated upstream
 
         // Fetch client details
+=======
+>>>>>>> Stashed changes
         this.client = await this.$store.dispatch('clients/fetchClient', clientId)
 
         // Fetch all invoices to filter by client
         await this.$store.dispatch('invoices/fetchInvoices')
 
+<<<<<<< Updated upstream
         const allInvoices = this.$store.state.invoices.invoices.data || []
+=======
+        const allInvoices = this.$store.getters['invoices/invoices'] || []
+>>>>>>> Stashed changes
         this.clientInvoices = allInvoices.filter((inv) => inv.client_id === this.client.id)
 
         // Calculate stats
@@ -236,6 +310,11 @@ export default {
         ).length
       } catch (error) {
         console.error('Failed to load client details:', error)
+<<<<<<< Updated upstream
+=======
+        this.$toast.error(this.$t('common.loadError'))
+        this.$router.push('/clients')
+>>>>>>> Stashed changes
       } finally {
         this.loading = false
       }

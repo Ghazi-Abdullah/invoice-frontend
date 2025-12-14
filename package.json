@@ -15,6 +15,15 @@
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^7.1.0",
+<<<<<<< Updated upstream
+=======
+    "@fortawesome/fontawesome-svg-core": "^7.1.0",
+    "@fortawesome/free-brands-svg-icons": "^7.1.0",
+    "@fortawesome/free-regular-svg-icons": "^7.1.0",
+    "@fortawesome/free-solid-svg-icons": "^7.1.0",
+    "@fortawesome/vue-fontawesome": "^3.1.2",
+    "@headlessui/vue": "^1.7.23",
+>>>>>>> Stashed changes
     "axios": "^1.13.2",
     "chart.js": "^3.9.1",
     "click-outside-vue3": "^4.0.1",
@@ -32,7 +41,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.37.0",
-    "@vitejs/plugin-vue": "^6.0.1",
+    "@vitejs/plugin-vue": "^6.0.2",
     "@vue/eslint-config-prettier": "^10.2.0",
     "autoprefixer": "^10.4.22",
     "eslint": "^9.37.0",

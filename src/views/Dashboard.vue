@@ -30,21 +30,37 @@
     <div v-else class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <!-- Welcome Section -->
       <div class="mb-8">
+<<<<<<< Updated upstream
         <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ $t('dashboard.title') }}</h1>
         <p class="text-gray-600 text-lg">{{ $t('dashboard.welcome') }}</p>
+=======
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">لوحة التحكم</h1>
+        <p class="text-gray-600 text-lg">مرحباً بك {{ user?.name }}</p>
+        <p class="text-sm text-gray-500">
+          المجموعة: {{ user?.group?.title_ar || user?.group?.title_en }}
+        </p>
+>>>>>>> Stashed changes
       </div>
 
       <!-- Stats Grid -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <!-- Total Invoices Card -->
-        <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+        <div
+          v-if="hasPermission('view_invoices')"
+          class="bg-white rounded-xl shadow-lg border border-gray-200 p-6"
+        >
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm font-medium text-gray-600">{{ $t('dashboard.total_invoices') }}</p>
               <p class="text-2xl font-bold text-gray-900 mt-2">{{ stats.totalInvoices }}</p>
               <div class="flex items-center mt-2">
+<<<<<<< Updated upstream
                 <span class="text-green-600 text-sm font-medium">+12%</span>
                 <span class="text-gray-500 text-sm mr-2">{{ $t('common.from_last_month') }}</span>
+=======
+                <span class="text-green-600 text-sm font-medium">+{{ stats.invoiceGrowth }}%</span>
+                <span class="text-gray-500 text-sm mr-2">من الشهر الماضي</span>
+>>>>>>> Stashed changes
               </div>
             </div>
             <div class="p-3 bg-blue-50 rounded-lg">
@@ -66,7 +82,10 @@
         </div>
 
         <!-- Total Clients Card -->
-        <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+        <div
+          v-if="hasPermission('view_clients')"
+          class="bg-white rounded-xl shadow-lg border border-gray-200 p-6"
+        >
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm font-medium text-gray-600">{{ $t('dashboard.total_clients') }}</p>
@@ -95,7 +114,10 @@
         </div>
 
         <!-- Paid Invoices Card -->
-        <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+        <div
+          v-if="hasPermission('view_invoices')"
+          class="bg-white rounded-xl shadow-lg border border-gray-200 p-6"
+        >
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm font-medium text-gray-600">{{ $t('invoices.paid') }}</p>
@@ -129,7 +151,10 @@
         </div>
 
         <!-- Revenue Card -->
-        <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+        <div
+          v-if="hasPermission('view_sales_report')"
+          class="bg-white rounded-xl shadow-lg border border-gray-200 p-6"
+        >
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm font-medium text-gray-600">{{ $t('dashboard.total_revenue') }}</p>
@@ -137,8 +162,13 @@
                 {{ formatCurrency(stats.revenue) }}
               </p>
               <div class="flex items-center mt-2">
+<<<<<<< Updated upstream
                 <span class="text-green-600 text-sm font-medium">+15%</span>
                 <span class="text-gray-500 text-sm mr-2">{{ $t('common.from_last_month') }}</span>
+=======
+                <span class="text-green-600 text-sm font-medium">+{{ stats.revenueGrowth }}%</span>
+                <span class="text-gray-500 text-sm mr-2">من الشهر الماضي</span>
+>>>>>>> Stashed changes
               </div>
             </div>
             <div class="p-3 bg-orange-50 rounded-lg">
@@ -169,6 +199,7 @@
             <h2 class="text-xl font-bold text-gray-900 mb-6">{{ $t('buttons.quick_actions') }}</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <router-link
+                v-if="hasPermission('create_invoice')"
                 to="/invoices/create"
                 class="flex items-center p-4 border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors duration-200"
               >
@@ -194,6 +225,7 @@
               </router-link>
 
               <router-link
+                v-if="hasPermission('create_client')"
                 to="/clients/create"
                 class="flex items-center p-4 border border-green-200 rounded-lg hover:bg-green-50 transition-colors duration-200"
               >
@@ -219,6 +251,7 @@
               </router-link>
 
               <router-link
+                v-if="hasPermission('view_invoices')"
                 to="/invoices"
                 class="flex items-center p-4 border border-purple-200 rounded-lg hover:bg-purple-50 transition-colors duration-200"
               >
@@ -244,6 +277,7 @@
               </router-link>
 
               <router-link
+                v-if="hasPermission('view_clients')"
                 to="/clients"
                 class="flex items-center p-4 border border-yellow-200 rounded-lg hover:bg-yellow-50 transition-colors duration-200"
               >
@@ -271,10 +305,14 @@
           </div>
 
           <!-- Recent Clients -->
-          <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+          <div
+            v-if="hasPermission('view_clients')"
+            class="bg-white rounded-xl shadow-lg border border-gray-200 p-6"
+          >
             <div class="flex items-center justify-between mb-6">
               <h2 class="text-xl font-bold text-gray-900">{{ $t('clients.recent_activity') }}</h2>
               <router-link
+                v-if="hasPermission('view_clients')"
                 to="/clients"
                 class="text-blue-600 hover:text-blue-700 text-sm font-medium"
               >
@@ -298,6 +336,7 @@
               </svg>
               <p class="text-gray-500">{{ $t('clients.no_clients_yet') }}</p>
               <router-link
+                v-if="hasPermission('create_client')"
                 to="/clients/create"
                 class="text-blue-600 hover:text-blue-700 text-sm font-medium mt-2 inline-block"
               >
@@ -310,7 +349,7 @@
                 v-for="client in recentClients"
                 :key="client.id"
                 class="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors cursor-pointer"
-                @click="$router.push(`/clients/${client.id}`)"
+                @click="goToClient(client.id)"
               >
                 <div
                   class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-sm"
@@ -319,9 +358,13 @@
                 </div>
                 <div class="flex-1">
                   <p class="font-semibold text-gray-900">{{ client.name }}</p>
+<<<<<<< Updated upstream
                   <p class="text-gray-600 text-sm mt-1">
                     {{ client.email || $t('clients.notProvided') }}
                   </p>
+=======
+                  <p class="text-gray-600 text-sm mt-1">{{ client.email || 'غير متوفر' }}</p>
+>>>>>>> Stashed changes
                   <p class="text-gray-500 text-xs mt-1">
                     {{ $t('clients.joined') }}: {{ formatDate(client.created_at) }}
                   </p>
@@ -330,7 +373,11 @@
                   <span
                     class="inline-block px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full"
                   >
+<<<<<<< Updated upstream
                     {{ $t('common.active') }}
+=======
+                    {{ client.status === 'active' ? 'نشط' : 'غير نشط' }}
+>>>>>>> Stashed changes
                   </span>
                 </div>
               </div>
@@ -341,10 +388,14 @@
         <!-- Right Column - 1/3 width -->
         <div class="space-y-8">
           <!-- Recent Invoices -->
-          <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+          <div
+            v-if="hasPermission('view_invoices')"
+            class="bg-white rounded-xl shadow-lg border border-gray-200 p-6"
+          >
             <div class="flex items-center justify-between mb-6">
               <h2 class="text-xl font-bold text-gray-900">{{ $t('invoices.recent_invoices') }}</h2>
               <router-link
+                v-if="hasPermission('view_invoices')"
                 to="/invoices"
                 class="text-blue-600 hover:text-blue-700 text-sm font-medium"
               >
@@ -368,6 +419,7 @@
               </svg>
               <p class="text-gray-500">{{ $t('invoices.no_invoices_yet') }}</p>
               <router-link
+                v-if="hasPermission('create_invoice')"
                 to="/invoices/create"
                 class="text-blue-600 hover:text-blue-700 text-sm font-medium mt-2 inline-block"
               >
@@ -380,7 +432,7 @@
                 v-for="invoice in recentInvoices"
                 :key="invoice.id"
                 class="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors cursor-pointer"
-                @click="$router.push(`/invoices/${invoice.id}`)"
+                @click="goToInvoice(invoice.id)"
               >
                 <div>
                   <p class="font-semibold text-gray-900">{{ invoice.invoice_number }}</p>
@@ -404,6 +456,7 @@
 
           <!-- Quick Stats -->
           <div
+            v-if="hasPermission('view_sales_report')"
             class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl shadow-lg p-6 text-white"
           >
             <h3 class="text-lg font-bold mb-4">{{ $t('common.quick_stats') }}</h3>
@@ -449,21 +502,54 @@ export default {
         newClientsThisMonth: 0,
         averageInvoice: 0,
         collectionRate: 0,
-        clientsGrowth: 10,
+        clientsGrowth: 0,
+        invoiceGrowth: 0,
+        revenueGrowth: 0,
         paymentRate: 0,
       },
     }
   },
+<<<<<<< Updated upstream
+=======
+  computed: {
+    user() {
+      return this.$store.state.auth.user
+    },
+    permissions() {
+      return this.$store.state.auth.permissions || []
+    },
+    isAdmin() {
+      return this.$store.state.auth.is_admin || false
+    },
+  },
+>>>>>>> Stashed changes
   mounted() {
     this.loadDashboardData()
   },
   methods: {
+    hasPermission(permission) {
+      // إذا كان المستخدم مديراً، لديه جميع الصلاحيات
+      if (this.isAdmin) return true
+
+      return this.permissions.includes(permission)
+    },
+
     formatCurrency(amount) {
+<<<<<<< Updated upstream
       return new Intl.NumberFormat('ar-SA', {
         style: 'currency',
         currency: 'SAR',
       }).format(amount || 0)
+=======
+      if (!amount) return '0.00 ر.س'
+      const num = parseFloat(amount)
+      if (isNaN(num)) return '0.00 ر.س'
+      return (
+        num.toLocaleString('ar-SA', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ر.س'
+      )
+>>>>>>> Stashed changes
     },
+
     formatDate(dateString) {
       if (!dateString) return this.$t('common.not_provided')
       return new Date(dateString).toLocaleDateString('ar-SA', {
@@ -472,6 +558,7 @@ export default {
         day: 'numeric',
       })
     },
+
     getInitials(name) {
       if (!name) return '?'
       return name
@@ -481,6 +568,7 @@ export default {
         .toUpperCase()
         .substring(0, 2)
     },
+
     getStatusClass(status) {
       const classes = {
         paid: 'bg-green-100 text-green-800',
@@ -490,11 +578,38 @@ export default {
       }
       return classes[status] || 'bg-gray-100 text-gray-800'
     },
+<<<<<<< Updated upstream
+=======
+
+    getStatusText(status) {
+      const texts = {
+        paid: 'مدفوعة',
+        sent: 'مرسلة',
+        draft: 'مسودة',
+        overdue: 'متأخرة',
+      }
+      return texts[status] || status
+    },
+
+    goToClient(id) {
+      if (this.hasPermission('view_clients')) {
+        this.$router.push(`/clients/${id}`)
+      }
+    },
+
+    goToInvoice(id) {
+      if (this.hasPermission('view_invoices')) {
+        this.$router.push(`/invoices/${id}`)
+      }
+    },
+
+>>>>>>> Stashed changes
     async loadDashboardData() {
       this.loading = true
       try {
         console.log('🔄 جلب بيانات Dashboard...')
 
+<<<<<<< Updated upstream
         // جلب العملاء
         console.log('📋 جلب العملاء...')
         const clientsResponse = await this.$store.dispatch('clients/fetchClients')
@@ -504,6 +619,27 @@ export default {
         console.log('🧾 جلب الفواتير...')
         const invoicesResponse = await this.$store.dispatch('invoices/fetchInvoices')
         console.log('📦 استجابة الفواتير:', invoicesResponse)
+=======
+        // جلب العملاء فقط إذا كان لديه الصلاحية
+        if (this.hasPermission('view_clients')) {
+          console.log('📋 جلب العملاء...')
+          try {
+            await this.$store.dispatch('clients/fetchClients')
+          } catch (error) {
+            console.warn('⚠️ لا يمكن جلب العملاء:', error.message)
+          }
+        }
+
+        // جلب الفواتير فقط إذا كان لديه الصلاحية
+        if (this.hasPermission('view_invoices')) {
+          console.log('🧾 جلب الفواتير...')
+          try {
+            await this.$store.dispatch('invoices/fetchInvoices')
+          } catch (error) {
+            console.warn('⚠️ لا يمكن جلب الفواتير:', error.message)
+          }
+        }
+>>>>>>> Stashed changes
 
         // تحديث البيانات
         this.updateDashboardData()
@@ -514,6 +650,7 @@ export default {
         this.loading = false
       }
     },
+
     updateDashboardData() {
       // الحصول على البيانات من الـ store
       const clients = this.$store.state.clients.clients.data || []
@@ -535,6 +672,7 @@ export default {
       // حساب الإحصائيات
       this.calculateStats(clients, invoices)
     },
+
     calculateStats(clients, invoices) {
       const now = new Date()
       const thisMonth = now.getMonth()
@@ -568,6 +706,11 @@ export default {
           : 0
 
       this.stats.collectionRate = this.stats.paymentRate
+
+      // معدلات النمو (محاكاة)
+      this.stats.clientsGrowth = Math.floor(Math.random() * 20) + 5
+      this.stats.invoiceGrowth = Math.floor(Math.random() * 25) + 10
+      this.stats.revenueGrowth = Math.floor(Math.random() * 30) + 15
 
       console.log('📈 الإحصائيات المحسوبة:', this.stats)
     },
@@ -609,23 +752,24 @@ export default {
   }
 }
 
-@media (max-width: 768px) {
-  .grid-cols-1 {
-    grid-template-columns: 1fr;
-  }
-
-  .grid-cols-2 {
-    grid-template-columns: repeat(2, 1fr);
-  }
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  transition: all 0.2s;
 }
 
-@media (min-width: 1024px) {
-  .lg\:grid-cols-3 {
-    grid-template-columns: repeat(3, 1fr);
-  }
+.btn-primary {
+  background-color: #3b82f6;
+  color: white;
+  border: 1px solid #3b82f6;
+}
 
-  .lg\:col-span-2 {
-    grid-column: span 2 / span 2;
-  }
+.btn-primary:hover {
+  background-color: #2563eb;
+  border-color: #2563eb;
 }
 </style>

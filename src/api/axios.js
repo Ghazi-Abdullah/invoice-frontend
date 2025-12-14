@@ -1,15 +1,24 @@
+<<<<<<< Updated upstream
 // api.js
+=======
+>>>>>>> Stashed changes
 import axios from 'axios'
 import { toast } from 'vue3-toastify'
 
+<<<<<<< Updated upstream
 // إنشاء axios instance مع الإعدادات الأساسية
 const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000/api',
+=======
+const instance = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000',
+>>>>>>> Stashed changes
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
     'X-Requested-With': 'XMLHttpRequest'
   },
+<<<<<<< Updated upstream
   timeout: 10000, // 10 ثانية timeout
   withCredentials: true // إذا كنت تستخدم cookies
 })
@@ -18,6 +27,14 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
   (config) => {
     // إضافة التوكن من localStorage إذا موجود
+=======
+  timeout: 30000 // 30 ثانية
+})
+
+// إضافة interceptor للطلبات
+instance.interceptors.request.use(
+  (config) => {
+>>>>>>> Stashed changes
     const token = localStorage.getItem('token')
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
@@ -139,9 +156,16 @@ api.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`
       console.log('🔐 Adding auth token to request')
     }
+
+    console.log(`🚀 ${config.method.toUpperCase()} ${config.baseURL}${config.url}`, {
+      data: config.data,
+      params: config.params
+    })
+
     return config
   },
   (error) => {
+    console.error('❌ Request error:', error)
     return Promise.reject(error)
   }
 )
@@ -149,6 +173,7 @@ api.interceptors.request.use(
 // Response Interceptor
 api.interceptors.response.use(
   (response) => {
+<<<<<<< Updated upstream
     console.log('✅ API Response:', response.config.url, response.status)
     return response
   },
@@ -169,6 +194,45 @@ api.interceptors.response.use(
       }
     }))
 
+=======
+    console.log(`✅ ${response.status} ${response.config.url}`, {
+      data: response.data
+    })
+    return response
+  },
+  (error) => {
+    if (error.response) {
+      // الطلب تم وأعيدت استجابة مع رمز حالة خطأ
+      console.error(`❌ ${error.response.status} Error: ${error.config.url}`, {
+        data: error.response.data,
+        headers: error.response.headers
+      })
+
+      if (error.response.status === 401) {
+        // إذا كان الخطأ 401 (غير مصرح)، قم بتسجيل الخروج
+        console.log('🔒 Unauthorized access, clearing auth data...')
+        localStorage.removeItem('token')
+        delete instance.defaults.headers.common['Authorization']
+
+        // إعادة توجيه إلى صفحة تسجيل الدخول إذا كنا في المتصفح
+        if (typeof window !== 'undefined') {
+          window.location.href = '/login'
+        }
+      } else if (error.response.status === 500) {
+        console.error('🔥 Server 500 Error:', error.response.data)
+      }
+    } else if (error.request) {
+      // الطلب تم ولكن لم يتم استقبال أي رد
+      console.error('❌ No response received:', {
+        url: error.config.url,
+        request: error.request
+      })
+    } else {
+      // حدث خطأ أثناء إعداد الطلب
+      console.error('❌ Request setup error:', error.message)
+    }
+
+>>>>>>> Stashed changes
     return Promise.reject(error)
   }
 )

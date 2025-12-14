@@ -1,96 +1,240 @@
 <template>
-  <div class="create-invoice">
-    <div class="container">
-      <div class="page-header">
-        <h1>إنشاء فاتورة جديدة</h1>
-        <router-link to="/invoices" class="btn btn-secondary"> رجوع للفواتير </router-link>
+  <div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Header -->
+      <div class="flex justify-between items-center mb-8">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900">{{ $t('invoices.create') }}</h1>
+          <p class="text-gray-600 mt-2">{{ $t('invoices.createDescription') }}</p>
+        </div>
+        <div>
+          <router-link
+            to="/invoices"
+            class="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+          >
+            <i class="fas fa-arrow-left mr-2"></i>
+            {{ $t('common.back') }}
+          </router-link>
+        </div>
       </div>
 
-      <div class="card">
+      <!-- Invoice Form -->
+      <div class="bg-white rounded-xl shadow-lg p-6">
         <form @submit.prevent="createInvoice">
-          <div class="form-group">
-            <label for="client">العميل</label>
-            <select id="client" v-model="invoiceData.client_id" required class="form-input">
-              <option value="">اختر العميل</option>
-              <option v-for="client in clients" :key="client.id" :value="client.id">
-                {{ client.name }} - {{ client.company_name }}
-              </option>
-            </select>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label for="issue_date">تاريخ الإصدار</label>
-              <input
-                type="date"
-                id="issue_date"
-                v-model="invoiceData.issue_date"
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <!-- Client Selection -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                {{ $t('invoices.client') }} *
+              </label>
+              <select
+                v-model="invoiceData.client_id"
                 required
-                class="form-input"
-              />
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">{{ $t('common.selectClient') }}</option>
+                <option v-for="client in clients" :key="client.id" :value="client.id">
+                  {{ client.name }} - {{ client.company_name || client.email }}
+                </option>
+              </select>
             </div>
 
-            <div class="form-group">
-              <label for="due_date">تاريخ الاستحقاق</label>
+            <!-- Invoice Number -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                {{ $t('invoices.invoiceNumber') }} *
+              </label>
               <input
-                type="date"
-                id="due_date"
-                v-model="invoiceData.due_date"
-                required
-                class="form-input"
-              />
-            </div>
-          </div>
-
-          <div class="invoice-items">
-            <h3>عناصر الفاتورة</h3>
-
-            <div v-for="(item, index) in invoiceData.items" :key="index" class="item-row">
-              <input
+                v-model="invoiceData.invoice_number"
                 type="text"
-                v-model="item.description"
-                placeholder="وصف العنصر"
-                class="form-input"
                 required
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                :placeholder="$t('invoices.invoiceNumberPlaceholder')"
               />
-              <input
-                type="number"
-                v-model="item.quantity"
-                placeholder="الكمية"
-                min="1"
-                class="form-input"
-                required
-              />
-              <input
-                type="number"
-                v-model="item.unit_price"
-                placeholder="سعر الوحدة"
-                min="0"
-                step="0.01"
-                class="form-input"
-                required
-              />
-              <span class="item-total">{{ (item.quantity * item.unit_price).toFixed(2) }}</span>
-              <button type="button" @click="removeItem(index)" class="btn btn-danger">×</button>
             </div>
 
-            <button type="button" @click="addItem" class="btn btn-secondary">إضافة عنصر</button>
+            <!-- Issue Date -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                {{ $t('invoices.issueDate') }} *
+              </label>
+              <input
+                v-model="invoiceData.issue_date"
+                type="date"
+                required
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <!-- Due Date -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                {{ $t('invoices.dueDate') }} *
+              </label>
+              <input
+                v-model="invoiceData.due_date"
+                type="date"
+                required
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
           </div>
 
-          <div class="form-group">
-            <label for="notes">ملاحظات</label>
+          <!-- Invoice Items -->
+          <div class="mb-8">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-lg font-semibold text-gray-900">{{ $t('invoices.items') }}</h3>
+              <button
+                type="button"
+                @click="addItem"
+                class="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
+              >
+                <i class="fas fa-plus mr-2"></i> {{ $t('invoices.addItem') }}
+              </button>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      {{ $t('common.description') }}
+                    </th>
+                    <th
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      {{ $t('common.quantity') }}
+                    </th>
+                    <th
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      {{ $t('common.unitPrice') }}
+                    </th>
+                    <th
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      {{ $t('common.total') }}
+                    </th>
+                    <th
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      {{ $t('common.actions') }}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                  <tr v-for="(item, index) in invoiceData.items" :key="index">
+                    <td class="px-6 py-4">
+                      <input
+                        type="text"
+                        v-model="item.description"
+                        required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        :placeholder="$t('invoices.itemDescription')"
+                      />
+                    </td>
+                    <td class="px-6 py-4">
+                      <input
+                        type="number"
+                        v-model="item.quantity"
+                        min="1"
+                        required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        @input="calculateItemTotal(index)"
+                      />
+                    </td>
+                    <td class="px-6 py-4">
+                      <input
+                        type="number"
+                        v-model="item.unit_price"
+                        min="0"
+                        step="0.01"
+                        required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        @input="calculateItemTotal(index)"
+                      />
+                    </td>
+                    <td class="px-6 py-4">
+                      <span class="font-medium">{{ calculateItemTotal(index) }}</span>
+                    </td>
+                    <td class="px-6 py-4">
+                      <button
+                        type="button"
+                        @click="removeItem(index)"
+                        class="text-red-600 hover:text-red-900"
+                        :disabled="invoiceData.items.length === 1"
+                      >
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+                <tfoot class="bg-gray-50">
+                  <tr>
+                    <td colspan="3" class="px-6 py-4 text-right font-medium">
+                      {{ $t('common.subtotal') }}:
+                    </td>
+                    <td colspan="2" class="px-6 py-4 font-bold text-lg">
+                      {{ calculateSubtotal() }}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colspan="3" class="px-6 py-4 text-right font-medium">
+                      {{ $t('common.tax') }} (15%):
+                    </td>
+                    <td colspan="2" class="px-6 py-4 font-bold">
+                      {{ calculateTax() }}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colspan="3" class="px-6 py-4 text-right font-medium">
+                      {{ $t('common.total') }}:
+                    </td>
+                    <td colspan="2" class="px-6 py-4 font-bold text-xl text-blue-600">
+                      {{ calculateTotal() }}
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+
+          <!-- Notes -->
+          <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              {{ $t('common.notes') }}
+            </label>
             <textarea
-              id="notes"
               v-model="invoiceData.notes"
-              class="form-input"
               rows="3"
-              placeholder="ملاحظات إضافية..."
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              :placeholder="$t('invoices.notesPlaceholder')"
             ></textarea>
           </div>
 
-          <div class="form-actions">
-            <button type="submit" :disabled="loading" class="btn btn-primary">
-              {{ loading ? 'جاري الإنشاء...' : 'إنشاء الفاتورة' }}
+          <!-- Form Actions -->
+          <div class="flex justify-end space-x-3">
+            <router-link
+              to="/invoices"
+              class="px-6 py-3 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
+            >
+              {{ $t('common.cancel') }}
+            </router-link>
+            <button
+              type="submit"
+              :disabled="loading || !isFormValid"
+              class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+            >
+              <span v-if="loading">
+                <i class="fas fa-spinner fa-spin mr-2"></i>
+                {{ $t('common.creating') }}
+              </span>
+              <span v-else>
+                <i class="fas fa-save mr-2"></i>
+                {{ $t('common.create') }}
+              </span>
             </button>
           </div>
         </form>
@@ -100,104 +244,118 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import { useInvoiceStore } from '../stores/modules/invoices'
-import { useClientStore } from '../stores/clients'
-
 export default {
   name: 'CreateInvoice',
-  setup() {
-    const invoiceStore = useInvoiceStore()
-    const clientStore = useClientStore()
-    const router = useRouter()
-
-    const invoiceData = ref({
-      client_id: '',
-      issue_date: new Date().toISOString().split('T')[0],
-      due_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      items: [{ description: '', quantity: 1, unit_price: 0 }],
-      notes: '',
-    })
-
-    const loading = ref(false)
-
-    onMounted(async () => {
-      await clientStore.fetchClients()
-    })
-
-    const addItem = () => {
-      invoiceData.value.items.push({ description: '', quantity: 1, unit_price: 0 })
-    }
-
-    const removeItem = (index) => {
-      if (invoiceData.value.items.length > 1) {
-        invoiceData.value.items.splice(index, 1)
-      }
-    }
-
-    const createInvoice = async () => {
-      loading.value = true
-      try {
-        await invoiceStore.createInvoice(invoiceData.value)
-        router.push('/invoices')
-      } catch (error) {
-        console.error('Failed to create invoice:', error)
-      } finally {
-        loading.value = false
-      }
-    }
-
+  data() {
     return {
-      invoiceData,
-      loading,
-      clients: clientStore.clients,
-      addItem,
-      removeItem,
-      createInvoice,
+      loading: false,
+      clients: [],
+      invoiceData: {
+        client_id: '',
+        invoice_number: '',
+        issue_date: new Date().toISOString().split('T')[0],
+        due_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        items: [
+          {
+            description: '',
+            quantity: 1,
+            unit_price: 0,
+            total: 0,
+          },
+        ],
+        notes: '',
+      },
     }
+  },
+  computed: {
+    isFormValid() {
+      return (
+        this.invoiceData.client_id &&
+        this.invoiceData.invoice_number &&
+        this.invoiceData.issue_date &&
+        this.invoiceData.due_date &&
+        this.invoiceData.items.every(
+          (item) => item.description && item.quantity > 0 && item.unit_price >= 0,
+        )
+      )
+    },
+  },
+  mounted() {
+    this.loadClients()
+  },
+  methods: {
+    async loadClients() {
+      try {
+        await this.$store.dispatch('clients/fetchClients')
+        this.clients = this.$store.getters['clients/clients']
+      } catch (error) {
+        this.$toast.error(this.$t('common.loadError'))
+      }
+    },
+    addItem() {
+      this.invoiceData.items.push({
+        description: '',
+        quantity: 1,
+        unit_price: 0,
+        total: 0,
+      })
+    },
+    removeItem(index) {
+      if (this.invoiceData.items.length > 1) {
+        this.invoiceData.items.splice(index, 1)
+        this.calculateTotals()
+      }
+    },
+    calculateItemTotal(index) {
+      const item = this.invoiceData.items[index]
+      if (item.quantity && item.unit_price) {
+        item.total = parseFloat(item.quantity) * parseFloat(item.unit_price)
+      } else {
+        item.total = 0
+      }
+      this.calculateTotals()
+      return item.total.toFixed(2)
+    },
+    calculateSubtotal() {
+      return this.invoiceData.items.reduce((sum, item) => sum + (item.total || 0), 0).toFixed(2)
+    },
+    calculateTax() {
+      const subtotal = parseFloat(this.calculateSubtotal())
+      return (subtotal * 0.15).toFixed(2)
+    },
+    calculateTotal() {
+      const subtotal = parseFloat(this.calculateSubtotal())
+      const tax = parseFloat(this.calculateTax())
+      return (subtotal + tax).toFixed(2)
+    },
+    calculateTotals() {
+      // Update the invoice data with calculated totals
+      this.invoiceData.subtotal = parseFloat(this.calculateSubtotal())
+      this.invoiceData.tax_amount = parseFloat(this.calculateTax())
+      this.invoiceData.total_amount = parseFloat(this.calculateTotal())
+    },
+    async createInvoice() {
+      this.loading = true
+      try {
+        // Prepare data for API
+        const data = {
+          ...this.invoiceData,
+          items: this.invoiceData.items.map((item) => ({
+            description: item.description,
+            quantity: item.quantity,
+            unit_price: item.unit_price,
+          })),
+        }
+
+        await this.$store.dispatch('invoices/createInvoice', data)
+        this.$toast.success(this.$t('invoices.createSuccess'))
+        this.$router.push('/invoices')
+      } catch (error) {
+        this.$toast.error(error.message || this.$t('invoices.createError'))
+      } finally {
+        this.loading = false
+      }
+    },
   },
 }
 </script>
-
-<style scoped>
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-}
-
-.invoice-items {
-  margin: 2rem 0;
-}
-
-.item-row {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr auto;
-  gap: 0.5rem;
-  align-items: center;
-  margin-bottom: 0.5rem;
-}
-
-.item-total {
-  text-align: center;
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-.form-actions {
-  margin-top: 2rem;
-  text-align: left;
-}
-
-@media (max-width: 768px) {
-  .form-row {
-    grid-template-columns: 1fr;
-  }
-
-  .item-row {
-    grid-template-columns: 1fr;
-    gap: 0.5rem;
-  }
-}
-</style>
