@@ -1,33 +1,145 @@
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-/* RTL Support */
-[dir='rtl'] {
-  text-align: right;
+/* تنسيقات مخصصة */
+:root {
+  --primary-color: #3b82f6;
+  --secondary-color: #10b981;
+  --danger-color: #ef4444;
+  --warning-color: #f59e0b;
+  --dark-color: #1f2937;
+  --light-color: #f9fafb;
 }
 
-/* Custom scrollbar for RTL */
-.rtl-scroll {
+/* تحسينات عامة */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   direction: rtl;
 }
 
-.rtl-scroll > * {
-  direction: ltr;
+/* تخصيص scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
 }
 
-/* Chart container */
-.chart-container {
-  direction: ltr;
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
 }
 
-/* Print styles */
-@media print {
-  .no-print {
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* فصول مخصصة */
+.btn {
+  @apply px-4 py-2 rounded-lg font-medium transition-colors duration-200;
+}
+
+.btn-primary {
+  @apply bg-blue-600 text-white hover:bg-blue-700;
+}
+
+.btn-secondary {
+  @apply bg-gray-200 text-gray-800 hover:bg-gray-300;
+}
+
+.btn-success {
+  @apply bg-green-600 text-white hover:bg-green-700;
+}
+
+.btn-danger {
+  @apply bg-red-600 text-white hover:bg-red-700;
+}
+
+.btn-warning {
+  @apply bg-yellow-500 text-white hover:bg-yellow-600;
+}
+
+.btn-outline {
+  @apply border border-gray-300 bg-transparent hover:bg-gray-50;
+}
+
+/* كروت */
+.card {
+  @apply bg-white rounded-xl shadow-lg border border-gray-200;
+}
+
+.card-header {
+  @apply border-b border-gray-200 px-6 py-4;
+}
+
+.card-body {
+  @apply p-6;
+}
+
+.card-footer {
+  @apply border-t border-gray-200 px-6 py-4;
+}
+
+/* نموذج */
+.form-group {
+  @apply mb-4;
+}
+
+.form-label {
+  @apply block text-sm font-medium text-gray-700 mb-1;
+}
+
+.form-control {
+  @apply w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
+}
+
+.form-control-error {
+  @apply border-red-500 focus:ring-red-500 focus:border-red-500;
+}
+
+.form-error {
+  @apply text-red-500 text-sm mt-1;
+}
+
+/* جدول */
+.table {
+  @apply min-w-full divide-y divide-gray-200;
+}
+
+.table th {
+  @apply px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider;
+}
+
+.table td {
+  @apply px-6 py-4 whitespace-nowrap text-sm text-gray-900;
+}
+
+.table tr {
+  @apply hover:bg-gray-50;
+}
+
+/* تحسينات للعربية */
+.rtl {
+  direction: rtl;
+  text-align: right;
+}
+
+.ltr {
+  direction: ltr;
+  text-align: left;
+}
+
+/* تحسينات للشاشات الصغيرة */
+@media (max-width: 768px) {
+  .hide-mobile {
     display: none !important;
   }
 
-  .print-only {
+  .show-mobile {
     display: block !important;
   }
 }

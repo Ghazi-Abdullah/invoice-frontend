@@ -1,8 +1,6 @@
 <template>
-<<<<<<< HEAD
-<<<<<<< Updated upstream
   <div class="min-h-screen bg-gray-50/30">
-    <!-- قسم التصحيح الموسع -->
+    <!-- قسم التصحيح الموسع (يمكن إزالته لاحقاً) -->
     <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-4">
       <div class="flex items-center justify-between">
         <div>
@@ -20,14 +18,14 @@
             </div>
             <div>
               <span class="font-medium">عدد العملاء:</span>
-              <span :class="clientsData.length > 0 ? 'text-green-600' : 'text-red-600'">
-                {{ clientsData.length }}
+              <span :class="filteredClients.length > 0 ? 'text-green-600' : 'text-red-600'">
+                {{ filteredClients.length }}
               </span>
             </div>
             <div>
-              <span class="font-medium">Has Clients:</span>
-              <span :class="hasClients ? 'text-green-600' : 'text-red-600'">
-                {{ hasClients }}
+              <span class="font-medium">Has Permission:</span>
+              <span :class="hasPermission('view_clients') ? 'text-green-600' : 'text-red-600'">
+                {{ hasPermission('view_clients') }}
               </span>
             </div>
           </div>
@@ -39,22 +37,9 @@
           إعادة تحميل
         </button>
       </div>
-
-      <details class="mt-3">
-        <summary class="cursor-pointer font-medium text-blue-700">
-          عرض البيانات الكاملة من الـ Store
-        </summary>
-        <div class="mt-2 bg-white p-3 rounded border">
-          <pre class="text-xs overflow-auto">{{ JSON.stringify(clientsStore, null, 2) }}</pre>
-        </div>
-      </details>
     </div>
 
-    <!-- باقي محتوى الصفحة -->
-=======
-  <div class="min-h-screen bg-gray-50">
     <!-- Header -->
->>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73
     <div class="bg-white border-b border-gray-200">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
@@ -76,85 +61,94 @@
               <p class="text-gray-600 mt-1">إدارة قاعدة عملائك بسهولة</p>
             </div>
           </div>
-=======
-  <div class="container mx-auto px-4 py-8">
-    <div class="flex justify-between items-center mb-6">
-      <div>
-        <h1 class="text-2xl font-bold text-gray-800">{{ $t('clients.title') }}</h1>
-        <p class="text-gray-600 mt-1">{{ $t('clients.subtitle') }}</p>
-      </div>
-      <div class="flex space-x-3">
-        <button
-          v-if="$store.getters['auth/hasPermission']('create_client')"
-          @click="$router.push('/clients/create')"
-          class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center"
-        >
-          <i class="fas fa-plus mr-2"></i> {{ $t('clients.create') }}
-        </button>
+          <div class="mt-4 sm:mt-0">
+            <button
+              v-if="hasPermission('create_client')"
+              @click="$router.push('/clients/create')"
+              class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                />
+              </svg>
+              إضافة عميل جديد
+            </button>
+          </div>
+        </div>
       </div>
     </div>
->>>>>>> Stashed changes
 
     <!-- Search and Filter -->
-    <div class="bg-white p-4 rounded-lg shadow mb-6">
-      <div class="flex flex-col md:flex-row md:items-center md:space-x-4">
-        <div class="flex-1">
-          <input
-            type="text"
-            v-model="searchQuery"
-            :placeholder="$t('common.search')"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-        <div class="mt-4 md:mt-0">
-          <button
-            @click="refreshClients"
-            class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg flex items-center"
-          >
-<<<<<<< Updated upstream
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-              />
-            </svg>
-<<<<<<< HEAD
-            <span>{{ $t('clients.addClient') }}</span>
-=======
-            <i class="fas fa-redo-alt mr-2"></i> {{ $t('common.refresh') }}
->>>>>>> Stashed changes
-=======
-            <span>إضافة عميل جديد</span>
->>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73
-          </button>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div class="bg-white p-4 rounded-lg shadow mb-6">
+        <div class="flex flex-col md:flex-row md:items-center md:space-x-4">
+          <div class="flex-1">
+            <input
+              type="text"
+              v-model="searchQuery"
+              placeholder="ابحث باسم العميل أو البريد أو الهاتف..."
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div class="mt-4 md:mt-0 flex space-x-2">
+            <button
+              @click="loadClients"
+              class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg flex items-center"
+            >
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                />
+              </svg>
+              تحديث
+            </button>
+            <button
+              @click="exportClients"
+              class="bg-green-100 hover:bg-green-200 text-green-700 px-4 py-2 rounded-lg flex items-center"
+            >
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
+              </svg>
+              تصدير
+            </button>
+          </div>
         </div>
       </div>
-    </div>
 
-<<<<<<< Updated upstream
-    <!-- المحتوى الرئيسي -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <!-- حالة التحميل -->
+      <!-- Loading State -->
       <div v-if="loading" class="text-center py-12">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-        <p class="text-gray-600 mt-4">جاري التحميل...</p>
+        <p class="text-gray-600 mt-4">جاري تحميل العملاء...</p>
       </div>
 
-      <!-- حالة الخطأ -->
+      <!-- Error State -->
       <div v-else-if="error" class="bg-red-50 border border-red-200 rounded-2xl p-6 text-center">
         <p class="text-red-600">{{ error }}</p>
         <button
-          @click="loadClients()"
+          @click="loadClients"
           class="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
         >
           إعادة المحاولة
         </button>
       </div>
 
-      <!-- حالة عدم وجود عملاء -->
-      <div v-else-if="!loading && clientsData.length === 0" class="text-center py-12">
+      <!-- No Clients State -->
+      <div
+        v-else-if="!loading && filteredClients.length === 0 && searchQuery === ''"
+        class="text-center py-12"
+      >
         <svg
           class="w-24 h-24 text-gray-300 mx-auto mb-4"
           fill="none"
@@ -171,7 +165,8 @@
         <h3 class="text-lg font-medium text-gray-900 mb-2">لا يوجد عملاء</h3>
         <p class="text-gray-500 mb-4">لم يتم إضافة أي عملاء بعد</p>
         <button
-          @click="showClientForm = true"
+          v-if="hasPermission('create_client')"
+          @click="$router.push('/clients/create')"
           class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
         >
           <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -186,201 +181,251 @@
         </button>
       </div>
 
-      <!-- قائمة العملاء -->
-      <div v-else>
-        <ClientList
-          :clients="clientsData"
-          :loading="loading"
-          @edit="handleEditClient"
-          @delete="handleDeleteClient"
-          @view="handleViewClient"
-          @add="showClientForm = true"
-        />
-      </div>
-=======
-    <!-- Loading State -->
-    <div v-if="loading" class="text-center py-12">
-      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
-      <p class="mt-4 text-gray-600">{{ $t('common.loading') }}</p>
->>>>>>> Stashed changes
-    </div>
-
-    <!-- Clients Table -->
-    <div v-else class="bg-white rounded-lg shadow overflow-hidden">
-      <div v-if="filteredClients.length === 0" class="text-center py-12">
-        <i class="fas fa-users text-gray-300 text-4xl mb-4"></i>
-        <h3 class="text-lg font-medium text-gray-900 mb-2">{{ $t('clients.noClients') }}</h3>
-        <p class="text-gray-500 mb-4">{{ $t('clients.noClientsMessage') }}</p>
-        <button
-          v-if="$store.getters['auth/hasPermission']('create_client')"
-          @click="$router.push('/clients/create')"
-          class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
+      <!-- No Search Results -->
+      <div
+        v-else-if="!loading && filteredClients.length === 0 && searchQuery !== ''"
+        class="text-center py-12"
+      >
+        <svg
+          class="w-24 h-24 text-gray-300 mx-auto mb-4"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
         >
-          <i class="fas fa-plus mr-2"></i> {{ $t('clients.create') }}
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+          />
+        </svg>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">لا توجد نتائج</h3>
+        <p class="text-gray-500 mb-4">لم يتم العثور على عملاء تطابق البحث "{{ searchQuery }}"</p>
+        <button
+          @click="searchQuery = ''"
+          class="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+        >
+          عرض جميع العملاء
         </button>
       </div>
 
-      <table v-else class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
-          <tr>
-            <th
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              {{ $t('clients.name') }}
-            </th>
-            <th
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              {{ $t('auth.email') }}
-            </th>
-            <th
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              {{ $t('clients.phone') }}
-            </th>
-            <th
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              {{ $t('clients.company') }}
-            </th>
-            <th
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              {{ $t('common.status') }}
-            </th>
-            <th
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              {{ $t('common.actions') }}
-            </th>
-          </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
-          <tr v-for="client in filteredClients" :key="client.id">
-            <td class="px-6 py-4 whitespace-nowrap">
-              <div class="flex items-center">
-                <div class="flex-shrink-0 h-10 w-10">
-                  <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                    <span class="text-blue-600 font-semibold">{{ getInitials(client.name) }}</span>
+      <!-- Clients Table -->
+      <div v-else class="bg-white rounded-lg shadow overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th
+                  class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  العميل
+                </th>
+                <th
+                  class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  البريد الإلكتروني
+                </th>
+                <th
+                  class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  الهاتف
+                </th>
+                <th
+                  class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  الشركة
+                </th>
+                <th
+                  class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  الحالة
+                </th>
+                <th
+                  class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  الإجراءات
+                </th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <tr v-for="client in filteredClients" :key="client.id" class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 h-10 w-10">
+                      <div
+                        class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center"
+                      >
+                        <span class="text-blue-600 font-semibold">{{
+                          getInitials(client.name)
+                        }}</span>
+                      </div>
+                    </div>
+                    <div class="mr-4">
+                      <div class="text-sm font-medium text-gray-900">
+                        {{ client.name }}
+                      </div>
+                      <div class="text-xs text-gray-500">
+                        {{ client.tax_number ? `الرقم الضريبي: ${client.tax_number}` : '' }}
+                      </div>
+                    </div>
                   </div>
-                </div>
-                <div class="ml-4">
-                  <div class="text-sm font-medium text-gray-900">
-                    {{ client.name }}
-                  </div>
-                </div>
-              </div>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              {{ client.email || $t('common.notAvailable') }}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              {{ client.phone || $t('common.notAvailable') }}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              {{ client.company_name || $t('common.notAvailable') }}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <span
-                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
-              >
-                {{ $t('common.active') }}
-              </span>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-              <button
-                @click="$router.push(`/clients/${client.id}`)"
-                class="text-blue-600 hover:text-blue-900 mr-3"
-              >
-                <i class="fas fa-eye mr-1"></i> {{ $t('common.view') }}
-              </button>
-              <button
-                v-if="$store.getters['auth/hasPermission']('edit_client')"
-                @click="$router.push(`/clients/${client.id}/edit`)"
-                class="text-green-600 hover:text-green-900 mr-3"
-              >
-                <i class="fas fa-edit mr-1"></i> {{ $t('common.edit') }}
-              </button>
-              <button
-                v-if="$store.getters['auth/hasPermission']('delete_client')"
-                @click="confirmDeleteClient(client)"
-                class="text-red-600 hover:text-red-900"
-              >
-                <i class="fas fa-trash mr-1"></i> {{ $t('common.delete') }}
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
-      <!-- Pagination -->
-      <div
-        v-if="pagination.total > pagination.per_page"
-        class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6"
-      >
-        <div class="flex-1 flex justify-between sm:hidden">
-          <button
-            @click="previousPage"
-            :disabled="pagination.current_page === 1"
-            class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-          >
-            {{ $t('common.previous') }}
-          </button>
-          <button
-            @click="nextPage"
-            :disabled="pagination.current_page === pagination.last_page"
-            class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-          >
-            {{ $t('common.next') }}
-          </button>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {{ client.email || 'غير متوفر' }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {{ client.phone || 'غير متوفر' }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {{ client.company_name || 'غير متوفر' }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span
+                    :class="
+                      client.status === 'active'
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-red-100 text-red-800'
+                    "
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                  >
+                    {{ client.status === 'active' ? 'نشط' : 'غير نشط' }}
+                  </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                  <button
+                    @click="viewClient(client)"
+                    class="text-blue-600 hover:text-blue-900"
+                    title="عرض التفاصيل"
+                  >
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                      />
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                      />
+                    </svg>
+                  </button>
+                  <button
+                    v-if="hasPermission('edit_client')"
+                    @click="editClient(client)"
+                    class="text-green-600 hover:text-green-900"
+                    title="تعديل"
+                  >
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                      />
+                    </svg>
+                  </button>
+                  <button
+                    v-if="hasPermission('delete_client')"
+                    @click="confirmDelete(client)"
+                    class="text-red-600 hover:text-red-900"
+                    title="حذف"
+                  >
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                      />
+                    </svg>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-        <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-          <div>
-            <p class="text-sm text-gray-700">
-              {{ $t('common.showing') }}
-              <span class="font-medium">{{ pagination.from }}</span>
-              {{ $t('common.to') }}
-              <span class="font-medium">{{ pagination.to }}</span>
-              {{ $t('common.of') }}
-              <span class="font-medium">{{ pagination.total }}</span>
-              {{ $t('common.results') }}
-            </p>
-          </div>
-          <div>
-            <nav
-              class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
-              aria-label="Pagination"
+
+        <!-- Pagination -->
+        <div
+          v-if="pagination.total > pagination.per_page"
+          class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6"
+        >
+          <div class="flex-1 flex justify-between sm:hidden">
+            <button
+              @click="previousPage"
+              :disabled="pagination.current_page === 1"
+              class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
             >
-              <button
-                @click="previousPage"
-                :disabled="pagination.current_page === 1"
-                class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-              >
-                <span class="sr-only">{{ $t('common.previous') }}</span>
-                <i class="fas fa-chevron-left"></i>
-              </button>
-              <button
-                v-for="page in pages"
-                :key="page"
-                @click="goToPage(page)"
-                :class="[
-                  'relative inline-flex items-center px-4 py-2 border text-sm font-medium',
-                  page === pagination.current_page
-                    ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
-                    : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50',
-                ]"
-              >
-                {{ page }}
-              </button>
-              <button
-                @click="nextPage"
-                :disabled="pagination.current_page === pagination.last_page"
-                class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-              >
-                <span class="sr-only">{{ $t('common.next') }}</span>
-                <i class="fas fa-chevron-right"></i>
-              </button>
-            </nav>
+              السابق
+            </button>
+            <button
+              @click="nextPage"
+              :disabled="pagination.current_page === pagination.last_page"
+              class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+            >
+              التالي
+            </button>
+          </div>
+          <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+            <div>
+              <p class="text-sm text-gray-700">
+                عرض
+                <span class="font-medium">{{ pagination.from }}</span>
+                إلى
+                <span class="font-medium">{{ pagination.to }}</span>
+                من
+                <span class="font-medium">{{ pagination.total }}</span>
+                نتيجة
+              </p>
+            </div>
+            <div>
+              <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                <button
+                  @click="previousPage"
+                  :disabled="pagination.current_page === 1"
+                  class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                >
+                  <span class="sr-only">السابق</span>
+                  <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path
+                      fill-rule="evenodd"
+                      d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                </button>
+                <button
+                  v-for="page in pages"
+                  :key="page"
+                  @click="goToPage(page)"
+                  :class="[
+                    'relative inline-flex items-center px-4 py-2 border text-sm font-medium',
+                    page === pagination.current_page
+                      ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
+                      : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50',
+                  ]"
+                >
+                  {{ page }}
+                </button>
+                <button
+                  @click="nextPage"
+                  :disabled="pagination.current_page === pagination.last_page"
+                  class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                >
+                  <span class="sr-only">التالي</span>
+                  <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path
+                      fill-rule="evenodd"
+                      d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                </button>
+              </nav>
+            </div>
           </div>
         </div>
       </div>
@@ -394,41 +439,32 @@ export default {
   data() {
     return {
       loading: false,
+      error: null,
       searchQuery: '',
       currentPage: 1,
       perPage: 10,
     }
   },
   computed: {
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-    clientsStore() {
-      return this.$store.state.clients
-    },
-
-=======
->>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73
-    clientsData() {
-      console.log('📊 Accessing clients data from store...')
-      const clients = this.$store.state.clients.clients
-      console.log('📊 Raw clients data:', clients)
-
-      if (Array.isArray(clients)) {
-        console.log('✅ Found clients as array:', clients)
-        return clients
-      }
-
-      console.log('❌ No clients found or not an array')
-      return []
-=======
     clients() {
-      return this.$store.getters['clients/clients']
+      const clients = this.$store.getters['clients/clients']
+      console.log('📊 Clients from store:', clients)
+      return clients || []
     },
     pagination() {
-      return this.$store.getters['clients/pagination'] || {}
+      return (
+        this.$store.getters['clients/pagination'] || {
+          current_page: 1,
+          last_page: 1,
+          per_page: 10,
+          total: 0,
+          from: 0,
+          to: 0,
+        }
+      )
     },
     filteredClients() {
-      if (!this.searchQuery) {
+      if (!this.searchQuery.trim()) {
         return this.clients
       }
       const query = this.searchQuery.toLowerCase()
@@ -437,7 +473,8 @@ export default {
           (client.name && client.name.toLowerCase().includes(query)) ||
           (client.email && client.email.toLowerCase().includes(query)) ||
           (client.phone && client.phone.includes(query)) ||
-          (client.company_name && client.company_name.toLowerCase().includes(query))
+          (client.company_name && client.company_name.toLowerCase().includes(query)) ||
+          (client.address && client.address.toLowerCase().includes(query))
         )
       })
     },
@@ -446,7 +483,7 @@ export default {
       const totalPages = this.pagination.last_page || 1
       const currentPage = this.pagination.current_page || 1
 
-      // Show maximum 5 page buttons
+      // إظهار 5 أرقام صفحات كحد أقصى
       let startPage = Math.max(1, currentPage - 2)
       let endPage = Math.min(totalPages, startPage + 4)
 
@@ -459,13 +496,23 @@ export default {
       }
 
       return pages
->>>>>>> Stashed changes
     },
   },
   mounted() {
     this.loadClients()
   },
   methods: {
+    hasPermission(permission) {
+      // إذا كان المستخدم مديراً، لديه جميع الصلاحيات
+      if (this.$store.state.auth.is_admin) {
+        return true
+      }
+
+      // التحقق من الصلاحيات المخزنة في state
+      const permissions = this.$store.state.auth.permissions || []
+      return permissions.includes(permission)
+    },
+
     getInitials(name) {
       if (!name) return '?'
       return name
@@ -475,100 +522,148 @@ export default {
         .toUpperCase()
         .substring(0, 2)
     },
+
     async loadClients() {
       this.loading = true
-<<<<<<< Updated upstream
       this.error = null
-      console.log('🚀 Starting to load clients...')
+      console.log('🚀 جلب العملاء...')
 
       try {
-        await this.$store.dispatch('clients/fetchClients')
-        console.log('✅ Load clients completed')
-
-        // التحقق من البيانات بعد التحميل
-        console.log('📋 After loading - clients:', this.$store.state.clients.clients)
-        console.log('📋 After loading - loading state:', this.$store.state.clients.loading)
-      } catch (error) {
-        console.error('❌ Failed to load clients:', error)
-<<<<<<< HEAD
-        this.error = error.message
-=======
-      try {
-        await this.$store.dispatch('clients/fetchClients')
-      } catch (error) {
-        this.$toast.error(this.$t('common.loadError'))
->>>>>>> Stashed changes
-=======
-        if (error.response) {
-          console.error('❌ Error response:', error.response.data)
-          console.error('❌ Error status:', error.response.status)
+        const params = {
+          page: this.currentPage,
+          per_page: this.perPage,
+          search: this.searchQuery,
         }
-        this.error = error.message || 'فشل في تحميل العملاء'
->>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73
+
+        console.log('📋 معلمات الجلب:', params)
+
+        await this.$store.dispatch('clients/fetchClients', params)
+
+        console.log('✅ تم جلب العملاء بنجاح')
+        console.log('📊 عدد العملاء المحملة:', this.clients.length)
+        console.log('📊 معلومات التصفح:', this.pagination)
+      } catch (error) {
+        console.error('❌ خطأ في جلب العملاء:', error)
+        this.error = error.message || 'حدث خطأ في جلب بيانات العملاء'
+
+        // إظهار رسالة للمستخدم
+        if (typeof this.$toast !== 'undefined') {
+          this.$toast.error(this.error)
+        }
       } finally {
         this.loading = false
       }
     },
-<<<<<<< Updated upstream
 
-    handleEditClient(client) {
-      this.editingClient = client
-      this.showClientForm = true
+    forceReload() {
+      console.log('🔄 إعادة تحميل قسرية...')
+      this.currentPage = 1
+      this.searchQuery = ''
+      this.loadClients()
     },
 
-    handleViewClient(client) {
+    async refreshClients() {
+      await this.loadClients()
+      if (typeof this.$toast !== 'undefined') {
+        this.$toast.success('تم تحديث البيانات بنجاح')
+      }
+    },
+
+    exportClients() {
+      // TODO: تنفيذ تصدير العملاء
+      console.log('📤 تصدير العملاء...')
+      if (typeof this.$toast !== 'undefined') {
+        this.$toast.info('سيتم تنفيذ التصدير قريباً')
+      }
+    },
+
+    viewClient(client) {
       this.$router.push(`/clients/${client.id}`)
     },
 
-    async handleDeleteClient(client) {
-      if (confirm(`هل أنت متأكد من حذف العميل "${client.name}"؟`)) {
-        try {
-          await this.$store.dispatch('clients/deleteClient', client.id)
-          this.$toast.success('تم حذف العميل بنجاح')
-          this.loadClients() // إعادة تحميل القائمة
-        } catch (error) {
-          console.error('❌ Failed to delete client:', error)
-          this.$toast.error('فشل في حذف العميل')
-        }
-=======
-    async refreshClients() {
-      await this.loadClients()
-      this.$toast.success(this.$t('common.refreshed'))
+    editClient(client) {
+      this.$router.push(`/clients/${client.id}/edit`)
     },
-    confirmDeleteClient(client) {
-      if (confirm(this.$t('common.confirmDelete'))) {
+
+    confirmDelete(client) {
+      if (confirm(`هل أنت متأكد من حذف العميل "${client.name}"؟`)) {
         this.deleteClient(client.id)
->>>>>>> Stashed changes
       }
     },
+
     async deleteClient(id) {
       this.loading = true
       try {
         await this.$store.dispatch('clients/deleteClient', id)
-        this.$toast.success(this.$t('clients.deleteSuccess'))
+
+        if (typeof this.$toast !== 'undefined') {
+          this.$toast.success('تم حذف العميل بنجاح')
+        }
+
+        // إعادة تحميل القائمة
+        await this.loadClients()
       } catch (error) {
-        this.$toast.error(error.message || this.$t('common.deleteError'))
+        console.error('❌ خطأ في حذف العميل:', error)
+
+        if (typeof this.$toast !== 'undefined') {
+          this.$toast.error(error.message || 'حدث خطأ في حذف العميل')
+        }
       } finally {
         this.loading = false
       }
     },
+
     previousPage() {
       if (this.pagination.current_page > 1) {
         this.currentPage = this.pagination.current_page - 1
         this.loadClients()
       }
     },
+
     nextPage() {
       if (this.pagination.current_page < this.pagination.last_page) {
         this.currentPage = this.pagination.current_page + 1
         this.loadClients()
       }
     },
+
     goToPage(page) {
       this.currentPage = page
       this.loadClients()
-      this.$toast.success('تم حفظ العميل بنجاح')
     },
+  },
+  watch: {
+    searchQuery() {
+      // البحث بعد توقف الكتابة
+      clearTimeout(this.searchTimeout)
+      this.searchTimeout = setTimeout(() => {
+        this.currentPage = 1
+        this.loadClients()
+      }, 500)
+    },
+  },
+  beforeUnmount() {
+    clearTimeout(this.searchTimeout)
   },
 }
 </script>
+
+<style scoped>
+/* تنسيقات إضافية */
+.hover\:bg-gray-50:hover {
+  background-color: #f9fafb;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+</style>

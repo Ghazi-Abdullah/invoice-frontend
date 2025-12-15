@@ -14,23 +14,18 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@element-plus/icons-vue": "^2.3.2",
     "@fortawesome/fontawesome-free": "^7.1.0",
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-=======
     "@fortawesome/fontawesome-svg-core": "^7.1.0",
     "@fortawesome/free-brands-svg-icons": "^7.1.0",
     "@fortawesome/free-regular-svg-icons": "^7.1.0",
     "@fortawesome/free-solid-svg-icons": "^7.1.0",
     "@fortawesome/vue-fontawesome": "^3.1.2",
     "@headlessui/vue": "^1.7.23",
->>>>>>> Stashed changes
-=======
-    "@headlessui/vue": "^1.7.23",
->>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73
     "axios": "^1.13.2",
     "chart.js": "^3.9.1",
     "click-outside-vue3": "^4.0.1",
+    "element-plus": "^2.12.0",
     "laravel-vue-i18n": "^2.8.0",
     "moment": "^2.30.1",
     "nprogress": "^0.2.0",

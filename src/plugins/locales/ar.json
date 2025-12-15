@@ -175,5 +175,36 @@
   },
   "errors": {
     "saveClientFailed": "فشل في حفظ العميل"
+  },
+  "adminGroups": {
+    "title": "إدارة المجموعات",
+    "subtitle": "إدارة مجموعات المستخدمين والصلاحيات",
+    "groups": "المجموعات",
+    "addGroup": "إضافة مجموعة",
+    "loading": "جاري التحميل...",
+    "group": "المجموعة",
+    "description": "الوصف",
+    "usersCount": "عدد المستخدمين",
+    "permissionsCount": "عدد الصلاحيات",
+    "actions": "الإجراءات",
+    "noDescription": "لا يوجد وصف",
+    "user": "مستخدم",
+    "permission": "صلاحية",
+    "editGroup": "تعديل مجموعة",
+    "addGroupModal": "إضافة مجموعة جديدة",
+    "groupNameAr": "اسم المجموعة (العربية)",
+    "groupNameEn": "اسم المجموعة (الإنجليزية)",
+    "managePermissions": "إدارة صلاحيات",
+    "loadingPermissions": "جاري تحميل الصلاحيات",
+    "messages": {
+      "addSuccess": "تم إضافة المجموعة بنجاح",
+      "addError": "فشل في إضافة المجموعة",
+      "updateSuccess": "تم تحديث المجموعة بنجاح",
+      "updateError": "فشل في تحديث المجموعة",
+      "deleteSuccess": "تم حذف المجموعة بنجاح",
+      "deleteError": "فشل في حذف المجموعة",
+      "permissionsUpdateSuccess": "تم تحديث الصلاحيات بنجاح",
+      "permissionsUpdateError": "فشل في تحديث الصلاحيات"
+    }
   }
 }

@@ -28,21 +28,8 @@
     <div v-else class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <!-- Welcome Section -->
       <div class="mb-8">
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ $t('dashboard.title') }}</h1>
-        <p class="text-gray-600 text-lg">{{ $t('dashboard.welcome') }}</p>
-=======
         <h1 class="text-3xl font-bold text-gray-900 mb-2">لوحة التحكم</h1>
         <p class="text-gray-600 text-lg">مرحباً بك {{ user?.name }}</p>
-        <p class="text-sm text-gray-500">
-          المجموعة: {{ user?.group?.title_ar || user?.group?.title_en }}
-        </p>
->>>>>>> Stashed changes
-=======
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">لوحة التحكم</h1>
-        <p class="text-gray-600 text-lg">مرحباً بك {{ user?.name }}</p>
->>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73
       </div>
 
       <!-- Stats Grid -->
@@ -57,17 +44,8 @@
               <p class="text-sm font-medium text-gray-600">إجمالي الفواتير</p>
               <p class="text-2xl font-bold text-gray-900 mt-2">{{ stats.totalInvoices }}</p>
               <div class="flex items-center mt-2">
-<<<<<<< Updated upstream
                 <span class="text-green-600 text-sm font-medium">+12%</span>
-<<<<<<< HEAD
-                <span class="text-gray-500 text-sm mr-2">{{ $t('common.from_last_month') }}</span>
-=======
-                <span class="text-green-600 text-sm font-medium">+{{ stats.invoiceGrowth }}%</span>
                 <span class="text-gray-500 text-sm mr-2">من الشهر الماضي</span>
->>>>>>> Stashed changes
-=======
-                <span class="text-gray-500 text-sm mr-2">من الشهر الماضي</span>
->>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73
               </div>
             </div>
             <div class="p-3 bg-blue-50 rounded-lg">
@@ -167,17 +145,8 @@
                 {{ formatCurrency(stats.revenue) }}
               </p>
               <div class="flex items-center mt-2">
-<<<<<<< Updated upstream
                 <span class="text-green-600 text-sm font-medium">+15%</span>
-<<<<<<< HEAD
-                <span class="text-gray-500 text-sm mr-2">{{ $t('common.from_last_month') }}</span>
-=======
-                <span class="text-green-600 text-sm font-medium">+{{ stats.revenueGrowth }}%</span>
                 <span class="text-gray-500 text-sm mr-2">من الشهر الماضي</span>
->>>>>>> Stashed changes
-=======
-                <span class="text-gray-500 text-sm mr-2">من الشهر الماضي</span>
->>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73
               </div>
             </div>
             <div class="p-3 bg-orange-50 rounded-lg">
@@ -367,13 +336,9 @@
                 </div>
                 <div class="flex-1">
                   <p class="font-semibold text-gray-900">{{ client.name }}</p>
-<<<<<<< Updated upstream
                   <p class="text-gray-600 text-sm mt-1">
                     {{ client.email || 'غير متوفر' }}
                   </p>
-=======
-                  <p class="text-gray-600 text-sm mt-1">{{ client.email || 'غير متوفر' }}</p>
->>>>>>> Stashed changes
                   <p class="text-gray-500 text-xs mt-1">
                     تاريخ الإضافة: {{ formatDate(client.created_at) }}
                   </p>
@@ -382,15 +347,7 @@
                   <span
                     class="inline-block px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full"
                   >
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-                    {{ $t('common.active') }}
-=======
-                    {{ client.status === 'active' ? 'نشط' : 'غير نشط' }}
->>>>>>> Stashed changes
-=======
                     نشط
->>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73
                   </span>
                 </div>
               </div>
@@ -524,16 +481,10 @@ export default {
       },
     }
   },
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-=======
-=======
->>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73
   computed: {
     user() {
       return this.$store.state.auth.user
     },
-<<<<<<< HEAD
     permissions() {
       return this.$store.state.auth.permissions || []
     },
@@ -541,10 +492,6 @@ export default {
       return this.$store.state.auth.is_admin || false
     },
   },
->>>>>>> Stashed changes
-=======
-  },
->>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73
   mounted() {
     this.loadDashboardData()
   },
@@ -557,26 +504,12 @@ export default {
     },
 
     formatCurrency(amount) {
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-      return new Intl.NumberFormat('ar-SA', {
-        style: 'currency',
-        currency: 'SAR',
-      }).format(amount || 0)
-=======
       if (!amount) return '0.00 ر.س'
       const num = parseFloat(amount)
       if (isNaN(num)) return '0.00 ر.س'
       return (
         num.toLocaleString('ar-SA', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ر.س'
       )
->>>>>>> Stashed changes
-=======
-      if (!amount) return '0.00 ر.س'
-      const num = parseFloat(amount)
-      if (isNaN(num)) return '0.00 ر.س'
-      return num.toFixed(2) + ' ر.س'
->>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73
     },
 
     formatDate(dateString) {
@@ -612,12 +545,6 @@ export default {
       }
       return classes[status] || 'bg-gray-100 text-gray-800'
     },
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-=======
-
-=======
->>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73
     getStatusText(status) {
       const texts = {
         paid: 'مدفوعة',
@@ -627,7 +554,6 @@ export default {
       }
       return texts[status] || status
     },
-<<<<<<< HEAD
 
     goToClient(id) {
       if (this.hasPermission('view_clients')) {
@@ -641,48 +567,18 @@ export default {
       }
     },
 
->>>>>>> Stashed changes
-=======
->>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73
     async loadDashboardData() {
       this.loading = true
       try {
         console.log('🔄 جلب بيانات لوحة التحكم...')
 
-<<<<<<< Updated upstream
         // جلب العملاء
         console.log('📋 جلب العملاء...')
         await this.$store.dispatch('clients/fetchClients')
 
         // جلب الفواتير
         console.log('🧾 جلب الفواتير...')
-<<<<<<< HEAD
-        const invoicesResponse = await this.$store.dispatch('invoices/fetchInvoices')
-        console.log('📦 استجابة الفواتير:', invoicesResponse)
-=======
-        // جلب العملاء فقط إذا كان لديه الصلاحية
-        if (this.hasPermission('view_clients')) {
-          console.log('📋 جلب العملاء...')
-          try {
-            await this.$store.dispatch('clients/fetchClients')
-          } catch (error) {
-            console.warn('⚠️ لا يمكن جلب العملاء:', error.message)
-          }
-        }
-
-        // جلب الفواتير فقط إذا كان لديه الصلاحية
-        if (this.hasPermission('view_invoices')) {
-          console.log('🧾 جلب الفواتير...')
-          try {
-            await this.$store.dispatch('invoices/fetchInvoices')
-          } catch (error) {
-            console.warn('⚠️ لا يمكن جلب الفواتير:', error.message)
-          }
-        }
->>>>>>> Stashed changes
-=======
         await this.$store.dispatch('invoices/fetchInvoices')
->>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73
 
         // تحديث البيانات
         this.updateDashboardData()
