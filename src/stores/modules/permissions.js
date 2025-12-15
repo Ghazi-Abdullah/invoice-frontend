@@ -1,18 +1,22 @@
-<<<<<<< HEAD
 import axios from '../../api/axios'
-import NProgress from 'nprogress'
 
 export default {
+  namespaced: true, // إضافة namespaced
+
   state: {
     permissions: [],
     menusWithPermissions: [],
-    isLoading: false
+    isLoading: false,
+    error: null
   },
+
   getters: {
     permissions: (state) => state.permissions,
     menusWithPermissions: (state) => state.menusWithPermissions,
-    isLoading: (state) => state.isLoading
+    isLoading: (state) => state.isLoading,
+    error: (state) => state.error
   },
+
   mutations: {
     SET_PERMISSIONS(state, permissions) {
       state.permissions = permissions
@@ -22,137 +26,103 @@ export default {
     },
     SET_LOADING(state, isLoading) {
       state.isLoading = isLoading
+    },
+    SET_ERROR(state, error) {
+      state.error = error
+    },
+    CLEAR_ERROR(state) {
+      state.error = null
     }
   },
+
   actions: {
     async getPermissions({ commit }) {
       commit('SET_LOADING', true)
-      await axios.get('permissions').then(
-        (res) => {
-          if (res.data.status) {
-            commit('SET_PERMISSIONS', res.data.data)
-          }
-          commit('SET_LOADING', false)
-        },
-        (error) => {
-          commit('SET_LOADING', false)
-          console.error(error)
+      commit('CLEAR_ERROR')
+
+      try {
+        const response = await axios.get('/api/admin/permissions')
+
+        if (response.data.status) {
+          commit('SET_PERMISSIONS', response.data.data)
+          return response.data.data
+        } else {
+          throw new Error(response.data.message || 'Failed to fetch permissions')
         }
-      )
+      } catch (error) {
+        const errorMsg = error.response?.data?.message || error.message
+        commit('SET_ERROR', errorMsg)
+        throw error
+      } finally {
+        commit('SET_LOADING', false)
+      }
     },
 
     async getMenusWithPermissions({ commit }) {
       commit('SET_LOADING', true)
-      await axios.get('permissions/menus').then(
-        (res) => {
-          if (res.data.status) {
-            commit('SET_MENUS_WITH_PERMISSIONS', res.data.data)
-          }
-          commit('SET_LOADING', false)
-        },
-        (error) => {
-          commit('SET_LOADING', false)
-          console.error(error)
+      commit('CLEAR_ERROR')
+
+      try {
+        const response = await axios.get('/api/admin/permissions/menus')
+
+        if (response.data.status) {
+          commit('SET_MENUS_WITH_PERMISSIONS', response.data.data)
+          return response.data.data
+        } else {
+          throw new Error(response.data.message || 'Failed to fetch menus')
         }
-      )
+      } catch (error) {
+        const errorMsg = error.response?.data?.message || error.message
+        commit('SET_ERROR', errorMsg)
+        throw error
+      } finally {
+        commit('SET_LOADING', false)
+      }
+    },
+
+    async createPermission({ dispatch }, permissionData) {
+      try {
+        const response = await axios.post('/api/admin/permissions', permissionData)
+
+        if (response.data.status) {
+          await dispatch('getPermissions')
+          return response.data.data
+        } else {
+          throw new Error(response.data.message || 'Failed to create permission')
+        }
+      } catch (error) {
+        throw error.response?.data?.message || error.message
+      }
+    },
+
+    async updatePermission({ dispatch }, { id, data }) {
+      try {
+        const response = await axios.put(`/api/admin/permissions/${id}`, data)
+
+        if (response.data.status) {
+          await dispatch('getPermissions')
+          return response.data.data
+        } else {
+          throw new Error(response.data.message || 'Failed to update permission')
+        }
+      } catch (error) {
+        throw error.response?.data?.message || error.message
+      }
+    },
+
+    async deletePermission({ dispatch }, id) {
+      try {
+        const response = await axios.delete(`/api/admin/permissions/${id}`)
+
+        if (response.data.status) {
+          await dispatch('getPermissions')
+          return true
+        } else {
+          throw new Error(response.data.message || 'Failed to delete permission')
+        }
+      } catch (error) {
+        throw error.response?.data?.message || error.message
+      }
     }
   }
 }
-=======
-import axios from '@/api/axios';
-
-const state = {
-  roles: [],
-  permissions: [],
-  userPermissions: [],
-  loading: false
-};
-
-const mutations = {
-  SET_ROLES(state, roles) {
-    state.roles = roles;
-  },
-  SET_PERMISSIONS(state, permissions) {
-    state.permissions = permissions;
-  },
-  SET_USER_PERMISSIONS(state, permissions) {
-    state.userPermissions = permissions;
-  },
-  SET_LOADING(state, loading) {
-    state.loading = loading;
-  }
-};
-
-const actions = {
-  async fetchRoles({ commit }) {
-    commit('SET_LOADING', true);
-    try {
-      const response = await axios.get('/api/permissions/roles');
-      commit('SET_ROLES', response.data);
-    } catch (error) {
-      console.error('Error fetching roles:', error);
-    } finally {
-      commit('SET_LOADING', false);
-    }
-  },
-
-  async fetchPermissions({ commit }) {
-    commit('SET_LOADING', true);
-    try {
-      const response = await axios.get('/api/permissions/permissions');
-      commit('SET_PERMISSIONS', response.data);
-    } catch (error) {
-      console.error('Error fetching permissions:', error);
-    } finally {
-      commit('SET_LOADING', false);
-    }
-  },
-
-  async fetchUserPermissions({ commit, rootState }) {
-    if (!rootState.auth.user) return;
-
-    try {
-      const response = await axios.get(`/api/permissions/users/${rootState.auth.user.id}/roles`);
-      const roles = response.data.roles || [];
-      const permissions = roles.flatMap(role =>
-        role.permissions.map(p => p.name)
-      );
-      commit('SET_USER_PERMISSIONS', permissions);
-    } catch (error) {
-      console.error('Error fetching user permissions:', error);
-    }
-  }
-};
-
-const getters = {
-  hasPermission: (state, getters, rootState) => (permissionName) => {
-    const user = rootState.auth.user;
-
-    if (!user) return false;
-
-    // إذا كان المستخدم مسؤولاً، فلديه جميع الصلاحيات
-    if (user.roles?.some(role => role.name === 'admin')) {
-      return true;
-    }
-
-    return state.userPermissions.includes(permissionName);
-  },
-
-  hasAnyPermission: (state, getters) => (permissions) => {
-    return permissions.some(permission => getters.hasPermission(permission));
-  },
-
-  roles: state => state.roles,
-  permissions: state => state.permissions,
-  userPermissions: state => state.userPermissions,
-  loading: state => state.loading
-};
-
-export default {
-  namespaced: true,
-  state,
-  mutations,
-  actions,
-  getters
-};
->>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73

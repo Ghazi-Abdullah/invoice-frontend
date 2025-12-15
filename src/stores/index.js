@@ -1,114 +1,61 @@
 import { createStore } from 'vuex'
-<<<<<<< Updated upstream
+
+// Import modules
 import auth from './modules/auth'
-import invoices from './modules/invoices'
 import clients from './modules/clients'
-import report from './modules/report'
-import permissions from './modules/permissions'
-
-const store = createStore({
-  modules: {
-    auth,
-    invoices,
-    clients,
-    report,
-    permissions
-  },
-
-  state: {
-    loading: false,
-    error: null
-  },
-
-  mutations: {
-    SET_LOADING(state, loading) {
-      state.loading = loading
-    },
-    SET_ERROR(state, error) {
-      state.error = error
-    },
-    CLEAR_ERROR(state) {
-      state.error = null
-    }
-  },
-
-  actions: {
-    setLoading({ commit }, loading) {
-      commit('SET_LOADING', loading)
-    },
-    setError({ commit }, error) {
-      commit('SET_ERROR', error)
-    },
-    clearError({ commit }) {
-      commit('CLEAR_ERROR')
-    }
-  },
-
-  getters: {
-    loading: state => state.loading,
-    error: state => state.error
-  }
-})
-
-<<<<<<< HEAD
-
-
-// src/store/index.js
-/*import { createStore } from 'vuex'
-
-import auth from './modules/auth'
 import invoices from './modules/invoices'
-import clients from './modules/clients'
-
-export default createStore({
-  modules: {
-    auth,
-    invoices,
-    clients
-  }
-})*/
-
-/*import { createPinia } from 'pinia'
-
-const pinia = createPinia()
-
-export default pinia*/
-=======
-
-import auth from './modules/auth'
-import adminGroups from './modules/adminGroups'
 import users from './modules/users'
-import clients from './modules/clients'
-import invoices from './modules/invoices'
+import adminGroups from './modules/adminGroups'
+import permissions from './modules/permissions'
 import report from './modules/report'
 
 export default createStore({
-  modules: {
-    auth,
-    adminGroups,
-    users,
-    clients,
-    invoices,
-    report
-  },
   state: {
-    loader: false
-  },
-  getters: {
-    loader: state => state.loader
+    appLoading: false,
+    appError: null,
+    appSuccess: null
   },
   mutations: {
-    SET_LOADER_STATUS(state, status) {
-      state.loader = status
+    SET_APP_LOADING(state, loading) {
+      state.appLoading = loading
+    },
+    SET_APP_ERROR(state, error) {
+      state.appError = error
+    },
+    SET_APP_SUCCESS(state, success) {
+      state.appSuccess = success
+    },
+    CLEAR_APP_MESSAGES(state) {
+      state.appError = null
+      state.appSuccess = null
     }
   },
   actions: {
-    updateLoaderStatus({ commit }, status) {
-      commit('SET_LOADER_STATUS', status)
+    setAppLoading({ commit }, loading) {
+      commit('SET_APP_LOADING', loading)
+    },
+    setAppError({ commit }, error) {
+      commit('SET_APP_ERROR', error)
+    },
+    setAppSuccess({ commit }, success) {
+      commit('SET_APP_SUCCESS', success)
+    },
+    clearAppMessages({ commit }) {
+      commit('CLEAR_APP_MESSAGES')
     }
+  },
+  getters: {
+    appLoading: state => state.appLoading,
+    appError: state => state.appError,
+    appSuccess: state => state.appSuccess
+  },
+  modules: {
+    auth: auth,
+    clients: clients,
+    invoices: invoices,
+    users: users,
+    adminGroups: adminGroups,
+    permissions: permissions,
+    report: report
   }
 })
->>>>>>> Stashed changes
-=======
-export default store
->>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73

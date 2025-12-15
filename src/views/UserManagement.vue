@@ -252,199 +252,162 @@
 </template>
 
 <script>
-import { ref, reactive, onMounted } from 'vue'
-import { useStore } from 'vuex'
-import { toast } from 'vue3-toastify'
+import { mapState } from 'vuex'
 import axios from '@/api/axios'
+import { toast } from 'vue3-toastify'
 
 export default {
   name: 'UserManagement',
 
-  setup() {
-    const store = useStore()
+  data() {
+    return {
+      loading: false,
+      submitting: false,
+      users: [],
+      roles: [],
 
-    const loading = ref(false)
-    const submitting = ref(false)
-    const users = ref([])
-    const roles = ref([])
+      showAddUserModal: false,
+      showEditUserModal: false,
+      showPermissionsModal: false,
 
-    const showAddUserModal = ref(false)
-    const showEditUserModal = ref(false)
-    const showPermissionsModal = ref(false)
+      selectedUser: null,
+      selectedRoles: [],
 
-    const selectedUser = ref(null)
-    const selectedRoles = ref([])
+      userForm: {
+        name: '',
+        email: '',
+        password: '',
+        password_confirmation: '',
+      },
+    }
+  },
 
-    const currentUser = computed(() => store.state.auth.user)
+  computed: {
+    ...mapState({
+      currentUser: (state) => state.auth.user,
+    }),
+  },
 
-    const userForm = reactive({
-      name: '',
-      email: '',
-      password: '',
-      password_confirmation: '',
-    })
+  mounted() {
+    this.fetchUsers()
+    this.fetchRoles()
+  },
 
-    const fetchUsers = async () => {
-      loading.value = true
+  methods: {
+    async fetchUsers() {
+      this.loading = true
       try {
-        const response = await axios.get('/api/permissions/users')
-        users.value = response.data
-      } catch (error) {
-        console.error('Error fetching users:', error)
+        const res = await axios.get('/api/permissions/users')
+        this.users = res.data
+      } catch (e) {
         toast.error('فشل في تحميل المستخدمين')
       } finally {
-        loading.value = false
+        this.loading = false
       }
-    }
+    },
 
-    const fetchRoles = async () => {
+    async fetchRoles() {
       try {
-        const response = await axios.get('/api/permissions/roles')
-        roles.value = response.data
-      } catch (error) {
-        console.error('Error fetching roles:', error)
+        const res = await axios.get('/api/permissions/roles')
+        this.roles = res.data
+      } catch (e) {
+        console.error(e)
       }
-    }
+    },
 
-    const addUser = async () => {
-      submitting.value = true
+    async addUser() {
+      this.submitting = true
       try {
-        const response = await axios.post('/api/register', userForm)
-        users.value.push(response.data.user)
-        closeModal()
+        const res = await axios.post('/api/register', this.userForm)
+        this.users.push(res.data.user)
+        this.closeModal()
         toast.success('تم إضافة المستخدم بنجاح')
-      } catch (error) {
-        const errorMsg = error.response?.data?.message || 'فشل في إضافة المستخدم'
-        toast.error(errorMsg)
+      } catch (e) {
+        toast.error(e.response?.data?.message || 'فشل في الإضافة')
       } finally {
-        submitting.value = false
+        this.submitting = false
       }
-    }
+    },
 
-    const editUser = (user) => {
-      selectedUser.value = user
-      userForm.name = user.name
-      userForm.email = user.email
-      showEditUserModal.value = true
-    }
+    editUser(user) {
+      this.selectedUser = user
+      this.userForm.name = user.name
+      this.userForm.email = user.email
+      this.showEditUserModal = true
+    },
 
-    const updateUser = async () => {
-      submitting.value = true
+    async updateUser() {
+      this.submitting = true
       try {
-        // Note: You'll need to create an update endpoint for users
-        const response = await axios.put(`/api/users/${selectedUser.value.id}`, userForm)
-        const index = users.value.findIndex((u) => u.id === selectedUser.value.id)
-        if (index !== -1) {
-          users.value[index] = response.data.user
-        }
-        closeModal()
-        toast.success('تم تحديث المستخدم بنجاح')
-      } catch (error) {
-        const errorMsg = error.response?.data?.message || 'فشل في تحديث المستخدم'
-        toast.error(errorMsg)
+        const res = await axios.put(`/api/users/${this.selectedUser.id}`, this.userForm)
+        const index = this.users.findIndex((u) => u.id === this.selectedUser.id)
+        if (index !== -1) this.users[index] = res.data.user
+        this.closeModal()
+        toast.success('تم التحديث بنجاح')
+      } catch (e) {
+        toast.error('فشل في التحديث')
       } finally {
-        submitting.value = false
+        this.submitting = false
       }
-    }
+    },
 
-    const managePermissions = async (user) => {
-      selectedUser.value = user
-      selectedRoles.value = user.roles.map((role) => role.id)
+    managePermissions(user) {
+      this.selectedUser = user
+      this.selectedRoles = user.roles.map((r) => r.id)
+      this.showPermissionsModal = true
+    },
 
-      if (roles.value.length === 0) {
-        await fetchRoles()
-      }
-
-      showPermissionsModal.value = true
-    }
-
-    const savePermissions = async () => {
-      submitting.value = true
+    async savePermissions() {
+      this.submitting = true
       try {
-        await axios.post(`/api/permissions/users/${selectedUser.value.id}/assign-roles`, {
-          roles: selectedRoles.value,
+        await axios.post(`/api/permissions/users/${this.selectedUser.id}/assign-roles`, {
+          roles: this.selectedRoles,
         })
 
-        // Update local user data
-        const index = users.value.findIndex((u) => u.id === selectedUser.value.id)
-        if (index !== -1) {
-          users.value[index].roles = roles.value.filter((role) =>
-            selectedRoles.value.includes(role.id),
-          )
-        }
+        this.selectedUser.roles = this.roles.filter((r) => this.selectedRoles.includes(r.id))
 
-        closeModal()
-        toast.success('تم حفظ الصلاحيات بنجاح')
-      } catch (error) {
-        const errorMsg = error.response?.data?.message || 'فشل في حفظ الصلاحيات'
-        toast.error(errorMsg)
+        this.closeModal()
+        toast.success('تم حفظ الصلاحيات')
+      } catch (e) {
+        toast.error('فشل في حفظ الصلاحيات')
       } finally {
-        submitting.value = false
+        this.submitting = false
       }
-    }
+    },
 
-    const confirmDeleteUser = (user) => {
-      if (confirm(`هل أنت متأكد من حذف المستخدم "${user.name}"؟`)) {
-        deleteUser(user.id)
-      }
-    }
-
-    const deleteUser = async (userId) => {
+    async deleteUser(id) {
       try {
-        // Note: You'll need to create a delete endpoint for users
-        await axios.delete(`/api/users/${userId}`)
-        users.value = users.value.filter((u) => u.id !== userId)
-        toast.success('تم حذف المستخدم بنجاح')
-      } catch (error) {
-        const errorMsg = error.response?.data?.message || 'فشل في حذف المستخدم'
-        toast.error(errorMsg)
+        await axios.delete(`/api/users/${id}`)
+        this.users = this.users.filter((u) => u.id !== id)
+        toast.success('تم حذف المستخدم')
+      } catch {
+        toast.error('فشل في الحذف')
       }
-    }
+    },
 
-    const formatDate = (dateString) => {
-      return new Date(dateString).toLocaleDateString('ar-SA')
-    }
+    confirmDeleteUser(user) {
+      if (confirm(`هل أنت متأكد من حذف ${user.name}؟`)) {
+        this.deleteUser(user.id)
+      }
+    },
 
-    const closeModal = () => {
-      showAddUserModal.value = false
-      showEditUserModal.value = false
-      showPermissionsModal.value = false
-      selectedUser.value = null
-      selectedRoles.value = []
+    formatDate(date) {
+      return new Date(date).toLocaleDateString('ar-SA')
+    },
 
-      // Reset form
-      Object.keys(userForm).forEach((key) => {
-        userForm[key] = ''
-      })
-    }
-
-    onMounted(async () => {
-      await Promise.all([fetchUsers(), fetchRoles()])
-    })
-
-    return {
-      loading,
-      submitting,
-      users,
-      roles,
-      showAddUserModal,
-      showEditUserModal,
-      showPermissionsModal,
-      selectedUser,
-      selectedRoles,
-      currentUser,
-      userForm,
-      fetchUsers,
-      fetchRoles,
-      addUser,
-      editUser,
-      updateUser,
-      managePermissions,
-      savePermissions,
-      confirmDeleteUser,
-      formatDate,
-      closeModal,
-    }
+    closeModal() {
+      this.showAddUserModal = false
+      this.showEditUserModal = false
+      this.showPermissionsModal = false
+      this.selectedUser = null
+      this.selectedRoles = []
+      this.userForm = {
+        name: '',
+        email: '',
+        password: '',
+        password_confirmation: '',
+      }
+    },
   },
 }
 </script>

@@ -1,107 +1,41 @@
 <template>
-<<<<<<< HEAD
   <div id="app">
-<<<<<<< Updated upstream
     <ToastContainer />
     <main class="main-content">
-      <Navbar v-if="showNavbar" />
-=======
-  <div class="min-h-screen bg-gray-100">
-    <Sidebar v-if="showSidebar" />
-
-    <main :class="showSidebar ? 'mr-64' : ''" class="min-h-screen transition-all duration-300">
->>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73
-      <router-view />
+      <!-- عرض الـ Layout المناسب -->
+      <DefaultLayout v-if="$store.state.auth.token && $store.state.auth.user" />
+      <router-view v-else />
     </main>
-=======
-    <DefaultLayout v-if="$store.state.auth.token && $store.state.auth.user" />
-    <router-view v-else />
->>>>>>> Stashed changes
   </div>
 </template>
 
 <script>
-<<<<<<< Updated upstream
-import { computed } from 'vue'
-import { useRouter } from 'vue-router'
-import Sidebar from '@/components/Sidebar.vue'
-
-export default {
-  name: 'App',
-
-  components: {
-    Sidebar,
-  },
-
-  setup() {
-    const router = useRouter()
-
-    const showSidebar = computed(() => {
-      const hideOnRoutes = ['/login', '/register']
-      return !hideOnRoutes.includes(router.currentRoute.value.path)
-    })
-
-    return {
-      showSidebar,
-    }
-  },
-}
-</script>
-
-<!--<template>
-  <div id="app">
-    <Navbar v-if="showNavbar" />
-    <router-view />
-  </div>
-</template>
-
-<script>
-import { computed } from 'vue'
-import { useRoute } from 'vue-router'
-<<<<<<< HEAD
-import { useStore } from 'vuex' // ⬅️ استبدل useAuthStore بـ useStore
-import Navbar from './components/shared/Navbar.vue'
-import ToastContainer from './components/shared/ToastContainer.vue'
-import { useI18n } from 'vue-i18n'
-=======
+import ToastContainer from '@/components/ToastContainer.vue'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
->>>>>>> Stashed changes
-=======
-import Navbar from '@/components/shared/Navbar.vue'
->>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73
+import { useStore } from 'vuex'
+import { computed } from 'vue'
 
 export default {
   name: 'App',
   components: {
-<<<<<<< Updated upstream
-    Navbar,
-  },
-  setup() {
-    const route = useRoute()
-
-    const showNavbar = computed(() => {
-      const hideOnRoutes = ['/login', '/register']
-      return !hideOnRoutes.includes(route.path)
-    })
-
-    return {
-      showNavbar,
-=======
+    ToastContainer,
     DefaultLayout,
   },
-  mounted() {
-    // التحقق من التوثيق عند تحميل التطبيق
-    if (this.$store.state.auth.token) {
-      this.$store.dispatch('auth/checkAuth')
->>>>>>> Stashed changes
+  setup() {
+    const store = useStore()
+
+    const isAuthenticated = computed(() => {
+      return store.state.auth.token && store.state.auth.user
+    })
+
+    return {
+      isAuthenticated,
     }
   },
 }
 </script>
-<<<<<<< Updated upstream
 
 <style>
-<<<<<<< HEAD
 * {
   margin: 0;
   padding: 0;
@@ -112,6 +46,7 @@ body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background-color: #f8f9fa;
   color: #333;
+  direction: rtl;
 }
 
 #app {
@@ -119,8 +54,7 @@ body {
 }
 
 .main-content {
-  min-height: calc(100vh - 80px);
-  padding: 20px;
+  min-height: 100vh;
 }
 
 /* تنسيقات عامة */
@@ -190,9 +124,3 @@ body {
   border-color: #3498db;
 }
 </style>
-=======
->>>>>>> Stashed changes
-=======
-/* يمكنك إضافة styles عامة هنا إذا لزم الأمر */
-</style>-->
->>>>>>> ed70c2fa7509b69723b93c2e81dab875d2a36a73

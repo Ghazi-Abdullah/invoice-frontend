@@ -33,7 +33,6 @@
     "live_updates": "Live Updates"
   },
   "invoices": {
-    "": "",
     "invoiceDetails": "Invoice Details",
     "viewDetails": "View all invoice details",
     "noInvoice": "No Invoice",
@@ -223,7 +222,8 @@
     "search": "Search",
     "quick_actions": "Quick Actions",
     "addItem": "Add Item",
-    "remove": "Remove"
+    "remove": "Remove",
+    "update": "Update"
   },
   "common": {
     "back": "Back",
@@ -397,5 +397,36 @@
       "amount": "Amount"
     },
     "currency": "SAR"
+  },
+  "adminGroups": {
+    "title": "Groups Management",
+    "subtitle": "Manage user groups and permissions",
+    "groups": "Groups",
+    "addGroup": "Add Group",
+    "loading": "Loading...",
+    "group": "Group",
+    "description": "Description",
+    "usersCount": "Number of Users",
+    "permissionsCount": "Number of Permissions",
+    "actions": "Actions",
+    "noDescription": "No Description",
+    "user": "User",
+    "permission": "Permission",
+    "editGroup": "Edit Group",
+    "addGroupModal": "Add New Group",
+    "groupNameAr": "Group Name (Arabic)",
+    "groupNameEn": "Group Name (English)",
+    "managePermissions": "Manage Permissions",
+    "loadingPermissions": "Loading Permissions",
+    "messages": {
+      "addSuccess": "Group added successfully",
+      "addError": "Failed to add group",
+      "updateSuccess": "Group updated successfully",
+      "updateError": "Failed to update group",
+      "deleteSuccess": "Group deleted successfully",
+      "deleteError": "Failed to delete group",
+      "permissionsUpdateSuccess": "Permissions updated successfully",
+      "permissionsUpdateError": "Failed to update permissions"
+    }
   }
 }
