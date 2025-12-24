@@ -5,142 +5,161 @@
       <p class="text-gray-600 mt-2">إدارة مجموعات المستخدمين والصلاحيات</p>
     </div>
 
+    <!-- Loading State -->
+    <div v-if="loading" class="text-center py-12">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+      <p class="mt-4 text-gray-600">جاري تحميل المجموعات...</p>
+    </div>
+
+    <!-- Error State -->
+    <div v-else-if="error" class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+      <div class="flex items-center">
+        <i class="fas fa-exclamation-circle text-red-500 ml-2"></i>
+        <p class="text-red-700">{{ error }}</p>
+      </div>
+    </div>
+
     <!-- Groups List -->
-    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+    <div v-else class="bg-white rounded-lg shadow-md overflow-hidden">
       <div class="px-6 py-4 border-b border-gray-200">
         <div class="flex justify-between items-center">
           <h2 class="text-xl font-semibold text-gray-800">المجموعات</h2>
-          <div class="flex space-x-3 space-x-reverse">
-            <button
-              @click="showAddPermissionModal = true"
-              class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
-            >
-              <i class="fas fa-shield-alt ml-2"></i>
-              إضافة صلاحية
-            </button>
-            <button
-              @click="showAddGroupModal = true"
-              class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
-            >
-              <i class="fas fa-plus ml-2"></i>
-              إضافة مجموعة
-            </button>
-          </div>
+          <button
+            @click="openAddGroupModal"
+            class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition flex items-center"
+            :disabled="loading"
+          >
+            <i class="fas fa-plus ml-2"></i>
+            إضافة مجموعة
+          </button>
         </div>
       </div>
 
-      <div v-if="loading" class="text-center py-12">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
-        <p class="mt-4 text-gray-600">جاري التحميل...</p>
-      </div>
-
-      <div v-else>
-        <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-              <tr>
-                <th
-                  class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  المجموعة
-                </th>
-                <th
-                  class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  الوصف
-                </th>
-                <th
-                  class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  عدد المستخدمين
-                </th>
-                <th
-                  class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  عدد الصلاحيات
-                </th>
-                <th
-                  class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  الإجراءات
-                </th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-              <tr v-for="group in adminGroups" :key="group.id">
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="flex items-center">
-                    <div class="flex-shrink-0 h-10 w-10">
-                      <div
-                        class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center"
-                      >
-                        <i class="fas fa-users text-blue-600"></i>
-                      </div>
-                    </div>
-                    <div class="mr-4">
-                      <div class="text-sm font-medium text-gray-900">
-                        {{ group.title_ar || group.title_en }}
-                      </div>
-                      <div class="text-sm text-gray-500">
-                        {{ group.title_en }}
-                      </div>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th
+                class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                المجموعة
+              </th>
+              <th
+                class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                الوصف
+              </th>
+              <th
+                class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                عدد المستخدمين
+              </th>
+              <th
+                class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                عدد الصلاحيات
+              </th>
+              <th
+                class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                الحالة
+              </th>
+              <th
+                class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                الإجراءات
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <tr v-for="group in adminGroups" :key="group.id">
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                  <div class="flex-shrink-0 h-10 w-10">
+                    <div
+                      class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center"
+                    >
+                      <i class="fas fa-users text-blue-600"></i>
                     </div>
                   </div>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="text-sm text-gray-900">{{ group.description || 'لا يوجد وصف' }}</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <span
-                    class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800"
-                  >
-                    {{ group.users_count || 0 }} مستخدم
-                  </span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <span
-                    class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800"
-                  >
-                    {{ group.permissions_count || 0 }} صلاحية
-                  </span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <button @click="editGroup(group)" class="text-blue-600 hover:text-blue-900 ml-4">
-                    <i class="fas fa-edit"></i>
-                  </button>
-                  <button
-                    @click="managePermissions(group)"
-                    class="text-purple-600 hover:text-purple-900 ml-4"
-                  >
-                    <i class="fas fa-shield-alt"></i>
-                  </button>
-                  <button
-                    @click="confirmDeleteGroup(group)"
-                    class="text-red-600 hover:text-red-900 ml-4"
-                    v-if="group.id !== 1"
-                  >
-                    <i class="fas fa-trash"></i>
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                  <div class="mr-4">
+                    <div class="text-sm font-medium text-gray-900">
+                      {{ group.title_ar || group.title_en }}
+                    </div>
+                    <div class="text-sm text-gray-500">
+                      {{ group.title_en }}
+                    </div>
+                  </div>
+                </div>
+              </td>
+              <td class="px-6 py-4">
+                <div class="text-sm text-gray-900">{{ group.description || 'لا يوجد وصف' }}</div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span
+                  class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800"
+                >
+                  {{ group.users_count || 0 }} مستخدم
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span
+                  class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800"
+                >
+                  {{ group.permissions_count || 0 }} صلاحية
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span
+                  :class="
+                    group.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                  "
+                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                >
+                  {{ group.is_active ? 'نشط' : 'غير نشط' }}
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                <button
+                  @click="editGroup(group)"
+                  class="text-blue-600 hover:text-blue-900 ml-4"
+                  title="تعديل"
+                >
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button
+                  @click="confirmDeleteGroup(group)"
+                  class="text-red-600 hover:text-red-900 ml-4"
+                  title="حذف"
+                  v-if="!group.is_system && group.id !== 1"
+                >
+                  <i class="fas fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Empty State -->
+        <div v-if="adminGroups.length === 0" class="text-center py-12">
+          <i class="fas fa-users text-4xl text-gray-300 mb-4"></i>
+          <p class="text-gray-500">لا توجد مجموعات لعرضها</p>
         </div>
       </div>
     </div>
 
     <!-- Add/Edit Group Modal -->
     <div
-      v-if="showAddGroupModal || showEditGroupModal"
+      v-if="showModal"
       class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50"
     >
       <div class="relative top-20 mx-auto p-5 border w-full max-w-md shadow-lg rounded-md bg-white">
         <div class="mt-3">
           <h3 class="text-lg font-medium text-gray-900 mb-4">
-            {{ showEditGroupModal ? 'تعديل مجموعة' : 'إضافة مجموعة جديدة' }}
+            {{ isEditing ? 'تعديل مجموعة' : 'إضافة مجموعة جديدة' }}
           </h3>
 
-          <form @submit.prevent="showEditGroupModal ? updateGroup() : addGroup()">
+          <form @submit.prevent="isEditing ? updateGroup() : addGroup()">
             <div class="mb-4">
               <label class="block text-sm font-medium text-gray-700 mb-2"
                 >اسم المجموعة (العربية) *</label
@@ -149,8 +168,14 @@
                 type="text"
                 v-model="groupForm.title_ar"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                :class="{ 'border-red-500': formErrors.title_ar }"
                 required
+                :disabled="submitting"
+                @input="clearError('title_ar')"
               />
+              <p v-if="formErrors.title_ar" class="mt-1 text-sm text-red-600">
+                {{ formErrors.title_ar }}
+              </p>
             </div>
 
             <div class="mb-4">
@@ -161,8 +186,14 @@
                 type="text"
                 v-model="groupForm.title_en"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                :class="{ 'border-red-500': formErrors.title_en }"
                 required
+                :disabled="submitting"
+                @input="clearError('title_en')"
               />
+              <p v-if="formErrors.title_en" class="mt-1 text-sm text-red-600">
+                {{ formErrors.title_en }}
+              </p>
             </div>
 
             <div class="mb-4">
@@ -171,282 +202,70 @@
                 v-model="groupForm.description"
                 rows="3"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                :disabled="submitting"
               ></textarea>
+            </div>
+
+            <div class="mb-4">
+              <label class="flex items-center">
+                <input
+                  type="checkbox"
+                  v-model="groupForm.is_active"
+                  class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  :disabled="submitting"
+                />
+                <span class="mr-2 text-sm text-gray-700">المجموعة مفعلة</span>
+              </label>
+            </div>
+
+            <!-- Error Message -->
+            <div v-if="formError" class="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
+              <div class="flex items-center">
+                <i class="fas fa-exclamation-circle text-red-500 ml-2"></i>
+                <p class="text-red-700 text-sm">{{ formError }}</p>
+              </div>
             </div>
 
             <div class="flex justify-end space-x-3 space-x-reverse mt-6">
               <button
                 type="button"
                 @click="closeModal"
-                class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+                class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition"
+                :disabled="submitting"
               >
                 إلغاء
               </button>
               <button
                 type="submit"
                 :disabled="submitting"
-                class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:opacity-50"
+                class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition disabled:opacity-50 flex items-center"
               >
-                {{ showEditGroupModal ? 'تحديث' : 'إضافة' }}
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-
-    <!-- Manage Permissions Modal -->
-    <div
-      v-if="showPermissionsModal"
-      class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50"
-    >
-      <div
-        class="relative top-20 mx-auto p-5 border w-full max-w-4xl shadow-lg rounded-md bg-white"
-      >
-        <div class="mt-3">
-          <div class="flex justify-between items-center mb-4">
-            <h3 class="text-lg font-medium text-gray-900">
-              إدارة صلاحيات: {{ selectedGroup?.title_ar }}
-            </h3>
-            <button
-              @click="showAddPermissionModal = true"
-              class="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
-            >
-              <i class="fas fa-plus ml-2"></i>
-              إضافة صلاحية جديدة
-            </button>
-          </div>
-
-          <div v-if="permissionsLoading" class="text-center py-8">
-            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
-            <p class="mt-2 text-gray-600">جاري تحميل الصلاحيات...</p>
-          </div>
-
-          <div v-else class="space-y-6">
-            <!-- Search and Filter -->
-            <div class="flex justify-between items-center">
-              <div class="relative w-64">
-                <input
-                  v-model="permissionSearch"
-                  type="text"
-                  placeholder="بحث في الصلاحيات..."
-                  class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <i class="fas fa-search absolute right-3 top-3 text-gray-400"></i>
-              </div>
-              <div class="flex items-center space-x-4 space-x-reverse">
-                <span class="text-sm text-gray-600">
-                  {{ filteredPermissions.length }} من {{ availablePermissions.length }} صلاحية
-                </span>
-              </div>
-            </div>
-
-            <!-- Permissions List with Actions -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div
-                v-for="permission in filteredPermissions"
-                :key="permission.id"
-                class="border rounded-lg p-4 hover:shadow-md transition"
-              >
-                <div class="flex items-start justify-between">
-                  <div class="flex items-center flex-1">
-                    <input
-                      type="checkbox"
-                      :id="`permission-${permission.id}`"
-                      :value="permission.id"
-                      v-model="selectedPermissions"
-                      class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mt-1"
-                    />
-                    <div class="mr-3 flex-1">
-                      <label :for="`permission-${permission.id}`" class="block cursor-pointer">
-                        <div class="text-sm font-medium text-gray-900 mb-1">
-                          {{ permission.description_ar }}
-                        </div>
-                        <div class="text-xs text-gray-500 mb-1">
-                          {{ permission.description_en }}
-                        </div>
-                        <div class="text-xs text-gray-400">
-                          {{ permission.title }}
-                        </div>
-                        <div v-if="permission.menu" class="mt-2">
-                          <span
-                            class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800"
-                          >
-                            {{ permission.menu.title_ar }}
-                          </span>
-                        </div>
-                      </label>
-                    </div>
-                  </div>
-                  <div class="flex flex-col space-y-2">
-                    <button
-                      @click="editPermission(permission)"
-                      class="text-blue-600 hover:text-blue-900 p-1"
-                      title="تعديل"
-                    >
-                      <i class="fas fa-edit"></i>
-                    </button>
-                    <button
-                      @click="confirmDeletePermission(permission)"
-                      class="text-red-600 hover:text-red-900 p-1"
-                      title="حذف"
-                      v-if="!permission.is_parent"
-                    >
-                      <i class="fas fa-trash"></i>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Empty State -->
-            <div v-if="filteredPermissions.length === 0" class="text-center py-12">
-              <i class="fas fa-shield-alt text-4xl text-gray-300 mb-4"></i>
-              <p class="text-gray-500">لا توجد صلاحيات لعرضها</p>
-            </div>
-          </div>
-
-          <div class="flex justify-end space-x-3 space-x-reverse mt-6">
-            <button
-              type="button"
-              @click="closeModal"
-              class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
-            >
-              إلغاء
-            </button>
-            <button
-              @click="savePermissions"
-              :disabled="submitting"
-              class="px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 disabled:opacity-50"
-            >
-              حفظ الصلاحيات للمجموعة
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Add/Edit Permission Modal -->
-    <div
-      v-if="showAddPermissionModal || showEditPermissionModal"
-      class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50"
-    >
-      <div class="relative top-20 mx-auto p-5 border w-full max-w-md shadow-lg rounded-md bg-white">
-        <div class="mt-3">
-          <h3 class="text-lg font-medium text-gray-900 mb-4">
-            {{ showEditPermissionModal ? 'تعديل صلاحية' : 'إضافة صلاحية جديدة' }}
-          </h3>
-
-          <form @submit.prevent="showEditPermissionModal ? updatePermission() : createPermission()">
-            <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700 mb-2">اسم الصلاحية *</label>
-              <input
-                v-model="permissionForm.title"
-                type="text"
-                required
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="مثال: view_clients"
-              />
-            </div>
-
-            <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700 mb-2">الوصف (العربية) *</label>
-              <input
-                v-model="permissionForm.description_ar"
-                type="text"
-                required
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="عرض العملاء"
-              />
-            </div>
-
-            <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700 mb-2"
-                >الوصف (الإنجليزية) *</label
-              >
-              <input
-                v-model="permissionForm.description_en"
-                type="text"
-                required
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="View Clients"
-              />
-            </div>
-
-            <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700 mb-2">القائمة الرئيسية</label>
-              <select
-                v-model="permissionForm.admin_menu_id"
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">اختر قائمة</option>
-                <option v-for="menu in menus" :key="menu.id" :value="menu.id">
-                  {{ menu.title_ar }} ({{ menu.title_en }})
-                </option>
-              </select>
-            </div>
-
-            <div class="mb-4" v-if="permissionForm.admin_menu_id">
-              <label class="block text-sm font-medium text-gray-700 mb-2">القائمة الفرعية</label>
-              <select
-                v-model="permissionForm.admin_sub_menu_id"
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">اختر قائمة فرعية</option>
-                <option
-                  v-for="subMenu in getSubMenus(permissionForm.admin_menu_id)"
-                  :key="subMenu.id"
-                  :value="subMenu.id"
-                >
-                  {{ subMenu.title_ar }} ({{ subMenu.title_en }})
-                </option>
-              </select>
-            </div>
-
-            <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700 mb-2">الصلاحية الرئيسية</label>
-              <select
-                v-model="permissionForm.parent_id"
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="0">بدون (صلاحية رئيسية)</option>
-                <option
-                  v-for="parentPermission in parentPermissions"
-                  :key="parentPermission.id"
-                  :value="parentPermission.id"
-                >
-                  {{ parentPermission.description_ar }}
-                </option>
-              </select>
-            </div>
-
-            <div class="mb-4">
-              <label class="flex items-center">
-                <input
-                  v-model="permissionForm.is_parent"
-                  type="checkbox"
-                  class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                />
-                <span class="mr-2 text-sm text-gray-700"
-                  >صلاحية رئيسية (يمكن أن تحتوي على صلاحيات فرعية)</span
-                >
-              </label>
-            </div>
-
-            <div class="flex justify-end space-x-3 space-x-reverse mt-6">
-              <button
-                type="button"
-                @click="closePermissionModal"
-                class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
-              >
-                إلغاء
-              </button>
-              <button
-                type="submit"
-                :disabled="permissionSubmitting"
-                class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:opacity-50"
-              >
-                {{ showEditPermissionModal ? 'تحديث' : 'إضافة' }}
+                <template v-if="submitting">
+                  <svg
+                    class="animate-spin h-4 w-4 text-white ml-2"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      class="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      stroke-width="4"
+                    ></circle>
+                    <path
+                      class="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  جاري الحفظ...
+                </template>
+                <template v-else>
+                  {{ isEditing ? 'تحديث' : 'إضافة' }}
+                </template>
               </button>
             </div>
           </form>
@@ -464,39 +283,19 @@ export default {
 
   data() {
     return {
-      showAddGroupModal: false,
-      showEditGroupModal: false,
-      showPermissionsModal: false,
-      showAddPermissionModal: false,
-      showEditPermissionModal: false,
+      showModal: false,
+      isEditing: false,
       submitting: false,
-      permissionsLoading: false,
-      permissionSubmitting: false,
-      selectedGroup: null,
-      selectedPermissions: [],
-      permissionSearch: '',
+      formError: '',
+      formErrors: {},
+      editingGroupId: null,
 
       groupForm: {
         title_ar: '',
         title_en: '',
         description: '',
+        is_active: true,
       },
-
-      permissionForm: {
-        title: '',
-        description_ar: '',
-        description_en: '',
-        admin_menu_id: '',
-        admin_sub_menu_id: '',
-        parent_id: 0,
-        is_parent: false,
-      },
-
-      menus: [],
-      subMenus: [],
-      parentPermissions: [],
-      availablePermissions: [],
-      editingPermission: null,
     }
   },
 
@@ -506,23 +305,10 @@ export default {
       loading: (state) => state.isLoading,
       error: (state) => state.error,
     }),
-    ...mapState('permissions', {
-      allPermissions: (state) => state.permissions,
-    }),
+  },
 
-    filteredPermissions() {
-      if (!this.permissionSearch) {
-        return this.availablePermissions
-      }
-
-      const search = this.permissionSearch.toLowerCase()
-      return this.availablePermissions.filter(
-        (permission) =>
-          permission.title?.toLowerCase().includes(search) ||
-          permission.description_ar?.toLowerCase().includes(search) ||
-          permission.description_en?.toLowerCase().includes(search),
-      )
-    },
+  async mounted() {
+    await this.loadGroups()
   },
 
   methods: {
@@ -531,200 +317,127 @@ export default {
       'createAdminGroup',
       'updateAdminGroup',
       'deleteAdminGroup',
-      'updateGroupPermissions',
-      'getAvailablePermissions',
-    ]),
-    ...mapActions('permissions', [
-      'getPermissions',
-      'createPermission',
-      'updatePermission',
-      'deletePermission',
-      'getMenusWithPermissions',
     ]),
 
-    async loadPermissions() {
+    async loadGroups() {
       try {
-        await this.getPermissions()
-        this.availablePermissions = this.allPermissions || []
-
-        // جلب الصلاحيات الرئيسية
-        this.parentPermissions = this.availablePermissions.filter((p) => p.is_parent)
+        await this.getAdminGroups()
       } catch (error) {
-        console.error('Failed to load permissions:', error)
-        this.$toast.error('فشل في تحميل الصلاحيات')
+        console.error('Error loading groups:', error)
       }
     },
 
-    async loadMenus() {
-      try {
-        const menusData = await this.getMenusWithPermissions()
-        this.menus = menusData || []
-
-        // جمع جميع القوائم الفرعية
-        this.subMenus = []
-        this.menus.forEach((menu) => {
-          if (menu.subMenus && menu.subMenus.length > 0) {
-            this.subMenus.push(...menu.subMenus)
-          }
-        })
-      } catch (error) {
-        console.error('Failed to load menus:', error)
-        this.$toast.error('فشل في تحميل القوائم')
+    openAddGroupModal() {
+      this.isEditing = false
+      this.formError = ''
+      this.formErrors = {}
+      this.editingGroupId = null
+      this.groupForm = {
+        title_ar: '',
+        title_en: '',
+        description: '',
+        is_active: true,
       }
+      this.showModal = true
     },
 
-    getSubMenus(menuId) {
-      const menu = this.menus.find((m) => m.id == menuId)
-      return menu ? menu.subMenus || [] : []
+    editGroup(group) {
+      this.isEditing = true
+      this.formError = ''
+      this.formErrors = {}
+      this.editingGroupId = group.id
+      this.groupForm = {
+        title_ar: group.title_ar || '',
+        title_en: group.title_en || '',
+        description: group.description || '',
+        is_active: group.is_active,
+      }
+      this.showModal = true
+    },
+
+    clearError(field) {
+      if (this.formErrors[field]) {
+        this.formErrors[field] = ''
+      }
     },
 
     async addGroup() {
       this.submitting = true
+      this.formError = ''
+      this.formErrors = {}
+
+      // Validate before sending
+      if (!this.groupForm.title_ar.trim()) {
+        this.formErrors.title_ar = 'اسم المجموعة بالعربية مطلوب'
+        this.submitting = false
+        return
+      }
+
+      if (!this.groupForm.title_en.trim()) {
+        this.formErrors.title_en = 'اسم المجموعة بالإنجليزية مطلوب'
+        this.submitting = false
+        return
+      }
+
       try {
-        await this.createAdminGroup(this.groupForm)
+        const groupData = {
+          title_ar: this.groupForm.title_ar.trim(),
+          title_en: this.groupForm.title_en.trim(),
+          description: this.groupForm.description.trim() || null,
+          is_active: this.groupForm.is_active,
+        }
+
+        console.log('إرسال بيانات المجموعة:', groupData)
+        await this.createAdminGroup(groupData)
+
         this.closeModal()
         this.$toast.success('تم إضافة المجموعة بنجاح')
       } catch (error) {
-        this.$toast.error(error.message || 'فشل في إضافة المجموعة')
+        console.error('Error adding group:', error)
+        this.formError = error.message || 'حدث خطأ أثناء إضافة المجموعة'
       } finally {
         this.submitting = false
       }
-    },
-
-    editGroup(group) {
-      this.selectedGroup = group
-      this.groupForm = {
-        title_ar: group.title_ar,
-        title_en: group.title_en,
-        description: group.description || '',
-      }
-      this.showEditGroupModal = true
     },
 
     async updateGroup() {
       this.submitting = true
+      this.formError = ''
+      this.formErrors = {}
+
+      // Validate before sending
+      if (!this.groupForm.title_ar.trim()) {
+        this.formErrors.title_ar = 'اسم المجموعة بالعربية مطلوب'
+        this.submitting = false
+        return
+      }
+
+      if (!this.groupForm.title_en.trim()) {
+        this.formErrors.title_en = 'اسم المجموعة بالإنجليزية مطلوب'
+        this.submitting = false
+        return
+      }
+
       try {
+        const groupData = {
+          title_ar: this.groupForm.title_ar.trim(),
+          title_en: this.groupForm.title_en.trim(),
+          description: this.groupForm.description.trim() || null,
+          is_active: this.groupForm.is_active,
+        }
+
         await this.updateAdminGroup({
-          id: this.selectedGroup.id,
-          data: this.groupForm,
+          id: this.editingGroupId,
+          data: groupData,
         })
+
         this.closeModal()
         this.$toast.success('تم تحديث المجموعة بنجاح')
       } catch (error) {
-        this.$toast.error(error.message || 'فشل في تحديث المجموعة')
+        console.error('Error updating group:', error)
+        this.formError = error.message || 'حدث خطأ أثناء تحديث المجموعة'
       } finally {
         this.submitting = false
-      }
-    },
-
-    async managePermissions(group) {
-      this.selectedGroup = group
-      this.permissionsLoading = true
-      this.showPermissionsModal = true
-
-      try {
-        await Promise.all([this.loadPermissions(), this.loadMenus()])
-
-        const availablePermissions = await this.getAvailablePermissions(group.id)
-        this.selectedPermissions = group.permissions
-          ? group.permissions.map((p) => p.id)
-          : availablePermissions?.map((p) => p.id) || []
-      } catch (error) {
-        this.$toast.error(error.message || 'فشل في تحميل الصلاحيات')
-      } finally {
-        this.permissionsLoading = false
-      }
-    },
-
-    async savePermissions() {
-      this.submitting = true
-      try {
-        await this.updateGroupPermissions({
-          id: this.selectedGroup.id,
-          permissions: this.selectedPermissions,
-        })
-        this.$toast.success('تم تحديث الصلاحيات بنجاح')
-      } catch (error) {
-        this.$toast.error(error.message || 'فشل في تحديث الصلاحيات')
-      } finally {
-        this.submitting = false
-      }
-    },
-
-    openAddPermissionModal() {
-      this.editingPermission = null
-      this.permissionForm = {
-        title: '',
-        description_ar: '',
-        description_en: '',
-        admin_menu_id: '',
-        admin_sub_menu_id: '',
-        parent_id: 0,
-        is_parent: false,
-      }
-      this.showAddPermissionModal = true
-      this.showEditPermissionModal = false
-    },
-
-    editPermission(permission) {
-      this.editingPermission = permission
-      this.permissionForm = {
-        title: permission.title,
-        description_ar: permission.description_ar,
-        description_en: permission.description_en,
-        admin_menu_id: permission.admin_menu_id,
-        admin_sub_menu_id: permission.admin_sub_menu_id,
-        parent_id: permission.parent_id || 0,
-        is_parent: permission.is_parent || false,
-      }
-      this.showEditPermissionModal = true
-      this.showAddPermissionModal = false
-    },
-
-    async createPermission() {
-      this.permissionSubmitting = true
-      try {
-        await this.createPermission(this.permissionForm)
-        await this.loadPermissions() // إعادة تحميل الصلاحيات
-        this.closePermissionModal()
-        this.$toast.success('تم إضافة الصلاحية بنجاح')
-      } catch (error) {
-        this.$toast.error(error.message || 'فشل في إضافة الصلاحية')
-      } finally {
-        this.permissionSubmitting = false
-      }
-    },
-
-    async updatePermission() {
-      this.permissionSubmitting = true
-      try {
-        await this.updatePermission({
-          id: this.editingPermission.id,
-          data: this.permissionForm,
-        })
-        await this.loadPermissions() // إعادة تحميل الصلاحيات
-        this.closePermissionModal()
-        this.$toast.success('تم تحديث الصلاحية بنجاح')
-      } catch (error) {
-        this.$toast.error(error.message || 'فشل في تحديث الصلاحية')
-      } finally {
-        this.permissionSubmitting = false
-      }
-    },
-
-    async deletePermission(id) {
-      try {
-        await this.deletePermission(id)
-        await this.loadPermissions() // إعادة تحميل الصلاحيات
-        this.$toast.success('تم حذف الصلاحية بنجاح')
-      } catch (error) {
-        this.$toast.error(error.message || 'فشل في حذف الصلاحية')
-      }
-    },
-
-    confirmDeletePermission(permission) {
-      if (confirm(`هل أنت متأكد من حذف الصلاحية "${permission.description_ar}"؟`)) {
-        this.deletePermission(permission.id)
       }
     },
 
@@ -739,48 +452,25 @@ export default {
         await this.deleteAdminGroup(id)
         this.$toast.success('تم حذف المجموعة بنجاح')
       } catch (error) {
+        console.error('Error deleting group:', error)
         this.$toast.error(error.message || 'فشل في حذف المجموعة')
       }
     },
 
     closeModal() {
-      this.showAddGroupModal = false
-      this.showEditGroupModal = false
-      this.showPermissionsModal = false
-      this.selectedGroup = null
-      this.selectedPermissions = []
+      this.showModal = false
+      this.isEditing = false
+      this.submitting = false
+      this.formError = ''
+      this.formErrors = {}
+      this.editingGroupId = null
       this.groupForm = {
         title_ar: '',
         title_en: '',
         description: '',
-      }
-      this.permissionSearch = ''
-    },
-
-    closePermissionModal() {
-      this.showAddPermissionModal = false
-      this.showEditPermissionModal = false
-      this.editingPermission = null
-      this.permissionForm = {
-        title: '',
-        description_ar: '',
-        description_en: '',
-        admin_menu_id: '',
-        admin_sub_menu_id: '',
-        parent_id: 0,
-        is_parent: false,
+        is_active: true,
       }
     },
-  },
-
-  async mounted() {
-    await this.getAdminGroups()
-    await this.loadPermissions()
-    await this.loadMenus()
   },
 }
 </script>
-
-<style scoped>
-/* تخصيصات بسيطة إذا لزم الأمر */
-</style>

@@ -8,7 +8,8 @@ export default {
     permissions: [],
     menus: [],
     is_admin: false,
-    isLoading: false
+    isLoading: false,
+    loginError: null
   },
   getters: {
     user: state => state.user,
@@ -17,9 +18,9 @@ export default {
     menus: state => state.menus,
     is_admin: state => state.is_admin,
     isLoading: state => state.isLoading,
+    loginError: state => state.loginError,
     isAuthenticated: state => !!state.token,
     hasPermission: state => permission => {
-      // إذا كان المستخدم مديراً، لديه جميع الصلاحيات
       if (state.is_admin) return true
       return state.permissions.includes(permission)
     }
@@ -43,52 +44,96 @@ export default {
     SET_LOADING(state, isLoading) {
       state.isLoading = isLoading
     },
+    SET_LOGIN_ERROR(state, error) {
+      state.loginError = error
+    },
     CLEAR_AUTH(state) {
       state.user = null
       state.token = null
       state.permissions = []
       state.menus = []
       state.is_admin = false
+      state.loginError = null
     }
   },
   actions: {
     async login({ commit, dispatch }, credentials) {
       commit('SET_LOADING', true)
-      try {
-        const response = await axios.post('/api/login', credentials)
+      commit('SET_LOGIN_ERROR', null)
 
-        if (response.data.status) {
+      console.log('🔐 محاولة تسجيل الدخول:', credentials)
+
+      try {
+        const response = await axios.post('/admin/login', credentials)
+        console.log('✅ استجابة تسجيل الدخول:', response.data)
+
+        if (response.data.status && response.data.data) {
           const { user, token, permissions, is_admin } = response.data.data
 
+          // حفظ التوكن في localStorage
+          localStorage.setItem('token', token)
+          localStorage.setItem('user', JSON.stringify(user))
+
+          // تحديث axios headers
+          axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+
+          // تحديث حالة Vuex
           commit('SET_USER', user)
           commit('SET_TOKEN', token)
-          commit('SET_PERMISSIONS', permissions)
+          commit('SET_PERMISSIONS', permissions || [])
           commit('SET_IS_ADMIN', is_admin || false)
+          commit('SET_LOGIN_ERROR', null)
 
-          localStorage.setItem('token', token)
-          axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+          // تحميل القوائم بعد تسجيل الدخول
+          await dispatch('loadMenus')
+
+          commit('SET_LOADING', false)
+          return { success: true, data: response.data.data }
+        } else {
+          const errorMsg = response.data.message || 'فشل تسجيل الدخول'
+          commit('SET_LOGIN_ERROR', errorMsg)
+          commit('SET_LOADING', false)
+          return { success: false, message: errorMsg }
+        }
+      } catch (error) {
+        console.error('❌ خطأ في تسجيل الدخول:', error)
+
+        let errorMessage = 'حدث خطأ أثناء تسجيل الدخول'
+        if (error.response) {
+          if (error.response.status === 401) {
+            errorMessage = 'البريد الإلكتروني أو كلمة المرور غير صحيحة'
+          } else if (error.response.data && error.response.data.message) {
+            errorMessage = error.response.data.message
+          }
+        } else if (error.message) {
+          errorMessage = error.message
         }
 
+        commit('SET_LOGIN_ERROR', errorMessage)
         commit('SET_LOADING', false)
-        return response.data
-      } catch (error) {
-        commit('SET_LOADING', false)
-        throw error.response?.data || error
+        return { success: false, message: errorMessage }
       }
     },
 
     async logout({ commit }) {
       commit('SET_LOADING', true)
       try {
-        await axios.post('/api/logout')
+        await axios.post('/admin/logout')
         commit('CLEAR_AUTH')
         localStorage.removeItem('token')
+        localStorage.removeItem('user')
         delete axios.defaults.headers.common['Authorization']
         commit('SET_LOADING', false)
-        return { status: true, message: 'Logged out successfully' }
+        return { success: true, message: 'تم تسجيل الخروج بنجاح' }
       } catch (error) {
+        console.error('❌ خطأ في تسجيل الخروج:', error)
+        // حتى لو فشل الطلب، نقوم بتنظيف البيانات المحلية
+        commit('CLEAR_AUTH')
+        localStorage.removeItem('token')
+        localStorage.removeItem('user')
+        delete axios.defaults.headers.common['Authorization']
         commit('SET_LOADING', false)
-        throw error
+        return { success: true, message: 'تم تسجيل الخروج محلياً' }
       }
     },
 
@@ -99,57 +144,140 @@ export default {
 
       commit('SET_LOADING', true)
       try {
-        const response = await axios.get('/api/me')
+        const response = await axios.get('/admin/me')
 
-        if (response.data.status) {
+        if (response.data.status && response.data.data) {
           const { user, permissions, is_admin } = response.data.data
 
           commit('SET_USER', user)
-          commit('SET_PERMISSIONS', permissions)
+          commit('SET_PERMISSIONS', permissions || [])
           commit('SET_IS_ADMIN', is_admin || false)
 
-          if (!axios.defaults.headers.common['Authorization']) {
-            axios.defaults.headers.common['Authorization'] = `Bearer ${state.token}`
-          }
+          // تحديث التوكن في localStorage إذا لزم الأمر
+          localStorage.setItem('user', JSON.stringify(user))
 
+          commit('SET_LOADING', false)
           return true
+        } else {
+          commit('CLEAR_AUTH')
+          localStorage.removeItem('token')
+          localStorage.removeItem('user')
+          delete axios.defaults.headers.common['Authorization']
+          commit('SET_LOADING', false)
+          return false
         }
-
-        commit('SET_LOADING', false)
-        return false
       } catch (error) {
-        console.error('Auth check error:', error)
+        console.error('❌ خطأ في التحقق من المصادقة:', error)
         commit('CLEAR_AUTH')
         localStorage.removeItem('token')
+        localStorage.removeItem('user')
         delete axios.defaults.headers.common['Authorization']
         commit('SET_LOADING', false)
         return false
       }
     },
 
-    async register({ commit }, userData) {
-      commit('SET_LOADING', true)
+    async loadMenus({ commit, rootState }) {
       try {
-        const response = await axios.post('/api/register', userData)
+        // تحميل القوائم بناءً على صلاحيات المستخدم
+        const menus = [
+          {
+            id: 1,
+            title: 'لوحة التحكم',
+            icon: 'home',
+            route: '/dashboard',
+            permission: 'view_dashboard'
+          },
+          {
+            id: 2,
+            title: 'العملاء',
+            icon: 'users',
+            route: '/clients',
+            permission: 'view_clients',
+            children: [
+              {
+                id: 21,
+                title: 'جميع العملاء',
+                route: '/clients',
+                permission: 'view_clients'
+              },
+              {
+                id: 22,
+                title: 'إضافة عميل',
+                route: '/clients/create',
+                permission: 'create_client'
+              }
+            ]
+          },
+          {
+            id: 3,
+            title: 'الفواتير',
+            icon: 'file-invoice',
+            route: '/invoices',
+            permission: 'view_invoices',
+            children: [
+              {
+                id: 31,
+                title: 'جميع الفواتير',
+                route: '/invoices',
+                permission: 'view_invoices'
+              },
+              {
+                id: 32,
+                title: 'إنشاء فاتورة',
+                route: '/invoices/create',
+                permission: 'create_invoice'
+              }
+            ]
+          },
+          {
+            id: 4,
+            title: 'التقارير',
+            icon: 'chart-bar',
+            route: '/reports',
+            permission: 'view_reports'
+          }
+        ]
 
-        if (response.data.status) {
-          const { user, token, permissions, is_admin } = response.data.data
-
-          commit('SET_USER', user)
-          commit('SET_TOKEN', token)
-          commit('SET_PERMISSIONS', permissions)
-          commit('SET_IS_ADMIN', is_admin || false)
-
-          localStorage.setItem('token', token)
-          axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+        // إضافة قوائم الإدارة للمسؤولين
+        if (rootState.auth.is_admin || rootState.auth.permissions.includes('view_admin_groups')) {
+          menus.push({
+            id: 5,
+            title: 'الإدارة',
+            icon: 'cog',
+            route: '/admin',
+            permission: 'view_admin_groups',
+            children: [
+              {
+                id: 51,
+                title: 'المستخدمون',
+                route: '/admin/users',
+                permission: 'view_users'
+              },
+              {
+                id: 52,
+                title: 'المجموعات',
+                route: '/admin/groups',
+                permission: 'view_admin_groups'
+              },
+              {
+                id: 53,
+                title: 'الصلاحيات',
+                route: '/admin/permissions',
+                permission: 'manage_permissions'
+              }
+            ]
+          })
         }
 
-        commit('SET_LOADING', false)
-        return response.data
+        commit('SET_MENUS', menus)
       } catch (error) {
-        commit('SET_LOADING', false)
-        throw error.response?.data || error
+        console.error('❌ خطأ في تحميل القوائم:', error)
       }
+    },
+
+    clearError({ commit }) {
+      commit('SET_LOGIN_ERROR', null)
     }
   }
 }

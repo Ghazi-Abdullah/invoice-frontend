@@ -5,11 +5,21 @@
       <p class="text-gray-600 mt-2">اختر مجموعة وقم بتعيين الصلاحيات المناسبة لها</p>
     </div>
 
+    <!-- Loading State -->
     <div v-if="loading" class="text-center py-12">
       <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
-      <p class="mt-4 text-gray-600">جاري التحميل...</p>
+      <p class="mt-4 text-gray-600">جاري تحميل المجموعات...</p>
     </div>
 
+    <!-- Error State -->
+    <div v-else-if="error" class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+      <div class="flex items-center">
+        <i class="fas fa-exclamation-circle text-red-500 ml-2"></i>
+        <p class="text-red-700">{{ error }}</p>
+      </div>
+    </div>
+
+    <!-- Main Content -->
     <div v-else class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <!-- اختيار المجموعة -->
       <div class="lg:col-span-1">
@@ -17,7 +27,7 @@
           <h2 class="text-xl font-semibold text-gray-800 mb-4">اختر مجموعة</h2>
           <div class="space-y-3">
             <div
-              v-for="group in groups"
+              v-for="group in adminGroups"
               :key="group.id"
               @click="selectGroup(group)"
               :class="[
@@ -34,11 +44,18 @@
                   <i class="fas fa-users text-blue-600"></i>
                 </div>
                 <div class="flex-1">
-                  <h3 class="font-medium text-gray-900">{{ group.title_ar }}</h3>
+                  <h3 class="font-medium text-gray-900">{{ group.title_ar || group.title_en }}</h3>
                   <p class="text-sm text-gray-500">{{ group.title_en }}</p>
                 </div>
               </div>
-              <p class="text-sm text-gray-600 mt-2">{{ group.permissions_count || 0 }} صلاحية</p>
+              <div class="mt-2 flex justify-between items-center">
+                <span class="text-sm text-gray-600">
+                  {{ group.permissions?.length || group.permissions_count || 0 }} صلاحية
+                </span>
+                <span class="text-sm text-gray-600">
+                  {{ group.users?.length || group.users_count || 0 }} مستخدم
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -53,23 +70,27 @@
           </div>
 
           <div v-else>
+            <!-- Header -->
             <div class="flex justify-between items-center mb-6">
               <div>
                 <h2 class="text-xl font-semibold text-gray-800">
-                  صلاحيات مجموعة: <span class="text-blue-600">{{ selectedGroup.title_ar }}</span>
+                  صلاحيات مجموعة:
+                  <span class="text-blue-600">{{
+                    selectedGroup.title_ar || selectedGroup.title_en
+                  }}</span>
                 </h2>
                 <p class="text-gray-600 mt-1">حدد الصلاحيات التي تريد منحها لهذه المجموعة</p>
               </div>
               <div class="flex space-x-3 space-x-reverse">
                 <button
-                  @click="selectAll"
+                  @click="selectAllPermissions"
                   class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
                 >
                   <i class="fas fa-check-circle ml-2"></i>
                   تحديد الكل
                 </button>
                 <button
-                  @click="deselectAll"
+                  @click="deselectAllPermissions"
                   class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
                 >
                   <i class="fas fa-times-circle ml-2"></i>
@@ -78,7 +99,7 @@
               </div>
             </div>
 
-            <!-- بحث في الصلاحيات -->
+            <!-- Search -->
             <div class="mb-6">
               <div class="relative">
                 <input
@@ -91,7 +112,7 @@
               </div>
             </div>
 
-            <!-- قائمة الصلاحيات -->
+            <!-- Permissions Loading -->
             <div v-if="permissionsLoading" class="text-center py-8">
               <div
                 class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"
@@ -99,24 +120,29 @@
               <p class="mt-2 text-gray-600">جاري تحميل الصلاحيات...</p>
             </div>
 
+            <!-- Permissions List -->
             <div v-else class="space-y-4">
               <div
                 v-for="permission in filteredPermissions"
                 :key="permission.id"
-                class="flex items-center p-4 border rounded-lg hover:bg-gray-50"
+                class="flex items-center p-4 border rounded-lg hover:bg-gray-50 transition"
               >
                 <input
                   type="checkbox"
                   :id="`perm-${permission.id}`"
                   :value="permission.id"
-                  v-model="selectedPermissions"
+                  v-model="selectedPermissionIds"
                   class="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded ml-3"
                 />
                 <label :for="`perm-${permission.id}`" class="flex-1 cursor-pointer">
                   <div class="flex justify-between items-start">
                     <div>
-                      <h4 class="font-medium text-gray-900">{{ permission.description_ar }}</h4>
-                      <p class="text-sm text-gray-500 mt-1">{{ permission.description_en }}</p>
+                      <h4 class="font-medium text-gray-900">
+                        {{ permission.description_ar || permission.title }}
+                      </h4>
+                      <p class="text-sm text-gray-500 mt-1">
+                        {{ permission.description_en || permission.title }}
+                      </p>
                       <p class="text-xs text-gray-400 mt-1">{{ permission.title }}</p>
                     </div>
                     <span
@@ -133,25 +159,26 @@
                 </label>
               </div>
 
-              <!-- لا توجد نتائج -->
+              <!-- No Results -->
               <div v-if="filteredPermissions.length === 0" class="text-center py-12">
                 <i class="fas fa-search text-4xl text-gray-300 mb-4"></i>
                 <p class="text-gray-600">لم يتم العثور على صلاحيات تطابق البحث</p>
               </div>
 
-              <!-- الإحصائيات وحفظ -->
-              <div class="border-t pt-6">
+              <!-- Stats and Save -->
+              <div class="border-t pt-6 mt-6">
                 <div class="flex justify-between items-center">
                   <div class="text-sm text-gray-600">
-                    تم تحديد {{ selectedPermissions.length }} من {{ permissions.length }} صلاحية
+                    تم تحديد {{ selectedPermissionIds.length }} من {{ permissions.length }} صلاحية
                   </div>
                   <button
                     @click="savePermissions"
-                    :disabled="saving"
-                    class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
+                    :disabled="saving || !selectedGroup"
+                    class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <i class="fas fa-save ml-2"></i>
-                    حفظ الصلاحيات للمجموعة
+                    <span v-if="saving">جاري الحفظ...</span>
+                    <span v-else>حفظ الصلاحيات</span>
                   </button>
                 </div>
               </div>
@@ -160,6 +187,8 @@
         </div>
       </div>
     </div>
+
+    <!-- Success Toast (via global $toast) -->
   </div>
 </template>
 
@@ -171,71 +200,95 @@ export default {
 
   data() {
     return {
-      selectedGroup: null,
-      permissions: [],
-      permissionsLoading: false,
-      selectedPermissions: [],
       searchQuery: '',
       saving: false,
+      permissionsLoading: false,
+      selectedGroup: null,
+      selectedPermissionIds: [],
+      permissions: [],
+      // نتجية جلب الصلاحيات المجمعة
+      availablePermissions: null,
     }
   },
 
   computed: {
     ...mapState('adminGroups', {
-      groups: (state) => state.adminGroups,
+      adminGroups: (state) => state.adminGroups,
       loading: (state) => state.isLoading,
       error: (state) => state.error,
     }),
 
+    ...mapState('permissions', {
+      allPermissions: (state) => state.permissionsList,
+    }),
+
     filteredPermissions() {
-      if (!this.searchQuery) {
+      if (!this.searchQuery.trim()) {
         return this.permissions
       }
 
       const search = this.searchQuery.toLowerCase()
       return this.permissions.filter(
         (permission) =>
-          permission.title?.toLowerCase().includes(search) ||
-          permission.description_ar?.toLowerCase().includes(search) ||
-          permission.description_en?.toLowerCase().includes(search),
+          (permission.title && permission.title.toLowerCase().includes(search)) ||
+          (permission.description_ar && permission.description_ar.toLowerCase().includes(search)) ||
+          (permission.description_en && permission.description_en.toLowerCase().includes(search)),
       )
     },
   },
 
+  async mounted() {
+    await this.loadData()
+  },
+
   methods: {
-    ...mapActions('adminGroups', [
-      'getAdminGroups',
-      'getAvailablePermissions',
-      'updateGroupPermissions',
-    ]),
+    ...mapActions('adminGroups', ['getAdminGroups', 'updateGroupPermissions']),
+    ...mapActions('permissions', ['getAllPermissions']),
+
+    async loadData() {
+      try {
+        // جلب المجموعات
+        await this.getAdminGroups()
+
+        // جلب جميع الصلاحيات
+        await this.getAllPermissions()
+
+        // تحميل الصلاحيات إلى المتغير المحلي
+        this.permissions = this.allPermissions || []
+      } catch (error) {
+        console.error('Error loading data:', error)
+        this.$toast.error('فشل في تحميل البيانات')
+      }
+    },
 
     async selectGroup(group) {
       this.selectedGroup = group
-      this.selectedPermissions = []
+      this.selectedPermissionIds = []
       this.permissionsLoading = true
 
       try {
-        // جلب الصلاحيات المتاحة والصلاحيات المعينة
-        const response = await this.getAvailablePermissions(group.id)
-
-        if (response && response.data) {
-          this.permissions = response.data // جميع الصلاحيات
-          this.selectedPermissions = response.selected_permissions || [] // الصلاحيات المعينة
+        // جلب الصلاحيات المعينة حاليًا للمجموعة
+        if (group.permissions && Array.isArray(group.permissions)) {
+          // إذا كانت الصلاحيات مدرجة بالفعل في بيانات المجموعة
+          this.selectedPermissionIds = group.permissions.map((p) => p.id)
+        } else {
+          // إذا لم تكن الصلاحيات مدرجة، افترض أن المجموعة ليس لديها صلاحيات
+          this.selectedPermissionIds = []
         }
       } catch (error) {
-        console.error('Error loading permissions:', error)
-        this.$toast.error('فشل في تحميل الصلاحيات')
+        console.error('Error loading group permissions:', error)
+        this.$toast.error('فشل في تحميل صلاحيات المجموعة')
       } finally {
         this.permissionsLoading = false
       }
     },
 
-    selectAll() {
-      this.selectedPermissions = this.permissions.map((p) => p.id)
+    selectAllPermissions() {
+      this.selectedPermissionIds = this.permissions.map((p) => p.id)
     },
 
-    deselectAll() {
-      this.selectedPermissions = []
+    deselectAllPermissions() {
+      this.selectedPermissionIds = []
     },
 
     async savePermissions() {
@@ -248,21 +301,25 @@ export default {
       try {
         await this.updateGroupPermissions({
           id: this.selectedGroup.id,
-          permissions: this.selectedPermissions,
+          permissions: this.selectedPermissionIds,
         })
 
         this.$toast.success('تم حفظ الصلاحيات بنجاح!')
+
+        // إعادة تحميل المجموعات لتحديث البيانات
+        await this.getAdminGroups()
       } catch (error) {
         console.error('Error saving permissions:', error)
-        this.$toast.error(error.message || 'فشل في حفظ الصلاحيات')
+        const errorMsg = error.response?.data?.message || error.message || 'فشل في حفظ الصلاحيات'
+        this.$toast.error(errorMsg)
       } finally {
         this.saving = false
       }
     },
   },
-
-  async mounted() {
-    await this.getAdminGroups()
-  },
 }
 </script>
+
+<style scoped>
+/* Add any custom styles if needed */
+</style>

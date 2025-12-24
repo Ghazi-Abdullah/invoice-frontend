@@ -111,7 +111,8 @@ export default {
       console.log('📋 Fetching clients with params:', params)
 
       try {
-        const response = await axios.get('/api/clients', {
+        // تصحيح المسار من /api/clients إلى /admin/clients
+        const response = await axios.get('/admin/clients', {
           params: {
             page: params.page || state.pagination.current_page || 1,
             search: params.search || '',
@@ -150,7 +151,8 @@ export default {
     async fetchClient({ commit }, id) {
       try {
         console.log(`🚀 Fetching client with ID: ${id}`)
-        const response = await axios.get(`/api/clients/${id}`)
+        // تصحيح المسار من /api/clients/{id} إلى /admin/clients/{id}
+        const response = await axios.get(`/admin/clients/${id}`)
         console.log('✅ Client details:', response.data)
 
         const client = response.data.data || response.data
@@ -165,7 +167,8 @@ export default {
     async createClient({ commit }, clientData) {
       try {
         console.log('🚀 Creating client:', clientData)
-        const response = await axios.post('/api/clients', clientData)
+        // تصحيح المسار من /api/clients إلى /admin/clients
+        const response = await axios.post('/admin/clients', clientData)
         console.log('✅ Client created:', response.data)
 
         const client = response.data.data || response.data
@@ -181,7 +184,8 @@ export default {
     async updateClient({ commit }, { id, data }) {
       try {
         console.log(`🚀 Updating client ${id}:`, data)
-        const response = await axios.put(`/api/clients/${id}`, data)
+        // تصحيح المسار من /api/clients/{id} إلى /admin/clients/{id}
+        const response = await axios.put(`/admin/clients/${id}`, data)
         console.log('✅ Client updated:', response.data)
 
         const updatedClient = response.data.data || response.data
@@ -196,7 +200,8 @@ export default {
     async deleteClient({ commit }, id) {
       try {
         console.log(`🚀 Deleting client ${id}`)
-        await axios.delete(`/api/clients/${id}`)
+        // تصحيح المسار من /api/clients/{id} إلى /admin/clients/{id}
+        await axios.delete(`/admin/clients/${id}`)
         console.log('✅ Client deleted')
         commit('DELETE_CLIENT', id)
         return true
@@ -209,7 +214,8 @@ export default {
     async getSimpleList({ commit }) {
       try {
         console.log('🚀 Fetching simple client list...')
-        const response = await axios.get('/api/clients/list/simple')
+        // إذا كان لديك هذا المسار في Backend، عدله أيضاً
+        const response = await axios.get('/admin/clients/list/simple')
         console.log('✅ Simple list:', response.data)
 
         return response.data.data || response.data || []
