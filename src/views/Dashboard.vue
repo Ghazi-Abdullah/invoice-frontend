@@ -10,7 +10,9 @@
             </div>
           </div>
           <div class="flex items-center space-x-4">
-            <button @click="loadDashboardData" class="btn btn-primary">تحديث البيانات</button>
+            <button @click="refreshDashboard" class="btn btn-primary" :disabled="loading">
+              {{ loading ? 'جاري التحديث...' : 'تحديث البيانات' }}
+            </button>
           </div>
         </div>
       </div>
@@ -24,19 +26,44 @@
       </div>
     </div>
 
+    <!-- Error State -->
+    <div v-else-if="error" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                fill-rule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </div>
+          <div class="ml-3">
+            <h3 class="text-sm font-medium text-red-800">حدث خطأ</h3>
+            <div class="mt-2 text-sm text-red-700">
+              <p>{{ error }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Main Dashboard Content -->
     <div v-else class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <!-- Welcome Section -->
       <div class="mb-8">
         <h1 class="text-3xl font-bold text-gray-900 mb-2">لوحة التحكم</h1>
-        <p class="text-gray-600 text-lg">مرحباً بك {{ user?.name }}</p>
+        <p class="text-gray-600 text-lg">
+          مرحباً بك {{ user?.name }} {{ isAdmin ? '(مدير)' : '' }}
+        </p>
       </div>
 
       <!-- Stats Grid -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <!-- Total Invoices Card -->
         <div
-          v-if="hasPermission('view_invoices')"
+          v-if="showInvoicesCard"
           class="bg-white rounded-xl shadow-lg border border-gray-200 p-6"
         >
           <div class="flex items-center justify-between">
@@ -44,7 +71,7 @@
               <p class="text-sm font-medium text-gray-600">إجمالي الفواتير</p>
               <p class="text-2xl font-bold text-gray-900 mt-2">{{ stats.totalInvoices }}</p>
               <div class="flex items-center mt-2">
-                <span class="text-green-600 text-sm font-medium">+12%</span>
+                <span class="text-green-600 text-sm font-medium">+{{ stats.invoiceGrowth }}%</span>
                 <span class="text-gray-500 text-sm mr-2">من الشهر الماضي</span>
               </div>
             </div>
@@ -68,7 +95,7 @@
 
         <!-- Total Clients Card -->
         <div
-          v-if="hasPermission('view_clients')"
+          v-if="showClientsCard"
           class="bg-white rounded-xl shadow-lg border border-gray-200 p-6"
         >
           <div class="flex items-center justify-between">
@@ -100,7 +127,7 @@
 
         <!-- Paid Invoices Card -->
         <div
-          v-if="hasPermission('view_invoices')"
+          v-if="showPaidInvoicesCard"
           class="bg-white rounded-xl shadow-lg border border-gray-200 p-6"
         >
           <div class="flex items-center justify-between">
@@ -135,7 +162,7 @@
 
         <!-- Revenue Card -->
         <div
-          v-if="hasPermission('view_sales_report')"
+          v-if="showRevenueCard"
           class="bg-white rounded-xl shadow-lg border border-gray-200 p-6"
         >
           <div class="flex items-center justify-between">
@@ -145,7 +172,7 @@
                 {{ formatCurrency(stats.revenue) }}
               </p>
               <div class="flex items-center mt-2">
-                <span class="text-green-600 text-sm font-medium">+15%</span>
+                <span class="text-green-600 text-sm font-medium">+{{ stats.revenueGrowth }}%</span>
                 <span class="text-gray-500 text-sm mr-2">من الشهر الماضي</span>
               </div>
             </div>
@@ -167,17 +194,19 @@
           </div>
         </div>
       </div>
-
       <!-- Main Content Area -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Left Column - 2/3 width -->
         <div class="lg:col-span-2 space-y-8">
           <!-- Quick Actions -->
-          <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+          <div
+            v-if="showQuickActions"
+            class="bg-white rounded-xl shadow-lg border border-gray-200 p-6"
+          >
             <h2 class="text-xl font-bold text-gray-900 mb-6">إجراءات سريعة</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <router-link
-                v-if="hasPermission('create_invoice')"
+                v-if="showCreateInvoice"
                 to="/invoices/create"
                 class="flex items-center p-4 border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors duration-200"
               >
@@ -203,7 +232,7 @@
               </router-link>
 
               <router-link
-                v-if="hasPermission('create_client')"
+                v-if="showCreateClient"
                 to="/clients/create"
                 class="flex items-center p-4 border border-green-200 rounded-lg hover:bg-green-50 transition-colors duration-200"
               >
@@ -229,7 +258,7 @@
               </router-link>
 
               <router-link
-                v-if="hasPermission('view_invoices')"
+                v-if="showViewInvoices"
                 to="/invoices"
                 class="flex items-center p-4 border border-purple-200 rounded-lg hover:bg-purple-50 transition-colors duration-200"
               >
@@ -255,7 +284,7 @@
               </router-link>
 
               <router-link
-                v-if="hasPermission('view_clients')"
+                v-if="showViewClients"
                 to="/clients"
                 class="flex items-center p-4 border border-yellow-200 rounded-lg hover:bg-yellow-50 transition-colors duration-200"
               >
@@ -284,13 +313,13 @@
 
           <!-- Recent Clients -->
           <div
-            v-if="hasPermission('view_clients')"
+            v-if="showRecentClients"
             class="bg-white rounded-xl shadow-lg border border-gray-200 p-6"
           >
             <div class="flex items-center justify-between mb-6">
               <h2 class="text-xl font-bold text-gray-900">العملاء الحديثين</h2>
               <router-link
-                v-if="hasPermission('view_clients')"
+                v-if="showViewClients"
                 to="/clients"
                 class="text-blue-600 hover:text-blue-700 text-sm font-medium"
               >
@@ -314,7 +343,7 @@
               </svg>
               <p class="text-gray-500">لا يوجد عملاء بعد</p>
               <router-link
-                v-if="hasPermission('create_client')"
+                v-if="showCreateClient"
                 to="/clients/create"
                 class="text-blue-600 hover:text-blue-700 text-sm font-medium mt-2 inline-block"
               >
@@ -359,13 +388,13 @@
         <div class="space-y-8">
           <!-- Recent Invoices -->
           <div
-            v-if="hasPermission('view_invoices')"
+            v-if="showRecentInvoices"
             class="bg-white rounded-xl shadow-lg border border-gray-200 p-6"
           >
             <div class="flex items-center justify-between mb-6">
               <h2 class="text-xl font-bold text-gray-900">الفواتير الحديثة</h2>
               <router-link
-                v-if="hasPermission('view_invoices')"
+                v-if="showViewInvoices"
                 to="/invoices"
                 class="text-blue-600 hover:text-blue-700 text-sm font-medium"
               >
@@ -389,7 +418,7 @@
               </svg>
               <p class="text-gray-500">لا يوجد فواتير بعد</p>
               <router-link
-                v-if="hasPermission('create_invoice')"
+                v-if="showCreateInvoice"
                 to="/invoices/create"
                 class="text-blue-600 hover:text-blue-700 text-sm font-medium mt-2 inline-block"
               >
@@ -407,14 +436,14 @@
                 <div>
                   <p class="font-semibold text-gray-900">{{ invoice.invoice_number }}</p>
                   <p class="text-gray-600 text-sm mt-1">
-                    {{ invoice.client?.name || 'غير معروف' }}
+                    {{ invoice.client_name || 'غير معروف' }}
                   </p>
                   <p class="text-gray-500 text-xs mt-1">
                     تاريخ الاستحقاق: {{ formatDate(invoice.due_date) }}
                   </p>
                 </div>
                 <div class="text-right">
-                  <p class="font-bold text-gray-900">{{ formatCurrency(invoice.total_amount) }}</p>
+                  <p class="font-bold text-gray-900">{{ formatCurrency(invoice.total) }}</p>
                   <span
                     :class="getStatusClass(invoice.status)"
                     class="inline-block px-2 py-1 text-xs rounded-full mt-1"
@@ -428,7 +457,7 @@
 
           <!-- Quick Stats -->
           <div
-            v-if="hasPermission('view_sales_report')"
+            v-if="showQuickStats"
             class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl shadow-lg p-6 text-white"
           >
             <h3 class="text-lg font-bold mb-4">إحصائيات سريعة</h3>
@@ -458,223 +487,147 @@
 </template>
 
 <script>
+import { mapState, mapGetters, mapActions } from 'vuex'
+
 export default {
   name: 'Dashboard',
+
   data() {
     return {
-      loading: false,
-      recentClients: [],
-      recentInvoices: [],
-      stats: {
-        totalClients: 0,
-        totalInvoices: 0,
-        paidInvoices: 0,
-        revenue: 0,
-        thisMonthInvoices: 0,
-        newClientsThisMonth: 0,
-        averageInvoice: 0,
-        collectionRate: 0,
-        clientsGrowth: 0,
-        invoiceGrowth: 0,
-        revenueGrowth: 0,
-        paymentRate: 0,
-      },
+      debugMode: true, // ضع false لإخفاء معلومات التصحيح
     }
   },
+
   computed: {
-    user() {
-      return this.$store.state.auth.user
-    },
-    permissions() {
-      return this.$store.state.auth.permissions || []
-    },
-    isAdmin() {
-      return this.$store.state.auth.is_admin || false
-    },
-  },
-  mounted() {
-    this.loadDashboardData()
-  },
-  methods: {
-    hasPermission(permission) {
-      // إذا كان المستخدم مديراً، لديه جميع الصلاحيات
-      if (this.isAdmin) return true
+    ...mapState('auth', ['user']),
 
-      return this.permissions.includes(permission)
+    ...mapGetters('dashboard', [
+      'stats',
+      'recentClients',
+      'recentInvoices',
+      'loading',
+      'error',
+      'formatCurrency',
+      'formatDate',
+      'getInitials',
+      'getStatusClass',
+      'getStatusText',
+    ]),
+
+    ...mapGetters('auth', ['permissions', 'isAdmin', 'hasPermission']),
+
+    // دوال مساعدة لعرض البطاقات
+    showInvoicesCard() {
+      return this.isAdmin || this.hasPermission('view_invoices')
     },
 
-    formatCurrency(amount) {
-      if (!amount) return '0.00 ر.س'
-      const num = parseFloat(amount)
-      if (isNaN(num)) return '0.00 ر.س'
+    showClientsCard() {
+      return this.isAdmin || this.hasPermission('view_clients')
+    },
+
+    showPaidInvoicesCard() {
+      return this.isAdmin || this.hasPermission('view_invoices')
+    },
+
+    showRevenueCard() {
+      return this.isAdmin || this.hasPermission('view_sales_report')
+    },
+
+    showCreateInvoice() {
+      return this.isAdmin || this.hasPermission('create_invoice')
+    },
+
+    showCreateClient() {
+      return this.isAdmin || this.hasPermission('create_client')
+    },
+
+    showViewInvoices() {
+      return this.isAdmin || this.hasPermission('view_invoices')
+    },
+
+    showViewClients() {
+      return this.isAdmin || this.hasPermission('view_clients')
+    },
+
+    showQuickActions() {
       return (
-        num.toLocaleString('ar-SA', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ر.س'
+        this.showCreateInvoice ||
+        this.showCreateClient ||
+        this.showViewInvoices ||
+        this.showViewClients
       )
     },
 
-    formatDate(dateString) {
-      if (!dateString) return 'غير محدد'
-      try {
-        const date = new Date(dateString)
-        return date.toLocaleDateString('ar-SA', {
-          year: 'numeric',
-          month: 'short',
-          day: 'numeric',
-        })
-      } catch (error) {
-        return 'تاريخ غير صالح'
-      }
+    showRecentClients() {
+      return this.isAdmin || this.hasPermission('view_clients')
     },
 
-    getInitials(name) {
-      if (!name) return '?'
-      return name
-        .split(' ')
-        .map((n) => n[0])
-        .join('')
-        .toUpperCase()
-        .substring(0, 2)
+    showRecentInvoices() {
+      return this.isAdmin || this.hasPermission('view_invoices')
     },
 
-    getStatusClass(status) {
-      const classes = {
-        paid: 'bg-green-100 text-green-800',
-        sent: 'bg-blue-100 text-blue-800',
-        draft: 'bg-gray-100 text-gray-800',
-        overdue: 'bg-red-100 text-red-800',
-      }
-      return classes[status] || 'bg-gray-100 text-gray-800'
+    showQuickStats() {
+      return this.isAdmin || this.hasPermission('view_sales_report')
     },
-    getStatusText(status) {
-      const texts = {
-        paid: 'مدفوعة',
-        sent: 'مرسلة',
-        draft: 'مسودة',
-        overdue: 'متأخرة',
-      }
-      return texts[status] || status
+  },
+
+  mounted() {
+    this.loadDashboardData()
+    this.checkUserPermissions()
+  },
+
+  methods: {
+    ...mapActions('dashboard', [
+      'fetchDashboardData',
+      'calculateDashboardData',
+      'refreshDashboardData',
+    ]),
+
+    checkUserPermissions() {
+      console.log('🔍 فحص صلاحيات المستخدم:')
+      console.log('👤 المستخدم:', this.user)
+      console.log('👑 هل هو مدير؟ (isAdmin):', this.isAdmin)
+      console.log('📋 الصلاحيات:', this.permissions)
+      console.log('💰 صلاحية view_sales_report:', this.hasPermission('view_sales_report'))
+      console.log('🧾 صلاحية view_invoices:', this.hasPermission('view_invoices'))
+      console.log('👥 صلاحية view_clients:', this.hasPermission('view_clients'))
+      console.log('🏢 state.is_admin:', this.$store.state.auth.is_admin)
+      console.log('👤 user.is_admin:', this.user?.is_admin)
     },
 
     goToClient(id) {
-      if (this.hasPermission('view_clients')) {
+      if (this.showViewClients) {
         this.$router.push(`/clients/${id}`)
       }
     },
 
     goToInvoice(id) {
-      if (this.hasPermission('view_invoices')) {
+      if (this.showViewInvoices) {
         this.$router.push(`/invoices/${id}`)
       }
     },
 
     async loadDashboardData() {
-      this.loading = true
       try {
-        console.log('🔄 جلب بيانات لوحة التحكم...')
-
-        // جلب العملاء
-        console.log('📋 جلب العملاء...')
-        await this.$store.dispatch('clients/fetchClients')
-
-        // جلب الفواتير
-        console.log('🧾 جلب الفواتير...')
-        await this.$store.dispatch('invoices/fetchInvoices')
-
-        // تحديث البيانات
-        this.updateDashboardData()
+        console.log('🚀 تحميل بيانات الداشبورد...')
+        // محاولة جلب البيانات من API
+        await this.fetchDashboardData()
+        this.$toast.success('تم تحميل بيانات الداشبورد بنجاح')
       } catch (error) {
-        console.error('❌ خطأ في تحميل بيانات لوحة التحكم:', error)
-        this.$toast.error('فشل في تحميل البيانات')
-      } finally {
-        this.loading = false
+        console.log('🔄 استخدام البيانات المحلية لحساب الإحصائيات...')
+        // في حالة فشل API، نقوم بحساب البيانات من المتاجر الأخرى
+        await this.calculateDashboardData()
+        this.$toast.info('تم استخدام البيانات المحلية للإحصائيات')
       }
     },
 
-    updateDashboardData() {
-      // الحصول على البيانات من الـ store
-      const clients = this.$store.getters['clients/clients']
-      const invoices = this.$store.getters['invoices/invoices']
-
-      console.log('📊 العملاء من الـ store:', clients)
-      console.log('📊 الفواتير من الـ store:', invoices)
-
-      // تحديث العملاء الأخيرة
-      this.recentClients = Array.isArray(clients)
-        ? [...clients].sort((a, b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, 5)
-        : []
-
-      // تحديث الفواتير الأخيرة
-      this.recentInvoices = Array.isArray(invoices)
-        ? [...invoices].sort((a, b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, 5)
-        : []
-
-      // حساب الإحصائيات
-      this.calculateStats(clients, invoices)
-    },
-
-    calculateStats(clients, invoices) {
-      const now = new Date()
-      const thisMonth = now.getMonth()
-      const thisYear = now.getFullYear()
-
-      // تأكد أن clients و invoices هي مصفوفات
-      const clientsArray = Array.isArray(clients) ? clients : []
-      const invoicesArray = Array.isArray(invoices) ? invoices : []
-
-      // إحصائيات العملاء
-      this.stats.totalClients = clientsArray.length
-
-      // حساب العملاء الجدد هذا الشهر
-      this.stats.newClientsThisMonth = clientsArray.filter((client) => {
-        try {
-          const clientDate = new Date(client.created_at)
-          return clientDate.getMonth() === thisMonth && clientDate.getFullYear() === thisYear
-        } catch (error) {
-          return false
-        }
-      }).length
-
-      // إحصائيات الفواتير
-      this.stats.totalInvoices = invoicesArray.length
-
-      // الفواتير المدفوعة
-      this.stats.paidInvoices = invoicesArray.filter((inv) => inv.status === 'paid').length
-
-      // إجمالي الإيرادات
-      this.stats.revenue = invoicesArray.reduce((sum, inv) => {
-        const amount = parseFloat(inv.total_amount || 0)
-        return isNaN(amount) ? sum : sum + amount
-      }, 0)
-
-      // الفواتير هذا الشهر
-      this.stats.thisMonthInvoices = invoicesArray.filter((invoice) => {
-        try {
-          const invoiceDate = new Date(invoice.created_at)
-          return invoiceDate.getMonth() === thisMonth && invoiceDate.getFullYear() === thisYear
-        } catch (error) {
-          return false
-        }
-      }).length
-
-      // معدلات
-      this.stats.paymentRate =
-        this.stats.totalInvoices > 0
-          ? Math.round((this.stats.paidInvoices / this.stats.totalInvoices) * 100)
-          : 0
-
-      this.stats.averageInvoice =
-        this.stats.totalInvoices > 0
-          ? parseFloat((this.stats.revenue / this.stats.totalInvoices).toFixed(2))
-          : 0
-
-      this.stats.collectionRate = this.stats.paymentRate
-
-      // معدلات النمو (محاكاة)
-      this.stats.clientsGrowth = Math.floor(Math.random() * 20) + 5
-      this.stats.invoiceGrowth = Math.floor(Math.random() * 25) + 10
-      this.stats.revenueGrowth = Math.floor(Math.random() * 30) + 15
-
-      console.log('📈 الإحصائيات المحسوبة:', this.stats)
+    async refreshDashboard() {
+      try {
+        await this.refreshDashboardData()
+        this.$toast.success('تم تحديث البيانات بنجاح')
+      } catch (error) {
+        this.$toast.error('فشل في تحديث البيانات')
+      }
     },
   },
 }
@@ -733,5 +686,10 @@ export default {
 .btn-primary:hover {
   background-color: #2563eb;
   border-color: #2563eb;
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 </style>

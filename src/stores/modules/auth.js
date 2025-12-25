@@ -14,32 +14,63 @@ export default {
   getters: {
     user: state => state.user,
     token: state => state.token,
-    permissions: state => state.permissions,
+    permissions: state => state.permissions || [],
     menus: state => state.menus,
     is_admin: state => state.is_admin,
+    isAdmin: state => {
+      console.log('🛡️ isAdmin getter:', {
+        state_is_admin: state.is_admin,
+        user_is_admin: state.user?.is_admin,
+        user: state.user
+      })
+      return state.is_admin || state.user?.is_admin === true || state.user?.is_admin === 1
+    },
     isLoading: state => state.isLoading,
     loginError: state => state.loginError,
     isAuthenticated: state => !!state.token,
     hasPermission: state => permission => {
-      if (state.is_admin) return true
-      return state.permissions.includes(permission)
+      console.log(`🔐 التحقق من الصلاحية "${permission}":`, {
+        isAdmin: state.is_admin,
+        permissions: state.permissions,
+        user: state.user
+      })
+
+      // Super Admin لديه جميع الصلاحيات
+      if (state.is_admin || state.user?.is_admin === true || state.user?.is_admin === 1) {
+        console.log(`✅ Super Admin - يملك صلاحية "${permission}" تلقائياً`)
+        return true
+      }
+
+      // المستخدم العادي يتحقق من قائمة الصلاحيات
+      const hasPerm = Array.isArray(state.permissions) && state.permissions.includes(permission)
+      console.log(`🔍 النتيجة:`, hasPerm)
+      return hasPerm
     }
   },
   mutations: {
     SET_USER(state, user) {
+      console.log('👤 تحديث بيانات المستخدم:', user)
       state.user = user
+
+      // تحديث is_admin من بيانات المستخدم
+      if (user && (user.is_admin === true || user.is_admin === 1 || user.role === 'admin')) {
+        state.is_admin = true
+        console.log('👑 تم تعيين is_admin = true من بيانات المستخدم')
+      }
     },
     SET_TOKEN(state, token) {
       state.token = token
     },
     SET_PERMISSIONS(state, permissions) {
-      state.permissions = permissions
+      console.log('📋 تحديث الصلاحيات:', permissions)
+      state.permissions = Array.isArray(permissions) ? permissions : []
     },
     SET_MENUS(state, menus) {
       state.menus = menus
     },
     SET_IS_ADMIN(state, isAdmin) {
-      state.is_admin = isAdmin
+      console.log('👑 تحديث is_admin إلى:', isAdmin)
+      state.is_admin = Boolean(isAdmin)
     },
     SET_LOADING(state, isLoading) {
       state.isLoading = isLoading
@@ -240,7 +271,7 @@ export default {
         ]
 
         // إضافة قوائم الإدارة للمسؤولين
-        if (rootState.auth.is_admin || rootState.auth.permissions.includes('view_admin_groups')) {
+        if (rootState.auth.is_admin || (Array.isArray(rootState.auth.permissions) && rootState.auth.permissions.includes('view_admin_groups'))) {
           menus.push({
             id: 5,
             title: 'الإدارة',

@@ -1,253 +1,127 @@
 <template>
-  <div class="flex min-h-screen bg-gray-100" :class="isRTL ? 'flex-row-reverse' : ''">
-    <!-- Sidebar -->
-    <aside class="w-64 bg-gray-800 text-white shadow-lg overflow-y-auto">
-      <div class="p-6">
-        <!-- Logo -->
-        <div class="flex items-center space-x-3 space-x-reverse mb-8">
-          <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
-            <i class="fas fa-file-invoice text-xl"></i>
-          </div>
-          <h1 class="text-xl font-bold">نظام الفواتير</h1>
+  <aside
+    class="flex h-full w-64 flex-col bg-gray-900 text-gray-100 shadow-xl"
+    :class="isRTL ? 'text-right' : 'text-left'"
+  >
+    <!-- Logo -->
+    <div class="flex h-16 items-center px-6 border-b border-gray-800">
+      <div class="flex items-center gap-2 font-bold text-xl tracking-tight text-blue-400">
+        <div
+          class="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-white shadow-md"
+        >
+          <i class="fas fa-file-invoice text-base"></i>
         </div>
+        <span>InvoiceAdmin</span>
+      </div>
+    </div>
 
-        <!-- User Info -->
-        <div v-if="user" class="mb-8">
-          <div class="flex items-center space-x-3 space-x-reverse">
-            <div class="w-12 h-12 bg-gray-700 rounded-full flex items-center justify-center">
-              <i class="fas fa-user text-lg"></i>
-            </div>
-            <div>
-              <p class="font-medium">{{ user.name }}</p>
-              <p class="text-sm text-gray-400">{{ user.email }}</p>
-              <div v-if="user.roles" class="mt-1">
-                <span class="inline-block px-2 py-1 text-xs bg-blue-600 rounded">
-                  {{ user.roles[0]?.name || 'مستخدم' }}
-                </span>
-              </div>
-            </div>
-          </div>
+    <!-- Navigation -->
+    <div class="flex-1 overflow-y-auto py-6">
+      <nav class="space-y-2 px-3">
+        <RouterLink
+          v-for="item in navItems"
+          :key="item.to"
+          :to="item.to"
+          class="group flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-all duration-200"
+          :class="
+            isActive(item.to)
+              ? 'bg-blue-600 text-white shadow-md'
+              : 'text-gray-400 hover:bg-gray-700 hover:text-white'
+          "
+        >
+          <i :class="[item.icon, 'text-sm']" />
+          <span>{{ item.label }}</span>
+        </RouterLink>
+      </nav>
+    </div>
+
+    <!-- User + Actions -->
+    <div class="border-t border-gray-800 p-4 space-y-3">
+      <!-- User Info -->
+      <div class="flex items-center gap-3 mb-2 px-2">
+        <div
+          class="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm font-semibold shadow-md"
+        >
+          {{ userInitial }}
         </div>
-
-        <!-- Navigation -->
-        <nav class="space-y-2">
-          <router-link
-            to="/dashboard"
-            class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg hover:bg-gray-700 transition"
-            :class="{ 'bg-gray-700': $route.path === '/dashboard' }"
-          >
-            <i class="fas fa-home"></i>
-            <span>لوحة التحكم</span>
-          </router-link>
-
-          <router-link
-            to="/invoices"
-            class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg hover:bg-gray-700 transition"
-            :class="{ 'bg-gray-700': $route.path.includes('/invoices') }"
-          >
-            <i class="fas fa-file-invoice"></i>
-            <span>الفواتير</span>
-          </router-link>
-
-          <router-link
-            to="/clients"
-            class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg hover:bg-gray-700 transition"
-            :class="{ 'bg-gray-700': $route.path === '/clients' }"
-          >
-            <i class="fas fa-users"></i>
-            <span>العملاء</span>
-          </router-link>
-
-          <router-link
-            to="/reports"
-            class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg hover:bg-gray-700 transition"
-            :class="{ 'bg-gray-700': $route.path === '/reports' }"
-          >
-            <i class="fas fa-chart-bar"></i>
-            <span>التقارير</span>
-          </router-link>
-
-          <!-- Admin Links -->
-          <div v-if="isAdmin">
-            <div class="pt-4 mt-4 border-t border-gray-700">
-              <p class="text-xs text-gray-400 mb-2 px-3">إدارة النظام</p>
-
-              <router-link
-                to="/permissions"
-                class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg hover:bg-gray-700 transition"
-                :class="{ 'bg-gray-700': $route.path === '/permissions' }"
-              >
-                <i class="fas fa-shield-alt"></i>
-                <span>إدارة الصلاحيات</span>
-              </router-link>
-
-              <router-link
-                to="/admin/assign-permissions"
-                class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition"
-              >
-                <i class="fas fa-shield-alt ml-3"></i>
-                <span>تعيين الصلاحيات</span>
-              </router-link>
-
-              <router-link
-                to="/users"
-                class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg hover:bg-gray-700 transition"
-                :class="{ 'bg-gray-700': $route.path === '/users' }"
-              >
-                <i class="fas fa-user-cog"></i>
-                <span>إدارة المستخدمين</span>
-              </router-link>
-            </div>
-          </div>
-        </nav>
-
-        <!-- Logout -->
-        <div class="pt-8 mt-8 border-t border-gray-700">
-          <button
-            @click="logout"
-            class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg hover:bg-red-600 transition w-full text-right"
-          >
-            <i class="fas fa-sign-out-alt"></i>
-            <span>تسجيل الخروج</span>
-          </button>
+        <div class="flex flex-col">
+          <span class="text-sm font-semibold">{{ user?.name }}</span>
+          <span class="text-xs font-medium text-blue-400 capitalize">
+            {{ user?.roles?.[0]?.name || 'User' }}
+          </span>
         </div>
       </div>
-    </aside>
 
-    <!-- Main Content -->
-    <div class="flex-1 flex flex-col">
-      <!-- Navbar -->
-      <nav class="bg-white shadow-lg">
-        <div class="px-4 py-4 flex justify-between items-center">
-          <span class="text-blue-600 font-bold text-lg">{{ $t('app.name') }}</span>
+      <!-- زر تغيير اللغة -->
+      <button
+        @click="toggleLanguage"
+        class="w-full flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium bg-gray-700 text-gray-200 hover:bg-gray-600 transition-all duration-200"
+      >
+        <i class="fas fa-language text-sm"></i>
+        <span>{{ isRTL ? 'English' : 'العربية' }}</span>
+      </button>
 
-          <div class="flex items-center space-x-4 space-x-reverse">
-            <!-- Language Switcher Dropdown -->
-            <div class="relative" @mouseleave="langOpen = false">
-              <button
-                @click="langOpen = !langOpen"
-                class="px-3 py-2 rounded-md border bg-white text-gray-600 hover:bg-gray-50 transition"
-              >
-                {{ locale.toUpperCase() }}
-                <i class="fas fa-chevron-down ml-1"></i>
-              </button>
-              <div
-                v-if="langOpen"
-                class="absolute right-0 mt-2 w-24 bg-white shadow-lg rounded-md z-50"
-              >
-                <button
-                  @click="setLocale('ar')"
-                  class="block w-full text-left px-3 py-2 hover:bg-gray-100"
-                >
-                  العربية
-                </button>
-                <button
-                  @click="setLocale('en')"
-                  class="block w-full text-left px-3 py-2 hover:bg-gray-100"
-                >
-                  English
-                </button>
-              </div>
-            </div>
-
-            <!-- User Dropdown -->
-            <div class="relative group">
-              <button class="flex items-center space-x-2">
-                <div
-                  class="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center text-white"
-                >
-                  {{ userInitials }}
-                </div>
-                <span class="text-sm font-medium text-gray-700">{{ user.name }}</span>
-                <svg class="h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                  <path
-                    fill-rule="evenodd"
-                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                    clip-rule="evenodd"
-                  />
-                </svg>
-              </button>
-
-              <div
-                class="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50"
-              >
-                <div class="py-1">
-                  <div class="px-4 py-2 text-sm text-gray-700 border-b">
-                    <div class="font-medium">{{ user.name }}</div>
-                    <div class="text-xs text-gray-500">
-                      {{ user.group ? user.group.title_en : $t('common.noGroup') }}
-                    </div>
-                  </div>
-                  <router-link
-                    to="/profile"
-                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    {{ $t('common.profile') }}
-                  </router-link>
-                  <button
-                    @click="logout"
-                    class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    {{ $t('auth.logout') }}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      <!-- Main Router View -->
-      <main class="flex-1 p-6">
-        <router-view />
-      </main>
+      <!-- زر تسجيل الخروج -->
+      <button
+        @click="handleLogout"
+        class="w-full flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium bg-red-600 text-white hover:bg-red-700 transition-all duration-200 shadow-md"
+      >
+        <i class="fas fa-sign-out-alt text-sm"></i>
+        <span>تسجيل الخروج</span>
+      </button>
     </div>
-  </div>
+  </aside>
 </template>
 
-<script setup>
-import { computed, ref } from 'vue'
-import { useStore } from 'vuex'
-import { useRouter } from 'vue-router'
-import { useI18n } from 'vue-i18n'
-import { changeLanguage } from '@/plugins/i18n' // عدل المسار حسب مشروعك
+<script>
+export default {
+  name: 'Sidebar',
 
-const store = useStore()
-const router = useRouter()
-const { locale } = useI18n()
+  data() {
+    return {
+      navItems: [
+        { label: 'Dashboard', to: '/dashboard', icon: 'fas fa-home' },
+        { label: 'Invoices', to: '/invoices', icon: 'fas fa-file-invoice' },
+        { label: 'Clients', to: '/clients', icon: 'fas fa-users' },
+        { label: 'Staff', to: '/users', icon: 'fas fa-briefcase' },
+        { label: 'Reports', to: '/reports', icon: 'fas fa-chart-bar' },
+        { label: 'Permissions', to: '/permissions', icon: 'fas fa-shield-alt' },
+      ],
+    }
+  },
 
-const user = computed(() => store.state.auth.user)
-const isAdmin = computed(() => user.value?.roles?.some((role) => role.name === 'admin') || false)
-const userInitials = computed(() => {
-  if (!user.value || !user.value.name) return 'U'
-  return user.value.name
-    .split(' ')
-    .map((word) => word[0])
-    .join('')
-    .toUpperCase()
-    .substring(0, 2)
-})
+  computed: {
+    user() {
+      return this.$store.state.auth.user
+    },
+    isRTL() {
+      return this.$i18n.locale === 'ar'
+    },
+    userInitial() {
+      if (!this.user || !this.user.name) return 'U'
+      return this.user.name.charAt(0).toUpperCase()
+    },
+  },
 
-const isRTL = computed(() => locale.value === 'ar')
-const langOpen = ref(false)
+  methods: {
+    isActive(path) {
+      return this.$route.path === path || this.$route.path.startsWith(path + '/')
+    },
 
-const logout = async () => {
-  try {
-    await store.dispatch('auth/logout')
-    router.push('/login')
-  } catch (error) {
-    console.error('Logout error:', error)
-  }
-}
+    async handleLogout() {
+      try {
+        await this.$store.dispatch('auth/logout')
+        this.$router.push('/login')
+      } catch (e) {
+        console.error('Logout error:', e)
+      }
+    },
 
-const setLocale = (newLocale) => {
-  changeLanguage(newLocale)
-  langOpen.value = false
+    toggleLanguage() {
+      const newLang = this.isRTL ? 'en' : 'ar'
+      this.$i18n.locale = newLang
+      localStorage.setItem('currentLang', newLang)
+    },
+  },
 }
 </script>
-
-<style scoped>
-.router-link-active {
-  @apply bg-gray-700;
-}
-</style>
