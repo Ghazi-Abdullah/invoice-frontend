@@ -1,194 +1,242 @@
 <template>
   <div class="min-h-screen bg-gray-50 py-8">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-      <!-- Header -->
-      <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900">تعديل الفاتورة</h1>
-        <p class="text-gray-600 mt-2">تعديل الفاتورة {{ invoice?.invoice_number }}</p>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Page Header -->
+      <PageHeader
+        :title="$t('invoices.edit')"
+        :subtitle="$t('invoices.editDescription')"
+        :breadcrumbs="breadcrumbs"
+        :actions="headerActions"
+      />
+
+      <!-- Loading State -->
+      <div v-if="loading" class="flex flex-col items-center justify-center py-12">
+        <LoadingSpinner size="lg" />
+        <p class="text-gray-600 text-lg mt-4">{{ $t('common.loading') }}</p>
       </div>
 
-      <div v-if="loading" class="flex justify-center items-center py-12">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
+      <!-- Error State -->
+      <BaseAlert
+        v-else-if="error"
+        type="error"
+        :title="$t('common.error')"
+        :message="error"
+        :actions="errorActions"
+        class="mb-6"
+      />
 
-      <div v-else-if="invoice" class="bg-white shadow rounded-lg p-6">
-        <form @submit.prevent="submitInvoice">
-          <!-- Dates -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">تاريخ الإصدار</label>
-              <input
-                type="date"
-                v-model="form.issue_date"
-                required
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
+      <!-- Edit Invoice Form -->
+      <BaseCard v-else class="edit-invoice-card">
+        <template #header>
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <div class="p-3 bg-blue-100 rounded-lg ml-4">
+                <font-awesome-icon :icon="['fas', 'edit']" class="text-blue-600 text-xl" />
+              </div>
+              <div>
+                <h2 class="text-xl font-bold text-gray-900">
+                  {{ $t('invoices.editInvoice') }} #{{ invoice?.invoice_number }}
+                </h2>
+                <p class="text-gray-600 text-sm">{{ $t('invoices.updateInfo') }}</p>
+              </div>
             </div>
+            <StatusBadge :status="invoice?.status" />
+          </div>
+        </template>
+
+        <form @submit.prevent="submitInvoice" class="space-y-6">
+          <!-- Basic Info -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <BaseInput
+              v-model="form.invoice_number"
+              :label="$t('invoices.invoiceNumber')"
+              :placeholder="$t('invoices.invoiceNumberPlaceholder')"
+              required
+              :error="errors.invoice_number"
+            />
+
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">تاريخ الاستحقاق</label>
-              <input
-                type="date"
-                v-model="form.due_date"
+              <label class="form-label">{{ $t('invoices.client') }} *</label>
+              <select
+                v-model="form.client_id"
                 required
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
+                class="form-input"
+                :class="{ 'border-red-500': errors.client_id }"
+                disabled
+              >
+                <option value="">{{ invoice?.client?.name || $t('common.selectClient') }}</option>
+              </select>
+              <div v-if="errors.client_id" class="mt-1 text-sm text-red-600">
+                {{ errors.client_id }}
+              </div>
             </div>
           </div>
 
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <BaseInput
+              v-model="form.issue_date"
+              type="date"
+              :label="$t('invoices.issueDate')"
+              required
+              :error="errors.issue_date"
+            />
+
+            <BaseInput
+              v-model="form.due_date"
+              type="date"
+              :label="$t('invoices.dueDate')"
+              required
+              :error="errors.due_date"
+            />
+          </div>
+
           <!-- Invoice Items -->
-          <div class="mb-6">
-            <div class="flex items-center justify-between mb-4">
-              <h3 class="text-lg font-medium text-gray-900">عناصر الفاتورة</h3>
-              <button
-                type="button"
-                @click="addItem"
-                class="inline-flex items-center px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-              >
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                  />
-                </svg>
-                إضافة عنصر
-              </button>
+          <div class="border border-gray-200 rounded-lg p-4">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-lg font-semibold text-gray-900">{{ $t('invoices.items') }}</h3>
+              <BaseButton type="button" @click="addItem" size="sm" :icon="['fas', 'plus']">
+                {{ $t('invoices.addItem') }}
+              </BaseButton>
             </div>
 
-            <div class="space-y-4">
-              <div
-                v-for="(item, index) in form.items"
-                :key="index"
-                class="grid grid-cols-12 gap-4 items-start p-4 border border-gray-200 rounded-lg"
-              >
-                <div class="col-span-5">
-                  <label class="block text-sm font-medium text-gray-700 mb-2">الوصف</label>
-                  <input
-                    type="text"
+            <div
+              v-for="(item, index) in form.items"
+              :key="index"
+              class="mb-4 p-4 bg-gray-50 rounded-lg border border-gray-200"
+            >
+              <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+                <div class="md:col-span-5">
+                  <BaseInput
                     v-model="item.description"
+                    :label="$t('common.description')"
+                    :placeholder="$t('invoices.itemDescription')"
                     required
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="وصف المنتج أو الخدمة"
                   />
                 </div>
-                <div class="col-span-2">
-                  <label class="block text-sm font-medium text-gray-700 mb-2">الكمية</label>
-                  <input
-                    type="number"
+
+                <div class="md:col-span-3">
+                  <BaseInput
                     v-model="item.quantity"
+                    type="number"
                     min="1"
+                    :label="$t('common.quantity')"
                     required
-                    @input="calculateItemTotal(item)"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    @input="calculateTotals"
                   />
                 </div>
-                <div class="col-span-3">
-                  <label class="block text-sm font-medium text-gray-700 mb-2">سعر الوحدة</label>
-                  <input
-                    type="number"
+
+                <div class="md:col-span-3">
+                  <BaseInput
                     v-model="item.unit_price"
+                    type="number"
                     min="0"
                     step="0.01"
+                    :label="$t('common.unitPrice')"
                     required
-                    @input="calculateItemTotal(item)"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    @input="calculateTotals"
                   />
                 </div>
-                <div class="col-span-1">
-                  <label class="block text-sm font-medium text-gray-700 mb-2">الإجمالي</label>
-                  <p class="px-3 py-2 bg-gray-100 rounded-lg text-gray-700">
-                    {{ item.total || 0 }} ر.س
-                  </p>
-                </div>
-                <div class="col-span-1 flex justify-end pt-6">
-                  <button
+
+                <div class="md:col-span-1 flex items-end">
+                  <BaseButton
                     type="button"
                     @click="removeItem(index)"
-                    v-if="form.items.length > 1"
-                    class="text-red-600 hover:text-red-800 transition-colors"
-                    title="حذف"
-                  >
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                      />
-                    </svg>
-                  </button>
+                    size="sm"
+                    variant="danger"
+                    :icon="['fas', 'trash']"
+                    :disabled="form.items.length === 1"
+                    class="w-full"
+                  />
                 </div>
+              </div>
+
+              <div class="flex justify-between items-center mt-3 pt-3 border-t border-gray-200">
+                <span class="text-gray-600">
+                  {{ $t('common.total') }}:
+                  <span class="font-semibold">{{ item.total || 0 }} ر.س</span>
+                </span>
+              </div>
+            </div>
+
+            <!-- Summary -->
+            <div class="mt-6 pt-6 border-t border-gray-200">
+              <div class="flex justify-between items-center mb-2">
+                <span class="text-gray-600">{{ $t('common.subtotal') }}:</span>
+                <span class="font-semibold">{{ form.subtotal }} ر.س</span>
+              </div>
+              <div class="flex justify-between items-center mb-2">
+                <span class="text-gray-600">{{ $t('common.tax') }} (15%):</span>
+                <span class="font-semibold">{{ form.tax_amount }} ر.س</span>
+              </div>
+              <div
+                class="flex justify-between items-center text-lg font-bold pt-2 border-t border-gray-200"
+              >
+                <span>{{ $t('common.total') }}:</span>
+                <span class="text-primary-600">{{ form.total_amount }} ر.س</span>
               </div>
             </div>
           </div>
 
           <!-- Notes -->
-          <div class="mb-6">
-            <label class="block text-sm font-medium text-gray-700 mb-2">ملاحظات</label>
-            <textarea
-              v-model="form.notes"
-              rows="3"
-              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="ملاحظات إضافية..."
-            ></textarea>
-          </div>
+          <BaseInput
+            v-model="form.notes"
+            :label="$t('common.notes')"
+            :placeholder="$t('invoices.notesPlaceholder')"
+            type="textarea"
+            rows="3"
+          />
 
-          <!-- Summary -->
-          <div class="bg-gray-50 rounded-lg p-6 mb-6">
-            <h3 class="text-lg font-medium text-gray-900 mb-4">ملخص الفاتورة</h3>
-            <div class="space-y-2">
-              <div class="flex justify-between">
-                <span class="text-gray-600">المجموع الفرعي:</span>
-                <span class="font-medium">{{ form.subtotal }} ر.س</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-gray-600">الضريبة (15%):</span>
-                <span class="font-medium">{{ form.tax_amount }} ر.س</span>
-              </div>
-              <div class="flex justify-between border-t border-gray-200 pt-2">
-                <span class="text-lg font-semibold text-gray-900">الإجمالي الكلي:</span>
-                <span class="text-lg font-bold text-blue-600">{{ form.total_amount }} ر.س</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Actions -->
-          <div class="flex items-center justify-end space-x-4 space-x-reverse">
-            <router-link
-              :to="`/invoices/${invoice.id}`"
-              class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              إلغاء
-            </router-link>
-            <button
-              type="submit"
+          <!-- Form Actions -->
+          <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+            <BaseButton
+              type="outline"
+              @click="$router.push(`/invoices/${invoice.id}`)"
               :disabled="submitting"
-              class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <span v-if="submitting">جاري الحفظ...</span>
-              <span v-else>تحديث</span>
-            </button>
+              {{ $t('common.cancel') }}
+            </BaseButton>
+
+            <BaseButton
+              type="primary"
+              :loading="submitting"
+              :disabled="submitting || !isFormValid"
+              :icon="['fas', 'save']"
+              html-type="submit"
+            >
+              {{ $t('common.update') }}
+            </BaseButton>
           </div>
         </form>
-      </div>
+      </BaseCard>
     </div>
   </div>
 </template>
 
 <script>
+import { mapActions } from 'vuex'
+
 export default {
   name: 'EditInvoice',
-
   data() {
     return {
-      invoice: null,
       loading: true,
       submitting: false,
+      error: null,
+      invoice: null,
+      errors: {},
       form: {
+        client_id: '',
+        invoice_number: '',
         issue_date: '',
         due_date: '',
-        items: [],
+        items: [
+          {
+            description: '',
+            quantity: 1,
+            unit_price: 0,
+            total: 0,
+          },
+        ],
         notes: '',
         subtotal: 0,
         tax_amount: 0,
@@ -196,9 +244,100 @@ export default {
       },
     }
   },
-
+  computed: {
+    breadcrumbs() {
+      return [
+        { text: this.$t('invoices.title'), to: '/invoices' },
+        {
+          text: `فاتورة #${this.invoice?.invoice_number || ''}`,
+          to: `/invoices/${this.invoice?.id}`,
+        },
+        { text: this.$t('common.edit') },
+      ]
+    },
+    headerActions() {
+      return [
+        {
+          text: this.$t('common.back'),
+          type: 'outline',
+          icon: ['fas', 'arrow-left'],
+          onClick: () => this.$router.push(`/invoices/${this.invoice?.id}`),
+        },
+      ]
+    },
+    errorActions() {
+      return [
+        {
+          text: this.$t('common.retry'),
+          onClick: this.loadInvoice,
+          type: 'danger',
+        },
+      ]
+    },
+    isFormValid() {
+      return (
+        this.form.client_id &&
+        this.form.invoice_number &&
+        this.form.issue_date &&
+        this.form.due_date &&
+        this.form.items.every(
+          (item) => item.description && item.quantity > 0 && item.unit_price >= 0,
+        )
+      )
+    },
+  },
+  mounted() {
+    this.loadInvoice()
+  },
   methods: {
+    ...mapActions('invoices', ['fetchInvoice', 'updateInvoice']),
+
+    async loadInvoice() {
+      this.loading = true
+      this.error = null
+      const invoiceId = this.$route.params.id
+
+      try {
+        this.invoice = await this.fetchInvoice(invoiceId)
+
+        this.form = {
+          client_id: this.invoice.client_id,
+          invoice_number: this.invoice.invoice_number || '',
+          issue_date: this.invoice.issue_date?.split('T')[0] || '',
+          due_date: this.invoice.due_date?.split('T')[0] || '',
+          items: this.invoice.items?.map((item) => ({
+            description: item.description || '',
+            quantity: item.quantity || 1,
+            unit_price: item.unit_price || 0,
+            total: (item.quantity || 1) * (item.unit_price || 0),
+          })) || [
+            {
+              description: '',
+              quantity: 1,
+              unit_price: 0,
+              total: 0,
+            },
+          ],
+          notes: this.invoice.notes || '',
+          subtotal: this.invoice.subtotal || 0,
+          tax_amount: this.invoice.tax_amount || 0,
+          total_amount: this.invoice.total_amount || 0,
+        }
+
+        this.calculateTotals()
+      } catch (error) {
+        console.error('❌ خطأ في تحميل الفاتورة:', error)
+        this.error = error.message || this.$t('common.loadError')
+      } finally {
+        this.loading = false
+      }
+    },
     calculateTotals() {
+      // حساب المجموع لكل عنصر
+      this.form.items.forEach((item) => {
+        item.total = (parseFloat(item.quantity) || 0) * (parseFloat(item.unit_price) || 0)
+      })
+
       const subtotal = this.form.items.reduce((sum, item) => sum + (parseFloat(item.total) || 0), 0)
       const tax_amount = subtotal * 0.15
       const total_amount = subtotal + tax_amount
@@ -207,12 +346,6 @@ export default {
       this.form.tax_amount = tax_amount.toFixed(2)
       this.form.total_amount = total_amount.toFixed(2)
     },
-
-    calculateItemTotal(item) {
-      item.total = (parseFloat(item.quantity) || 0) * (parseFloat(item.unit_price) || 0)
-      this.calculateTotals()
-    },
-
     addItem() {
       this.form.items.push({
         description: '',
@@ -221,79 +354,66 @@ export default {
         total: 0,
       })
     },
-
     removeItem(index) {
       if (this.form.items.length > 1) {
         this.form.items.splice(index, 1)
         this.calculateTotals()
       }
     },
-
     async submitInvoice() {
-      if (
-        this.form.items.some(
-          (item) => !item.description || item.quantity <= 0 || item.unit_price <= 0,
-        )
-      ) {
-        alert('يرجى ملء جميع حقول العناصر بشكل صحيح')
-        return
-      }
-
+      this.errors = {}
       this.submitting = true
+
       try {
+        // التحقق من البيانات
+        if (!this.form.invoice_number.trim()) {
+          this.errors.invoice_number = 'الرجاء إدخال رقم الفاتورة'
+          return
+        }
+
+        if (!this.form.issue_date) {
+          this.errors.issue_date = 'الرجاء اختيار تاريخ الإصدار'
+          return
+        }
+
+        if (!this.form.due_date) {
+          this.errors.due_date = 'الرجاء اختيار تاريخ الاستحقاق'
+          return
+        }
+
         const invoiceData = {
           ...this.form,
+          subtotal: parseFloat(this.form.subtotal),
+          tax_amount: parseFloat(this.form.tax_amount),
+          total_amount: parseFloat(this.form.total_amount),
           items: this.form.items.map((item) => ({
             description: item.description,
             quantity: parseFloat(item.quantity),
             unit_price: parseFloat(item.unit_price),
+            total: parseFloat(item.total),
           })),
         }
 
-        await this.$store.dispatch('invoices/updateInvoice', {
+        await this.updateInvoice({
           id: this.invoice.id,
           data: invoiceData,
         })
 
-        this.$toast.success('تم تحديث الفاتورة بنجاح')
+        this.$toast.success(this.$t('invoices.updateSuccess'))
         this.$router.push(`/invoices/${this.invoice.id}`)
       } catch (error) {
-        console.error('Failed to update invoice:', error)
-        this.$toast.error('فشل في تحديث الفاتورة: ' + error.message)
+        console.error('❌ خطأ في تحديث الفاتورة:', error)
+
+        if (error.response?.data?.errors) {
+          this.errors = error.response.data.errors
+        } else {
+          this.$toast.error(error.message || this.$t('invoices.updateError'))
+        }
       } finally {
         this.submitting = false
       }
     },
-
-    async loadInvoice() {
-      try {
-        const invoiceId = this.$route.params.id
-        this.invoice = await this.$store.dispatch('invoices/fetchInvoice', invoiceId)
-
-        this.form = {
-          issue_date: this.invoice.issue_date.split('T')[0],
-          due_date: this.invoice.due_date.split('T')[0],
-          items: this.invoice.items.map((item) => ({
-            description: item.description,
-            quantity: item.quantity,
-            unit_price: item.unit_price,
-            total: item.total,
-          })),
-          notes: this.invoice.notes || '',
-          subtotal: this.invoice.subtotal,
-          tax_amount: this.invoice.tax_amount,
-          total_amount: this.invoice.total_amount,
-        }
-      } catch (error) {
-        console.error('Failed to fetch invoice:', error)
-        this.$toast.error('فشل في تحميل الفاتورة')
-        this.$router.push('/invoices')
-      } finally {
-        this.loading = false
-      }
-    },
   },
-
   watch: {
     'form.items': {
       handler() {
@@ -302,9 +422,11 @@ export default {
       deep: true,
     },
   },
-
-  mounted() {
-    this.loadInvoice()
-  },
 }
 </script>
+
+<style scoped>
+.edit-invoice-card {
+  @apply border-blue-100;
+}
+</style>

@@ -9,6 +9,8 @@ import adminGroups from './modules/adminGroups'
 import permissions from './modules/permissions'
 import report from './modules/report'
 import dashboard from './modules/dashboard'
+import invoiceManagement from './modules/invoiceManagement'
+import assignPermissions from './modules/assignPermissions'
 
 export default createStore({
   state: {
@@ -58,6 +60,10 @@ export default createStore({
     adminGroups: adminGroups,
     permissions: permissions,
     report: report,
-    dashboard: dashboard
+    dashboard: dashboard,
+    invoiceManagement: invoiceManagement,
+    assignPermissions: assignPermissions,
+
+
   }
 })

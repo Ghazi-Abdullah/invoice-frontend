@@ -1,153 +1,196 @@
 <template>
   <div class="min-h-screen bg-gray-50 py-8">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-      <!-- Header -->
-      <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
-        <div>
-          <h1 class="text-3xl font-bold text-gray-900">{{ $t('clients.editClient') }}</h1>
-          <p class="text-gray-600 mt-2">{{ $t('clients.editClientDescription') }}</p>
-        </div>
-        <div class="mt-4 md:mt-0">
-          <router-link
-            :to="`/clients/${clientId}`"
-            class="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-          >
-            <i class="fas fa-arrow-left mr-2"></i>
-            {{ $t('common.back') }}
-          </router-link>
-        </div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Page Header -->
+      <PageHeader
+        :title="$t('clients.editClient')"
+        :subtitle="$t('clients.editClientDescription')"
+        :breadcrumbs="breadcrumbs"
+        :actions="headerActions"
+      />
+
+      <!-- Loading State -->
+      <div v-if="loading" class="flex flex-col items-center justify-center py-12">
+        <LoadingSpinner size="lg" />
+        <p class="text-gray-600 text-lg mt-4">{{ $t('common.loading') }}</p>
       </div>
 
-      <!-- Form Container -->
-      <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
-        <!-- Form Header -->
-        <div class="px-6 py-4 bg-gradient-to-r from-green-600 to-emerald-700 text-white">
+      <!-- Error State -->
+      <BaseAlert
+        v-else-if="error"
+        type="error"
+        :title="$t('common.error')"
+        :message="error"
+        :actions="errorActions"
+        class="mb-6"
+      />
+
+      <!-- Edit Form -->
+      <BaseCard v-else class="edit-client-card">
+        <template #header>
           <div class="flex items-center">
-            <div class="p-3 bg-white/20 rounded-lg mr-4">
-              <i class="fas fa-user-edit text-white text-xl"></i>
+            <div class="p-3 bg-green-100 rounded-lg ml-4">
+              <font-awesome-icon :icon="['fas', 'user-edit']" class="text-green-600 text-xl" />
             </div>
             <div>
-              <h2 class="text-xl font-bold">{{ $t('clients.editClientTitle') }}</h2>
-              <p class="text-green-100 text-sm mt-1">{{ $t('clients.updateInfo') }}</p>
+              <h2 class="text-xl font-bold text-gray-900">{{ $t('clients.editClientTitle') }}</h2>
+              <p class="text-gray-600 text-sm">{{ $t('clients.updateInfo') }}</p>
             </div>
           </div>
-        </div>
+        </template>
 
-        <!-- Client Form -->
-        <form @submit.prevent="handleSubmit" class="p-6">
-          <div v-if="loading" class="text-center py-8">
-            <div
-              class="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"
-            ></div>
-            <p class="mt-4 text-gray-600">{{ $t('common.loading') }}</p>
-          </div>
-
-          <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <form @submit.prevent="handleSubmit" class="space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Name -->
-            <div class="md:col-span-2">
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                {{ $t('clients.name') }} *
-              </label>
-              <input
-                v-model="form.name"
-                type="text"
-                required
-                class="w-full px-4 py-3 bg-gray-50/80 border border-gray-300/50 rounded-xl focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all duration-300"
-                :placeholder="$t('clients.namePlaceholder')"
-              />
-            </div>
+            <BaseInput
+              v-model="form.name"
+              :label="$t('clients.form.name')"
+              :placeholder="$t('clients.form.namePlaceholder')"
+              required
+              :error="errors.name"
+              class="md:col-span-2"
+            />
 
             <!-- Email -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                {{ $t('auth.email') }}
-              </label>
-              <input
-                v-model="form.email"
-                type="email"
-                class="w-full px-4 py-3 bg-gray-50/80 border border-gray-300/50 rounded-xl focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all duration-300"
-                :placeholder="$t('clients.emailPlaceholder')"
-              />
-            </div>
+            <BaseInput
+              v-model="form.email"
+              type="email"
+              :label="$t('auth.email')"
+              :placeholder="$t('clients.form.emailPlaceholder')"
+              :error="errors.email"
+              required
+            />
 
             <!-- Phone -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                {{ $t('clients.phone') }}
-              </label>
-              <input
-                v-model="form.phone"
-                type="tel"
-                class="w-full px-4 py-3 bg-gray-50/80 border border-gray-300/50 rounded-xl focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all duration-300"
-                :placeholder="$t('clients.phonePlaceholder')"
-              />
-            </div>
+            <BaseInput
+              v-model="form.phone"
+              :label="$t('clients.form.phone')"
+              :placeholder="$t('clients.form.phonePlaceholder')"
+              :error="errors.phone"
+            />
 
             <!-- Company Name -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                {{ $t('clients.company') }}
-              </label>
-              <input
-                v-model="form.company_name"
-                type="text"
-                class="w-full px-4 py-3 bg-gray-50/80 border border-gray-300/50 rounded-xl focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all duration-300"
-                :placeholder="$t('clients.companyPlaceholder')"
-              />
-            </div>
+            <BaseInput
+              v-model="form.company_name"
+              :label="$t('clients.form.companyName')"
+              :placeholder="$t('clients.form.companyNamePlaceholder')"
+              :error="errors.company_name"
+            />
 
             <!-- Tax Number -->
+            <BaseInput
+              v-model="form.tax_number"
+              :label="$t('clients.form.taxNumber')"
+              :placeholder="$t('clients.form.taxNumberPlaceholder')"
+              :error="errors.tax_number"
+            />
+
+            <!-- Payment Terms -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                {{ $t('clients.taxNumber') }}
-              </label>
-              <input
-                v-model="form.tax_number"
-                type="text"
-                class="w-full px-4 py-3 bg-gray-50/80 border border-gray-300/50 rounded-xl focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all duration-300"
-                :placeholder="$t('clients.taxNumberPlaceholder')"
-              />
+              <label class="form-label">{{ $t('clients.form.paymentTerms') }}</label>
+              <select
+                v-model="form.payment_terms"
+                class="form-input"
+                :class="{ 'border-red-500': errors.payment_terms }"
+              >
+                <option value="net_30">صافي 30 يوم</option>
+                <option value="net_15">صافي 15 يوم</option>
+                <option value="net_7">صافي 7 أيام</option>
+                <option value="upon_receipt">عند الاستلام</option>
+              </select>
+              <div v-if="errors.payment_terms" class="mt-1 text-sm text-red-600">
+                {{ errors.payment_terms }}
+              </div>
             </div>
 
-            <!-- Address -->
-            <div class="md:col-span-2">
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                {{ $t('clients.address') }}
-              </label>
-              <textarea
-                v-model="form.address"
-                rows="3"
-                class="w-full px-4 py-3 bg-gray-50/80 border border-gray-300/50 rounded-xl focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all duration-300 resize-none"
-                :placeholder="$t('clients.addressPlaceholder')"
-              ></textarea>
+            <!-- Currency -->
+            <div>
+              <label class="form-label">{{ $t('clients.form.currency') }}</label>
+              <select
+                v-model="form.currency"
+                class="form-input"
+                :class="{ 'border-red-500': errors.currency }"
+              >
+                <option value="SAR">ريال سعودي (SAR)</option>
+                <option value="USD">دولار أمريكي (USD)</option>
+                <option value="EUR">يورو (EUR)</option>
+                <option value="KWD">دينار كويتي (KWD)</option>
+              </select>
+              <div v-if="errors.currency" class="mt-1 text-sm text-red-600">
+                {{ errors.currency }}
+              </div>
+            </div>
+
+            <!-- Status -->
+            <div>
+              <label class="form-label">{{ $t('common.status') }}</label>
+              <select
+                v-model="form.status"
+                class="form-input"
+                :class="{ 'border-red-500': errors.status }"
+              >
+                <option value="active">{{ $t('common.active') }}</option>
+                <option value="inactive">{{ $t('common.inactive') }}</option>
+              </select>
+              <div v-if="errors.status" class="mt-1 text-sm text-red-600">
+                {{ errors.status }}
+              </div>
             </div>
           </div>
 
-          <!-- Buttons -->
-          <div class="flex justify-end space-x-3 mt-8">
-            <router-link
-              :to="`/clients/${clientId}`"
-              class="px-6 py-3 text-gray-700 hover:text-gray-900 font-medium transition-colors duration-200"
+          <!-- Address -->
+          <BaseInput
+            v-model="form.address"
+            :label="$t('clients.form.address')"
+            :placeholder="$t('clients.form.addressPlaceholder')"
+            type="textarea"
+            rows="3"
+            :error="errors.address"
+          />
+
+          <!-- Notes -->
+          <BaseInput
+            v-model="form.notes"
+            :label="$t('clients.form.notes')"
+            :placeholder="$t('clients.form.notesPlaceholder')"
+            type="textarea"
+            rows="3"
+            :error="errors.notes"
+          />
+
+          <!-- Quick Tips -->
+          <div class="p-4 bg-green-50 rounded-lg border border-green-100">
+            <h4 class="font-medium text-green-800 mb-2">{{ $t('clients.quickTips') }}</h4>
+            <ul class="text-sm text-green-700 space-y-1">
+              <li>{{ $t('clients.tip1') }}</li>
+              <li>{{ $t('clients.tip2') }}</li>
+              <li>{{ $t('clients.tip3') }}</li>
+              <li>{{ $t('clients.tip4') }}</li>
+            </ul>
+          </div>
+
+          <!-- Form Actions -->
+          <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+            <BaseButton
+              type="outline"
+              @click="$router.push(`/clients/${clientId}`)"
+              :disabled="submitting"
             >
               {{ $t('common.cancel') }}
-            </router-link>
-            <button
-              type="submit"
-              :disabled="submitting || loading"
-              class="px-6 py-3 bg-gradient-to-br from-green-600 to-emerald-700 hover:from-green-700 hover:to-emerald-800 text-white font-semibold rounded-xl shadow-lg shadow-green-500/25 hover:shadow-green-500/40 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+            </BaseButton>
+
+            <BaseButton
+              type="primary"
+              :loading="submitting"
+              :disabled="submitting"
+              icon="save"
+              html-type="submit"
             >
-              <span v-if="submitting" class="flex items-center">
-                <i class="fas fa-spinner fa-spin mr-2"></i>
-                {{ $t('common.saving') }}
-              </span>
-              <span v-else class="flex items-center">
-                <i class="fas fa-check mr-2"></i>
-                {{ $t('common.update') }}
-              </span>
-            </button>
+              {{ $t('common.update') }}
+            </BaseButton>
           </div>
         </form>
-      </div>
+      </BaseCard>
     </div>
   </div>
 </template>
@@ -167,8 +210,42 @@ export default {
         address: '',
         company_name: '',
         tax_number: '',
+        payment_terms: 'net_30',
+        currency: 'SAR',
+        notes: '',
+        status: 'active',
       },
+      errors: {},
+      error: null,
     }
+  },
+  computed: {
+    breadcrumbs() {
+      return [
+        { text: this.$t('clients.title'), to: '/clients' },
+        { text: this.form.name || 'تحميل...', to: `/clients/${this.clientId}` },
+        { text: this.$t('common.edit') },
+      ]
+    },
+    headerActions() {
+      return [
+        {
+          text: this.$t('common.back'),
+          type: 'outline',
+          icon: ['fas', 'arrow-left'],
+          onClick: () => this.$router.push(`/clients/${this.clientId}`),
+        },
+      ]
+    },
+    errorActions() {
+      return [
+        {
+          text: this.$t('common.retry'),
+          onClick: this.loadClient,
+          type: 'danger',
+        },
+      ]
+    },
   },
   mounted() {
     this.clientId = this.$route.params.id
@@ -177,32 +254,117 @@ export default {
   methods: {
     async loadClient() {
       this.loading = true
+      this.error = null
       try {
         const client = await this.$store.dispatch('clients/fetchClient', this.clientId)
-        this.form = { ...client }
+        console.log('📊 بيانات العميل المستلمة:', client)
+
+        this.form = {
+          name: client.name || '',
+          email: client.email || '',
+          phone: client.phone || '',
+          address: client.address || '',
+          company_name: client.company_name || '',
+          tax_number: client.tax_number || '',
+          payment_terms: client.payment_terms || 'net_30',
+          currency: client.currency || 'SAR',
+          notes: client.notes || '',
+          status: client.is_active ? 'active' : 'inactive',
+        }
       } catch (error) {
-        this.$toast.error(this.$t('common.loadError'))
-        this.$router.push('/clients')
+        console.error('❌ خطأ في تحميل العميل:', error)
+        this.error = error.message || this.$t('common.loadError')
       } finally {
         this.loading = false
       }
     },
-
     async handleSubmit() {
+      this.errors = {}
       this.submitting = true
+
       try {
+        // التحقق من البيانات
+        if (!this.form.name.trim()) {
+          this.errors.name = 'الرجاء إدخال اسم العميل'
+          return
+        }
+
+        if (!this.form.email.trim()) {
+          this.errors.email = 'البريد الإلكتروني مطلوب'
+          return
+        }
+
+        if (this.form.email && !this.isValidEmail(this.form.email)) {
+          this.errors.email = 'البريد الإلكتروني غير صالح'
+          return
+        }
+
+        // إعداد البيانات للإرسال
+        const dataToSend = {
+          name: this.form.name,
+          email: this.form.email,
+          phone: this.form.phone || '',
+          address: this.form.address || '',
+          company_name: this.form.company_name || '',
+          tax_number: this.form.tax_number || '',
+          payment_terms: this.form.payment_terms,
+          currency: this.form.currency,
+          notes: this.form.notes || '',
+          status: this.form.status, // سيتم تحويله إلى is_active في الـ Backend
+        }
+
+        // إزالة الحقول الفارغة (اختياري)
+        Object.keys(dataToSend).forEach((key) => {
+          if (dataToSend[key] === '' || dataToSend[key] === null) {
+            delete dataToSend[key]
+          }
+        })
+
         await this.$store.dispatch('clients/updateClient', {
           id: this.clientId,
-          data: this.form,
+          data: dataToSend,
         })
+
         this.$toast.success(this.$t('clients.updateSuccess'))
         this.$router.push(`/clients/${this.clientId}`)
       } catch (error) {
-        this.$toast.error(error.message || this.$t('clients.updateError'))
+        console.error('❌ خطأ في تحديث العميل:', error)
+
+        if (error.response?.data) {
+          console.error('📡 تفاصيل استجابة الخطأ:', error.response.data)
+
+          if (error.response.data.message) {
+            this.$toast.error(error.response.data.message)
+          }
+
+          if (error.response.data.errors) {
+            this.errors = error.response.data.errors
+          }
+        } else if (error.message) {
+          this.$toast.error(error.message)
+        }
       } finally {
         this.submitting = false
       }
     },
+    isValidEmail(email) {
+      const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      return re.test(email)
+    },
   },
 }
 </script>
+
+<style scoped>
+.edit-client-card {
+  @apply border-green-100;
+}
+
+.form-label {
+  @apply block text-sm font-medium text-gray-700 mb-1;
+}
+
+.form-input {
+  @apply mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm;
+}
+</style>

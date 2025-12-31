@@ -1,126 +1,228 @@
 <template>
-  <div id="app">
+  <div id="app" :class="appClasses" class="app-container">
+    <!-- Toast Notifications -->
     <ToastContainer />
-    <main class="main-content">
-      <!-- عرض الـ Layout المناسب -->
-      <DefaultLayout v-if="$store.state.auth.token && $store.state.auth.user" />
-      <router-view v-else />
-    </main>
+
+    <!-- Render Layout Based on Authentication -->
+    <template v-if="isAuthenticated">
+      <DefaultLayout />
+    </template>
+    <template v-else>
+      <router-view />
+    </template>
+
+    <!-- Global Loading Overlay -->
+    <div v-if="globalLoading" class="global-loading-overlay">
+      <LoadingSpinner size="lg" />
+      <p class="mt-4 text-white font-medium">{{ $t('common.loading') }}</p>
+    </div>
   </div>
 </template>
 
 <script>
 import ToastContainer from '@/components/ToastContainer.vue'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
-import { useStore } from 'vuex'
-import { computed } from 'vue'
+import LoadingSpinner from '@/components/shared/LoadingSpinner.vue'
 
 export default {
   name: 'App',
+
   components: {
     ToastContainer,
     DefaultLayout,
+    LoadingSpinner,
   },
-  setup() {
-    const store = useStore()
 
-    const isAuthenticated = computed(() => {
-      return store.state.auth.token && store.state.auth.user
-    })
+  computed: {
+    isAuthenticated() {
+      const token = this.$store.state.auth.token
+      const user = this.$store.state.auth.user
+      return token && user
+    },
 
-    return {
-      isAuthenticated,
+    appClasses() {
+      return {
+        'lang-ar': this.$i18n.locale === 'ar',
+        'lang-en': this.$i18n.locale === 'en',
+        rtl: this.$i18n.locale === 'ar',
+        ltr: this.$i18n.locale === 'en',
+      }
+    },
+
+    globalLoading() {
+      // يمكنك إضافة شروط للتحميل العام هنا
+      return (
+        this.$store.state.auth.loading ||
+        this.$store.state.invoices.loading ||
+        this.$store.state.clients.loading
+      )
+    },
+  },
+
+  created() {
+    // تطبيق إعدادات اللغة عند بدء التطبيق
+    const savedLang = localStorage.getItem('userLanguage') || 'ar'
+    this.$i18n.locale = savedLang
+    document.documentElement.dir = savedLang === 'ar' ? 'rtl' : 'ltr'
+    document.documentElement.lang = savedLang
+    document.documentElement.setAttribute('class', `lang-${savedLang}`)
+
+    // التحقق من المصادقة عند تحميل التطبيق
+    const token = localStorage.getItem('token')
+    if (token && !this.$store.state.auth.user) {
+      this.$store.dispatch('auth/checkAuth')
+    }
+  },
+
+  mounted() {
+    // إضافة فئات للغة
+    document.body.classList.add(`lang-${this.$i18n.locale}`)
+    if (this.$i18n.locale === 'ar') {
+      document.body.classList.add('rtl')
+      document.body.classList.remove('ltr')
+    } else {
+      document.body.classList.add('ltr')
+      document.body.classList.remove('rtl')
     }
   },
 }
 </script>
 
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+/* الأنماط العامة للتطبيق */
+.app-container {
+  font-family: theme('fontFamily.sans');
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f6f8fa 0%, #f1f5f9 100%);
+  color: var(--color-gray-900);
+  transition: background-color 0.3s ease;
 }
 
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f8f9fa;
-  color: #333;
+/* دعم RTL/LTR */
+.rtl {
   direction: rtl;
+  text-align: right;
 }
 
-#app {
-  min-height: 100vh;
+.ltr {
+  direction: ltr;
+  text-align: left;
 }
 
-.main-content {
-  min-height: 100vh;
+/* Global Loading Overlay */
+.global-loading-overlay {
+  @apply fixed inset-0 bg-black/50 backdrop-blur-sm flex flex-col items-center justify-center z-50;
+}
+
+/* تحسينات للأجهزة المحمولة */
+@media (max-width: 768px) {
+  .container {
+    padding: 0 1rem;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
 }
 
 /* تنسيقات عامة */
 .container {
-  max-width: 1200px;
+  max-width: 1280px;
   margin: 0 auto;
   padding: 0 1rem;
 }
 
-.card {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  padding: 1.5rem;
-  margin-bottom: 1rem;
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
 }
 
-.btn {
-  padding: 0.5rem 1rem;
-  border: none;
+::-webkit-scrollbar-track {
+  background: var(--color-gray-100);
   border-radius: 4px;
-  cursor: pointer;
-  text-decoration: none;
-  display: inline-block;
-  text-align: center;
-  transition: background 0.3s;
 }
 
-.btn-primary {
-  background: #3498db;
+::-webkit-scrollbar-thumb {
+  background: var(--color-gray-300);
+  border-radius: 4px;
+  transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-gray-400);
+}
+
+/* Selection Color */
+::selection {
+  background-color: var(--color-primary-light);
   color: white;
 }
 
-.btn-primary:hover {
-  background: #2980b9;
+/* Focus Styles */
+*:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
-.btn-danger {
-  background: #e74c3c;
-  color: white;
-}
-
-.btn-danger:hover {
-  background: #c0392b;
-}
-
-.form-group {
-  margin-bottom: 1rem;
-}
-
-.form-label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 500;
-}
-
-.form-input {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 1rem;
-}
-
-.form-input:focus {
+*:focus:not(:focus-visible) {
   outline: none;
-  border-color: #3498db;
+}
+
+/* Smooth Transitions */
+.page-transition-enter-active,
+.page-transition-leave-active {
+  transition:
+    opacity 0.3s,
+    transform 0.3s;
+}
+
+.page-transition-enter-from,
+.page-transition-leave-to {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+/* Print Styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  .print-break {
+    page-break-before: always;
+  }
+}
+
+/* Utility Classes */
+.text-balance {
+  text-wrap: balance;
+}
+
+.glass-effect {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Status Colors */
+.status-draft {
+  @apply bg-yellow-100 text-yellow-800;
+}
+.status-sent {
+  @apply bg-blue-100 text-blue-800;
+}
+.status-paid {
+  @apply bg-green-100 text-green-800;
+}
+.status-overdue {
+  @apply bg-red-100 text-red-800;
 }
 </style>

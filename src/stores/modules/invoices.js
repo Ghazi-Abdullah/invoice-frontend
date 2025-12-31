@@ -198,13 +198,15 @@ export default {
       }
     },
 
-    async updateInvoiceStatus({ commit }, { id, status }) {
+    async updateInvoiceStatus({ commit }, { id, status, payment_date = null }) {
       try {
         console.log(`🚀 Updating invoice ${id} status to: ${status}`)
 
-        let response;
+        let response
         if (status === 'paid') {
-          response = await axios.put(`/admin/invoices/${id}/mark-paid`)
+          // استخدم المسار الجديد الذي أضفناه
+          const data = payment_date ? { payment_date } : {}
+          response = await axios.put(`/admin/invoices/${id}/mark-paid`, data)
         } else if (status === 'sent') {
           response = await axios.post(`/admin/invoices/${id}/send`)
         } else {
@@ -218,6 +220,9 @@ export default {
         return updatedInvoice
       } catch (error) {
         console.error('❌ Error updating invoice status:', error)
+        if (error.response?.data?.message) {
+          throw new Error(error.response.data.message)
+        }
         throw error
       }
     }

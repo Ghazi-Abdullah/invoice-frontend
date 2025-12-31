@@ -1,4 +1,6 @@
 import './assets/main.css'
+import './assets/theme.css'
+import './style.css'
 
 import { createApp } from 'vue'
 import App from './App.vue'
@@ -29,10 +31,38 @@ import {
   faCircle,
   faChevronDown,
   faUserPlus,
-  faFolder
+  faFolder,
+  faEye,
+  faDownload,
+  faPrint,
+  faSearch,
+  faFilter,
+  faCalendar,
+  faClock,
+  faPhone,
+  faEnvelope,
+  faMapMarkerAlt,
+  faBuilding,
+  faIdCard,
+  faSave,
+  faTimes,
+  faSpinner,
+  faArrowLeft,
+  faPaperPlane,
+  faShareAlt,
+  faInbox,
+  faSort,
+  faSortUp,
+  faSortDown,
+  faTimesCircle,
+  faExclamationCircle,
+  faExclamationTriangle,
+  faInfoCircle,
+  faCheckCircle as faCheckCircleSolid,
+  faSort as faSortSolid
 } from '@fortawesome/free-solid-svg-icons'
 
-// إضافة الأيقونات
+// إضافة جميع الأيقونات
 library.add(
   faUser,
   faFileInvoice,
@@ -49,14 +79,66 @@ library.add(
   faCircle,
   faChevronDown,
   faUserPlus,
-  faFolder
+  faFolder,
+  faEye,
+  faDownload,
+  faPrint,
+  faSearch,
+  faFilter,
+  faCalendar,
+  faClock,
+  faPhone,
+  faEnvelope,
+  faMapMarkerAlt,
+  faBuilding,
+  faIdCard,
+  faSave,
+  faTimes,
+  faSpinner,
+  faArrowLeft,
+  faPaperPlane,
+  faShareAlt,
+  faInbox,
+  faSort,
+  faSortUp,
+  faSortDown,
+  faTimesCircle,
+  faExclamationCircle,
+  faExclamationTriangle,
+  faInfoCircle,
+  faCheckCircleSolid,
+  faSortSolid,
 )
+
+// استيراد المكونات المشتركة
+import BaseButton from './components/shared/BaseButton.vue'
+import BaseCard from './components/shared/BaseCard.vue'
+import BaseBadge from './components/shared/BaseBadge.vue'
+import BaseInput from './components/shared/BaseInput.vue'
+import BaseTable from './components/shared/BaseTable.vue'
+import BaseModal from './components/shared/BaseModal.vue'
+import BaseAlert from './components/shared/BaseAlert.vue'
+import LoadingSpinner from './components/shared/LoadingSpinner.vue'
+import PageHeader from './components/shared/PageHeader.vue'
+import StatusBadge from './components/shared/StatusBadge.vue'
 
 // إنشاء التطبيق
 const app = createApp(App)
 
 // تسجيل FontAwesome كمكوّن عام
 app.component('font-awesome-icon', FontAwesomeIcon)
+
+// تسجيل المكونات المشتركة كعالمية
+app.component('BaseButton', BaseButton)
+app.component('BaseCard', BaseCard)
+app.component('BaseBadge', BaseBadge)
+app.component('BaseInput', BaseInput)
+app.component('BaseTable', BaseTable)
+app.component('BaseModal', BaseModal)
+app.component('BaseAlert', BaseAlert)
+app.component('LoadingSpinner', LoadingSpinner)
+app.component('PageHeader', PageHeader)
+app.component('StatusBadge', StatusBadge)
 
 // Vuex + Router + i18n
 app.use(store)
@@ -69,6 +151,7 @@ app.use(Vue3Toastify, {
   position: 'top-right',
   theme: 'colored',
   rtl: true,
+  transition: 'slide',
 })
 
 // دالة مساعدة للتحقق من الصلاحيات
@@ -88,6 +171,42 @@ app.config.globalProperties.$hasPermission = function (permission) {
 app.config.globalProperties.$isAdmin = function () {
   const user = this.$store.state.auth.user
   return user?.roles?.some(role => role.name === 'admin') || false
+}
+
+// دوال مساعدة للتنسيق
+app.config.globalProperties.$formatCurrency = function (amount) {
+  if (!amount && amount !== 0) return this.$t('common.notAvailable')
+  try {
+    const formatter = new Intl.NumberFormat(this.$i18n.locale === 'ar' ? 'ar-SA' : 'en-US', {
+      style: 'currency',
+      currency: this.$i18n.locale === 'ar' ? 'SAR' : 'USD',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })
+    return formatter.format(amount)
+  } catch (error) {
+    console.error('Error formatting currency:', error)
+    return amount
+  }
+}
+
+app.config.globalProperties.$formatDate = function (dateString) {
+  if (!dateString) return this.$t('common.notAvailable')
+  try {
+    const options = {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      timeZone: 'UTC',
+    }
+    return new Date(dateString).toLocaleDateString(
+      this.$i18n.locale === 'ar' ? 'ar-SA' : 'en-US',
+      options,
+    )
+  } catch (error) {
+    console.error('Error formatting date:', error)
+    return dateString
+  }
 }
 
 // ربط toast عالميًا

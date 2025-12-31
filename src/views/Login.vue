@@ -1,236 +1,275 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gray-100">
-    <div class="w-full max-w-md bg-white rounded-lg shadow-md p-6">
-      <h2 class="text-2xl font-bold text-center mb-6">تسجيل الدخول</h2>
+  <div
+    class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center px-4"
+  >
+    <div class="w-full max-w-md">
+      <!-- Logo and Header -->
+      <div class="text-center mb-8">
+        <div class="mb-6">
+          <div
+            class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl shadow-lg shadow-blue-500/25 animate-float"
+          >
+            <font-awesome-icon :icon="['fas', 'file-invoice-dollar']" class="text-white text-2xl" />
+          </div>
+        </div>
+        <h1 class="text-3xl font-bold text-gray-900">مرحباً بعودتك</h1>
+        <p class="text-gray-600 mt-2">سجل الدخول إلى حسابك للمتابعة</p>
+      </div>
 
-      <form @submit.prevent="handleLogin">
-        <!-- Email -->
-        <div class="mb-4">
-          <label class="block text-gray-700 mb-2">البريد الإلكتروني</label>
-          <input
+      <!-- Login Form -->
+      <BaseCard class="shadow-xl border-0">
+        <form @submit.prevent="handleLogin" class="space-y-6">
+          <!-- Email -->
+          <BaseInput
             v-model="form.email"
             type="email"
+            label="البريد الإلكتروني"
             required
-            placeholder="admin@invoice.com"
-            class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="أدخل بريدك الإلكتروني"
+            :prefix-icon="['fas', 'envelope']"
+            :error="errors.email"
           />
-        </div>
 
-        <!-- Password -->
-        <div class="mb-4">
-          <label class="block text-gray-700 mb-2">كلمة المرور</label>
-          <input
-            v-model="form.password"
-            type="password"
-            required
-            placeholder="password123"
-            class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          <!-- Password -->
+          <div class="relative">
+            <BaseInput
+              v-model="form.password"
+              :type="showPassword ? 'text' : 'password'"
+              label="كلمة المرور"
+              required
+              placeholder="أدخل كلمة المرور"
+              :prefix-icon="['fas', 'lock']"
+              :error="errors.password"
+            />
+            <button
+              type="button"
+              @click="showPassword = !showPassword"
+              class="absolute left-3 top-9 text-gray-400 hover:text-gray-600"
+              :title="showPassword ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'"
+            >
+              <font-awesome-icon :icon="showPassword ? ['fas', 'eye-slash'] : ['fas', 'eye']" />
+            </button>
+          </div>
+
+          <!-- Remember Me & Forgot Password -->
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <input
+                id="remember-me"
+                v-model="rememberMe"
+                type="checkbox"
+                class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+              />
+              <label for="remember-me" class="mr-2 block text-sm text-gray-900"> تذكرني </label>
+            </div>
+
+            <router-link
+              to="/forgot-password"
+              class="text-sm text-primary-600 hover:text-primary-500 font-medium"
+            >
+              نسيت كلمة المرور؟
+            </router-link>
+          </div>
+
+          <!-- Error Message -->
+          <BaseAlert
+            v-if="error"
+            type="error"
+            :title="'خطأ في تسجيل الدخول'"
+            :message="error"
+            dismissible
+            @dismiss="error = ''"
+            class="mt-4 animate-fade-in"
           />
+
+          <!-- Submit Button -->
+          <BaseButton
+            type="primary"
+            :loading="loading"
+            :disabled="loading"
+            html-type="submit"
+            block
+            size="lg"
+            class="mt-6 shadow-md hover:shadow-lg transition-shadow"
+          >
+            <template v-if="loading">
+              <font-awesome-icon :icon="['fas', 'spinner']" class="animate-spin ml-2" />
+              جاري تسجيل الدخول...
+            </template>
+            <template v-else>
+              <font-awesome-icon :icon="['fas', 'sign-in-alt']" class="ml-2" />
+              تسجيل الدخول
+            </template>
+          </BaseButton>
+        </form>
+
+        <!-- Divider -->
+        <div class="mt-8">
+          <div class="relative">
+            <div class="absolute inset-0 flex items-center">
+              <div class="w-full border-t border-gray-300"></div>
+            </div>
+            <div class="relative flex justify-center text-sm">
+              <span class="px-4 bg-white text-gray-500">أو</span>
+            </div>
+          </div>
         </div>
 
-        <!-- Error Message -->
-        <div v-if="error" class="mb-4 p-3 bg-red-100 text-red-700 rounded">
-          <strong>خطأ:</strong> {{ error }}
+        <!-- Register Link -->
+        <div class="mt-8 text-center">
+          <p class="text-gray-600">
+            ليس لديك حساب؟
+            <router-link to="/register" class="text-primary-600 hover:text-primary-800 font-medium">
+              أنشئ حساب جديد
+            </router-link>
+          </p>
         </div>
 
-        <!-- Loading State -->
-        <div v-if="loading" class="mb-4 text-center">
-          <div
-            class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"
-          ></div>
-          <p class="mt-2 text-gray-600">جاري تسجيل الدخول...</p>
+        <!-- Demo Credentials -->
+        <div class="mt-8 p-4 bg-blue-50 rounded-xl border border-blue-100">
+          <div class="flex items-start">
+            <font-awesome-icon :icon="['fas', 'info-circle']" class="text-blue-600 mt-0.5 ml-3" />
+            <div>
+              <h4 class="text-sm font-medium text-blue-800 mb-2">بيانات تجريبية:</h4>
+              <div class="text-xs text-blue-700 space-y-2">
+                <div class="flex items-center">
+                  <font-awesome-icon :icon="['fas', 'user']" class="ml-2" />
+                  <code class="bg-blue-100 px-2 py-1 rounded">admin@invoice.com</code>
+                </div>
+                <div class="flex items-center">
+                  <font-awesome-icon :icon="['fas', 'key']" class="ml-2" />
+                  <code class="bg-blue-100 px-2 py-1 rounded">password123</code>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+      </BaseCard>
 
-        <!-- Submit Button -->
-        <button
-          type="submit"
-          :disabled="loading"
-          class="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {{ loading ? 'جاري تسجيل الدخول...' : 'تسجيل الدخول' }}
-        </button>
-
-        <!-- Debug Info -->
-        <div v-if="debugInfo" class="mt-4 p-3 bg-gray-100 rounded">
-          <details>
-            <summary class="cursor-pointer text-sm text-gray-600">معلومات التصحيح</summary>
-            <pre class="mt-2 text-xs overflow-auto">{{ JSON.stringify(debugInfo, null, 2) }}</pre>
-          </details>
-        </div>
-      </form>
-
-      <!-- Debug Buttons -->
-      <div class="mt-6 space-y-2">
-        <button
-          @click="testDirectLogin"
-          class="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 text-sm"
-        >
-          اختبار تسجيل الدخول المباشر
-        </button>
-
-        <button
-          @click="checkAuthState"
-          class="w-full bg-yellow-600 text-white py-2 rounded-md hover:bg-yellow-700 text-sm"
-        >
-          فحص حالة المصادقة
-        </button>
-
-        <button
-          @click="clearLocalStorage"
-          class="w-full bg-red-600 text-white py-2 rounded-md hover:bg-red-700 text-sm"
-        >
-          تنظيف التخزين المحلي
-        </button>
+      <!-- Security Note -->
+      <div class="mt-8 text-center">
+        <p class="text-xs text-gray-500">
+          © 2024 نظام إدارة الفواتير. جميع الحقوق محفوظة.
+          <br />
+          <a href="#" class="text-gray-600 hover:text-gray-800">سياسة الخصوصية</a> •
+          <a href="#" class="text-gray-600 hover:text-gray-800">الشروط والأحكام</a>
+        </p>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { mapState } from 'vuex'
-
 export default {
   name: 'Login',
-
   data() {
     return {
+      loading: false,
+      error: '',
+      showPassword: false,
+      rememberMe: false,
       form: {
         email: 'admin@invoice.com',
         password: 'password123',
       },
-      error: '',
-      debugInfo: null,
+      errors: {},
     }
   },
-
-  computed: {
-    ...mapState('auth', ['isLoading', 'loginError']),
-    loading() {
-      return this.isLoading
-    },
-  },
-
-  created() {
-    // تنظيف أي أخطاء سابقة
-    this.$store.commit('auth/CLEAR_ERROR')
-
+  mounted() {
     // إذا كان المستخدم مصادقاً بالفعل، توجيهه إلى Dashboard
     if (this.$store.getters['auth/isAuthenticated']) {
       this.$router.push('/dashboard')
     }
   },
-
   methods: {
     async handleLogin() {
       this.error = ''
-      this.debugInfo = null
+      this.errors = {}
+
+      // التحقق من صحة البيانات
+      if (!this.form.email.trim()) {
+        this.errors.email = 'الرجاء إدخال البريد الإلكتروني'
+        return
+      }
+
+      if (!this.isValidEmail(this.form.email)) {
+        this.errors.email = 'البريد الإلكتروني غير صالح'
+        return
+      }
+
+      if (!this.form.password) {
+        this.errors.password = 'الرجاء إدخال كلمة المرور'
+        return
+      }
+
+      this.loading = true
 
       try {
-        console.log('🚀 بدء تسجيل الدخول...')
-
-        // استدعاء action تسجيل الدخول من Vuex
-        const result = await this.$store.dispatch('auth/login', this.form)
-
-        console.log('✅ نتيجة تسجيل الدخول:', result)
+        const result = await this.$store.dispatch('auth/login', {
+          ...this.form,
+          remember: this.rememberMe,
+        })
 
         if (result.success) {
-          // عرض رسالة نجاح
-          this.$toast.success('تم تسجيل الدخول بنجاح!')
+          this.$toast.success('تم تسجيل الدخول بنجاح!', {
+            position: 'top-center',
+            timeout: 2000,
+          })
 
           // الانتقال إلى Dashboard بعد تأخير بسيط
           setTimeout(() => {
-            console.log('📍 التوجيه إلى /dashboard')
             this.$router.push('/dashboard')
           }, 1000)
         } else {
           this.error = result.message || 'فشل تسجيل الدخول'
-          this.debugInfo = { error: result }
+
+          if (result.errors) {
+            this.errors = result.errors
+          }
         }
       } catch (err) {
-        console.error('❌ خطأ غير متوقع:', err)
-        this.error = 'حدث خطأ غير متوقع أثناء تسجيل الدخول'
-        this.debugInfo = {
-          message: err.message,
-          stack: err.stack,
-        }
+        console.error('❌ خطأ في تسجيل الدخول:', err)
+        this.error = 'حدث خطأ غير متوقع أثناء تسجيل الدخول. الرجاء المحاولة مرة أخرى.'
+      } finally {
+        this.loading = false
       }
     },
 
-    async testDirectLogin() {
-      try {
-        console.log('🧪 اختبار تسجيل الدخول المباشر...')
-
-        // استخدام بيانات افتراضية
-        const testData = {
-          email: 'admin@invoice.com',
-          password: 'password123',
-        }
-
-        const result = await this.$store.dispatch('auth/login', testData)
-
-        if (result.success) {
-          this.$toast.success('✅ اختبار تسجيل الدخول ناجح!')
-          this.debugInfo = {
-            testResult: result,
-            storedToken: localStorage.getItem('token'),
-            storedUser: localStorage.getItem('user'),
-            vuexState: this.$store.state.auth,
-          }
-        } else {
-          this.$toast.error('❌ اختبار تسجيل الدخول فاشل')
-          this.debugInfo = { testError: result }
-        }
-      } catch (error) {
-        console.error('❌ خطأ في الاختبار:', error)
-        this.$toast.error('خطأ في الاختبار')
-      }
-    },
-
-    checkAuthState() {
-      console.log('🔍 فحص حالة المصادقة:')
-
-      const authState = this.$store.state.auth
-      const localStorageState = {
-        token: localStorage.getItem('token'),
-        user: localStorage.getItem('user'),
-      }
-
-      this.debugInfo = {
-        vuexAuthState: {
-          user: authState.user,
-          token: authState.token ? '*** موجود ***' : 'غير موجود',
-          isAuthenticated: this.$store.getters['auth/isAuthenticated'],
-          is_admin: authState.is_admin,
-          permissions: authState.permissions,
-        },
-        localStorage: {
-          token: localStorageState.token ? '*** موجود ***' : 'غير موجود',
-          user: localStorageState.user ? JSON.parse(localStorageState.user) : 'غير موجود',
-        },
-        axiosHeaders: {
-          authorization: axios.defaults.headers.common['Authorization'] || 'غير معين',
-        },
-      }
-
-      console.log('📊 حالة المصادقة:', this.debugInfo)
-      this.$toast.info('تم فحص حالة المصادقة، انظر الـ console')
-    },
-
-    clearLocalStorage() {
-      console.log('🧹 تنظيف localStorage...')
-
-      localStorage.removeItem('token')
-      localStorage.removeItem('user')
-
-      // تنظيف حالة Vuex
-      this.$store.commit('auth/CLEAR_AUTH')
-
-      // إعادة تعيين axios headers
-      delete axios.defaults.headers.common['Authorization']
-
-      this.$toast.success('تم تنظيف التخزين المحلي')
-      this.debugInfo = { message: 'تم تنظيف جميع بيانات المصادقة' }
+    isValidEmail(email) {
+      const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      return re.test(email)
     },
   },
 }
 </script>
+
+<style scoped>
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+</style>
