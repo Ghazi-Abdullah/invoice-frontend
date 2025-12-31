@@ -1,27 +1,41 @@
 <template>
   <div class="min-h-screen bg-gray-50 py-8">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <PageHeader
-        :title="$t('invoices.edit')"
-        :subtitle="$t('invoices.editDescription')"
-        :breadcrumbs="breadcrumbs"
-        :actions="headerActions"
-      />
+      <!-- Page Header -->
+      <div class="mb-8">
+        <div class="flex justify-between items-center">
+          <div>
+            <h1 class="text-3xl font-bold text-gray-900">{{ $t('invoices.edit') }}</h1>
+            <p class="text-gray-600 mt-2">{{ $t('invoices.editDescription') }}</p>
+          </div>
 
+          <BaseButton
+            type="outline"
+            @click="$router.push(`/invoices/${invoice?.id}`)"
+            :icon="['fas', 'arrow-left']"
+          >
+            {{ $t('common.back') }}
+          </BaseButton>
+        </div>
+      </div>
+
+      <!-- Loading State -->
       <div v-if="loading" class="flex flex-col items-center justify-center py-12">
-        <LoadingSpinner size="lg" />
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
         <p class="text-gray-600 text-lg mt-4">{{ $t('common.loading') }}</p>
       </div>
 
+      <!-- Error State -->
       <BaseAlert
         v-else-if="error"
         type="error"
         :title="$t('common.error')"
         :message="error"
-        :actions="errorActions"
+        @close="clearError"
         class="mb-6"
       />
 
+      <!-- Edit Invoice Form -->
       <BaseCard v-else class="edit-invoice-card">
         <template #header>
           <div class="flex items-center justify-between">
@@ -36,11 +50,14 @@
                 <p class="text-gray-600 text-sm">{{ $t('invoices.updateInfo') }}</p>
               </div>
             </div>
-            <StatusBadge :status="invoice?.status" />
+            <span :class="getStatusClass(invoice?.status)" class="px-3 py-1 text-sm rounded-full">
+              {{ getStatusText(invoice?.status) }}
+            </span>
           </div>
         </template>
 
         <form @submit.prevent="submitInvoice" class="space-y-6">
+          <!-- Basic Info -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <BaseInput
               v-model="form.invoice_number"
@@ -51,18 +68,11 @@
             />
 
             <div>
-              <label class="form-label">{{ $t('invoices.client') }} *</label>
-              <select
-                v-model="form.client_id"
-                required
-                class="form-input"
-                :class="{ 'border-red-500': errors.client_id }"
-                disabled
-              >
-                <option value="">{{ invoice?.client?.name || $t('common.selectClient') }}</option>
-              </select>
-              <div v-if="errors.client_id" class="mt-1 text-sm text-red-600">
-                {{ errors.client_id }}
+              <label class="block text-sm font-medium text-gray-700 mb-2">{{
+                $t('invoices.client')
+              }}</label>
+              <div class="form-input bg-gray-50">
+                {{ invoice?.client?.name || 'غير محدد' }}
               </div>
             </div>
           </div>
@@ -85,6 +95,7 @@
             />
           </div>
 
+          <!-- Invoice Items -->
           <div class="border border-gray-200 rounded-lg p-4">
             <div class="flex justify-between items-center mb-4">
               <h3 class="text-lg font-semibold text-gray-900">{{ $t('invoices.items') }}</h3>
@@ -147,29 +158,31 @@
               <div class="flex justify-between items-center mt-3 pt-3 border-t border-gray-200">
                 <span class="text-gray-600">
                   {{ $t('common.total') }}:
-                  <span class="font-semibold">{{ item.total || 0 }} ر.س</span>
+                  <span class="font-semibold">{{ formatCurrency(item.total || 0) }}</span>
                 </span>
               </div>
             </div>
 
+            <!-- Summary -->
             <div class="mt-6 pt-6 border-t border-gray-200">
               <div class="flex justify-between items-center mb-2">
                 <span class="text-gray-600">{{ $t('common.subtotal') }}:</span>
-                <span class="font-semibold">{{ form.subtotal }} ر.س</span>
+                <span class="font-semibold">{{ formatCurrency(form.subtotal) }}</span>
               </div>
               <div class="flex justify-between items-center mb-2">
                 <span class="text-gray-600">{{ $t('common.tax') }} (15%):</span>
-                <span class="font-semibold">{{ form.tax_amount }} ر.س</span>
+                <span class="font-semibold">{{ formatCurrency(form.tax_amount) }}</span>
               </div>
               <div
                 class="flex justify-between items-center text-lg font-bold pt-2 border-t border-gray-200"
               >
                 <span>{{ $t('common.total') }}:</span>
-                <span class="text-primary-600">{{ form.total }} ر.س</span>
+                <span class="text-primary-600">{{ formatCurrency(form.total) }}</span>
               </div>
             </div>
           </div>
 
+          <!-- Notes -->
           <BaseInput
             v-model="form.notes"
             :label="$t('common.notes')"
@@ -178,19 +191,20 @@
             rows="3"
           />
 
+          <!-- Form Actions -->
           <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200">
             <BaseButton
               type="outline"
               @click="$router.push(`/invoices/${invoice.id}`)"
-              :disabled="submitting"
+              :disabled="updating"
             >
               {{ $t('common.cancel') }}
             </BaseButton>
 
             <BaseButton
               type="primary"
-              :loading="submitting"
-              :disabled="submitting || !isFormValid"
+              :loading="updating"
+              :disabled="updating || !isFormValid"
               :icon="['fas', 'save']"
               html-type="submit"
             >
@@ -212,7 +226,6 @@ export default {
   data() {
     return {
       form: {
-        client_id: '',
         invoice_number: '',
         invoice_date: '',
         due_date: '',
@@ -230,52 +243,19 @@ export default {
         total: 0,
       },
       errors: {},
-      submitting: false,
+      updating: false,
     }
   },
 
   computed: {
-    ...mapGetters('invoices', ['currentInvoice', 'loading', 'error']),
+    ...mapGetters('invoices', ['loading', 'error', 'currentInvoice']),
 
     invoice() {
       return this.currentInvoice
     },
 
-    breadcrumbs() {
-      return [
-        { text: this.$t('invoices.title'), to: '/invoices' },
-        {
-          text: `فاتورة #${this.invoice?.invoice_number || ''}`,
-          to: `/invoices/${this.invoice?.id}`,
-        },
-        { text: this.$t('common.edit') },
-      ]
-    },
-
-    headerActions() {
-      return [
-        {
-          text: this.$t('common.back'),
-          type: 'outline',
-          icon: ['fas', 'arrow-left'],
-          onClick: () => this.$router.push(`/invoices/${this.invoice?.id}`),
-        },
-      ]
-    },
-
-    errorActions() {
-      return [
-        {
-          text: this.$t('common.retry'),
-          onClick: this.loadInvoice,
-          type: 'danger',
-        },
-      ]
-    },
-
     isFormValid() {
       return (
-        this.form.client_id &&
         this.form.invoice_number &&
         this.form.invoice_date &&
         this.form.due_date &&
@@ -291,44 +271,37 @@ export default {
   },
 
   methods: {
-    ...mapActions('invoices', ['fetchInvoice', 'updateInvoice']),
+    ...mapActions('invoices', ['fetchInvoice', 'updateInvoice', 'clearError']),
 
     async loadInvoice() {
       const invoiceId = this.$route.params.id
+      await this.fetchInvoice(invoiceId)
 
-      try {
-        await this.fetchInvoice(invoiceId)
-
-        if (this.invoice) {
-          this.form = {
-            client_id: this.invoice.client_id,
-            invoice_number: this.invoice.invoice_number || '',
-            invoice_date: this.invoice.invoice_date?.split('T')[0] || '',
-            due_date: this.invoice.due_date?.split('T')[0] || '',
-            items: this.invoice.items?.map((item) => ({
-              description: item.description || '',
-              quantity: item.quantity || 1,
-              unit_price: item.unit_price || 0,
-              total: (item.quantity || 1) * (item.unit_price || 0),
-            })) || [
-              {
-                description: '',
-                quantity: 1,
-                unit_price: 0,
-                total: 0,
-              },
-            ],
-            notes: this.invoice.notes || '',
-            subtotal: this.invoice.subtotal || 0,
-            tax_amount: this.invoice.tax_amount || 0,
-            total: this.invoice.total || 0,
-          }
-
-          this.calculateTotals()
+      if (this.invoice) {
+        this.form = {
+          invoice_number: this.invoice.invoice_number || '',
+          invoice_date: this.invoice.invoice_date?.split('T')[0] || '',
+          due_date: this.invoice.due_date?.split('T')[0] || '',
+          items: this.invoice.items?.map((item) => ({
+            description: item.description || '',
+            quantity: item.quantity || 1,
+            unit_price: item.unit_price || 0,
+            total: (item.quantity || 1) * (item.unit_price || 0),
+          })) || [
+            {
+              description: '',
+              quantity: 1,
+              unit_price: 0,
+              total: 0,
+            },
+          ],
+          notes: this.invoice.notes || '',
+          subtotal: this.invoice.subtotal || 0,
+          tax_amount: this.invoice.tax_amount || 0,
+          total: this.invoice.total || 0,
         }
-      } catch (error) {
-        console.error('❌ خطأ في تحميل الفاتورة:', error)
-        this.error = error.message || this.$t('common.loadError')
+
+        this.calculateTotals()
       }
     },
 
@@ -341,9 +314,9 @@ export default {
       const tax_amount = subtotal * 0.15
       const total = subtotal + tax_amount
 
-      this.form.subtotal = subtotal.toFixed(2)
-      this.form.tax_amount = tax_amount.toFixed(2)
-      this.form.total = total.toFixed(2)
+      this.form.subtotal = subtotal
+      this.form.tax_amount = tax_amount
+      this.form.total = total
     },
 
     addItem() {
@@ -362,9 +335,34 @@ export default {
       }
     },
 
+    formatCurrency(amount) {
+      if (!amount && amount !== 0) return '0.00 ر.س'
+      return parseFloat(amount).toFixed(2) + ' ر.س'
+    },
+
+    getStatusClass(status) {
+      const classes = {
+        draft: 'bg-gray-100 text-gray-800',
+        sent: 'bg-blue-100 text-blue-800',
+        paid: 'bg-green-100 text-green-800',
+        overdue: 'bg-red-100 text-red-800',
+      }
+      return classes[status] || 'bg-gray-100 text-gray-800'
+    },
+
+    getStatusText(status) {
+      const texts = {
+        draft: 'مسودة',
+        sent: 'مرسلة',
+        paid: 'مدفوعة',
+        overdue: 'متأخرة',
+      }
+      return texts[status] || status
+    },
+
     async submitInvoice() {
       this.errors = {}
-      this.submitting = true
+      this.updating = true
 
       try {
         if (!this.form.invoice_number.trim()) {
@@ -372,11 +370,24 @@ export default {
           return
         }
 
+        if (!this.form.invoice_date) {
+          this.errors.invoice_date = 'الرجاء اختيار تاريخ الإصدار'
+          return
+        }
+
+        if (!this.form.due_date) {
+          this.errors.due_date = 'الرجاء اختيار تاريخ الاستحقاق'
+          return
+        }
+
         const invoiceData = {
-          ...this.form,
-          subtotal: parseFloat(this.form.subtotal),
-          tax_amount: parseFloat(this.form.tax_amount),
-          total: parseFloat(this.form.total),
+          invoice_number: this.form.invoice_number,
+          invoice_date: this.form.invoice_date,
+          due_date: this.form.due_date,
+          subtotal: this.form.subtotal,
+          tax_amount: this.form.tax_amount,
+          total: this.form.total,
+          notes: this.form.notes,
           items: this.form.items.map((item) => ({
             description: item.description,
             quantity: parseFloat(item.quantity),
@@ -400,7 +411,7 @@ export default {
           this.$toast.error(error.response?.data?.message || this.$t('invoices.updateError'))
         }
       } finally {
-        this.submitting = false
+        this.updating = false
       }
     },
   },
@@ -419,5 +430,9 @@ export default {
 <style scoped>
 .edit-invoice-card {
   @apply border-blue-100;
+}
+
+.form-input {
+  @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
 }
 </style>

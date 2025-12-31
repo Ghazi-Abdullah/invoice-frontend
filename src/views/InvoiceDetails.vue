@@ -1,7 +1,6 @@
 <template>
   <div class="min-h-screen bg-gray-50 py-8">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <!-- Page Header -->
       <PageHeader
         :title="$t('invoices.details.title')"
         :subtitle="$t('invoices.details.subtitle')"
@@ -9,25 +8,21 @@
         :actions="headerActions"
       />
 
-      <!-- Loading State -->
       <div v-if="loading" class="flex flex-col items-center justify-center py-12">
         <LoadingSpinner size="lg" />
         <p class="text-gray-600 text-lg mt-4">{{ $t('common.loading') }}</p>
       </div>
 
-      <!-- Error State -->
       <BaseAlert
-        v-else-if="error"
+        v-else-if="storeError"
         type="error"
         title="حدث خطأ"
-        :message="error"
+        :message="storeError"
         :actions="errorActions"
         class="mb-6"
       />
 
-      <!-- Invoice Content -->
       <div v-else-if="invoice" class="space-y-6">
-        <!-- Invoice Summary Card -->
         <BaseCard class="invoice-header-card">
           <template #header>
             <div class="flex items-center justify-between">
@@ -39,7 +34,6 @@
           </template>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <!-- Client Info -->
             <div class="info-section">
               <h3 class="section-title">{{ $t('invoices.clientInfo') }}</h3>
               <div class="space-y-4">
@@ -68,13 +62,12 @@
               </div>
             </div>
 
-            <!-- Dates Info -->
             <div class="info-section">
               <h3 class="section-title">{{ $t('invoices.datesInfo') }}</h3>
               <div class="space-y-3">
                 <div class="date-item">
                   <span class="date-label">{{ $t('invoices.issueDate') }}:</span>
-                  <span class="date-value">{{ formatDate(invoice.issue_date) }}</span>
+                  <span class="date-value">{{ formatDate(invoice.invoice_date) }}</span>
                 </div>
                 <div class="date-item">
                   <span class="date-label">{{ $t('invoices.dueDate') }}:</span>
@@ -89,7 +82,6 @@
               </div>
             </div>
 
-            <!-- Summary Info -->
             <div class="info-section">
               <h3 class="section-title">{{ $t('common.summary') }}</h3>
               <div class="space-y-2">
@@ -104,7 +96,7 @@
                 <div class="summary-item total">
                   <span class="text-lg font-semibold">{{ $t('common.total') }}:</span>
                   <span class="text-xl font-bold text-primary-600">
-                    {{ formatCurrency(invoice.total_amount || 0) }}
+                    {{ formatCurrency(invoice.total || 0) }}
                   </span>
                 </div>
               </div>
@@ -112,7 +104,6 @@
           </div>
         </BaseCard>
 
-        <!-- Invoice Items -->
         <BaseCard :title="$t('invoices.items')" class="invoice-items-card">
           <div v-if="!invoiceItems || invoiceItems.length === 0" class="text-center py-8">
             <font-awesome-icon :icon="['fas', 'inbox']" class="text-gray-300 text-4xl mb-3" />
@@ -155,17 +146,13 @@
           </BaseTable>
         </BaseCard>
 
-        <!-- Notes and Actions -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <!-- Notes -->
           <BaseCard v-if="invoice.notes" :title="$t('common.notes')" class="lg:col-span-2">
             <p class="text-gray-700 whitespace-pre-line">{{ invoice.notes }}</p>
           </BaseCard>
 
-          <!-- Quick Actions -->
           <BaseCard :title="$t('common.actions')">
             <div class="space-y-3">
-              <!-- زر إرسال الفاتورة -->
               <BaseButton
                 v-if="
                   hasPermission('edit_invoice') &&
@@ -182,7 +169,6 @@
                 {{ $t('invoices.actions.markSent') }}
               </BaseButton>
 
-              <!-- زر تم الدفع -->
               <BaseButton
                 v-if="hasPermission('edit_invoice') && invoice.status !== 'paid'"
                 @click="updateStatus('paid')"
@@ -195,17 +181,14 @@
                 {{ $t('invoices.actions.markPaid') }}
               </BaseButton>
 
-              <!-- زر طباعة -->
               <BaseButton @click="printInvoice" type="outline" :icon="['fas', 'print']" block>
                 {{ $t('invoices.actions.print') }}
               </BaseButton>
 
-              <!-- زر تحميل PDF -->
               <BaseButton @click="downloadPDF" type="outline" :icon="['fas', 'download']" block>
                 {{ $t('invoices.actions.downloadPDF') }}
               </BaseButton>
 
-              <!-- زر حذف الفاتورة -->
               <BaseButton
                 v-if="hasPermission('delete_invoice')"
                 @click="confirmDelete"
@@ -221,7 +204,6 @@
         </div>
       </div>
 
-      <!-- No Invoice Found -->
       <BaseAlert
         v-else
         type="warning"
@@ -235,16 +217,15 @@
 </template>
 
 <script>
+import { mapActions, mapGetters } from 'vuex'
+
 export default {
   name: 'InvoiceDetails',
 
   data() {
     return {
-      loading: true,
-      error: null,
       updatingStatus: false,
       statusToUpdate: '',
-
       itemColumns: [
         { key: 'description', label: this.$t('common.description'), align: 'right' },
         { key: 'quantity', label: this.$t('common.quantity'), align: 'center' },
@@ -255,46 +236,16 @@ export default {
   },
 
   computed: {
-    storeLoading() {
-      return this.$store.getters['invoices/loading']
-    },
+    ...mapGetters('invoices', ['currentInvoice', 'loading', 'error']),
 
-    storeCurrentInvoice() {
-      return this.$store.getters['invoices/currentInvoice']
-    },
-
-    invoiceById() {
-      const id = this.$route.params.id
-      return this.$store.getters['invoices/invoiceById'](id)
-    },
-
-    // الحصول على الفاتورة من أي مصدر
     invoice() {
-      const id = this.$route.params.id
-
-      // المحاولة 1: البحث في invoiceById
-      if (this.invoiceById) {
-        return this.invoiceById
-      }
-
-      // المحاولة 2: استخدام currentInvoice
-      if (this.storeCurrentInvoice && this.storeCurrentInvoice.id == id) {
-        return this.storeCurrentInvoice
-      }
-
-      // المحاولة 3: البحث في قائمة الفواتير
-      const invoices = this.$store.getters['invoices/invoices']
-      if (Array.isArray(invoices)) {
-        const found = invoices.find((inv) => inv.id == id)
-        if (found) {
-          return found
-        }
-      }
-
-      return null
+      return this.currentInvoice
     },
 
-    // الحصول على العناصر بشكل آمن
+    storeError() {
+      return this.error
+    },
+
     invoiceItems() {
       if (!this.invoice) return []
       return this.invoice.items || []
@@ -317,7 +268,6 @@ export default {
         },
       ]
 
-      // إضافة زر التعديل إذا كانت الفاتورة قابلة للتعديل
       if (this.invoice && this.hasPermission('edit_invoice') && this.invoice.status !== 'paid') {
         actions.push({
           text: this.$t('common.edit'),
@@ -356,6 +306,8 @@ export default {
   },
 
   methods: {
+    ...mapActions('invoices', ['fetchInvoice', 'updateInvoiceStatus', 'deleteInvoice']),
+
     hasPermission(permission) {
       if (this.$store.state.auth.is_admin) return true
       const permissions = this.$store.state.auth.permissions || []
@@ -442,30 +394,17 @@ export default {
     },
 
     async loadInvoice() {
-      this.error = null
-      this.loading = true
-
       const invoiceId = this.$route.params.id
 
       if (!invoiceId) {
         this.error = 'معرف الفاتورة غير صالح'
-        this.loading = false
         return
       }
 
       try {
-        await this.$store.dispatch('invoices/fetchInvoice', invoiceId)
-
-        // التحقق من وجود البيانات
-        if (!this.invoice) {
-          this.error = 'لم يتم العثور على بيانات الفاتورة'
-        }
+        await this.fetchInvoice(invoiceId)
       } catch (error) {
         console.error('❌ خطأ في تحميل الفاتورة:', error)
-        this.error =
-          error.response?.data?.message || error.message || this.$t('invoices.messages.loadFailed')
-      } finally {
-        this.loading = false
       }
     },
 
@@ -475,7 +414,6 @@ export default {
         return
       }
 
-      // تحقق من الصلاحية
       if (!this.hasPermission('edit_invoice')) {
         this.$toast.error('ليس لديك صلاحية لتحديث حالة الفاتورة')
         return
@@ -485,17 +423,16 @@ export default {
       this.statusToUpdate = status
 
       try {
-        await this.$store.dispatch('invoices/updateInvoiceStatus', {
+        await this.updateInvoiceStatus({
           id: this.invoice.id,
           status,
         })
 
         this.$toast.success(`تم تحديث حالة الفاتورة إلى "${status}"`)
-
-        // إعادة تحميل البيانات
         await this.loadInvoice()
       } catch (error) {
         console.error('Error updating invoice status:', error)
+        this.$toast.error(error.response?.data?.message || 'فشل في تحديث حالة الفاتورة')
       } finally {
         this.updatingStatus = false
         this.statusToUpdate = ''
@@ -509,14 +446,14 @@ export default {
         `هل أنت متأكد من حذف الفاتورة "#${this.invoice.invoice_number}"؟`,
         'هذا الإجراء لا يمكن التراجع عنه',
         async () => {
-          await this.deleteInvoice()
+          await this.deleteInvoiceHandler()
         },
       )
     },
 
-    async deleteInvoice() {
+    async deleteInvoiceHandler() {
       try {
-        await this.$store.dispatch('invoices/deleteInvoice', this.invoice.id)
+        await this.deleteInvoice(this.invoice.id)
         this.$toast.success('تم حذف الفاتورة بنجاح')
         this.$router.push('/invoices')
       } catch (error) {
@@ -595,7 +532,6 @@ export default {
   @apply border-t border-gray-200 mt-2 pt-3;
 }
 
-/* Print styles */
 @media print {
   .no-print {
     display: none !important;

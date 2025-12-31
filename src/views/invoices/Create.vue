@@ -1,7 +1,6 @@
 <template>
   <div class="min-h-screen bg-gray-50 py-8">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <!-- Page Header -->
       <PageHeader
         :title="$t('invoices.create')"
         :subtitle="$t('invoices.createDescription')"
@@ -9,7 +8,6 @@
         :actions="headerActions"
       />
 
-      <!-- Invoice Form -->
       <BaseCard>
         <form @submit.prevent="createInvoice" class="space-y-6">
           <!-- Basic Info -->
@@ -43,11 +41,11 @@
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <BaseInput
-              v-model="invoiceData.issue_date"
+              v-model="invoiceData.invoice_date"
               type="date"
               :label="$t('invoices.issueDate')"
               required
-              :error="errors.issue_date"
+              :error="errors.invoice_date"
             />
 
             <BaseInput
@@ -169,17 +167,17 @@
 </template>
 
 <script>
+import { mapActions, mapGetters } from 'vuex'
+
 export default {
   name: 'CreateInvoice',
+
   data() {
     return {
-      loading: false,
-      clients: [],
-      errors: {},
       invoiceData: {
         client_id: '',
         invoice_number: '',
-        issue_date: new Date().toISOString().split('T')[0],
+        invoice_date: new Date().toISOString().split('T')[0],
         due_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
         items: [
           {
@@ -190,16 +188,23 @@ export default {
           },
         ],
         notes: '',
+        status: 'draft',
       },
+      clients: [],
+      errors: {},
     }
   },
+
   computed: {
+    ...mapGetters('invoices', ['loading', 'error']),
+
     breadcrumbs() {
       return [
         { text: this.$t('invoices.title'), to: '/invoices' },
         { text: this.$t('invoices.create') },
       ]
     },
+
     headerActions() {
       return [
         {
@@ -210,11 +215,12 @@ export default {
         },
       ]
     },
+
     isFormValid() {
       return (
         this.invoiceData.client_id &&
         this.invoiceData.invoice_number &&
-        this.invoiceData.issue_date &&
+        this.invoiceData.invoice_date &&
         this.invoiceData.due_date &&
         this.invoiceData.items.every(
           (item) => item.description && item.quantity > 0 && item.unit_price >= 0,
@@ -222,18 +228,28 @@ export default {
       )
     },
   },
+
   mounted() {
     this.loadClients()
   },
+
   methods: {
+    ...mapActions('invoices', ['createInvoice']),
+
     async loadClients() {
       try {
-        await this.$store.dispatch('clients/fetchClients')
-        this.clients = this.$store.getters['clients/clients']
+        const response = await this.$store.dispatch('clients/fetchClients', {
+          per_page: 100,
+          is_active: true,
+        })
+        if (response && response.data) {
+          this.clients = response.data.data || []
+        }
       } catch (error) {
         this.$toast.error(this.$t('common.loadError'))
       }
     },
+
     addItem() {
       this.invoiceData.items.push({
         description: '',
@@ -242,12 +258,14 @@ export default {
         total: 0,
       })
     },
+
     removeItem(index) {
       if (this.invoiceData.items.length > 1) {
         this.invoiceData.items.splice(index, 1)
         this.calculateTotals()
       }
     },
+
     calculateItemTotal(index) {
       const item = this.invoiceData.items[index]
       if (item.quantity && item.unit_price) {
@@ -258,26 +276,30 @@ export default {
       this.calculateTotals()
       return item.total.toFixed(2)
     },
+
     calculateSubtotal() {
       return this.invoiceData.items.reduce((sum, item) => sum + (item.total || 0), 0).toFixed(2)
     },
+
     calculateTax() {
       const subtotal = parseFloat(this.calculateSubtotal())
       return (subtotal * 0.15).toFixed(2)
     },
+
     calculateTotal() {
       const subtotal = parseFloat(this.calculateSubtotal())
       const tax = parseFloat(this.calculateTax())
       return (subtotal + tax).toFixed(2)
     },
+
     calculateTotals() {
       this.invoiceData.subtotal = parseFloat(this.calculateSubtotal())
       this.invoiceData.tax_amount = parseFloat(this.calculateTax())
-      this.invoiceData.total_amount = parseFloat(this.calculateTotal())
+      this.invoiceData.total = parseFloat(this.calculateTotal())
     },
+
     async createInvoice() {
       this.errors = {}
-      this.loading = true
 
       try {
         // التحقق من البيانات
@@ -295,14 +317,17 @@ export default {
 
         const data = {
           ...this.invoiceData,
+          subtotal: parseFloat(this.calculateSubtotal()),
+          tax_amount: parseFloat(this.calculateTax()),
+          total: parseFloat(this.calculateTotal()),
           items: this.invoiceData.items.map((item) => ({
             description: item.description,
-            quantity: item.quantity,
-            unit_price: item.unit_price,
+            quantity: parseFloat(item.quantity),
+            unit_price: parseFloat(item.unit_price),
           })),
         }
 
-        await this.$store.dispatch('invoices/createInvoice', data)
+        await this.createInvoice(data)
         this.$toast.success(this.$t('invoices.createSuccess'))
         this.$router.push('/invoices')
       } catch (error) {
@@ -311,11 +336,18 @@ export default {
         if (error.response?.data?.errors) {
           this.errors = error.response.data.errors
         } else {
-          this.$toast.error(error.message || this.$t('invoices.createError'))
+          this.$toast.error(error.response?.data?.message || this.$t('invoices.createError'))
         }
-      } finally {
-        this.loading = false
       }
+    },
+  },
+
+  watch: {
+    'invoiceData.items': {
+      handler() {
+        this.calculateTotals()
+      },
+      deep: true,
     },
   },
 }

@@ -1,75 +1,95 @@
 <template>
   <div class="min-h-screen bg-gray-50 py-8">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <!-- Page Header -->
-      <PageHeader
-        :title="$t('invoices.title')"
-        :subtitle="$t('invoices.subtitle')"
-        :actions="headerActions"
-      />
+      <!-- العنوان والإحصائيات -->
+      <div class="mb-8">
+        <div class="flex justify-between items-center mb-6">
+          <div>
+            <h1 class="text-3xl font-bold text-gray-900">{{ $t('invoices.title') }}</h1>
+            <p class="text-gray-600 mt-2">{{ $t('invoices.subtitle') }}</p>
+          </div>
+          <button
+            v-if="hasPermission('create_invoice')"
+            @click="$router.push('/invoices/create')"
+            class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 flex items-center transition-colors duration-200"
+          >
+            <i class="fas fa-plus ml-2"></i>
+            {{ $t('invoices.create_new') }}
+          </button>
+        </div>
 
-      <!-- Stats Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <BaseCard hoverable class="stat-card">
-          <div class="flex items-center">
-            <div class="p-3 bg-blue-100 rounded-lg mr-4">
-              <font-awesome-icon :icon="['fas', 'file-invoice']" class="text-blue-600 text-xl" />
-            </div>
-            <div>
-              <p class="text-sm font-medium text-gray-600">{{ $t('invoices.stats.total') }}</p>
-              <p class="text-2xl font-bold text-gray-900">{{ stats.total }}</p>
+        <!-- إحصائيات -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+          <div
+            class="bg-white rounded-lg shadow p-6 hover:shadow-md transition-shadow duration-200 stat-card"
+          >
+            <div class="flex items-center">
+              <div class="p-3 bg-blue-100 rounded-lg mr-4">
+                <i class="fas fa-file-invoice text-blue-600 text-xl"></i>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-gray-600">{{ $t('invoices.stats.total') }}</p>
+                <p class="text-2xl font-bold text-gray-900">{{ stats.total || 0 }}</p>
+              </div>
             </div>
           </div>
-        </BaseCard>
 
-        <BaseCard hoverable class="stat-card">
-          <div class="flex items-center">
-            <div class="p-3 bg-green-100 rounded-lg mr-4">
-              <font-awesome-icon :icon="['fas', 'check-circle']" class="text-green-600 text-xl" />
-            </div>
-            <div>
-              <p class="text-sm font-medium text-gray-600">{{ $t('invoices.stats.paid') }}</p>
-              <p class="text-2xl font-bold text-gray-900">{{ stats.paid }}</p>
+          <div
+            class="bg-white rounded-lg shadow p-6 hover:shadow-md transition-shadow duration-200 stat-card"
+          >
+            <div class="flex items-center">
+              <div class="p-3 bg-green-100 rounded-lg mr-4">
+                <i class="fas fa-check-circle text-green-600 text-xl"></i>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-gray-600">{{ $t('invoices.stats.paid') }}</p>
+                <p class="text-2xl font-bold text-gray-900">{{ stats.paid || 0 }}</p>
+              </div>
             </div>
           </div>
-        </BaseCard>
 
-        <BaseCard hoverable class="stat-card">
-          <div class="flex items-center">
-            <div class="p-3 bg-yellow-100 rounded-lg mr-4">
-              <font-awesome-icon :icon="['fas', 'paper-plane']" class="text-yellow-600 text-xl" />
-            </div>
-            <div>
-              <p class="text-sm font-medium text-gray-600">{{ $t('invoices.stats.sent') }}</p>
-              <p class="text-2xl font-bold text-gray-900">{{ stats.sent }}</p>
+          <div
+            class="bg-white rounded-lg shadow p-6 hover:shadow-md transition-shadow duration-200 stat-card"
+          >
+            <div class="flex items-center">
+              <div class="p-3 bg-yellow-100 rounded-lg mr-4">
+                <i class="fas fa-paper-plane text-yellow-600 text-xl"></i>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-gray-600">{{ $t('invoices.stats.sent') }}</p>
+                <p class="text-2xl font-bold text-gray-900">{{ stats.sent || 0 }}</p>
+              </div>
             </div>
           </div>
-        </BaseCard>
 
-        <BaseCard hoverable class="stat-card">
-          <div class="flex items-center">
-            <div class="p-3 bg-red-100 rounded-lg mr-4">
-              <font-awesome-icon
-                :icon="['fas', 'exclamation-triangle']"
-                class="text-red-600 text-xl"
-              />
-            </div>
-            <div>
-              <p class="text-sm font-medium text-gray-600">{{ $t('invoices.stats.overdue') }}</p>
-              <p class="text-2xl font-bold text-gray-900">{{ stats.overdue }}</p>
+          <div
+            class="bg-white rounded-lg shadow p-6 hover:shadow-md transition-shadow duration-200 stat-card"
+          >
+            <div class="flex items-center">
+              <div class="p-3 bg-red-100 rounded-lg mr-4">
+                <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-gray-600">{{ $t('invoices.stats.overdue') }}</p>
+                <p class="text-2xl font-bold text-gray-900">{{ stats.overdue || 0 }}</p>
+              </div>
             </div>
           </div>
-        </BaseCard>
+        </div>
       </div>
 
-      <!-- Filters Card -->
-      <BaseCard class="mb-6" title="فلاتر البحث">
+      <!-- فلاتر البحث -->
+      <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4">{{ $t('common.filters') }}</h2>
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">{{
-              $t('invoices.status')
+              $t('common.status')
             }}</label>
-            <select v-model="filters.status" @change="applyFilters" class="form-input">
+            <select
+              v-model="filters.status"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            >
               <option value="">{{ $t('common.all') }}</option>
               <option value="draft">{{ $t('invoices.statuses.draft') }}</option>
               <option value="sent">{{ $t('invoices.statuses.sent') }}</option>
@@ -84,9 +104,8 @@
             }}</label>
             <input
               type="date"
-              v-model="filters.start_date"
-              @change="applyFilters"
-              class="form-input"
+              v-model="filters.date_from"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
 
@@ -96,180 +115,303 @@
             }}</label>
             <input
               type="date"
-              v-model="filters.end_date"
-              @change="applyFilters"
-              class="form-input"
+              v-model="filters.date_to"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
 
-          <div class="flex items-end">
-            <BaseButton @click="applyFilters" type="primary" icon="filter" block>
-              {{ $t('common.filter') }}
-            </BaseButton>
-          </div>
-        </div>
-      </BaseCard>
-
-      <!-- Invoices Table -->
-      <BaseCard>
-        <template #actions>
-          <div class="flex items-center space-x-2">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">{{
+              $t('common.search')
+            }}</label>
             <div class="relative">
               <input
                 type="text"
-                v-model="searchQuery"
+                v-model="filters.search"
                 @input="onSearch"
-                placeholder="بحث برقم الفاتورة أو اسم العميل..."
-                class="form-input pl-10"
+                :placeholder="$t('invoices.searchPlaceholder')"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10"
               />
-              <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                <font-awesome-icon :icon="['fas', 'search']" class="text-gray-400" />
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i class="fas fa-search text-gray-400"></i>
               </div>
             </div>
+          </div>
+        </div>
+        <div class="mt-4 flex space-x-3 space-x-reverse">
+          <button
+            @click="applyFilters"
+            class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors duration-200 flex items-center"
+          >
+            <i class="fas fa-search ml-2"></i>
+            {{ $t('buttons.search') }}
+          </button>
+          <button
+            @click="clearFilters"
+            class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors duration-200 flex items-center"
+          >
+            <i class="fas fa-redo ml-2"></i>
+            {{ $t('reports.buttons.reset_filters') }}
+          </button>
+        </div>
+      </div>
 
-            <BaseButton
+      <!-- حالة التحميل -->
+      <div v-if="loading" class="text-center py-12">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+        <p class="mt-4 text-gray-600">{{ $t('invoices.loading') }}</p>
+      </div>
+
+      <!-- حالة الخطأ -->
+      <div v-else-if="error" class="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <i class="fas fa-exclamation-circle text-red-400"></i>
+          </div>
+          <div class="mr-3">
+            <p class="text-sm text-red-700">{{ error }}</p>
+          </div>
+          <button @click="clearError" class="text-red-700 hover:text-red-900 mr-auto">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- جدول الفواتير -->
+      <div v-else>
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+          <div
+            class="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50"
+          >
+            <h3 class="text-lg font-semibold text-gray-800">
+              {{ $t('invoices.table.invoice_list') }}
+            </h3>
+            <div class="text-sm text-gray-500">
+              {{ $t('invoices.total_amount') }}:
+              <span class="font-bold text-gray-900">{{ formatCurrency(stats.totalAmount) }}</span>
+            </div>
+          </div>
+
+          <div v-if="invoices.length === 0" class="text-center py-12">
+            <i class="fas fa-file-invoice text-gray-300 text-4xl mb-3"></i>
+            <p class="text-gray-500">{{ $t('invoices.no_invoices') }}</p>
+            <button
               v-if="hasPermission('create_invoice')"
               @click="$router.push('/invoices/create')"
-              type="primary"
-              icon="plus"
+              class="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors duration-200"
             >
-              {{ $t('invoices.create') }}
-            </BaseButton>
+              <i class="fas fa-plus ml-2"></i>
+              {{ $t('invoices.start_creating') }}
+            </button>
           </div>
-        </template>
 
-        <!-- Loading -->
-        <div v-if="loading" class="flex justify-center py-12">
-          <LoadingSpinner />
+          <div v-else class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th
+                    class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    {{ $t('invoices.table.invoice_number') }}
+                  </th>
+                  <th
+                    class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    {{ $t('invoices.table.client') }}
+                  </th>
+                  <th
+                    class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    {{ $t('invoices.table.date') }}
+                  </th>
+                  <th
+                    class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    {{ $t('invoices.table.due_date') }}
+                  </th>
+                  <th
+                    class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    {{ $t('invoices.table.amount') }}
+                  </th>
+                  <th
+                    class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    {{ $t('invoices.table.status') }}
+                  </th>
+                  <th
+                    class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    {{ $t('invoices.table.actions') }}
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr v-for="invoice in invoices" :key="invoice.id" class="hover:bg-gray-50">
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <router-link
+                      :to="`/invoices/${invoice.id}`"
+                      class="text-blue-500 hover:text-blue-700 font-medium transition-colors duration-200"
+                    >
+                      {{
+                        invoice.invoice_number ||
+                        $t('invoices.invoiceHeading', { number: invoice.id })
+                      }}
+                    </router-link>
+                    <div class="text-xs text-gray-500 mt-1">#{{ invoice.id }}</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                      <div
+                        class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center ml-3"
+                      >
+                        <span class="text-blue-600 text-xs font-semibold">
+                          {{ getInitials(invoice.client?.name) }}
+                        </span>
+                      </div>
+                      <div>
+                        <div class="text-sm font-medium text-gray-900">
+                          {{ invoice.client?.name || $t('common.notAvailable') }}
+                        </div>
+                        <div class="text-sm text-gray-500">
+                          {{ invoice.client?.email || $t('common.notAvailable') }}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900">
+                    {{ formatDate(invoice.invoice_date) }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-center">
+                    <span
+                      :class="getDaysRemainingClass(invoice.due_date)"
+                      class="text-sm font-medium"
+                    >
+                      {{ formatDate(invoice.due_date) }}
+                      <div class="text-xs mt-1">{{ getDaysRemaining(invoice.due_date) }}</div>
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-right">
+                    <span class="font-semibold text-gray-900">{{
+                      formatCurrency(invoice.total)
+                    }}</span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-center">
+                    <span
+                      :class="getStatusClass(invoice.status)"
+                      class="px-3 py-1 text-xs font-medium rounded-full inline-block min-w-[80px]"
+                    >
+                      {{ getStatusText(invoice.status) }}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-center">
+                    <div class="flex items-center space-x-2 action-buttons">
+                      <BaseButton
+                        @click="$router.push(`/invoices/${invoice.id}`)"
+                        type="ghost"
+                        size="sm"
+                        icon="eye"
+                        :title="$t('buttons.view')"
+                      />
+                      <BaseButton
+                        v-if="hasPermission('edit_invoice')"
+                        @click="$router.push(`/invoices/${invoice.id}/edit`)"
+                        type="ghost"
+                        size="sm"
+                        icon="edit"
+                        :title="$t('buttons.edit')"
+                      />
+                      <BaseButton
+                        v-if="hasPermission('delete_client')"
+                        @click="confirmDelete(invoice)"
+                        type="ghost"
+                        size="sm"
+                        icon="trash"
+                        :title="$t('buttons.delete')"
+                        class="text-red-600 hover:text-red-700"
+                      />
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
-
-        <!-- Empty State -->
-        <div v-else-if="invoices.length === 0" class="text-center py-12">
-          <font-awesome-icon :icon="['fas', 'file-invoice']" class="text-gray-300 text-4xl mb-4" />
-          <h3 class="text-lg font-medium text-gray-900 mb-2">{{ $t('invoices.noInvoices') }}</h3>
-          <p class="text-gray-500 mb-6">{{ $t('invoices.noInvoicesMessage') }}</p>
-          <BaseButton
-            v-if="hasPermission('create_invoice')"
-            @click="$router.push('/invoices/create')"
-            type="primary"
-            icon="plus"
-          >
-            {{ $t('invoices.create') }}
-          </BaseButton>
-        </div>
-
-        <!-- Table -->
-        <BaseTable
-          v-else
-          :columns="tableColumns"
-          :data="filteredInvoices"
-          :show-actions="true"
-          bordered
-          striped
-          hoverable
-        >
-          <template #cell-invoice_number="{ row }">
-            <div class="font-medium text-gray-900">{{ row.invoice_number }}</div>
-            <div class="text-sm text-gray-500">#{{ row.id }}</div>
-          </template>
-
-          <template #cell-client="{ row }">
-            <div class="flex items-center">
-              <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center ml-3">
-                <span class="text-blue-600 text-xs font-semibold">
-                  {{ getInitials(row.client?.name) }}
-                </span>
-              </div>
-              <div>
-                <div class="text-sm font-medium text-gray-900">
-                  {{ row.client?.name || 'غير محدد' }}
-                </div>
-                <div class="text-sm text-gray-500">{{ row.client?.email || 'غير محدد' }}</div>
-              </div>
-            </div>
-          </template>
-
-          <template #cell-issue_date="{ row }">
-            {{ formatDate(row.issue_date) }}
-          </template>
-
-          <template #cell-due_date="{ row }">
-            <span :class="getDaysRemainingClass(row.due_date)">
-              {{ getDaysRemaining(row.due_date) }}
-            </span>
-          </template>
-
-          <template #cell-total_amount="{ row }">
-            <span class="font-semibold">{{ formatCurrency(row.total_amount) }}</span>
-          </template>
-
-          <template #cell-status="{ row }">
-            <StatusBadge :status="row.status" />
-          </template>
-
-          <template #actions="{ row }">
-            <div class="flex items-center space-x-2">
-              <BaseButton
-                @click="$router.push(`/invoices/${row.id}`)"
-                type="ghost"
-                size="sm"
-                icon="eye"
-                title="عرض"
-              />
-
-              <BaseButton
-                v-if="hasPermission('edit_invoice')"
-                @click="$router.push(`/invoices/${row.id}/edit`)"
-                type="ghost"
-                size="sm"
-                icon="edit"
-                title="تعديل"
-              />
-
-              <BaseButton
-                v-if="hasPermission('delete_invoice')"
-                @click="confirmDelete(row)"
-                type="ghost"
-                size="sm"
-                icon="trash"
-                title="حذف"
-                class="text-red-600 hover:text-red-700"
-              />
-            </div>
-          </template>
-        </BaseTable>
 
         <!-- Pagination -->
-        <div v-if="pagination && pagination.total > pagination.per_page" class="mt-6">
-          <div class="flex items-center justify-between">
+        <div
+          v-if="pagination && pagination.total > pagination.per_page"
+          class="mt-6 bg-white rounded-lg shadow p-4"
+        >
+          <div
+            class="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0"
+          >
             <div class="text-sm text-gray-700">
-              عرض {{ pagination.from }} إلى {{ pagination.to }} من {{ pagination.total }}
-              {{ $t('common.results') }}
+              {{
+                $t('pagination.showing', {
+                  from: pagination.from || 1,
+                  to: pagination.to || pagination.total,
+                  total: pagination.total,
+                })
+              }}
             </div>
-            <div class="flex space-x-2">
-              <BaseButton
+            <div class="flex items-center space-x-2 space-x-reverse">
+              <button
                 @click="previousPage"
                 :disabled="pagination.current_page === 1"
-                type="outline"
-                size="sm"
-                :icon="['fas', 'chevron-right']"
-              />
+                class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <i class="fas fa-chevron-right ml-1"></i>
+                {{ $t('pagination.previous') }}
+              </button>
 
-              <span class="flex items-center px-3">
-                صفحة {{ pagination.current_page }} من {{ pagination.last_page }}
-              </span>
+              <div class="flex items-center space-x-2">
+                <template v-if="pagination.last_page <= 7">
+                  <button
+                    v-for="page in pagination.last_page"
+                    :key="page"
+                    @click="goToPage(page)"
+                    :class="[
+                      'px-3 py-1 rounded text-sm transition-colors duration-200',
+                      page === pagination.current_page
+                        ? 'bg-blue-500 text-white'
+                        : 'border border-gray-300 hover:bg-gray-50',
+                    ]"
+                  >
+                    {{ page }}
+                  </button>
+                </template>
+                <template v-else>
+                  <button
+                    v-for="page in getPaginationRange()"
+                    :key="page"
+                    @click="goToPage(page)"
+                    :class="[
+                      'px-3 py-1 rounded text-sm transition-colors duration-200',
+                      page === pagination.current_page
+                        ? 'bg-blue-500 text-white'
+                        : 'border border-gray-300 hover:bg-gray-50',
+                      page === '...' ? 'cursor-default hover:bg-transparent' : '',
+                    ]"
+                    :disabled="page === '...'"
+                  >
+                    {{ page }}
+                  </button>
+                </template>
+              </div>
 
-              <BaseButton
+              <button
                 @click="nextPage"
                 :disabled="pagination.current_page === pagination.last_page"
-                type="outline"
-                size="sm"
-                :icon="['fas', 'chevron-left']"
-              />
+                class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {{ $t('pagination.next') }}
+                <i class="fas fa-chevron-left mr-1"></i>
+              </button>
             </div>
           </div>
         </div>
-      </BaseCard>
+      </div>
     </div>
   </div>
 </template>
@@ -284,87 +426,66 @@ export default {
     return {
       filters: {
         status: '',
-        start_date: '',
-        end_date: '',
+        date_from: '',
+        date_to: '',
+        search: '',
       },
-      searchQuery: '',
       searchTimeout: null,
-
-      tableColumns: [
-        { key: 'invoice_number', label: 'رقم الفاتورة', align: 'right' },
-        { key: 'client', label: 'العميل', align: 'right' },
-        { key: 'issue_date', label: 'تاريخ الإصدار', align: 'center' },
-        { key: 'due_date', label: 'تاريخ الاستحقاق', align: 'center' },
-        { key: 'total_amount', label: 'المبلغ', align: 'right' },
-        { key: 'status', label: 'الحالة', align: 'center' },
-      ],
     }
   },
 
   computed: {
-    ...mapGetters('invoices', ['loading', 'invoices', 'pagination']),
-
-    filteredInvoices() {
-      if (!this.searchQuery && !this.filters.status) {
-        return this.invoices
-      }
-
-      return this.invoices.filter((invoice) => {
-        const matchesSearch =
-          !this.searchQuery ||
-          invoice.invoice_number?.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-          invoice.client?.name?.toLowerCase().includes(this.searchQuery.toLowerCase())
-
-        const matchesStatus = !this.filters.status || invoice.status === this.filters.status
-
-        return matchesSearch && matchesStatus
-      })
-    },
+    ...mapGetters('invoices', [
+      'invoices',
+      'loading',
+      'error',
+      'pagination',
+      'invoiceStats',
+      'invoiceFilters',
+    ]),
 
     stats() {
-      const invoices = this.invoices
-      return {
-        total: invoices.length,
-        paid: invoices.filter((inv) => inv.status === 'paid').length,
-        sent: invoices.filter((inv) => inv.status === 'sent').length,
-        overdue: invoices.filter((inv) => inv.status === 'overdue').length,
-      }
-    },
-
-    headerActions() {
-      return [
-        {
-          text: this.$t('invoices.create'),
-          type: 'primary',
-          icon: 'plus',
-          onClick: () => this.$router.push('/invoices/create'),
-          disabled: !this.hasPermission('create_invoice'),
-        },
-      ]
+      return this.invoiceStats
     },
   },
 
   mounted() {
-    console.log('🚀 Invoices component mounted')
+    console.log('🚀 ' + this.$t('invoices.title') + ' component mounted')
+
+    // تحميل الفلاتر المخزنة
+    this.filters = { ...this.filters, ...this.invoiceFilters }
+
+    // تحميل الفواتير
     this.loadInvoices()
   },
 
   methods: {
-    ...mapActions('invoices', ['fetchInvoices', 'deleteInvoice']),
+    ...mapActions('invoices', [
+      'fetchInvoices',
+      'deleteInvoice',
+      'updateFilters',
+      'clearFilters',
+      'clearError',
+    ]),
 
     async loadInvoices() {
-      console.log('🔄 Loading invoices...')
+      console.log('🔄 ' + this.$t('invoices.loading') + '...')
       try {
         await this.fetchInvoices(this.filters)
-        console.log('✅ Invoices loaded successfully:', this.invoices)
+        console.log(
+          '✅ ' + this.$t('invoices.load_success') + ':',
+          this.invoices.length,
+          'invoices',
+        )
       } catch (error) {
-        console.error('❌ Error loading invoices:', error)
-        this.$toast.error(error.message || 'فشل في تحميل الفواتير')
+        console.error('❌ ' + this.$t('invoices.loadFailed') + ':', error)
+        this.$toast.error(error.message || this.$t('errors.loadFailed'))
       }
     },
 
     applyFilters() {
-      console.log('🔍 Applying filters:', this.filters)
+      console.log('🔍 ' + this.$t('common.filters') + ':', this.filters)
+      this.updateFilters(this.filters)
       this.loadInvoices()
     },
 
@@ -374,13 +495,30 @@ export default {
       }
 
       this.searchTimeout = setTimeout(() => {
-        console.log('🔍 Searching for:', this.searchQuery)
         this.applyFilters()
       }, 500)
     },
 
+    clearFilters() {
+      this.filters = {
+        status: '',
+        date_from: '',
+        date_to: '',
+        search: '',
+      }
+      this.clearFilters()
+      this.loadInvoices()
+      this.$toast.info(this.$t('reports.buttons.reset_filters'))
+    },
+
     confirmDelete(invoice) {
-      if (confirm(`هل أنت متأكد من حذف الفاتورة "${invoice.invoice_number}"؟`)) {
+      if (
+        confirm(
+          this.$t('invoices.delete_confirm', { number: invoice.invoice_number || invoice.id }) +
+            ' ' +
+            this.$t('invoices.delete_warning'),
+        )
+      ) {
         this.deleteInvoiceHandler(invoice.id)
       }
     },
@@ -388,17 +526,27 @@ export default {
     async deleteInvoiceHandler(id) {
       try {
         await this.deleteInvoice(id)
-        this.$toast.success('تم حذف الفاتورة بنجاح')
+        this.$toast.success(
+          this.$t('invoices.messages.deleteSuccess', { item: this.$t('invoices.invoice') }),
+        )
         this.loadInvoices()
       } catch (error) {
-        this.$toast.error(error.message || 'فشل في حذف الفاتورة')
+        this.$toast.error(error.message || this.$t('invoices.delete_error'))
       }
+    },
+
+    goToPage(page) {
+      if (page === '...' || page === this.pagination.current_page) return
+      this.filters.page = page
+      this.loadInvoices()
+      window.scrollTo({ top: 0, behavior: 'smooth' })
     },
 
     previousPage() {
       if (this.pagination && this.pagination.current_page > 1) {
         this.filters.page = this.pagination.current_page - 1
         this.loadInvoices()
+        window.scrollTo({ top: 0, behavior: 'smooth' })
       }
     },
 
@@ -406,7 +554,37 @@ export default {
       if (this.pagination && this.pagination.current_page < this.pagination.last_page) {
         this.filters.page = this.pagination.current_page + 1
         this.loadInvoices()
+        window.scrollTo({ top: 0, behavior: 'smooth' })
       }
+    },
+
+    getPaginationRange() {
+      const current = this.pagination.current_page
+      const last = this.pagination.last_page
+      const delta = 2
+      const range = []
+      const rangeWithDots = []
+      let l
+
+      for (let i = 1; i <= last; i++) {
+        if (i === 1 || i === last || (i >= current - delta && i <= current + delta)) {
+          range.push(i)
+        }
+      }
+
+      for (let i of range) {
+        if (l) {
+          if (i - l === 2) {
+            rangeWithDots.push(l + 1)
+          } else if (i - l !== 1) {
+            rangeWithDots.push('...')
+          }
+        }
+        rangeWithDots.push(i)
+        l = i
+      }
+
+      return rangeWithDots
     },
 
     hasPermission(permission) {
@@ -417,34 +595,45 @@ export default {
 
     formatDate(dateString) {
       if (!dateString) return '-'
-      return new Date(dateString).toLocaleDateString('ar-SA')
+      const date = new Date(dateString)
+      return date.toLocaleDateString('ar-SA', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      })
     },
 
     formatCurrency(amount) {
-      if (!amount) return '0.00 ر.س'
-      return new Intl.NumberFormat('ar-SA', {
+      if (!amount && amount !== 0) return '0.00 ' + this.$t('common.currency')
+      const formatter = new Intl.NumberFormat('ar-SA', {
         style: 'currency',
         currency: 'SAR',
         minimumFractionDigits: 2,
-      }).format(amount)
+      })
+      return formatter.format(amount)
     },
 
     getInitials(name) {
-      if (!name) return '؟'
-      return name.substring(0, 2).toUpperCase()
+      if (!name) return '؟؟'
+      return name
+        .split(' ')
+        .map((word) => word[0])
+        .join('')
+        .toUpperCase()
+        .substring(0, 2)
     },
 
     getDaysRemaining(dueDate) {
-      if (!dueDate) return 'غير محدد'
+      if (!dueDate) return this.$t('common.notAvailable')
       const today = new Date()
       const due = new Date(dueDate)
       const diffTime = due - today
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
 
-      if (diffDays < 0) return 'منتهية'
-      if (diffDays === 0) return 'اليوم'
-      if (diffDays === 1) return 'غداً'
-      return `${diffDays} يوم`
+      if (diffDays < 0) return this.$t('invoices.overdue')
+      if (diffDays === 0) return this.$t('invoices.today')
+      if (diffDays === 1) return this.$t('invoices.tomorrow')
+      return this.$t('invoices.days', { days: diffDays })
     },
 
     getDaysRemainingClass(dueDate) {
@@ -454,29 +643,83 @@ export default {
       const diffTime = due - today
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
 
-      if (diffDays < 0) return 'text-red-600 font-semibold'
-      if (diffDays <= 3) return 'text-yellow-600 font-semibold'
-      return 'text-green-600 font-semibold'
+      if (diffDays < 0) return 'text-red-600'
+      if (diffDays <= 3) return 'text-yellow-600'
+      return 'text-green-600'
+    },
+
+    getStatusClass(status) {
+      const classes = {
+        draft: 'bg-gray-100 text-gray-800',
+        sent: 'bg-blue-100 text-blue-800',
+        paid: 'bg-green-100 text-green-800',
+        overdue: 'bg-red-100 text-red-800',
+      }
+      return classes[status] || 'bg-gray-100 text-gray-800'
+    },
+
+    getStatusText(status) {
+      const texts = {
+        draft: this.$t('invoices.statuses.draft'),
+        sent: this.$t('invoices.statuses.sent'),
+        paid: this.$t('invoices.statuses.paid'),
+        overdue: this.$t('invoices.statuses.overdue'),
+      }
+      return texts[status] || status
     },
   },
 
   watch: {
-    filters: {
-      handler() {
-        this.applyFilters()
+    invoiceFilters: {
+      immediate: true,
+      handler(newFilters) {
+        this.filters = { ...newFilters }
       },
-      deep: true,
     },
   },
 }
 </script>
 
 <style scoped>
-.stat-card {
-  @apply transition-all duration-200 hover:shadow-lg;
+.animate-spin {
+  animation: spin 1s linear infinite;
 }
 
-.form-input {
-  @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* تحسينات للجدول على الأجهزة المحمولة */
+@media (max-width: 640px) {
+  .table-responsive {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .action-buttons button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* تأثيرات hover للبطاقات */
+.stat-card {
+  transition: all 0.2s ease-in-out;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
 }
 </style>

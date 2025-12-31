@@ -7,6 +7,7 @@ export default {
     invoices: [],
     currentInvoice: null,
     loading: false,
+    error: null,
     pagination: {
       current_page: 1,
       last_page: 1,
@@ -14,20 +15,37 @@ export default {
       total: 0,
       from: 0,
       to: 0
+    },
+    filters: {
+      status: '',
+      date_from: '',
+      date_to: '',
+      search: ''
     }
   }),
 
   getters: {
-    invoices: state => {
-      return Array.isArray(state.invoices) ? state.invoices : []
-    },
+    invoices: state => state.invoices,
     currentInvoice: state => state.currentInvoice,
     loading: state => state.loading,
+    error: state => state.error,
     pagination: state => state.pagination,
+    invoiceFilters: state => state.filters,
 
     invoiceById: (state) => (id) => {
-      if (!Array.isArray(state.invoices)) return null
       return state.invoices.find(invoice => Number(invoice.id) === Number(id))
+    },
+
+    invoiceStats: (state) => {
+      const invoices = state.invoices
+      return {
+        total: invoices.length,
+        paid: invoices.filter(inv => inv.status === 'paid').length,
+        sent: invoices.filter(inv => inv.status === 'sent').length,
+        overdue: invoices.filter(inv => inv.status === 'overdue').length,
+        draft: invoices.filter(inv => inv.status === 'draft').length,
+        totalAmount: invoices.reduce((sum, inv) => sum + (parseFloat(inv.total) || 0), 0)
+      }
     }
   },
 
@@ -36,29 +54,52 @@ export default {
       state.loading = loading
     },
 
-    SET_INVOICES(state, response) {
-      console.log('📊 SET_INVOICES mutation called with:', response)
+    SET_ERROR(state, error) {
+      state.error = error
+    },
 
-      if (response && response.data) {
-        // إذا كان الرد يحتوي على pagination
-        if (response.data.data) {
+    SET_INVOICES(state, data) {
+      console.log('📊 SET_INVOICES mutation called with:', data)
+
+      // تحسين معالجة البيانات لتناسب هيكل Laravel
+      if (data && data.data) {
+        // إذا كان الرد يحتوي على pagination من Laravel
+        if (Array.isArray(data.data)) {
           // بيانات مع pagination
-          state.invoices = response.data.data || []
+          state.invoices = data.data
           state.pagination = {
-            current_page: response.data.current_page || 1,
-            last_page: response.data.last_page || 1,
-            per_page: response.data.per_page || 10,
-            total: response.data.total || 0,
-            from: response.data.from || 0,
-            to: response.data.to || 0
+            current_page: data.current_page || 1,
+            last_page: data.last_page || 1,
+            per_page: data.per_page || 10,
+            total: data.total || 0,
+            from: data.from || 0,
+            to: data.to || 0
           }
         } else {
           // بيانات بدون هيكل محدد
-          state.invoices = response.data.invoices || response.data || []
-          state.pagination = {}
+          state.invoices = data.data
+          state.pagination = {
+            current_page: 1,
+            last_page: 1,
+            per_page: data.data.length,
+            total: data.data.length,
+            from: 1,
+            to: data.data.length
+          }
+        }
+      } else if (Array.isArray(data)) {
+        // بيانات مباشرة كمصفوفة
+        state.invoices = data
+        state.pagination = {
+          current_page: 1,
+          last_page: 1,
+          per_page: data.length,
+          total: data.length,
+          from: 1,
+          to: data.length
         }
       } else {
-        // افتراضياً، مصفوفة فارغة
+        console.warn('⚠️ Unexpected data structure in SET_INVOICES:', data)
         state.invoices = []
         state.pagination = {}
       }
@@ -91,120 +132,194 @@ export default {
       if (Array.isArray(state.invoices)) {
         state.invoices = state.invoices.filter(i => i.id !== id)
       }
+    },
+
+    SET_FILTERS(state, filters) {
+      state.filters = { ...state.filters, ...filters }
+    },
+
+    CLEAR_FILTERS(state) {
+      state.filters = {
+        status: '',
+        date_from: '',
+        date_to: '',
+        search: ''
+      }
+    },
+
+    CLEAR_ERROR(state) {
+      state.error = null
     }
   },
 
   actions: {
     async fetchInvoices({ commit, state }, params = {}) {
       commit('SET_LOADING', true)
-      console.log('📋 Fetching invoices with params:', params)
+      commit('CLEAR_ERROR')
 
       try {
-        const response = await axios.get('/admin/invoices', {
-          params: {
-            page: params.page || state.pagination.current_page || 1,
-            per_page: params.per_page || state.pagination.per_page || 10,
-            search: params.search || '',
-            status: params.status || '',
-            date_from: params.date_from || '',
-            date_to: params.date_to || '',
-            ...params
-          }
-        })
+        const filters = { ...state.filters, ...params }
+        console.log('📋 Fetching invoices with params:', filters)
 
+        const response = await axios.get('/admin/invoices', { params: filters })
         console.log('✅ Invoices API Response:', response.data)
 
+        // معالجة الاستجابة بناءً على هيكل Laravel
         if (response.data) {
-          commit('SET_INVOICES', response.data)
-          return response.data
+          if (response.data.status === true || response.data.success === true) {
+            // هيكل Laravel مع status/success
+            const data = response.data.data || response.data
+
+            // إذا كان data يحتوي على pagination (كما في Laravel Paginator)
+            if (data && data.data) {
+              commit('SET_INVOICES', data)
+            } else {
+              commit('SET_INVOICES', data)
+            }
+          } else if (response.data.data) {
+            // إذا كان هناك data مباشرة
+            commit('SET_INVOICES', response.data)
+          } else if (Array.isArray(response.data)) {
+            // إذا كانت الاستجابة مصفوفة مباشرة
+            commit('SET_INVOICES', response.data)
+          } else {
+            console.warn('⚠️ Unknown response structure:', response.data)
+            commit('SET_ERROR', 'هيكل البيانات غير متوقع')
+            commit('SET_INVOICES', [])
+          }
         } else {
-          console.error('❌ API response empty')
-          commit('SET_INVOICES', { data: [] })
-          throw new Error('No data received from API')
+          commit('SET_ERROR', 'لا توجد بيانات في الاستجابة')
+          commit('SET_INVOICES', [])
         }
+
+        return response.data
       } catch (error) {
         console.error('❌ Error fetching invoices:', error)
-        commit('SET_INVOICES', { data: [] })
+        console.error('Error details:', error.response?.data || error.message)
 
-        let errorMessage = 'حدث خطأ في جلب بيانات الفواتير'
-        if (error.response && error.response.data && error.response.data.message) {
-          errorMessage = error.response.data.message
-        } else if (error.message) {
-          errorMessage = error.message
-        }
+        const errorMessage = error.response?.data?.message ||
+                            error.response?.data?.error ||
+                            'حدث خطأ في جلب بيانات الفواتير'
 
-        throw new Error(errorMessage)
+        commit('SET_ERROR', errorMessage)
+        commit('SET_INVOICES', [])
+        throw error
       } finally {
         commit('SET_LOADING', false)
       }
     },
 
     async fetchInvoice({ commit }, id) {
+      commit('SET_LOADING', true)
+      commit('CLEAR_ERROR')
+
       try {
         console.log(`🚀 Fetching invoice with ID: ${id}`)
         const response = await axios.get(`/admin/invoices/${id}`)
         console.log('✅ Invoice details:', response.data)
 
-        const invoice = response.data.data || response.data
-        commit('SET_CURRENT_INVOICE', invoice)
-        return invoice
+        if (response.data) {
+          const invoice = response.data.data || response.data
+          commit('SET_CURRENT_INVOICE', invoice)
+        } else {
+          commit('SET_ERROR', 'فشل في تحميل الفاتورة: لا توجد بيانات')
+        }
+        return response.data
       } catch (error) {
         console.error('❌ Error fetching invoice:', error)
+        commit('SET_ERROR', error.response?.data?.message || 'فشل في تحميل الفاتورة')
         throw error
+      } finally {
+        commit('SET_LOADING', false)
       }
     },
 
     async createInvoice({ commit }, invoiceData) {
+      commit('SET_LOADING', true)
+      commit('CLEAR_ERROR')
+
       try {
         console.log('🚀 Creating invoice:', invoiceData)
         const response = await axios.post('/admin/invoices', invoiceData)
         console.log('✅ Invoice created:', response.data)
 
-        const invoice = response.data.data || response.data
-        commit('ADD_INVOICE', invoice)
-        return invoice
+        if (response.data) {
+          const invoice = response.data.data || response.data
+          commit('ADD_INVOICE', invoice)
+          commit('SET_CURRENT_INVOICE', invoice)
+        } else {
+          commit('SET_ERROR', 'فشل في إنشاء الفاتورة: لا توجد بيانات')
+        }
+        return response.data
       } catch (error) {
         console.error('❌ Error creating invoice:', error)
-        console.error('❌ Error details:', error.response?.data || error.message)
+        console.error('Error details:', error.response?.data || error.message)
+        commit('SET_ERROR', error.response?.data?.message || 'فشل في إنشاء الفاتورة')
         throw error
+      } finally {
+        commit('SET_LOADING', false)
       }
     },
 
     async updateInvoice({ commit }, { id, data }) {
+      commit('SET_LOADING', true)
+      commit('CLEAR_ERROR')
+
       try {
         console.log(`🚀 Updating invoice ${id}:`, data)
         const response = await axios.put(`/admin/invoices/${id}`, data)
         console.log('✅ Invoice updated:', response.data)
 
-        const updatedInvoice = response.data.data || response.data
-        commit('UPDATE_INVOICE', updatedInvoice)
-        return updatedInvoice
+        if (response.data) {
+          const invoice = response.data.data || response.data
+          commit('UPDATE_INVOICE', invoice)
+          commit('SET_CURRENT_INVOICE', invoice)
+        } else {
+          commit('SET_ERROR', 'فشل في تحديث الفاتورة: لا توجد بيانات')
+        }
+        return response.data
       } catch (error) {
         console.error('❌ Error updating invoice:', error)
+        commit('SET_ERROR', error.response?.data?.message || 'فشل في تحديث الفاتورة')
         throw error
+      } finally {
+        commit('SET_LOADING', false)
       }
     },
 
     async deleteInvoice({ commit }, id) {
+      commit('SET_LOADING', true)
+      commit('CLEAR_ERROR')
+
       try {
         console.log(`🚀 Deleting invoice ${id}`)
-        await axios.delete(`/admin/invoices/${id}`)
-        console.log('✅ Invoice deleted')
-        commit('DELETE_INVOICE', id)
-        return true
+        const response = await axios.delete(`/admin/invoices/${id}`)
+        console.log('✅ Invoice deleted:', response.data)
+
+        if (response.data) {
+          commit('DELETE_INVOICE', id)
+        } else {
+          commit('SET_ERROR', 'فشل في حذف الفاتورة: لا توجد بيانات')
+        }
+        return response.data
       } catch (error) {
         console.error('❌ Error deleting invoice:', error)
+        commit('SET_ERROR', error.response?.data?.message || 'فشل في حذف الفاتورة')
         throw error
+      } finally {
+        commit('SET_LOADING', false)
       }
     },
 
     async updateInvoiceStatus({ commit }, { id, status, payment_date = null }) {
+      commit('SET_LOADING', true)
+      commit('CLEAR_ERROR')
+
       try {
         console.log(`🚀 Updating invoice ${id} status to: ${status}`)
 
         let response
         if (status === 'paid') {
-          // استخدم المسار الجديد الذي أضفناه
           const data = payment_date ? { payment_date } : {}
           response = await axios.put(`/admin/invoices/${id}/mark-paid`, data)
         } else if (status === 'sent') {
@@ -215,16 +330,37 @@ export default {
 
         console.log('✅ Invoice status updated:', response.data)
 
-        const updatedInvoice = response.data.data || response.data
-        commit('UPDATE_INVOICE', updatedInvoice)
-        return updatedInvoice
+        if (response.data) {
+          const invoice = response.data.data || response.data
+          commit('UPDATE_INVOICE', invoice)
+          commit('SET_CURRENT_INVOICE', invoice)
+        } else {
+          commit('SET_ERROR', 'فشل في تحديث حالة الفاتورة: لا توجد بيانات')
+        }
+        return response.data
       } catch (error) {
         console.error('❌ Error updating invoice status:', error)
         if (error.response?.data?.message) {
-          throw new Error(error.response.data.message)
+          commit('SET_ERROR', error.response.data.message)
+        } else {
+          commit('SET_ERROR', 'فشل في تحديث حالة الفاتورة')
         }
         throw error
+      } finally {
+        commit('SET_LOADING', false)
       }
+    },
+
+    updateFilters({ commit }, filters) {
+      commit('SET_FILTERS', filters)
+    },
+
+    clearFilters({ commit }) {
+      commit('CLEAR_FILTERS')
+    },
+
+    clearError({ commit }) {
+      commit('CLEAR_ERROR')
     }
   }
 }

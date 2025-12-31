@@ -30,21 +30,6 @@
     "admin_indicator": "(Admin)",
     "user": "User"
   },
-  "users": {
-    "title": "Users",
-    "management": "User Management",
-    "managementDescription": "Manage user accounts and permissions",
-    "name": "Name",
-    "namePlaceholder": "Enter full name",
-    "emailPlaceholder": "Enter email address",
-    "add": "Add User",
-    "edit": "Edit User",
-    "user": "user",
-    "searchPlaceholder": "Search by name or email...",
-    "noUsers": "No users found",
-    "startAdding": "Start by adding a new user",
-    "newPassword": "New Password (optional)"
-  },
   "dashboard": {
     "title": "Dashboard",
     "welcome": "Welcome to the invoice management system",
@@ -136,12 +121,18 @@
     "updateSuccess": "Client updated successfully",
     "updateError": "Failed to update client",
     "table": {
+      "title": "Clients List",
       "client": "Client",
       "email": "Email",
       "phone": "Phone",
       "company": "Company",
       "status": "Status",
-      "actions": "Actions"
+      "actions": "Actions",
+      "contactInfo": "Contact Information",
+      "invoices": "Invoices",
+      "lastActivity": "Last Activity",
+      "totalSpent": "Total Spent",
+      "invoice_list": "Invoices List"
     },
     "stats": {
       "totalInvoices": "Total Invoices",
@@ -229,6 +220,10 @@
     "today": "Today",
     "tomorrow": "Tomorrow",
     "days": "{days} days",
+    "searchPlaceholder": "Search by invoice number or client name...",
+    "loading": "Loading invoices...",
+    "load_success": "Invoices loaded successfully",
+    "delete_warning": "This action cannot be undone.",
     "details": {
       "title": "Invoice Details",
       "subtitle": "View all invoice details",
@@ -269,7 +264,8 @@
       "due_date": "Due Date",
       "amount": "Amount",
       "status": "Status",
-      "actions": "Actions"
+      "actions": "Actions",
+      "invoice_list": "Invoices List"
     },
     "stats": {
       "total": "Total",
@@ -340,6 +336,16 @@
     "error": "Error",
     "success": "Success",
     "search": "Search",
+    "lastUpdated": "Last Updated",
+    "pending": "Pending",
+    "timeAgo": {
+      "minutes": "{minutes} minutes ago",
+      "hours": "{hours} hours ago",
+      "day": "1 day ago",
+      "days": "{days} days ago",
+      "months": "{months} months ago",
+      "years": "{years} years ago"
+    },
     "sort": {
       "newest": "Newest",
       "oldest": "Oldest",
@@ -377,13 +383,10 @@
     "refreshSuccess": "Data refreshed successfully",
     "exportComingSoon": "Export feature coming soon",
     "data_loaded": "Data loaded successfully",
-    "operation_failed": "Operation failed"
-  },
-  "validation": {
-    "required": "{field} is required",
-    "email": "Invalid email address",
-    "minLength": "{field} must be at least {min} characters",
-    "passwordMatch": "Passwords do not match"
+    "operation_failed": "Operation failed",
+    "createSuccess": "{item} created successfully",
+    "updateSuccess": "{item} updated successfully",
+    "confirmDelete": "Are you sure you want to delete {item}?"
   },
   "errors": {
     "saveClientFailed": "Failed to save client",
@@ -397,6 +400,12 @@
     "updateFailed": "Error updating",
     "updateError": "Failed to update",
     "deleteFailed": "Error deleting"
+  },
+  "validation": {
+    "required": "{field} is required",
+    "email": "Invalid email address",
+    "minLength": "{field} must be at least {min} characters",
+    "passwordMatch": "Passwords do not match"
   },
   "permissions": {
     "hasPermission": "Has Permission",
@@ -432,6 +441,21 @@
     "role": "role",
     "list": "Roles List",
     "noRoles": "No roles found"
+  },
+  "users": {
+    "title": "Users",
+    "management": "User Management",
+    "managementDescription": "Manage user accounts and permissions",
+    "name": "Name",
+    "namePlaceholder": "Enter full name",
+    "emailPlaceholder": "Enter email address",
+    "add": "Add User",
+    "edit": "Edit User",
+    "user": "user",
+    "searchPlaceholder": "Search by name or email...",
+    "noUsers": "No users found",
+    "startAdding": "Start by adding a new user",
+    "newPassword": "New Password (optional)"
   },
   "pagination": {
     "previous": "Previous",
@@ -513,7 +537,11 @@
       "page": "Page",
       "of_pages": "of",
       "no_data": "No data to display",
-      "no_data_hint": "Try changing filters or selecting a different period"
+      "no_data_hint": "Try changing filters or selecting a different period",
+      "title": "Clients List",
+      "contactInfo": "Contact Information",
+      "lastActivity": "Last Activity",
+      "totalSpent": "Total Spent"
     },
     "info_cards": {
       "last_update": "Last Update",

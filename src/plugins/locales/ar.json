@@ -121,12 +121,18 @@
     "updateSuccess": "تم تحديث العميل بنجاح",
     "updateError": "فشل في تحديث العميل",
     "table": {
+      "title": "قائمة العملاء",
       "client": "العميل",
       "email": "البريد الإلكتروني",
       "phone": "الهاتف",
       "company": "الشركة",
       "status": "الحالة",
-      "actions": "الإجراءات"
+      "actions": "الإجراءات",
+      "contactInfo": "معلومات الاتصال",
+      "invoices": "الفواتير",
+      "lastActivity": "آخر نشاط",
+      "totalSpent": "الإجمالي المنفق",
+      "invoice_list": "قائمة الفواتير"
     },
     "stats": {
       "totalInvoices": "إجمالي الفواتير",
@@ -172,6 +178,11 @@
     "recent_activity": "العملاء الحديثين"
   },
   "invoices": {
+    "status_legend": "وسيلة إيضاح الحالة",
+    "financial_summary": "ملخص مالي",
+    "overdue_amount": "المبلغ المتأخر",
+    "outstanding": "المستحق",
+    "collected": "المحصل",
     "title": "الفواتير",
     "subtitle": "إدارة وعرض جميع الفواتير",
     "create_new": "إنشاء فاتورة جديدة",
@@ -194,6 +205,7 @@
     "unitPrice": "سعر الوحدة",
     "total": "الإجمالي",
     "subtotal": "المجموع الفرعي",
+    "create": "إنشاء",
     "tax": "الضريبة",
     "totalAmount": "المبلغ الإجمالي",
     "notes": "ملاحظات",
@@ -208,6 +220,10 @@
     "today": "اليوم",
     "tomorrow": "غداً",
     "days": "{days} يوم",
+    "searchPlaceholder": "ابحث برقم الفاتورة أو اسم العميل...",
+    "loading": "جاري تحميل الفواتير...",
+    "load_success": "تم تحميل الفواتير بنجاح",
+    "delete_warning": "هذا الإجراء لا يمكن التراجع عنه.",
     "details": {
       "title": "تفاصيل الفاتورة",
       "subtitle": "عرض جميع تفاصيل الفاتورة",
@@ -234,7 +250,11 @@
       "loadFailed": "خطأ في تحميل الفاتورة",
       "fillAllItems": "يرجى ملء جميع العناصر بشكل صحيح",
       "updateFailed": "فشل في تحديث الفاتورة",
-      "pdfComingSoon": "تحميل PDF قريباً"
+      "pdfComingSoon": "تحميل PDF قريباً",
+      "createSuccess": "تم إنشاء {item} بنجاح",
+      "updateSuccess": "تم تحديث {item} بنجاح",
+      "deleteSuccess": "تم حذف {item} بنجاح",
+      "confirmDelete": "هل أنت متأكد من حذف {item}؟"
     },
     "table": {
       "invoice_number": "رقم الفاتورة",
@@ -244,7 +264,8 @@
       "due_date": "تاريخ الاستحقاق",
       "amount": "المبلغ",
       "status": "الحالة",
-      "actions": "الإجراءات"
+      "actions": "الإجراءات",
+      "invoice_list": "قائمة الفواتير"
     },
     "stats": {
       "total": "الإجمالي",
@@ -278,6 +299,17 @@
     "collapse_sidebar": "طي القائمة الجانبية"
   },
   "common": {
+    "filter": "فلتر",
+    "general": "عام",
+    "filters": "فلاتر",
+    "fromDate": "من تاريخ",
+    "toDate": "إلى تاريخ",
+    "all": "الكل",
+    "delete": "حذف",
+    "add": "إضافة",
+    "creating": "جاري الإنشاء...",
+    "invoices": "الفواتير",
+    "refresh": "تحديث",
     "cancel": "إلغاء",
     "save": "حفظ",
     "create": "إنشاء",
@@ -304,6 +336,16 @@
     "error": "خطأ",
     "success": "نجاح",
     "search": "بحث",
+    "lastUpdated": "آخر تحديث",
+    "pending": "قيد الانتظار",
+    "timeAgo": {
+      "minutes": "منذ {minutes} دقيقة",
+      "hours": "منذ {hours} ساعة",
+      "day": "منذ يوم",
+      "days": "منذ {days} أيام",
+      "months": "منذ {months} شهر",
+      "years": "منذ {years} سنة"
+    },
     "sort": {
       "newest": "الأحدث",
       "oldest": "الأقدم",
@@ -495,7 +537,11 @@
       "page": "صفحة",
       "of_pages": "من",
       "no_data": "لا توجد بيانات للعرض",
-      "no_data_hint": "حاول تغيير الفلاتر أو اختيار فترة مختلفة"
+      "no_data_hint": "حاول تغيير الفلاتر أو اختيار فترة مختلفة",
+      "title": "قائمة العملاء",
+      "contactInfo": "معلومات الاتصال",
+      "lastActivity": "آخر نشاط",
+      "totalSpent": "الإجمالي المنفق"
     },
     "info_cards": {
       "last_update": "آخر تحديث",
