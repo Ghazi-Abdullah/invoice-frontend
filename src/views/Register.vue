@@ -12,8 +12,8 @@
             <font-awesome-icon :icon="['fas', 'user-plus']" class="text-white text-2xl" />
           </div>
         </div>
-        <h1 class="text-3xl font-bold text-gray-900">أنشئ حساباً جديداً</h1>
-        <p class="text-gray-600 mt-2">انضم إلى نظام إدارة الفواتير</p>
+        <h1 class="text-3xl font-bold text-gray-900">{{ $t('auth.register') }}</h1>
+        <p class="text-gray-600 mt-2">{{ $t('auth.registerSubtitle') }}</p>
       </div>
 
       <!-- Register Form -->
@@ -22,9 +22,9 @@
           <!-- Name -->
           <BaseInput
             v-model="form.name"
-            label="الاسم الكامل"
+            :label="$t('users.name')"
             required
-            placeholder="أدخل اسمك الكامل"
+            :placeholder="$t('users.namePlaceholder')"
             :prefix-icon="['fas', 'user']"
             :error="errors.name"
           />
@@ -33,9 +33,9 @@
           <BaseInput
             v-model="form.email"
             type="email"
-            label="البريد الإلكتروني"
+            :label="$t('auth.email')"
             required
-            placeholder="أدخل بريدك الإلكتروني"
+            :placeholder="$t('users.emailPlaceholder')"
             :prefix-icon="['fas', 'envelope']"
             :error="errors.email"
           />
@@ -44,9 +44,9 @@
           <BaseInput
             v-model="form.password"
             type="password"
-            label="كلمة المرور"
+            :label="$t('auth.password')"
             required
-            placeholder="أدخل كلمة المرور"
+            :placeholder="$t('auth.passwordPlaceholder')"
             :prefix-icon="['fas', 'lock']"
             :error="errors.password"
           />
@@ -55,9 +55,9 @@
           <BaseInput
             v-model="form.password_confirmation"
             type="password"
-            label="تأكيد كلمة المرور"
+            :label="$t('auth.confirm_password')"
             required
-            placeholder="أكد كلمة المرور"
+            :placeholder="$t('auth.confirm_passwordPlaceholder')"
             :prefix-icon="['fas', 'lock']"
             :error="errors.password_confirmation"
           />
@@ -72,10 +72,10 @@
               class="h-4 w-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
             />
             <label for="terms" class="mr-3 block text-sm text-gray-900">
-              أوافق على
-              <a href="#" class="text-primary-600 hover:text-primary-500">الشروط والأحكام</a>
-              و
-              <a href="#" class="text-primary-600 hover:text-primary-500">سياسة الخصوصية</a>
+              {{ $t('auth.agreeTo') }}
+              <a href="#" class="text-primary-600 hover:text-primary-500">{{ $t('auth.terms') }}</a>
+              {{ $t('auth.and') }}
+              <a href="#" class="text-primary-600 hover:text-primary-500">{{ $t('auth.privacyPolicy') }}</a>
             </label>
           </div>
           <div v-if="errors.agree_terms" class="text-sm text-red-600">
@@ -86,7 +86,7 @@
           <BaseAlert
             v-if="error"
             type="error"
-            :title="'خطأ في التسجيل'"
+            :title="$t('auth.registerError')"
             :message="error"
             dismissible
             @dismiss="error = ''"
@@ -105,11 +105,11 @@
           >
             <template v-if="loading">
               <font-awesome-icon :icon="['fas', 'spinner']" class="animate-spin ml-2" />
-              جاري إنشاء الحساب...
+              {{ $t('auth.creatingAccount') }}
             </template>
             <template v-else>
               <font-awesome-icon :icon="['fas', 'user-plus']" class="ml-2" />
-              إنشاء حساب
+              {{ $t('auth.register') }}
             </template>
           </BaseButton>
         </form>
@@ -117,9 +117,9 @@
         <!-- Login Link -->
         <div class="mt-8 pt-6 border-t border-gray-200 text-center">
           <p class="text-gray-600">
-            لديك حساب بالفعل؟
+            {{ $t('auth.alreadyHaveAccount') }}
             <router-link to="/login" class="text-primary-600 hover:text-primary-800 font-medium">
-              سجل الدخول
+              {{ $t('auth.login') }}
             </router-link>
           </p>
         </div>
@@ -129,10 +129,9 @@
           <div class="flex items-start">
             <font-awesome-icon :icon="['fas', 'shield-alt']" class="text-blue-600 mt-0.5 ml-3" />
             <div>
-              <h4 class="text-sm font-medium text-blue-800 mb-1">معلومات أمنية</h4>
+              <h4 class="text-sm font-medium text-blue-800 mb-1">{{ $t('auth.securityInfo') }}</h4>
               <p class="text-xs text-blue-700">
-                نستخدم أحدث تقنيات التشفير لحماية بياناتك. كلمة المرور يجب أن تكون 8 أحرف على الأقل
-                وتحتوي على أحرف وأرقام.
+                {{ $t('auth.securityDescription') }}
               </p>
             </div>
           </div>
@@ -160,7 +159,6 @@ export default {
     }
   },
   mounted() {
-    // إذا كان المستخدم مصادقاً بالفعل، توجيهه إلى Dashboard
     if (this.$store.getters['auth/isAuthenticated']) {
       this.$router.push('/dashboard')
     }
@@ -170,39 +168,41 @@ export default {
       this.error = ''
       this.errors = {}
 
-      // التحقق من صحة البيانات
       if (!this.form.name.trim()) {
-        this.errors.name = 'الرجاء إدخال الاسم'
+        this.errors.name = this.$t('validation.required', { field: this.$t('users.name') })
         return
       }
 
       if (!this.form.email.trim()) {
-        this.errors.email = 'الرجاء إدخال البريد الإلكتروني'
+        this.errors.email = this.$t('validation.required', { field: this.$t('auth.email') })
         return
       }
 
       if (!this.isValidEmail(this.form.email)) {
-        this.errors.email = 'البريد الإلكتروني غير صالح'
+        this.errors.email = this.$t('validation.email')
         return
       }
 
       if (!this.form.password) {
-        this.errors.password = 'الرجاء إدخال كلمة المرور'
+        this.errors.password = this.$t('validation.required', { field: this.$t('auth.password') })
         return
       }
 
       if (this.form.password.length < 8) {
-        this.errors.password = 'كلمة المرور يجب أن تكون 8 أحرف على الأقل'
+        this.errors.password = this.$t('validation.minLength', {
+          field: this.$t('auth.password'),
+          min: 8,
+        })
         return
       }
 
       if (this.form.password !== this.form.password_confirmation) {
-        this.errors.password_confirmation = 'كلمتا المرور غير متطابقتين'
+        this.errors.password_confirmation = this.$t('validation.passwordMatch')
         return
       }
 
       if (!this.form.agree_terms) {
-        this.errors.agree_terms = 'يجب الموافقة على الشروط والأحكام'
+        this.errors.agree_terms = this.$t('auth.mustAgreeTerms')
         return
       }
 
@@ -212,22 +212,21 @@ export default {
         const response = await this.$store.dispatch('auth/register', this.form)
 
         if (response?.success) {
-          this.$toast.success('تم إنشاء الحساب بنجاح!')
+          this.$toast.success(this.$t('auth.registerSuccess'))
 
-          // الانتقال إلى الصفحة الرئيسية بعد تأخير بسيط
           setTimeout(() => {
             this.$router.push('/')
           }, 1500)
         } else {
-          this.error = response?.message || 'فشل إنشاء الحساب'
+          this.error = response?.message || this.$t('auth.registerFailed')
 
           if (response?.errors) {
             this.errors = response.errors
           }
         }
       } catch (err) {
-        console.error('❌ خطأ في إنشاء الحساب:', err)
-        this.error = 'حدث خطأ أثناء إنشاء الحساب. الرجاء المحاولة مرة أخرى.'
+        console.error('❌ ' + this.$t('errors.createFailed') + ':', err)
+        this.error = this.$t('auth.registerErrorGeneral')
       } finally {
         this.loading = false
       }

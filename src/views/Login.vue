@@ -12,8 +12,8 @@
             <font-awesome-icon :icon="['fas', 'file-invoice-dollar']" class="text-white text-2xl" />
           </div>
         </div>
-        <h1 class="text-3xl font-bold text-gray-900">مرحباً بعودتك</h1>
-        <p class="text-gray-600 mt-2">سجل الدخول إلى حسابك للمتابعة</p>
+        <h1 class="text-3xl font-bold text-gray-900">{{ $t('auth.welcomeBack') }}</h1>
+        <p class="text-gray-600 mt-2">{{ $t('auth.loginSubtitle') }}</p>
       </div>
 
       <!-- Login Form -->
@@ -23,9 +23,9 @@
           <BaseInput
             v-model="form.email"
             type="email"
-            label="البريد الإلكتروني"
+            :label="$t('auth.email')"
             required
-            placeholder="أدخل بريدك الإلكتروني"
+            :placeholder="$t('users.emailPlaceholder')"
             :prefix-icon="['fas', 'envelope']"
             :error="errors.email"
           />
@@ -35,9 +35,9 @@
             <BaseInput
               v-model="form.password"
               :type="showPassword ? 'text' : 'password'"
-              label="كلمة المرور"
+              :label="$t('auth.password')"
               required
-              placeholder="أدخل كلمة المرور"
+              :placeholder="$t('auth.passwordPlaceholder')"
               :prefix-icon="['fas', 'lock']"
               :error="errors.password"
             />
@@ -45,7 +45,7 @@
               type="button"
               @click="showPassword = !showPassword"
               class="absolute left-3 top-9 text-gray-400 hover:text-gray-600"
-              :title="showPassword ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'"
+              :title="showPassword ? $t('auth.hidePassword') : $t('auth.showPassword')"
             >
               <font-awesome-icon :icon="showPassword ? ['fas', 'eye-slash'] : ['fas', 'eye']" />
             </button>
@@ -60,14 +60,16 @@
                 type="checkbox"
                 class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
               />
-              <label for="remember-me" class="mr-2 block text-sm text-gray-900"> تذكرني </label>
+              <label for="remember-me" class="mr-2 block text-sm text-gray-900">
+                {{ $t('auth.remember_me') }}
+              </label>
             </div>
 
             <router-link
               to="/forgot-password"
               class="text-sm text-primary-600 hover:text-primary-500 font-medium"
             >
-              نسيت كلمة المرور؟
+              {{ $t('auth.forgot_password') }}
             </router-link>
           </div>
 
@@ -75,7 +77,7 @@
           <BaseAlert
             v-if="error"
             type="error"
-            :title="'خطأ في تسجيل الدخول'"
+            :title="$t('auth.loginError')"
             :message="error"
             dismissible
             @dismiss="error = ''"
@@ -94,11 +96,11 @@
           >
             <template v-if="loading">
               <font-awesome-icon :icon="['fas', 'spinner']" class="animate-spin ml-2" />
-              جاري تسجيل الدخول...
+              {{ $t('auth.loggingIn') }}
             </template>
             <template v-else>
               <font-awesome-icon :icon="['fas', 'sign-in-alt']" class="ml-2" />
-              تسجيل الدخول
+              {{ $t('auth.login') }}
             </template>
           </BaseButton>
         </form>
@@ -110,7 +112,7 @@
               <div class="w-full border-t border-gray-300"></div>
             </div>
             <div class="relative flex justify-center text-sm">
-              <span class="px-4 bg-white text-gray-500">أو</span>
+              <span class="px-4 bg-white text-gray-500">{{ $t('common.or') }}</span>
             </div>
           </div>
         </div>
@@ -118,9 +120,9 @@
         <!-- Register Link -->
         <div class="mt-8 text-center">
           <p class="text-gray-600">
-            ليس لديك حساب؟
+            {{ $t('auth.noAccount') }}
             <router-link to="/register" class="text-primary-600 hover:text-primary-800 font-medium">
-              أنشئ حساب جديد
+              {{ $t('auth.register') }}
             </router-link>
           </p>
         </div>
@@ -130,7 +132,9 @@
           <div class="flex items-start">
             <font-awesome-icon :icon="['fas', 'info-circle']" class="text-blue-600 mt-0.5 ml-3" />
             <div>
-              <h4 class="text-sm font-medium text-blue-800 mb-2">بيانات تجريبية:</h4>
+              <h4 class="text-sm font-medium text-blue-800 mb-2">
+                {{ $t('auth.demoCredentials') }}:
+              </h4>
               <div class="text-xs text-blue-700 space-y-2">
                 <div class="flex items-center">
                   <font-awesome-icon :icon="['fas', 'user']" class="ml-2" />
@@ -149,10 +153,10 @@
       <!-- Security Note -->
       <div class="mt-8 text-center">
         <p class="text-xs text-gray-500">
-          © 2024 نظام إدارة الفواتير. جميع الحقوق محفوظة.
+          © 2024 {{ $t('app.name') }}. {{ $t('auth.allRightsReserved') }}
           <br />
-          <a href="#" class="text-gray-600 hover:text-gray-800">سياسة الخصوصية</a> •
-          <a href="#" class="text-gray-600 hover:text-gray-800">الشروط والأحكام</a>
+          <a href="#" class="text-gray-600 hover:text-gray-800">{{ $t('auth.privacyPolicy') }}</a> •
+          <a href="#" class="text-gray-600 hover:text-gray-800">{{ $t('auth.terms') }}</a>
         </p>
       </div>
     </div>
@@ -176,7 +180,6 @@ export default {
     }
   },
   mounted() {
-    // إذا كان المستخدم مصادقاً بالفعل، توجيهه إلى Dashboard
     if (this.$store.getters['auth/isAuthenticated']) {
       this.$router.push('/dashboard')
     }
@@ -186,19 +189,18 @@ export default {
       this.error = ''
       this.errors = {}
 
-      // التحقق من صحة البيانات
       if (!this.form.email.trim()) {
-        this.errors.email = 'الرجاء إدخال البريد الإلكتروني'
+        this.errors.email = this.$t('validation.required', { field: this.$t('auth.email') })
         return
       }
 
       if (!this.isValidEmail(this.form.email)) {
-        this.errors.email = 'البريد الإلكتروني غير صالح'
+        this.errors.email = this.$t('validation.email')
         return
       }
 
       if (!this.form.password) {
-        this.errors.password = 'الرجاء إدخال كلمة المرور'
+        this.errors.password = this.$t('validation.required', { field: this.$t('auth.password') })
         return
       }
 
@@ -211,25 +213,24 @@ export default {
         })
 
         if (result.success) {
-          this.$toast.success('تم تسجيل الدخول بنجاح!', {
+          this.$toast.success(this.$t('auth.loginSuccess'), {
             position: 'top-center',
             timeout: 2000,
           })
 
-          // الانتقال إلى Dashboard بعد تأخير بسيط
           setTimeout(() => {
             this.$router.push('/dashboard')
           }, 1000)
         } else {
-          this.error = result.message || 'فشل تسجيل الدخول'
+          this.error = result.message || this.$t('auth.loginFailed')
 
           if (result.errors) {
             this.errors = result.errors
           }
         }
       } catch (err) {
-        console.error('❌ خطأ في تسجيل الدخول:', err)
-        this.error = 'حدث خطأ غير متوقع أثناء تسجيل الدخول. الرجاء المحاولة مرة أخرى.'
+        console.error('❌ ' + this.$t('errors.loadFailed') + ':', err)
+        this.error = this.$t('auth.loginErrorGeneral')
       } finally {
         this.loading = false
       }

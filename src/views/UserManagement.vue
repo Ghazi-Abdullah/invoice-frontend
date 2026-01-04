@@ -105,7 +105,7 @@
                 type="ghost"
                 size="sm"
                 icon="edit"
-                :title="$t('common.edit')"
+                :title="$t('buttons.edit')"
               />
 
               <BaseButton
@@ -122,7 +122,7 @@
                 type="ghost"
                 size="sm"
                 icon="trash"
-                :title="$t('common.delete')"
+                :title="$t('buttons.delete')"
                 class="text-red-600 hover:text-red-700"
               />
             </div>
@@ -209,9 +209,9 @@
         <BaseInput
           v-model="userForm.password_confirmation"
           type="password"
-          :label="$t('auth.confirmPassword')"
+          :label="$t('auth.confirm_password')"
           :required="!showEditUserModal"
-          :placeholder="$t('auth.confirmPasswordPlaceholder')"
+          :placeholder="$t('auth.confirm_password')"
           :error="errors.password_confirmation"
         />
 

@@ -13,11 +13,11 @@
 
       <!-- Message -->
       <div class="mb-8">
-        <h1 class="text-4xl font-bold text-gray-900 mb-4">عذراً! هذه الصفحة غير موجودة</h1>
+        <h1 class="text-4xl font-bold text-gray-900 mb-4">{{ $t('errors.notFoundTitle') }}</h1>
         <p class="text-xl text-gray-600 mb-2">
-          يبدو أنك حاولت الوصول إلى صفحة غير موجودة في نظامنا.
+          {{ $t('errors.notFoundMessage') }}
         </p>
-        <p class="text-gray-500">يمكن أن يكون السبب خطأ في الرابط أو أن الصفحة قد تم نقلها.</p>
+        <p class="text-gray-500">{{ $t('errors.notFoundReason') }}</p>
       </div>
 
       <!-- Actions -->
@@ -29,7 +29,7 @@
           icon="arrow-right"
           class="shadow-lg"
         >
-          العودة للخلف
+          {{ $t('common.back') }}
         </BaseButton>
 
         <BaseButton
@@ -39,20 +39,20 @@
           icon="home"
           class="shadow-lg"
         >
-          الذهاب للرئيسية
+          {{ $t('nav.dashboard') }}
         </BaseButton>
       </div>
 
       <!-- Help Links -->
       <div class="mt-8 p-6 bg-white rounded-2xl shadow-lg border border-gray-200">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">ربما كنت تبحث عن:</h3>
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">{{ $t('errors.maybeLookingFor') }}</h3>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
           <router-link
             to="/dashboard"
             class="flex items-center p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
           >
             <font-awesome-icon :icon="['fas', 'tachometer-alt']" class="text-gray-600 ml-3" />
-            <span class="text-gray-700">لوحة التحكم</span>
+            <span class="text-gray-700">{{ $t('nav.dashboard') }}</span>
           </router-link>
 
           <router-link
@@ -60,7 +60,7 @@
             class="flex items-center p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
           >
             <font-awesome-icon :icon="['fas', 'file-invoice']" class="text-gray-600 ml-3" />
-            <span class="text-gray-700">الفواتير</span>
+            <span class="text-gray-700">{{ $t('nav.invoices') }}</span>
           </router-link>
 
           <router-link
@@ -68,7 +68,7 @@
             class="flex items-center p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
           >
             <font-awesome-icon :icon="['fas', 'users']" class="text-gray-600 ml-3" />
-            <span class="text-gray-700">العملاء</span>
+            <span class="text-gray-700">{{ $t('nav.clients') }}</span>
           </router-link>
 
           <router-link
@@ -76,20 +76,20 @@
             class="flex items-center p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
           >
             <font-awesome-icon :icon="['fas', 'chart-bar']" class="text-gray-600 ml-3" />
-            <span class="text-gray-700">التقارير</span>
+            <span class="text-gray-700">{{ $t('nav.reports') }}</span>
           </router-link>
         </div>
       </div>
 
       <!-- Contact Support -->
       <div class="mt-8">
-        <p class="text-gray-500 mb-2">لا زلت تواجه مشكلة؟</p>
+        <p class="text-gray-500 mb-2">{{ $t('errors.stillHavingProblem') }}</p>
         <a
           href="mailto:support@invoiceapp.com"
           class="inline-flex items-center text-primary-600 hover:text-primary-800 font-medium"
         >
           <font-awesome-icon :icon="['fas', 'life-ring']" class="ml-2" />
-          اتصل بالدعم الفني
+          {{ $t('errors.contactSupport') }}
         </a>
       </div>
     </div>
@@ -100,7 +100,6 @@
 export default {
   name: 'NotFound',
   mounted() {
-    // إرسال حدث تحليلي في حالة حقيقية
     console.log('🔍 404 Error - Page not found:', this.$route.path)
   },
 }
