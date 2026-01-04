@@ -43,6 +43,12 @@ const routes = [
     meta: { requiresAuth: true, permission: 'view_invoices' }
   },
   {
+    path: '/invoices/:id/edit',
+    name: 'EditInvoice',
+    component: () => import('@/views/invoices/Edit.vue'),
+    meta: { requiresAuth: true, permission: 'edit_invoice' }
+  },
+  {
     path: '/clients',
     name: 'Clients',
     component: () => import('@/views/Clients.vue'),
@@ -67,16 +73,19 @@ const routes = [
     meta: { requiresAuth: true, permission: 'edit_client' }
   },
   {
-    path: '/reports',
-    name: 'Reports',
-    component: () => import('@/views/Reports/Index.vue'),
-    meta: { requiresAuth: true, permission: 'view_reports' }
-  },
-  {
     path: '/reports/sales',
     name: 'SalesReport',
     component: () => import('@/views/Reports/SalesReport.vue'),
     meta: { requiresAuth: true, permission: 'view_sales_report' }
+  },
+  {
+    path: '/reports',
+    name: 'Reports',
+    component: () => import('@/views/Reports/ReportsIndex.vue'),
+    meta: {
+      requiresAuth: true,
+      title: 'التقارير'
+    }
   },
   {
     path: '/admin',
@@ -113,11 +122,6 @@ const routes = [
     }
   },
   {
-    path: '/:pathMatch(.*)*',
-    name: 'NotFound',
-    component: () => import('@/views/NotFound.vue')
-  },
-  {
     path: '/admin/assign-permissions',
     name: 'AssignPermissions',
     component: () => import('@/views/Admin/AssignPermissions.vue'),
@@ -125,8 +129,12 @@ const routes = [
       requiresAuth: true,
       requiresAdmin: true
     }
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'NotFound',
+    component: () => import('@/views/NotFound.vue')
   }
-
 ]
 
 const router = createRouter({
@@ -134,15 +142,17 @@ const router = createRouter({
   routes
 })
 
-// Navigation Guard - محسن
+// Navigation Guard - محسن ومبسط
 router.beforeEach(async (to, from, next) => {
+  console.log(`🛡️ Navigation Guard: ${from.path} -> ${to.path}`)
+
   // الحصول على التوكن
   const token = localStorage.getItem('token')
 
   // إذا كانت الصفحة تتطلب مصادقة
   if (to.meta.requiresAuth) {
     if (!token) {
-      // إذا لم يكن هناك توكن، توجيه للصفحة الرئيسية
+      console.log('🚫 لا يوجد توكن، توجيه إلى /login')
       return next('/login')
     }
 
@@ -151,7 +161,7 @@ router.beforeEach(async (to, from, next) => {
       const isAuthenticated = await store.dispatch('auth/checkAuth')
 
       if (!isAuthenticated) {
-        // إذا لم يكن المستخدم مصادقًا
+        console.log('❌ التوكن غير صالح، توجيه إلى /login')
         store.commit('auth/CLEAR_AUTH')
         localStorage.removeItem('token')
         return next('/login')
@@ -161,15 +171,22 @@ router.beforeEach(async (to, from, next) => {
       if (to.meta.permission) {
         const hasPermission = store.getters['auth/hasPermission'](to.meta.permission)
         if (!hasPermission) {
-          // إذا لم يكن لديه الصلاحية
+          console.log(`⛔ لا تملك صلاحية ${to.meta.permission}، توجيه إلى /dashboard`)
           return next('/dashboard')
         }
       }
 
-      // السماح بالوصول
+      // التحقق من صلاحية المدير إذا كانت مطلوبة
+      if (to.meta.requiresAdmin && !store.getters['auth/is_admin']) {
+        console.log('⛔ ليس لديك صلاحية مدير، توجيه إلى /dashboard')
+        return next('/dashboard')
+      }
+
+      console.log('✅ التحقق من المصادقة والصلاحيات ناجح')
       next()
+
     } catch (error) {
-      console.error('Authentication error:', error)
+      console.error('💥 خطأ في التحقق من المصادقة:', error)
       store.commit('auth/CLEAR_AUTH')
       localStorage.removeItem('token')
       return next('/login')
@@ -178,13 +195,15 @@ router.beforeEach(async (to, from, next) => {
   // إذا كانت الصفحة للضيوف فقط
   else if (to.meta.requiresGuest) {
     if (token) {
-      // إذا كان المستخدم مصادقًا، توجيه للصفحة الرئيسية
+      console.log('🔄 المستخدم مصادق بالفعل، توجيه إلى /dashboard')
       return next('/dashboard')
     }
+    console.log('👋 صفحة ضيف، السماح بالدخول')
     next()
   }
   // المسارات العامة
   else {
+    console.log('🛣️ صفحة عامة، السماح بالدخول')
     next()
   }
 })

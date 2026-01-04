@@ -1,162 +1,222 @@
 <template>
-  <div class="container mx-auto px-4 py-8">
-    <div class="mb-6">
-      <h1 class="text-3xl font-bold text-gray-800">تعيين الصلاحيات للمجموعات</h1>
-      <p class="text-gray-600 mt-2">اختر مجموعة وقم بتعيين الصلاحيات المناسبة لها</p>
-    </div>
+  <div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Page Header -->
+      <PageHeader
+        :title="$t('nav.assign_permissions')"
+        :subtitle="$t('permissions.assignRoles')"
+        :breadcrumbs="breadcrumbs"
+      />
 
-    <div v-if="loading" class="text-center py-12">
-      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
-      <p class="mt-4 text-gray-600">جاري التحميل...</p>
-    </div>
+      <!-- Loading State -->
+      <div v-if="loading" class="flex flex-col items-center justify-center py-12">
+        <LoadingSpinner size="lg" />
+        <p class="text-gray-600 text-lg mt-4">{{ $t('common.loading') }}</p>
+      </div>
 
-    <div v-else class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <!-- اختيار المجموعة -->
-      <div class="lg:col-span-1">
-        <div class="bg-white rounded-lg shadow-md p-6">
-          <h2 class="text-xl font-semibold text-gray-800 mb-4">اختر مجموعة</h2>
+      <!-- Error State -->
+      <BaseAlert
+        v-else-if="error"
+        type="error"
+        :title="$t('common.error')"
+        :message="error"
+        :actions="errorActions"
+        class="mb-6"
+      />
+
+      <!-- Main Content -->
+      <div v-else class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Groups List Card -->
+        <BaseCard class="groups-card">
+          <template #header>
+            <h2 class="text-xl font-bold text-gray-900">{{ $t('nav.groups') }}</h2>
+          </template>
+
           <div class="space-y-3">
             <div
-              v-for="group in groups"
+              v-for="group in adminGroups"
               :key="group.id"
               @click="selectGroup(group)"
               :class="[
-                'p-4 border rounded-lg cursor-pointer transition',
+                'p-4 border rounded-lg cursor-pointer transition-all duration-200',
                 selectedGroup?.id === group.id
-                  ? 'border-blue-500 bg-blue-50'
-                  : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50',
+                  ? 'border-primary-500 bg-primary-50 transform scale-[1.02]'
+                  : 'border-gray-200 hover:border-primary-300 hover:bg-gray-50',
               ]"
             >
               <div class="flex items-center">
                 <div
-                  class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center ml-3"
+                  class="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center ml-3"
                 >
-                  <i class="fas fa-users text-blue-600"></i>
+                  <font-awesome-icon :icon="['fas', 'users']" class="text-primary-600" />
                 </div>
                 <div class="flex-1">
-                  <h3 class="font-medium text-gray-900">{{ group.title_ar }}</h3>
+                  <h3 class="font-semibold text-gray-900">
+                    {{ group.title_ar || group.title_en }}
+                  </h3>
                   <p class="text-sm text-gray-500">{{ group.title_en }}</p>
                 </div>
               </div>
-              <p class="text-sm text-gray-600 mt-2">{{ group.permissions_count || 0 }} صلاحية</p>
+              <div class="mt-3 flex justify-between items-center text-sm">
+                <BaseBadge
+                  :label="`${group.permissions_count || 0} ${$t('permissions.permission')}`"
+                />
+                <BaseBadge
+                  :label="`${group.users_count || 0} ${$t('common.user')}`"
+                  type="success"
+                />
+              </div>
             </div>
           </div>
-        </div>
-      </div>
+        </BaseCard>
 
-      <!-- تعيين الصلاحيات -->
-      <div class="lg:col-span-2">
-        <div class="bg-white rounded-lg shadow-md p-6">
-          <div v-if="!selectedGroup" class="text-center py-12">
-            <i class="fas fa-users text-4xl text-gray-300 mb-4"></i>
-            <p class="text-gray-600">الرجاء اختيار مجموعة من القائمة</p>
-          </div>
-
-          <div v-else>
-            <div class="flex justify-between items-center mb-6">
-              <div>
-                <h2 class="text-xl font-semibold text-gray-800">
-                  صلاحيات مجموعة: <span class="text-blue-600">{{ selectedGroup.title_ar }}</span>
-                </h2>
-                <p class="text-gray-600 mt-1">حدد الصلاحيات التي تريد منحها لهذه المجموعة</p>
-              </div>
-              <div class="flex space-x-3 space-x-reverse">
-                <button
-                  @click="selectAll"
-                  class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
-                >
-                  <i class="fas fa-check-circle ml-2"></i>
-                  تحديد الكل
-                </button>
-                <button
-                  @click="deselectAll"
-                  class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
-                >
-                  <i class="fas fa-times-circle ml-2"></i>
-                  إلغاء الكل
-                </button>
-              </div>
-            </div>
-
-            <!-- بحث في الصلاحيات -->
-            <div class="mb-6">
-              <div class="relative">
-                <input
-                  v-model="searchQuery"
-                  type="text"
-                  placeholder="ابحث في الصلاحيات..."
-                  class="w-full pr-10 pl-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
-              </div>
-            </div>
-
-            <!-- قائمة الصلاحيات -->
-            <div v-if="permissionsLoading" class="text-center py-8">
-              <div
-                class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"
-              ></div>
-              <p class="mt-2 text-gray-600">جاري تحميل الصلاحيات...</p>
-            </div>
-
-            <div v-else class="space-y-4">
-              <div
-                v-for="permission in filteredPermissions"
-                :key="permission.id"
-                class="flex items-center p-4 border rounded-lg hover:bg-gray-50"
-              >
-                <input
-                  type="checkbox"
-                  :id="`perm-${permission.id}`"
-                  :value="permission.id"
-                  v-model="selectedPermissions"
-                  class="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded ml-3"
-                />
-                <label :for="`perm-${permission.id}`" class="flex-1 cursor-pointer">
-                  <div class="flex justify-between items-start">
-                    <div>
-                      <h4 class="font-medium text-gray-900">{{ permission.description_ar }}</h4>
-                      <p class="text-sm text-gray-500 mt-1">{{ permission.description_en }}</p>
-                      <p class="text-xs text-gray-400 mt-1">{{ permission.title }}</p>
-                    </div>
-                    <span
-                      :class="
-                        permission.is_parent
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-gray-100 text-gray-800'
-                      "
-                      class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                    >
-                      {{ permission.is_parent ? 'رئيسية' : 'فرعية' }}
+        <!-- Permissions Card -->
+        <div class="lg:col-span-2">
+          <BaseCard>
+            <template #header>
+              <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                <div>
+                  <h2 class="text-xl font-bold text-gray-900">
+                    {{ $t('permissions.list') }}
+                    <span v-if="selectedGroup" class="text-primary-600">
+                      - {{ selectedGroup.title_ar || selectedGroup.title_en }}
                     </span>
-                  </div>
-                </label>
-              </div>
-
-              <!-- لا توجد نتائج -->
-              <div v-if="filteredPermissions.length === 0" class="text-center py-12">
-                <i class="fas fa-search text-4xl text-gray-300 mb-4"></i>
-                <p class="text-gray-600">لم يتم العثور على صلاحيات تطابق البحث</p>
-              </div>
-
-              <!-- الإحصائيات وحفظ -->
-              <div class="border-t pt-6">
-                <div class="flex justify-between items-center">
-                  <div class="text-sm text-gray-600">
-                    تم تحديد {{ selectedPermissions.length }} من {{ permissions.length }} صلاحية
-                  </div>
-                  <button
-                    @click="savePermissions"
-                    :disabled="saving"
-                    class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
+                  </h2>
+                  <p v-if="selectedGroup" class="text-gray-600 text-sm mt-1">
+                    {{
+                      $t('permissions.manageFor', {
+                        user: selectedGroup.title_ar || selectedGroup.title_en,
+                      })
+                    }}
+                  </p>
+                </div>
+                <div class="mt-3 md:mt-0 flex space-x-2 space-x-reverse">
+                  <BaseButton
+                    @click="selectAllPermissions"
+                    type="outline"
+                    size="sm"
+                    icon="check-square"
                   >
-                    <i class="fas fa-save ml-2"></i>
-                    حفظ الصلاحيات للمجموعة
-                  </button>
+                    {{ $t('buttons.selectAll') }}
+                  </BaseButton>
+                  <BaseButton
+                    @click="deselectAllPermissions"
+                    type="outline"
+                    size="sm"
+                    icon="square"
+                  >
+                    {{ $t('buttons.deselectAll') }}
+                  </BaseButton>
+                </div>
+              </div>
+            </template>
+
+            <div v-if="!selectedGroup" class="text-center py-12">
+              <div class="empty-state">
+                <font-awesome-icon
+                  :icon="['fas', 'hand-pointer']"
+                  class="text-gray-300 text-4xl mb-3"
+                />
+                <p class="text-gray-500">{{ $t('permissions.selectGroupFirst') }}</p>
+              </div>
+            </div>
+
+            <div v-else>
+              <!-- Search -->
+              <BaseInput
+                v-model="searchQuery"
+                :placeholder="$t('common.search') + '...'"
+                :prefix-icon="['fas', 'search']"
+                class="mb-6"
+                @input="onSearch"
+              />
+
+              <!-- Permissions Loading -->
+              <div v-if="permissionsLoading" class="flex justify-center py-8">
+                <LoadingSpinner size="md" :text="$t('common.loading')" />
+              </div>
+
+              <!-- Permissions List -->
+              <div v-else class="space-y-3">
+                <div
+                  v-for="permission in filteredPermissions"
+                  :key="permission.id"
+                  class="permission-item"
+                >
+                  <div class="flex items-center">
+                    <input
+                      type="checkbox"
+                      :id="`perm-${permission.id}`"
+                      :value="permission.id"
+                      v-model="selectedPermissionIds"
+                      class="h-5 w-5 text-primary-600 focus:ring-primary-500 border-gray-300 rounded ml-3"
+                    />
+                    <label :for="`perm-${permission.id}`" class="flex-1 cursor-pointer">
+                      <div class="flex justify-between items-start">
+                        <div>
+                          <h4 class="font-medium text-gray-900">
+                            {{ permission.description_ar || permission.title }}
+                          </h4>
+                          <p class="text-sm text-gray-500 mt-1">
+                            {{ permission.description_en || permission.title }}
+                          </p>
+                          <p class="text-xs text-gray-400 mt-1 font-mono">
+                            {{ permission.title }}
+                          </p>
+                        </div>
+                        <BaseBadge
+                          :label="
+                            permission.is_parent
+                              ? $t('permissions.parent')
+                              : $t('permissions.child')
+                          "
+                          :type="permission.is_parent ? 'primary' : 'info'"
+                          size="sm"
+                        />
+                      </div>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- No Results -->
+                <div v-if="filteredPermissions.length === 0" class="text-center py-12">
+                  <font-awesome-icon
+                    :icon="['fas', 'search']"
+                    class="text-gray-300 text-4xl mb-3"
+                  />
+                  <p class="text-gray-500">{{ $t('common.noResults') }}</p>
+                </div>
+              </div>
+
+              <!-- Stats and Actions -->
+              <div v-if="selectedGroup" class="mt-8 pt-6 border-t border-gray-200">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                  <div class="text-sm text-gray-600">
+                    {{
+                      $t('permissions.selectedCount', {
+                        selected: selectedPermissionIds.length,
+                        total: permissions.length,
+                      })
+                    }}
+                  </div>
+                  <div class="flex space-x-3 space-x-reverse">
+                    <BaseButton @click="resetSelection" type="outline" :disabled="saving">
+                      {{ $t('common.cancel') }}
+                    </BaseButton>
+                    <BaseButton
+                      @click="savePermissions"
+                      type="primary"
+                      :loading="saving"
+                      :disabled="saving"
+                      icon="save"
+                    >
+                      {{ $t('buttons.save') }}
+                    </BaseButton>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          </BaseCard>
         </div>
       </div>
     </div>
@@ -164,105 +224,160 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex'
-
 export default {
   name: 'AssignPermissions',
-
   data() {
     return {
-      selectedGroup: null,
-      permissions: [],
-      permissionsLoading: false,
-      selectedPermissions: [],
       searchQuery: '',
       saving: false,
+      permissionsLoading: false,
+      selectedGroup: null,
+      selectedPermissionIds: [],
+      permissions: [],
     }
   },
-
   computed: {
-    ...mapState('adminGroups', {
-      groups: (state) => state.adminGroups,
-      loading: (state) => state.isLoading,
-      error: (state) => state.error,
-    }),
-
+    adminGroups() {
+      return this.$store.state.adminGroups.adminGroups || []
+    },
+    loading() {
+      return this.$store.state.adminGroups.isLoading
+    },
+    error() {
+      return this.$store.state.adminGroups.error
+    },
+    allPermissions() {
+      return this.$store.state.permissions.permissionsList || []
+    },
     filteredPermissions() {
-      if (!this.searchQuery) {
+      if (!this.searchQuery.trim()) {
         return this.permissions
       }
 
       const search = this.searchQuery.toLowerCase()
       return this.permissions.filter(
         (permission) =>
-          permission.title?.toLowerCase().includes(search) ||
-          permission.description_ar?.toLowerCase().includes(search) ||
-          permission.description_en?.toLowerCase().includes(search),
+          (permission.title && permission.title.toLowerCase().includes(search)) ||
+          (permission.description_ar && permission.description_ar.toLowerCase().includes(search)) ||
+          (permission.description_en && permission.description_en.toLowerCase().includes(search)),
       )
     },
+    breadcrumbs() {
+      return [
+        { text: this.$t('nav.permissions'), to: '/permissions' },
+        { text: this.$t('nav.assign_permissions') },
+      ]
+    },
+    errorActions() {
+      return [
+        {
+          text: this.$t('common.retry'),
+          onClick: this.loadData,
+          type: 'danger',
+        },
+      ]
+    },
   },
-
+  async mounted() {
+    await this.loadData()
+  },
   methods: {
-    ...mapActions('adminGroups', [
-      'getAdminGroups',
-      'getAvailablePermissions',
-      'updateGroupPermissions',
-    ]),
-
+    async loadData() {
+      try {
+        await Promise.all([
+          this.$store.dispatch('adminGroups/getAdminGroups'),
+          this.$store.dispatch('permissions/getAllPermissions'),
+        ])
+        this.permissions = this.allPermissions
+      } catch (error) {
+        console.error('❌ خطأ في تحميل البيانات:', error)
+        this.$toast.error(this.$t('errors.loadFailed'))
+      }
+    },
     async selectGroup(group) {
       this.selectedGroup = group
-      this.selectedPermissions = []
+      this.selectedPermissionIds = []
       this.permissionsLoading = true
 
       try {
-        // جلب الصلاحيات المتاحة والصلاحيات المعينة
-        const response = await this.getAvailablePermissions(group.id)
-
-        if (response && response.data) {
-          this.permissions = response.data // جميع الصلاحيات
-          this.selectedPermissions = response.selected_permissions || [] // الصلاحيات المعينة
+        if (group.permissions && Array.isArray(group.permissions)) {
+          this.selectedPermissionIds = group.permissions.map((p) => p.id)
+        } else {
+          this.selectedPermissionIds = []
         }
       } catch (error) {
-        console.error('Error loading permissions:', error)
-        this.$toast.error('فشل في تحميل الصلاحيات')
+        console.error('❌ خطأ في تحميل صلاحيات المجموعة:', error)
+        this.$toast.error(this.$t('errors.loadFailed'))
       } finally {
         this.permissionsLoading = false
       }
     },
-
-    selectAll() {
-      this.selectedPermissions = this.permissions.map((p) => p.id)
+    selectAllPermissions() {
+      this.selectedPermissionIds = this.permissions.map((p) => p.id)
     },
-
-    deselectAll() {
-      this.selectedPermissions = []
+    deselectAllPermissions() {
+      this.selectedPermissionIds = []
     },
-
+    resetSelection() {
+      this.selectedGroup = null
+      this.selectedPermissionIds = []
+      this.searchQuery = ''
+    },
+    onSearch() {
+      // البحث الفوري
+    },
     async savePermissions() {
       if (!this.selectedGroup) {
-        this.$toast.warning('الرجاء اختيار مجموعة أولاً')
+        this.$toast.warning(this.$t('permissions.selectGroupFirst'))
         return
       }
 
       this.saving = true
       try {
-        await this.updateGroupPermissions({
+        await this.$store.dispatch('adminGroups/updateGroupPermissions', {
           id: this.selectedGroup.id,
-          permissions: this.selectedPermissions,
+          permissions: this.selectedPermissionIds,
         })
 
-        this.$toast.success('تم حفظ الصلاحيات بنجاح!')
+        this.$toast.success(this.$t('adminGroups.messages.permissionsUpdateSuccess'))
+
+        // تحديث بيانات المجموعات
+        await this.$store.dispatch('adminGroups/getAdminGroups')
+
+        // إعادة تحديد المجموعة الحالية
+        const updatedGroup = this.adminGroups.find((g) => g.id === this.selectedGroup.id)
+        if (updatedGroup) {
+          this.selectedGroup = updatedGroup
+        }
       } catch (error) {
-        console.error('Error saving permissions:', error)
-        this.$toast.error(error.message || 'فشل في حفظ الصلاحيات')
+        console.error('❌ خطأ في حفظ الصلاحيات:', error)
+        const errorMsg =
+          error.response?.data?.message ||
+          error.message ||
+          this.$t('adminGroups.messages.permissionsUpdateError')
+        this.$toast.error(errorMsg)
       } finally {
         this.saving = false
       }
     },
   },
-
-  async mounted() {
-    await this.getAdminGroups()
-  },
 }
 </script>
+
+<style scoped>
+.groups-card {
+  @apply border-primary-100;
+}
+
+.permission-item {
+  @apply p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-150;
+}
+
+.empty-state {
+  @apply py-12 text-center;
+}
+
+.permission-item:hover {
+  @apply border-primary-300 shadow-sm;
+}
+</style>
