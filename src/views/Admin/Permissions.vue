@@ -64,11 +64,6 @@
               <th
                 class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
               >
-                القائمة
-              </th>
-              <th
-                class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
                 نوع
               </th>
               <th
@@ -92,11 +87,6 @@
               </td>
               <td class="px-6 py-4">
                 <div class="text-sm text-gray-900">{{ permission.description_en }}</div>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <span class="text-sm text-gray-500">
-                  {{ permission.menu?.title_ar || 'لا توجد' }}
-                </span>
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
                 <span
@@ -184,19 +174,6 @@
             </div>
 
             <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700 mb-2">القائمة الرئيسية</label>
-              <select
-                v-model="permissionForm.admin_menu_id"
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">اختر قائمة</option>
-                <option v-for="menu in menus" :key="menu.id" :value="menu.id">
-                  {{ menu.title_ar }} ({{ menu.title_en }})
-                </option>
-              </select>
-            </div>
-
-            <div class="mb-4">
               <label class="flex items-center">
                 <input
                   v-model="permissionForm.is_parent"
@@ -246,10 +223,8 @@ export default {
         title: '',
         description_ar: '',
         description_en: '',
-        admin_menu_id: '',
         is_parent: false,
       },
-      menus: [],
     }
   },
 
@@ -268,9 +243,9 @@ export default {
       const search = this.searchQuery.toLowerCase()
       return (this.permissions || []).filter((permission) => {
         return (
-          permission.title?.toLowerCase().includes(search) ||
-          permission.description_ar?.toLowerCase().includes(search) ||
-          permission.description_en?.toLowerCase().includes(search)
+          (permission.title && permission.title.toLowerCase().includes(search)) ||
+          (permission.description_ar && permission.description_ar.toLowerCase().includes(search)) ||
+          (permission.description_en && permission.description_en.toLowerCase().includes(search))
         )
       })
     },
@@ -278,7 +253,6 @@ export default {
 
   async mounted() {
     await this.loadPermissions()
-    await this.loadMenus()
   },
 
   methods: {
@@ -297,22 +271,12 @@ export default {
       }
     },
 
-    async loadMenus() {
-      try {
-        const response = await this.$store.dispatch('permissions/getMenusWithPermissions')
-        this.menus = response || []
-      } catch (error) {
-        console.error('Failed to load menus:', error)
-      }
-    },
-
     openCreateModal() {
       this.editingPermission = null
       this.permissionForm = {
         title: '',
         description_ar: '',
         description_en: '',
-        admin_menu_id: '',
         is_parent: false,
       }
       this.showModal = true
@@ -324,8 +288,7 @@ export default {
         title: permission.title,
         description_ar: permission.description_ar,
         description_en: permission.description_en,
-        admin_menu_id: permission.admin_menu_id,
-        is_parent: permission.is_parent,
+        is_parent: permission.is_parent || false,
       }
       this.showModal = true
     },
@@ -381,7 +344,6 @@ export default {
         title: '',
         description_ar: '',
         description_en: '',
-        admin_menu_id: '',
         is_parent: false,
       }
     },

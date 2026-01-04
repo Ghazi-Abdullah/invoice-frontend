@@ -1,17 +1,96 @@
 <template>
-  <div class="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-    <div class="text-center">
-      <h1 class="text-9xl font-bold text-blue-600">404</h1>
-      <h2 class="text-3xl font-bold text-gray-900 mt-4">{{ $t('notFound.title') }}</h2>
-      <p class="text-gray-600 mt-2">{{ $t('notFound.message') }}</p>
-      <div class="mt-6">
-        <router-link
-          to="/"
-          class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+  <div
+    class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center px-4"
+  >
+    <div class="text-center max-w-lg">
+      <!-- Animated 404 -->
+      <div class="relative mb-8">
+        <div class="text-9xl font-bold text-gray-200 opacity-60">404</div>
+        <div class="absolute inset-0 flex items-center justify-center">
+          <div class="text-9xl font-bold text-primary-600 animate-pulse">404</div>
+        </div>
+      </div>
+
+      <!-- Message -->
+      <div class="mb-8">
+        <h1 class="text-4xl font-bold text-gray-900 mb-4">{{ $t('errors.notFoundTitle') }}</h1>
+        <p class="text-xl text-gray-600 mb-2">
+          {{ $t('errors.notFoundMessage') }}
+        </p>
+        <p class="text-gray-500">{{ $t('errors.notFoundReason') }}</p>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+        <BaseButton
+          @click="$router.go(-1)"
+          type="outline"
+          size="lg"
+          icon="arrow-right"
+          class="shadow-lg"
         >
-          <i class="fas fa-home mr-2"></i>
-          {{ $t('notFound.backHome') }}
-        </router-link>
+          {{ $t('common.back') }}
+        </BaseButton>
+
+        <BaseButton
+          @click="$router.push('/')"
+          type="primary"
+          size="lg"
+          icon="home"
+          class="shadow-lg"
+        >
+          {{ $t('nav.dashboard') }}
+        </BaseButton>
+      </div>
+
+      <!-- Help Links -->
+      <div class="mt-8 p-6 bg-white rounded-2xl shadow-lg border border-gray-200">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">{{ $t('errors.maybeLookingFor') }}</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <router-link
+            to="/dashboard"
+            class="flex items-center p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <font-awesome-icon :icon="['fas', 'tachometer-alt']" class="text-gray-600 ml-3" />
+            <span class="text-gray-700">{{ $t('nav.dashboard') }}</span>
+          </router-link>
+
+          <router-link
+            to="/invoices"
+            class="flex items-center p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <font-awesome-icon :icon="['fas', 'file-invoice']" class="text-gray-600 ml-3" />
+            <span class="text-gray-700">{{ $t('nav.invoices') }}</span>
+          </router-link>
+
+          <router-link
+            to="/clients"
+            class="flex items-center p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <font-awesome-icon :icon="['fas', 'users']" class="text-gray-600 ml-3" />
+            <span class="text-gray-700">{{ $t('nav.clients') }}</span>
+          </router-link>
+
+          <router-link
+            to="/reports"
+            class="flex items-center p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <font-awesome-icon :icon="['fas', 'chart-bar']" class="text-gray-600 ml-3" />
+            <span class="text-gray-700">{{ $t('nav.reports') }}</span>
+          </router-link>
+        </div>
+      </div>
+
+      <!-- Contact Support -->
+      <div class="mt-8">
+        <p class="text-gray-500 mb-2">{{ $t('errors.stillHavingProblem') }}</p>
+        <a
+          href="mailto:support@invoiceapp.com"
+          class="inline-flex items-center text-primary-600 hover:text-primary-800 font-medium"
+        >
+          <font-awesome-icon :icon="['fas', 'life-ring']" class="ml-2" />
+          {{ $t('errors.contactSupport') }}
+        </a>
       </div>
     </div>
   </div>
@@ -20,5 +99,39 @@
 <script>
 export default {
   name: 'NotFound',
+  mounted() {
+    console.log('🔍 404 Error - Page not found:', this.$route.path)
+  },
 }
 </script>
+
+<style scoped>
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-out forwards;
+}
+</style>

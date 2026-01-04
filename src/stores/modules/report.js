@@ -1,40 +1,108 @@
-import axios from '@/api/axios'
+import ReportApi from '@/api/report'
 
 export default {
   namespaced: true,
 
-  state: () => ({
+  state: {
     reports: {
-      invoices: null,
-      clients: null,
-      revenue: null,
-      overdue: null,
+      invoices: [],
+      clients: [],
+      revenue: [],
+      overdue: []
+    },
+    reportStats: {
+      invoices: {},
+      clients: {},
+      revenue: {},
+      overdue: {}
     },
     loading: false,
     error: null,
-  }),
+    filters: {
+      start_date: '',
+      end_date: '',
+      status: '',
+      client_id: ''
+    }
+  },
+
+  getters: {
+    invoicesReport: (state) => state.reports.invoices,
+    clientsReport: (state) => state.reports.clients,
+    revenueReport: (state) => state.reports.revenue,
+    overdueReport: (state) => state.reports.overdue,
+
+    invoiceStats: (state) => state.reportStats.invoices,
+    clientStats: (state) => state.reportStats.clients,
+    revenueStats: (state) => state.reportStats.revenue,
+    overdueStats: (state) => state.reportStats.overdue,
+
+    isLoading: (state) => state.loading,
+    reportError: (state) => state.error,
+    reportFilters: (state) => state.filters,
+    overdueCount: (state) => state.reportStats.overdue.total_overdue || 0
+  },
 
   mutations: {
-    SET_REPORT_DATA(state, { reportType, data }) {
-      state.reports[reportType] = data
+    SET_INVOICES_REPORT(state, data) {
+      state.reports.invoices = data.data || []
+      state.reportStats.invoices = data.stats || {}
     },
+
+    SET_CLIENTS_REPORT(state, data) {
+      state.reports.clients = data.data || []
+      state.reportStats.clients = data.stats || {}
+    },
+
+    SET_REVENUE_REPORT(state, data) {
+      state.reports.revenue = data.data || []
+      state.reportStats.revenue = data.stats || {}
+    },
+
+    SET_OVERDUE_REPORT(state, data) {
+      state.reports.overdue = data.data || []
+      state.reportStats.overdue = data.stats || {}
+    },
+
     SET_LOADING(state, loading) {
       state.loading = loading
     },
+
     SET_ERROR(state, error) {
       state.error = error
     },
+
+    SET_FILTERS(state, filters) {
+      state.filters = { ...state.filters, ...filters }
+    },
+
+    RESET_FILTERS(state) {
+      const endDate = new Date()
+      const startDate = new Date()
+      startDate.setDate(startDate.getDate() - 30)
+
+      state.filters = {
+        start_date: startDate.toISOString().split('T')[0],
+        end_date: endDate.toISOString().split('T')[0],
+        status: '',
+        client_id: ''
+      }
+    },
+
     CLEAR_ERROR(state) {
       state.error = null
-    },
+    }
   },
 
   actions: {
-    async fetchReport({ commit }, { reportType, filters = {} }) {
+    async getInvoicesReport({ commit, state }, data = {}) {
       commit('SET_LOADING', true)
       commit('CLEAR_ERROR')
 
+      const params = { ...state.filters, ...data }
+
       try {
+<<<<<<< HEAD
         let endpoint
         switch (reportType) {
           case 'invoices':
@@ -57,48 +125,155 @@ export default {
 
         const response = await axios.get(endpoint, { params: filters })
 
+=======
+        const response = await ReportApi.getInvoiceReport(params)
+>>>>>>> b6d1335e33cfc3f277e9b11cc891f6f9da45361f
         if (response.data.success) {
-          const reportData = {
-            ...response.data.data,
-            stats: response.data.data.stats || {
-              total_invoices: response.data.data.total_invoices || 0,
-              total_amount: response.data.data.total_amount || 0,
-              total_paid: response.data.data.total_paid || 0,
-              total_due: response.data.data.total_due || 0,
-              total_clients: response.data.data.total_clients || 0,
-            }
-          }
-
-          commit('SET_REPORT_DATA', { reportType, data: reportData })
-          return reportData
+          commit('SET_INVOICES_REPORT', response.data.data)
         } else {
-          throw new Error(response.data.message || 'فشل في جلب بيانات التقرير')
+          commit('SET_ERROR', response.data.message || 'فشل في تحميل تقرير الفواتير')
         }
       } catch (error) {
-        const errorMsg = error.response?.data?.message || error.message
-        console.error('❌ خطأ في جلب التقرير:', errorMsg)
-        commit('SET_ERROR', errorMsg)
-        throw error
+        commit('SET_ERROR', error.response?.data?.message || 'فشل في تحميل تقرير الفواتير')
       } finally {
         commit('SET_LOADING', false)
       }
     },
 
-    clearReport({ commit }, reportType) {
-      commit('SET_REPORT_DATA', { reportType, data: null })
+    async getClientsReport({ commit, state }, data = {}) {
+      commit('SET_LOADING', true)
       commit('CLEAR_ERROR')
-    },
-  },
 
-  getters: {
-    reportData: (state) => (reportType) => {
-      return state.reports[reportType]
+      const params = { ...state.filters, ...data }
+
+      try {
+        const response = await ReportApi.getClientReport(params)
+        if (response.data.success) {
+          commit('SET_CLIENTS_REPORT', response.data.data)
+        } else {
+          commit('SET_ERROR', response.data.message || 'فشل في تحميل تقرير العملاء')
+        }
+      } catch (error) {
+        commit('SET_ERROR', error.response?.data?.message || 'فشل في تحميل تقرير العملاء')
+      } finally {
+        commit('SET_LOADING', false)
+      }
     },
-    isLoading: (state) => state.loading,
-    reportError: (state) => state.error,
-    invoicesReport: (state) => state.reports.invoices,
-    clientsReport: (state) => state.reports.clients,
-    revenueReport: (state) => state.reports.revenue,
-    overdueReport: (state) => state.reports.overdue,
-  },
+
+    async getRevenueReport({ commit, state }, data = {}) {
+      commit('SET_LOADING', true)
+      commit('CLEAR_ERROR')
+
+      const params = { ...state.filters, ...data }
+
+      try {
+        const response = await ReportApi.getRevenueReport(params)
+        if (response.data.success) {
+          commit('SET_REVENUE_REPORT', response.data.data)
+        } else {
+          commit('SET_ERROR', response.data.message || 'فشل في تحميل تقرير الإيرادات')
+        }
+      } catch (error) {
+        commit('SET_ERROR', error.response?.data?.message || 'فشل في تحميل تقرير الإيرادات')
+      } finally {
+        commit('SET_LOADING', false)
+      }
+    },
+
+    async getOverdueReport({ commit, state }, data = {}) {
+      commit('SET_LOADING', true)
+      commit('CLEAR_ERROR')
+
+      const params = { ...state.filters, ...data }
+
+      try {
+        const response = await ReportApi.getOverdueReport(params)
+        if (response.data.success) {
+          commit('SET_OVERDUE_REPORT', response.data.data)
+        } else {
+          commit('SET_ERROR', response.data.message || 'فشل في تحميل تقرير المتأخرات')
+        }
+      } catch (error) {
+        commit('SET_ERROR', error.response?.data?.message || 'فشل في تحميل تقرير المتأخرات')
+      } finally {
+        commit('SET_LOADING', false)
+      }
+    },
+
+    async exportReport({ state }, type) {
+      try {
+        const response = await ReportApi.exportReport(type, state.filters)
+
+        // إنشاء رابط تنزيل
+        const url = window.URL.createObjectURL(new Blob([response.data]))
+        const link = document.createElement('a')
+        link.href = url
+
+        // استخراج اسم الملف
+        const contentDisposition = response.headers['content-disposition']
+        let fileName = `report_${type}_${new Date().toISOString().split('T')[0]}.xlsx`
+
+        if (contentDisposition) {
+          const fileNameMatch = contentDisposition.match(/filename="?(.+)"?/)
+          if (fileNameMatch && fileNameMatch.length === 2) {
+            fileName = fileNameMatch[1]
+          }
+        }
+
+        link.setAttribute('download', fileName)
+        document.body.appendChild(link)
+        link.click()
+        link.remove()
+        window.URL.revokeObjectURL(url)
+
+        return { success: true, fileName }
+      } catch (error) {
+        throw new Error(error.response?.data?.message || 'فشل في تصدير التقرير')
+      }
+    },
+
+    async sendReminder({ commit }, invoiceId) {
+      commit('SET_LOADING', true)
+
+      try {
+        const response = await ReportApi.sendReminder(invoiceId)
+        return response.data
+      } catch (error) {
+        throw new Error(error.response?.data?.message || 'فشل في إرسال التذكير')
+      } finally {
+        commit('SET_LOADING', false)
+      }
+    },
+
+    async markAsPaid({ commit, dispatch }, invoiceId) {
+      commit('SET_LOADING', true)
+
+      try {
+        const response = await ReportApi.markAsPaid(invoiceId)
+
+        // تحديث تقرير المتأخرات بعد ثانية
+        setTimeout(() => {
+          dispatch('getOverdueReport')
+        }, 1000)
+
+        return response.data
+      } catch (error) {
+        throw new Error(error.response?.data?.message || 'فشل في تسديد الفاتورة')
+      } finally {
+        commit('SET_LOADING', false)
+      }
+    },
+
+    updateFilters({ commit }, filters) {
+      commit('SET_FILTERS', filters)
+    },
+
+    resetFilters({ commit }) {
+      commit('RESET_FILTERS')
+    },
+
+    clearError({ commit }) {
+      commit('CLEAR_ERROR')
+    }
+  }
 }

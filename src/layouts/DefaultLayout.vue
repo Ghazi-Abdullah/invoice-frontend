@@ -1,38 +1,42 @@
 <template>
-  <div class="flex min-h-screen bg-gray-100" :class="isRTL ? 'flex-row-reverse' : ''">
+  <div class="flex min-h-screen bg-gray-100" :dir="$i18n.locale === 'ar' ? 'rtl' : 'ltr'">
     <!-- Sidebar -->
     <aside
       :class="[
-        'bg-gray-800 text-white shadow-lg overflow-y-auto transition-all duration-300',
-        sidebarOpen ? 'w-64' : 'w-0 md:w-16',
+        'bg-gradient-to-b from-gray-900 to-gray-800 text-white shadow-xl overflow-y-auto transition-all duration-300',
+        sidebarOpen ? 'w-64' : 'w-0 md:w-20',
       ]"
     >
-      <div class="p-6 h-full">
+      <div class="p-4 h-full flex flex-col">
         <!-- Logo and Toggle -->
-        <div class="flex items-center justify-between mb-8">
-          <div v-if="sidebarOpen" class="flex items-center space-x-3 space-x-reverse">
-            <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+        <div class="flex items-center justify-between mb-6">
+          <div v-if="sidebarOpen" class="flex items-center gap-3">
+            <div
+              class="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg"
+            >
               <i class="fas fa-file-invoice text-xl"></i>
             </div>
-            <h1 class="text-xl font-bold">نظام الفواتير</h1>
+            <h1 class="text-lg font-bold text-white">{{ $t('app.name') }}</h1>
           </div>
-          <button @click="toggleSidebar" class="text-white hover:text-gray-300">
-            <i class="fas fa-bars"></i>
+          <button @click="toggleSidebar" class="text-white hover:text-blue-300 transition p-2">
+            <i :class="sidebarOpen ? 'fas fa-chevron-right' : 'fas fa-bars'"></i>
           </button>
         </div>
 
         <!-- User Info -->
-        <div v-if="sidebarOpen && user" class="mb-8">
-          <div class="flex items-center space-x-3 space-x-reverse">
-            <div class="w-12 h-12 bg-gray-700 rounded-full flex items-center justify-center">
-              <span class="text-lg font-bold">{{ getInitials(user.name) }}</span>
+        <div v-if="sidebarOpen && user" class="mb-6 p-3 bg-gray-800/50 rounded-xl">
+          <div class="flex items-center gap-3">
+            <div
+              class="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-lg"
+            >
+              <span class="text-sm font-bold text-white">{{ getInitials(user.name) }}</span>
             </div>
-            <div>
-              <p class="font-medium">{{ user.name }}</p>
-              <p class="text-sm text-gray-400">{{ user.email }}</p>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-white truncate">{{ user.name }}</p>
+              <p class="text-xs text-gray-300 truncate">{{ user.email }}</p>
               <div class="mt-1">
-                <span class="inline-block px-2 py-1 text-xs bg-blue-600 rounded">
-                  {{ user.group?.title_ar || 'مستخدم' }}
+                <span class="inline-block px-2 py-0.5 text-xs bg-blue-600/80 rounded-lg">
+                  {{ user.group?.title_ar || $t('auth.user') }}
                 </span>
               </div>
             </div>
@@ -40,210 +44,299 @@
         </div>
 
         <!-- Navigation -->
-        <nav class="space-y-2">
+        <nav class="space-y-1 flex-1">
           <!-- Dashboard -->
           <router-link
             v-if="hasPermission('dashboard')"
             to="/dashboard"
-            class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg hover:bg-gray-700 transition"
-            :class="{ 'bg-gray-700': $route.path === '/dashboard' }"
-            :title="sidebarOpen ? '' : 'لوحة التحكم'"
+            class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700/50 transition group"
+            :class="{
+              'bg-gradient-to-r from-blue-600/20 to-blue-600/10 border-r-2 border-blue-500':
+                $route.path === '/dashboard',
+            }"
           >
-            <i class="fas fa-home w-5 text-center"></i>
-            <span v-if="sidebarOpen">لوحة التحكم</span>
+            <i
+              class="fas fa-home w-5 text-center text-gray-300 group-hover:text-white transition"
+            ></i>
+            <span v-if="sidebarOpen" class="text-gray-300 group-hover:text-white transition">
+              {{ $t('nav.dashboard') }}
+            </span>
           </router-link>
 
           <!-- Clients -->
           <div v-if="hasPermission('view_clients')">
             <router-link
               to="/clients"
-              class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg hover:bg-gray-700 transition"
-              :class="{ 'bg-gray-700': $route.path === '/clients' }"
-              :title="sidebarOpen ? '' : 'العملاء'"
+              class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700/50 transition group"
+              :class="{
+                'bg-gradient-to-r from-blue-600/20 to-blue-600/10 border-r-2 border-blue-500':
+                  $route.path === '/clients',
+              }"
             >
-              <i class="fas fa-users w-5 text-center"></i>
-              <span v-if="sidebarOpen">العملاء</span>
+              <i
+                class="fas fa-users w-5 text-center text-gray-300 group-hover:text-white transition"
+              ></i>
+              <span v-if="sidebarOpen" class="text-gray-300 group-hover:text-white transition">
+                {{ $t('nav.clients') }}
+              </span>
             </router-link>
-
-            <div v-if="sidebarOpen" class="mr-6">
-              <router-link
-                v-if="hasPermission('create_client')"
-                to="/clients/create"
-                class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-gray-700 transition text-sm"
-                :class="{ 'bg-gray-700': $route.path === '/clients/create' }"
-              >
-                <i class="fas fa-plus w-5 text-center"></i>
-                <span>إضافة عميل</span>
-              </router-link>
-            </div>
           </div>
 
           <!-- Invoices -->
           <div v-if="hasPermission('view_invoices')">
             <router-link
               to="/invoices"
-              class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg hover:bg-gray-700 transition"
-              :class="{ 'bg-gray-700': $route.path.includes('/invoices') }"
-              :title="sidebarOpen ? '' : 'الفواتير'"
+              class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700/50 transition group"
+              :class="{
+                'bg-gradient-to-r from-blue-600/20 to-blue-600/10 border-r-2 border-blue-500':
+                  $route.path.includes('/invoices'),
+              }"
             >
-              <i class="fas fa-file-invoice w-5 text-center"></i>
-              <span v-if="sidebarOpen">الفواتير</span>
+              <i
+                class="fas fa-file-invoice w-5 text-center text-gray-300 group-hover:text-white transition"
+              ></i>
+              <span v-if="sidebarOpen" class="text-gray-300 group-hover:text-white transition">
+                {{ $t('nav.invoices') }}
+              </span>
             </router-link>
-
-            <div v-if="sidebarOpen" class="mr-6">
-              <router-link
-                v-if="hasPermission('create_invoice')"
-                to="/invoices/create"
-                class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-gray-700 transition text-sm"
-                :class="{ 'bg-gray-700': $route.path === '/invoices/create' }"
-              >
-                <i class="fas fa-plus w-5 text-center"></i>
-                <span>إنشاء فاتورة</span>
-              </router-link>
-            </div>
           </div>
 
           <!-- Reports -->
           <router-link
             v-if="hasPermission('view_sales_report')"
             to="/reports"
-            class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg hover:bg-gray-700 transition"
-            :class="{ 'bg-gray-700': $route.path === '/reports' }"
-            :title="sidebarOpen ? '' : 'التقارير'"
+            class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700/50 transition group"
+            :class="{
+              'bg-gradient-to-r from-blue-600/20 to-blue-600/10 border-r-2 border-blue-500':
+                $route.path === '/reports',
+            }"
           >
-            <i class="fas fa-chart-bar w-5 text-center"></i>
-            <span v-if="sidebarOpen">التقارير</span>
+            <i
+              class="fas fa-chart-bar w-5 text-center text-gray-300 group-hover:text-white transition"
+            ></i>
+            <span v-if="sidebarOpen" class="text-gray-300 group-hover:text-white transition">
+              {{ $t('nav.reports') }}
+            </span>
           </router-link>
 
-          <!-- Admin Links -->
-          <div v-if="isAdmin">
-            <div class="pt-4 mt-4 border-t border-gray-700" v-if="sidebarOpen">
-              <p class="text-xs text-gray-400 mb-2 px-3">إدارة النظام</p>
+          <!-- Admin Section -->
+          <div v-if="isAdmin && sidebarOpen" class="pt-4 mt-4 border-t border-gray-700">
+            <div class="px-3 mb-2">
+              <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">
+                {{ $t('admin.title') }}
+              </p>
             </div>
 
-            <!-- في قسم Admin Links -->
             <router-link
               v-if="hasPermission('administration')"
               to="/admin/users"
-              class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg hover:bg-gray-700 transition"
-              :class="{ 'bg-gray-700': $route.path.includes('/admin/users') }"
-              :title="sidebarOpen ? '' : 'المستخدمون'"
+              class="flex items-center gap-3 p-3 rounded-lg hover:bg-purple-600/10 transition group"
+              :class="{
+                'bg-gradient-to-r from-purple-600/20 to-purple-600/10 border-r-2 border-purple-500':
+                  $route.path.includes('/admin/users'),
+              }"
             >
-              <i class="fas fa-user-cog w-5 text-center"></i>
-              <span v-if="sidebarOpen">المستخدمون</span>
+              <i
+                class="fas fa-user-cog w-5 text-center text-gray-300 group-hover:text-purple-400 transition"
+              ></i>
+              <span class="text-gray-300 group-hover:text-purple-400 transition">
+                {{ $t('nav.users') }}
+              </span>
             </router-link>
 
             <router-link
               v-if="hasPermission('administration')"
               to="/admin/groups"
-              class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg hover:bg-gray-700 transition"
-              :class="{ 'bg-gray-700': $route.path.includes('/admin/groups') }"
-              :title="sidebarOpen ? '' : 'المجموعات'"
+              class="flex items-center gap-3 p-3 rounded-lg hover:bg-purple-600/10 transition group"
+              :class="{
+                'bg-gradient-to-r from-purple-600/20 to-purple-600/10 border-r-2 border-purple-500':
+                  $route.path.includes('/admin/groups'),
+              }"
             >
-              <i class="fas fa-users-cog w-5 text-center"></i>
-              <span v-if="sidebarOpen">المجموعات</span>
+              <i
+                class="fas fa-users-cog w-5 text-center text-gray-300 group-hover:text-purple-400 transition"
+              ></i>
+              <span class="text-gray-300 group-hover:text-purple-400 transition">
+                {{ $t('nav.groups') }}
+              </span>
             </router-link>
 
             <router-link
               v-if="hasPermission('administration')"
               to="/admin/permissions"
-              class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg hover:bg-gray-700 transition"
-              :class="{ 'bg-gray-700': $route.path.includes('/admin/permissions') }"
-              :title="sidebarOpen ? '' : 'الصلاحيات'"
+              class="flex items-center gap-3 p-3 rounded-lg hover:bg-purple-600/10 transition group"
+              :class="{
+                'bg-gradient-to-r from-purple-600/20 to-purple-600/10 border-r-2 border-purple-500':
+                  $route.path.includes('/admin/permissions'),
+              }"
             >
-              <i class="fas fa-shield-alt w-5 text-center"></i>
-              <span v-if="sidebarOpen">الصلاحيات</span>
+              <i
+                class="fas fa-shield-alt w-5 text-center text-gray-300 group-hover:text-purple-400 transition"
+              ></i>
+              <span class="text-gray-300 group-hover:text-purple-400 transition">
+                {{ $t('nav.permissions') }}
+              </span>
             </router-link>
 
+            <!-- ✅ تم إضافة قسم "تعيين الصلاحيات" هنا -->
             <router-link
+              v-if="hasPermission('administration')"
               to="/admin/assign-permissions"
-              class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition"
+              class="flex items-center gap-3 p-3 rounded-lg hover:bg-purple-600/10 transition group"
+              :class="{
+                'bg-gradient-to-r from-purple-600/20 to-purple-600/10 border-r-2 border-purple-500':
+                  $route.path.includes('/admin/assign-permissions'),
+              }"
             >
-              <i class="fas fa-shield-alt ml-3"></i>
-              <span>تعيين الصلاحيات</span>
+              <i
+                class="fas fa-key w-5 text-center text-gray-300 group-hover:text-purple-400 transition"
+              ></i>
+              <span class="text-gray-300 group-hover:text-purple-400 transition">
+                {{ $t('nav.assign_permissions') }}
+              </span>
             </router-link>
           </div>
         </nav>
 
-        <!-- Logout Button -->
-        <!--<div class="pt-8 mt-8 border-t border-gray-700 absolute bottom-6 left-6 right-6">
+        <!-- Bottom Section -->
+        <div class="pt-4 border-t border-gray-700">
+          <!-- Language Toggle -->
+          <button
+            @click="toggleLanguage"
+            class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700/50 transition w-full group"
+            :title="sidebarOpen ? '' : $t('nav.toggle_language')"
+          >
+            <i
+              class="fas fa-language w-5 text-center text-gray-300 group-hover:text-blue-400 transition"
+            ></i>
+            <span v-if="sidebarOpen" class="text-gray-300 group-hover:text-blue-400 transition">
+              {{ $t('nav.toggle_language') }}
+            </span>
+          </button>
+
+          <!-- Logout -->
           <button
             @click="logout"
-            class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg hover:bg-red-600 transition w-full text-right"
-            :title="sidebarOpen ? '' : 'تسجيل الخروج'"
+            class="flex items-center gap-3 p-3 rounded-lg hover:bg-red-600/10 transition w-full group"
+            :title="sidebarOpen ? '' : $t('auth.logout')"
           >
-            <i class="fas fa-sign-out-alt w-5 text-center"></i>
-            <span v-if="sidebarOpen">تسجيل الخروج</span>
+            <i
+              class="fas fa-sign-out-alt w-5 text-center text-gray-300 group-hover:text-red-400 transition"
+            ></i>
+            <span v-if="sidebarOpen" class="text-gray-300 group-hover:text-red-400 transition">
+              {{ $t('auth.logout') }}
+            </span>
           </button>
-        </div>-->
+        </div>
       </div>
     </aside>
 
+    <!-- Overlay for mobile -->
+    <div
+      v-if="!sidebarOpen && isMobile"
+      class="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+      @click="toggleSidebar"
+    ></div>
+
     <!-- Main Content -->
-    <div class="flex-1 flex flex-col">
+    <div class="flex-1 flex flex-col min-h-screen">
       <!-- Navbar -->
-      <nav class="bg-white shadow-lg">
-        <div class="px-4 py-4 flex justify-between items-center">
-          <!-- Sidebar Toggle Button -->
-          <button @click="toggleSidebar" class="text-gray-600 hover:text-gray-800">
-            <i class="fas fa-bars text-xl"></i>
-          </button>
-
-          <!-- Page Title -->
-          <div class="flex-1 text-center">
-            <span class="text-blue-600 font-bold text-lg">
-              {{ getPageTitle() }}
-            </span>
-          </div>
-
-          <!-- User Dropdown -->
-          <div class="relative group">
-            <button class="flex items-center space-x-2 focus:outline-none">
-              <div
-                class="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center text-white"
-              >
-                {{ getInitials(user?.name || '') }}
-              </div>
-              <span class="text-sm font-medium text-gray-700">{{ user?.name }}</span>
-              <svg class="h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                <path
-                  fill-rule="evenodd"
-                  d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                  clip-rule="evenodd"
-                />
-              </svg>
+      <nav class="bg-white shadow-lg sticky top-0 z-30">
+        <div class="px-4 py-3 flex items-center justify-between">
+          <!-- Left: Sidebar Toggle -->
+          <div class="flex items-center gap-4">
+            <button
+              @click="toggleSidebar"
+              class="text-gray-600 hover:text-blue-600 transition p-2 rounded-lg hover:bg-gray-100"
+            >
+              <i class="fas fa-bars text-lg"></i>
             </button>
 
-            <div
-              class="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50"
+            <!-- Breadcrumb -->
+            <div class="hidden md:flex items-center text-sm text-gray-600">
+              <router-link to="/dashboard" class="hover:text-blue-600 transition">
+                {{ $t('nav.dashboard') }}
+              </router-link>
+              <template v-if="$route.path !== '/dashboard'">
+                <i class="fas fa-chevron-left mx-2 text-gray-400 text-xs"></i>
+                <span class="text-gray-800 font-medium">{{ getPageTitle() }}</span>
+              </template>
+            </div>
+          </div>
+
+          <!-- Center: Page Title (Mobile) -->
+          <div class="md:hidden">
+            <h1 class="text-blue-600 font-bold text-sm">
+              {{ getPageTitle() }}
+            </h1>
+          </div>
+
+          <!-- Right: User Menu and Language -->
+          <div class="flex items-center gap-3">
+            <!-- Language Switcher -->
+            <button
+              @click="toggleLanguage"
+              class="hidden md:flex items-center gap-2 px-3 py-1.5 text-sm text-gray-600 hover:text-blue-600 hover:bg-gray-100 rounded-lg transition"
             >
-              <div class="py-1">
-                <div class="px-4 py-2 text-sm text-gray-700 border-b">
-                  <div class="font-medium">{{ user?.name }}</div>
-                  <div class="text-xs text-gray-500">
-                    {{ user?.group?.title_ar || 'مستخدم' }}
-                  </div>
+              <i class="fas fa-language"></i>
+              <span>{{ $i18n.locale === 'ar' ? 'English' : 'العربية' }}</span>
+            </button>
+
+            <!-- User Dropdown -->
+            <div class="relative">
+              <button
+                @click="userDropdownOpen = !userDropdownOpen"
+                class="flex items-center gap-2 focus:outline-none"
+              >
+                <div
+                  class="h-8 w-8 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center text-white shadow"
+                >
+                  {{ getInitials(user?.name || '') }}
                 </div>
-                <router-link
-                  to="/profile"
-                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                >
-                  الملف الشخصي
-                </router-link>
-                <button
-                  @click="logout"
-                  class="block w-full text-right px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                >
-                  تسجيل الخروج
-                </button>
+                <div class="hidden md:block text-right">
+                  <p class="text-sm font-medium text-gray-700">{{ user?.name }}</p>
+                  <p class="text-xs text-gray-500">
+                    {{ user?.group?.title_ar || $t('auth.user') }}
+                  </p>
+                </div>
+                <i class="fas fa-chevron-down text-gray-400 text-xs hidden md:block"></i>
+              </button>
+
+              <!-- Dropdown Menu -->
+              <div
+                v-if="userDropdownOpen"
+                class="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-50"
+                v-click-outside="() => (userDropdownOpen = false)"
+              >
+                <div class="p-3 border-b border-gray-100">
+                  <p class="font-medium text-gray-900">{{ user?.name }}</p>
+                  <p class="text-xs text-gray-500 truncate">{{ user?.email }}</p>
+                </div>
+                <div class="py-1">
+                  <router-link
+                    to="/profile"
+                    class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition"
+                    @click="userDropdownOpen = false"
+                  >
+                    <i class="fas fa-user-circle text-gray-400"></i>
+                    <span>{{ $t('nav.profile') }}</span>
+                  </router-link>
+                  <button
+                    @click="logout"
+                    class="flex items-center gap-2 w-full text-right px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition"
+                  >
+                    <i class="fas fa-sign-out-alt text-gray-400"></i>
+                    <span>{{ $t('auth.logout') }}</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </nav>
 
-      <!-- Main Router View -->
-      <main class="flex-1 p-6 overflow-auto">
+      <!-- Main Content -->
+      <main class="flex-1 p-4 md:p-6 bg-gray-50">
         <router-view />
       </main>
     </div>
@@ -253,23 +346,43 @@
 <script>
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
-import { computed, ref, onMounted } from 'vue'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 export default {
   name: 'DefaultLayout',
+
+  directives: {
+    'click-outside': {
+      mounted(el, binding) {
+        el.clickOutsideEvent = (event) => {
+          if (!(el === event.target || el.contains(event.target))) {
+            binding.value()
+          }
+        }
+        document.addEventListener('click', el.clickOutsideEvent)
+      },
+      unmounted(el) {
+        document.removeEventListener('click', el.clickOutsideEvent)
+      },
+    },
+  },
+
   setup() {
     const store = useStore()
     const router = useRouter()
+    const { locale } = useI18n()
 
     const sidebarOpen = ref(true)
+    const userDropdownOpen = ref(false)
+    const isMobile = ref(false)
 
-    // البيانات المحسوبة
+    // Computed properties
     const user = computed(() => store.state.auth.user)
     const permissions = computed(() => store.state.auth.permissions || [])
     const isAdmin = computed(() => store.state.auth.is_admin || false)
-    const isRTL = computed(() => true) // دعم RTL دائمًا
 
-    // الطرق
+    // Methods
     const getInitials = (name) => {
       if (!name) return 'U'
       return name
@@ -290,13 +403,12 @@ export default {
       const titles = {
         '/dashboard': 'لوحة التحكم',
         '/clients': 'العملاء',
-        '/clients/create': 'إضافة عميل',
         '/invoices': 'الفواتير',
-        '/invoices/create': 'إنشاء فاتورة',
         '/reports': 'التقارير',
-        '/admin/users': 'إدارة المستخدمين',
-        '/admin/groups': 'إدارة المجموعات',
-        '/admin/permissions': 'إدارة الصلاحيات',
+        '/admin/users': 'المستخدمون',
+        '/admin/groups': 'المجموعات',
+        '/admin/permissions': 'الصلاحيات',
+        '/admin/assign-permissions': 'تعيين الصلاحيات',
         '/profile': 'الملف الشخصي',
       }
       return titles[route.path] || 'نظام الفواتير'
@@ -304,6 +416,15 @@ export default {
 
     const toggleSidebar = () => {
       sidebarOpen.value = !sidebarOpen.value
+    }
+
+    // ✅ دالة تغيير اللغة مع إعادة تحميل الصفحة
+    const toggleLanguage = () => {
+      const newLang = locale.value === 'ar' ? 'en' : 'ar'
+      locale.value = newLang
+      localStorage.setItem('userLanguage', newLang)
+      // إعادة تحميل الصفحة لتطبيق اللغة
+      window.location.reload()
     }
 
     const logout = async () => {
@@ -315,23 +436,42 @@ export default {
       }
     }
 
-    // عند التحميل، تحقق من حالة المستخدم
+    // Check auth on mount
     onMounted(async () => {
       if (!user.value) {
         await store.dispatch('auth/checkAuth')
       }
+
+      // Check screen size
+      const checkMobile = () => {
+        isMobile.value = window.innerWidth < 768
+      }
+
+      checkMobile()
+      window.addEventListener('resize', checkMobile)
+
+      // Close sidebar on mobile by default
+      if (isMobile.value) {
+        sidebarOpen.value = false
+      }
+
+      onUnmounted(() => {
+        window.removeEventListener('resize', checkMobile)
+      })
     })
 
     return {
       sidebarOpen,
+      userDropdownOpen,
+      isMobile,
       user,
       permissions,
       isAdmin,
-      isRTL,
       getInitials,
       hasPermission,
       getPageTitle,
       toggleSidebar,
+      toggleLanguage,
       logout,
     }
   },
@@ -339,34 +479,55 @@ export default {
 </script>
 
 <style scoped>
+/* تحسينات التصميم */
 .router-link-active {
-  @apply bg-gray-700;
+  position: relative;
 }
 
-/* تخصيص scrollbar للسايدبار */
+.router-link-active::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(to bottom, #3b82f6, #1d4ed8);
+  border-radius: 0 3px 3px 0;
+}
+
+[dir='rtl'] .router-link-active::after {
+  left: auto;
+  right: 0;
+}
+
+/* تخصيص scrollbar */
 aside::-webkit-scrollbar {
   width: 6px;
 }
 
 aside::-webkit-scrollbar-track {
-  background: #2d3748;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
 }
 
 aside::-webkit-scrollbar-thumb {
-  background: #4a5568;
-  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
 }
 
 aside::-webkit-scrollbar-thumb:hover {
-  background: #718096;
+  background: rgba(255, 255, 255, 0.3);
 }
 
-/* تحسينات للأجهزة الصغيرة */
+/* تحسينات للأجهزة المحمولة */
 @media (max-width: 768px) {
   aside {
     position: fixed;
-    z-index: 50;
+    top: 0;
+    right: 0;
     height: 100vh;
+    z-index: 50;
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.2);
   }
 
   .w-64 {
@@ -378,9 +539,16 @@ aside::-webkit-scrollbar-thumb:hover {
     overflow: hidden;
     padding: 0;
   }
+}
 
-  .md\\:w-16 {
-    width: 4rem;
-  }
+/* تأثيرات انتقالية */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s;
+}
+
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>

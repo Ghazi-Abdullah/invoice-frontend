@@ -1,251 +1,354 @@
 <template>
   <div class="min-h-screen bg-gray-50 py-8">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-      <!-- Header -->
-      <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
-        <div>
-          <h1 class="text-3xl font-bold text-gray-900">{{ $t('invoices.details') }}</h1>
-          <p class="text-gray-600 mt-2">{{ $t('invoices.detailsDescription') }}</p>
-        </div>
-        <div class="mt-4 md:mt-0 flex space-x-3">
-          <router-link
-            to="/invoices"
-            class="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-          >
-            <i class="fas fa-arrow-left mr-2"></i>
-            {{ $t('common.back') }}
-          </router-link>
-          <router-link
-            v-if="$store.getters['auth/hasPermission']('edit_invoice')"
-            :to="`/invoices/${invoice.id}/edit`"
-            class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <i class="fas fa-edit mr-2"></i>
-            {{ $t('common.edit') }}
-          </router-link>
-        </div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <PageHeader
+        :title="$t('invoices.details.title')"
+        :subtitle="$t('invoices.details.subtitle')"
+        :breadcrumbs="breadcrumbs"
+        :actions="headerActions"
+      />
+
+      <div v-if="loading" class="flex flex-col items-center justify-center py-12">
+        <LoadingSpinner size="lg" />
+        <p class="text-gray-600 text-lg mt-4">{{ $t('common.loading') }}</p>
       </div>
 
-      <div v-if="loading" class="flex justify-center items-center py-12">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-        <span class="mr-3 text-gray-600">{{ $t('common.loading') }}</span>
-      </div>
+      <BaseAlert
+        v-else-if="storeError"
+        type="error"
+        title="حدث خطأ"
+        :message="storeError"
+        :actions="errorActions"
+        class="mb-6"
+      />
 
-      <div v-else-if="invoice" class="bg-white shadow rounded-lg overflow-hidden">
-        <!-- Invoice Header -->
-        <div class="px-6 py-4 bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
-          <div class="flex flex-col md:flex-row md:items-center md:justify-between">
-            <div>
-              <h2 class="text-2xl font-bold">
-                {{ $t('invoices.invoice') }} #{{ invoice.invoice_number }}
+      <div v-else-if="invoice" class="space-y-6">
+        <BaseCard class="invoice-header-card">
+          <template #header>
+            <div class="flex items-center justify-between">
+              <h2 class="text-xl font-bold text-gray-900">
+                {{ $t('invoices.invoice') }} #{{ invoice.invoice_number || 'غير محدد' }}
               </h2>
-              <p class="text-blue-100 mt-1">{{ formatDate(invoice.issue_date) }}</p>
+              <StatusBadge :status="invoice.status" />
             </div>
-            <div class="mt-4 md:mt-0">
-              <span :class="`status-badge status-${invoice.status}`">
-                {{ getStatusText(invoice.status) }}
-              </span>
-            </div>
-          </div>
-        </div>
+          </template>
 
-        <!-- Invoice Details -->
-        <div class="p-6">
-          <!-- Client and Dates Info -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-            <div>
-              <h3 class="text-lg font-semibold text-gray-900 mb-4">
-                {{ $t('invoices.clientInfo') }}
-              </h3>
-              <div class="space-y-2">
-                <div class="flex items-center space-x-3">
-                  <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                    <span class="text-blue-600 font-semibold text-sm">
-                      {{ getInitials(invoice.client?.name) }}
-                    </span>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="info-section">
+              <h3 class="section-title">{{ $t('invoices.clientInfo') }}</h3>
+              <div class="space-y-4">
+                <div v-if="invoice.client" class="flex items-center space-x-3 space-x-reverse">
+                  <div class="client-avatar">
+                    {{ getInitials(invoice.client.name) }}
                   </div>
                   <div>
-                    <p class="font-medium text-gray-900">{{ invoice.client?.name }}</p>
-                    <p class="text-gray-600 text-sm">{{ invoice.client?.email }}</p>
+                    <p class="client-name">{{ invoice.client.name }}</p>
+                    <p class="client-email">{{ invoice.client.email || 'لا يوجد بريد' }}</p>
                   </div>
                 </div>
-                <div class="text-sm text-gray-600 mt-3">
-                  <p>{{ invoice.client?.phone || $t('common.notAvailable') }}</p>
-                  <p>{{ invoice.client?.address || $t('common.notAvailable') }}</p>
+                <div v-else class="text-gray-500 italic">
+                  {{ invoice.client_id ? 'جاري تحميل بيانات العميل...' : 'لا توجد معلومات العميل' }}
+                </div>
+                <div class="client-details">
+                  <div v-if="invoice.client?.phone" class="detail-item">
+                    <font-awesome-icon :icon="['fas', 'phone']" />
+                    <span>{{ invoice.client.phone }}</span>
+                  </div>
+                  <div v-if="invoice.client?.address" class="detail-item">
+                    <font-awesome-icon :icon="['fas', 'map-marker-alt']" />
+                    <span>{{ invoice.client.address }}</span>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div>
-              <h3 class="text-lg font-semibold text-gray-900 mb-4">
-                {{ $t('invoices.datesInfo') }}
-              </h3>
+            <div class="info-section">
+              <h3 class="section-title">{{ $t('invoices.datesInfo') }}</h3>
               <div class="space-y-3">
-                <div class="flex justify-between">
-                  <span class="text-gray-600">{{ $t('invoices.issueDate') }}:</span>
-                  <span class="font-medium">{{ formatDate(invoice.issue_date) }}</span>
+                <div class="date-item">
+                  <span class="date-label">{{ $t('invoices.issueDate') }}:</span>
+                  <span class="date-value">{{ formatDate(invoice.invoice_date) }}</span>
                 </div>
-                <div class="flex justify-between">
-                  <span class="text-gray-600">{{ $t('invoices.dueDate') }}:</span>
-                  <span class="font-medium">{{ formatDate(invoice.due_date) }}</span>
+                <div class="date-item">
+                  <span class="date-label">{{ $t('invoices.dueDate') }}:</span>
+                  <span class="date-value">{{ formatDate(invoice.due_date) }}</span>
                 </div>
-                <div class="flex justify-between">
-                  <span class="text-gray-600">{{ $t('invoices.daysRemaining') }}:</span>
+                <div class="date-item">
+                  <span class="date-label">{{ $t('invoices.daysRemaining') }}:</span>
                   <span :class="getDaysRemainingClass(invoice.due_date)">
                     {{ getDaysRemaining(invoice.due_date) }}
                   </span>
                 </div>
               </div>
             </div>
-          </div>
 
-          <!-- Invoice Items -->
-          <div class="mb-8">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">
-              {{ $t('invoices.items') }}
-            </h3>
-            <div class="overflow-x-auto">
-              <table class="w-full">
-                <thead class="bg-gray-50">
-                  <tr>
-                    <th class="px-4 py-3 text-right text-sm font-medium text-gray-700">
-                      {{ $t('common.description') }}
-                    </th>
-                    <th class="px-4 py-3 text-right text-sm font-medium text-gray-700">
-                      {{ $t('common.quantity') }}
-                    </th>
-                    <th class="px-4 py-3 text-right text-sm font-medium text-gray-700">
-                      {{ $t('common.unitPrice') }}
-                    </th>
-                    <th class="px-4 py-3 text-right text-sm font-medium text-gray-700">
-                      {{ $t('common.total') }}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-200">
-                  <tr v-for="item in invoice.items" :key="item.id">
-                    <td class="px-4 py-3 text-sm text-gray-900">{{ item.description }}</td>
-                    <td class="px-4 py-3 text-sm text-gray-900 text-center">{{ item.quantity }}</td>
-                    <td class="px-4 py-3 text-sm text-gray-900">
-                      {{ formatCurrency(item.unit_price) }}
-                    </td>
-                    <td class="px-4 py-3 text-sm font-medium text-gray-900">
-                      {{ formatCurrency(item.total) }}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <!-- Invoice Summary -->
-          <div class="border-t border-gray-200 pt-6">
-            <div class="max-w-xs ml-auto space-y-3">
-              <div class="flex justify-between">
-                <span class="text-gray-600">{{ $t('common.subtotal') }}:</span>
-                <span class="font-medium">{{ formatCurrency(invoice.subtotal) }}</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-gray-600">{{ $t('common.tax') }} (15%):</span>
-                <span class="font-medium">{{ formatCurrency(invoice.tax_amount) }}</span>
-              </div>
-              <div class="flex justify-between border-t border-gray-200 pt-3">
-                <span class="text-lg font-semibold text-gray-900">{{ $t('common.total') }}:</span>
-                <span class="text-lg font-bold text-blue-600">{{
-                  formatCurrency(invoice.total_amount)
-                }}</span>
+            <div class="info-section">
+              <h3 class="section-title">{{ $t('common.summary') }}</h3>
+              <div class="space-y-2">
+                <div class="summary-item">
+                  <span>{{ $t('common.subtotal') }}:</span>
+                  <span class="font-semibold">{{ formatCurrency(invoice.subtotal || 0) }}</span>
+                </div>
+                <div class="summary-item">
+                  <span>{{ $t('common.tax') }} (15%):</span>
+                  <span class="font-semibold">{{ formatCurrency(invoice.tax_amount || 0) }}</span>
+                </div>
+                <div class="summary-item total">
+                  <span class="text-lg font-semibold">{{ $t('common.total') }}:</span>
+                  <span class="text-xl font-bold text-primary-600">
+                    {{ formatCurrency(invoice.total || 0) }}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
+        </BaseCard>
 
-          <!-- Notes -->
-          <div v-if="invoice.notes" class="mt-8 p-4 bg-gray-50 rounded-lg">
-            <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ $t('common.notes') }}</h3>
-            <p class="text-gray-700">{{ invoice.notes }}</p>
+        <BaseCard :title="$t('invoices.items')" class="invoice-items-card">
+          <div v-if="!invoiceItems || invoiceItems.length === 0" class="text-center py-8">
+            <font-awesome-icon :icon="['fas', 'inbox']" class="text-gray-300 text-4xl mb-3" />
+            <p class="text-gray-500">لا توجد عناصر في هذه الفاتورة</p>
           </div>
-        </div>
 
-        <!-- Actions -->
-        <div class="px-6 py-4 bg-gray-50 border-t border-gray-200">
-          <div
-            class="flex flex-col md:flex-row md:items-center md:justify-between space-y-3 md:space-y-0"
+          <BaseTable
+            v-else
+            :columns="itemColumns"
+            :data="invoiceItems"
+            bordered
+            striped
+            class="mt-4"
           >
-            <div class="flex space-x-3">
-              <button
-                v-if="$store.getters['auth/hasPermission']('edit_invoice')"
+            <template #cell-description="{ row }">
+              <div class="flex items-center">
+                <div class="w-8 h-8 bg-primary-100 rounded flex items-center justify-center ml-3">
+                  <font-awesome-icon
+                    :icon="['fas', 'file-invoice']"
+                    class="text-primary-600 text-sm"
+                  />
+                </div>
+                <span>{{ row.description || 'بدون وصف' }}</span>
+              </div>
+            </template>
+
+            <template #cell-quantity="{ row }">
+              <span class="badge bg-gray-100 text-gray-800 px-3 py-1 rounded">
+                {{ row.quantity || 0 }}
+              </span>
+            </template>
+
+            <template #cell-unit_price="{ row }">
+              {{ formatCurrency(row.unit_price || 0) }}
+            </template>
+
+            <template #cell-total="{ row }">
+              <span class="font-semibold">{{ formatCurrency(row.total || 0) }}</span>
+            </template>
+          </BaseTable>
+        </BaseCard>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <BaseCard v-if="invoice.notes" :title="$t('common.notes')" class="lg:col-span-2">
+            <p class="text-gray-700 whitespace-pre-line">{{ invoice.notes }}</p>
+          </BaseCard>
+
+          <BaseCard :title="$t('common.actions')">
+            <div class="space-y-3">
+              <BaseButton
+                v-if="
+                  hasPermission('edit_invoice') &&
+                  invoice.status !== 'sent' &&
+                  invoice.status !== 'paid'
+                "
                 @click="updateStatus('sent')"
-                :disabled="invoice.status === 'sent'"
-                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+                :disabled="updatingStatus"
+                type="primary"
+                :icon="['fas', 'paper-plane']"
+                :loading="updatingStatus && statusToUpdate === 'sent'"
+                block
               >
-                {{ $t('invoices.markAsSent') }}
-              </button>
-              <button
-                v-if="$store.getters['auth/hasPermission']('edit_invoice')"
+                {{ $t('invoices.actions.markSent') }}
+              </BaseButton>
+
+              <BaseButton
+                v-if="hasPermission('edit_invoice') && invoice.status !== 'paid'"
                 @click="updateStatus('paid')"
-                :disabled="invoice.status === 'paid'"
-                class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
+                :disabled="updatingStatus"
+                type="success"
+                :icon="['fas', 'check-circle']"
+                :loading="updatingStatus && statusToUpdate === 'paid'"
+                block
               >
-                {{ $t('invoices.markAsPaid') }}
-              </button>
-            </div>
-            <div class="flex space-x-3">
-              <button
-                @click="printInvoice"
-                class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                {{ $t('invoices.actions.markPaid') }}
+              </BaseButton>
+
+              <BaseButton @click="printInvoice" type="outline" :icon="['fas', 'print']" block>
+                {{ $t('invoices.actions.print') }}
+              </BaseButton>
+
+              <BaseButton @click="downloadPDF" type="outline" :icon="['fas', 'download']" block>
+                {{ $t('invoices.actions.downloadPDF') }}
+              </BaseButton>
+
+              <BaseButton
+                v-if="hasPermission('delete_invoice')"
+                @click="confirmDelete"
+                type="danger"
+                :icon="['fas', 'trash']"
+                :disabled="updatingStatus"
+                block
               >
-                <i class="fas fa-print mr-2"></i> {{ $t('invoices.print') }}
-              </button>
+                {{ $t('common.delete') }}
+              </BaseButton>
             </div>
-          </div>
+          </BaseCard>
         </div>
       </div>
 
-      <!-- Error State -->
-      <div v-else class="text-center py-12">
-        <i class="fas fa-file-invoice text-gray-300 text-4xl mb-4"></i>
-        <h3 class="text-lg font-medium text-gray-900 mb-2">{{ $t('invoices.notFound') }}</h3>
-        <p class="text-gray-500">{{ $t('invoices.notFoundMessage') }}</p>
-      </div>
+      <BaseAlert
+        v-else
+        type="warning"
+        :title="$t('invoices.details.notFound')"
+        :message="`لم يتم العثور على فاتورة بالرقم: ${$route.params.id}`"
+        :actions="noInvoiceActions"
+        class="mt-8"
+      />
     </div>
   </div>
 </template>
 
 <script>
+import { mapActions, mapGetters } from 'vuex'
+
 export default {
   name: 'InvoiceDetails',
+
   data() {
     return {
-      loading: true,
+      updatingStatus: false,
+      statusToUpdate: '',
+      itemColumns: [
+        { key: 'description', label: this.$t('common.description'), align: 'right' },
+        { key: 'quantity', label: this.$t('common.quantity'), align: 'center' },
+        { key: 'unit_price', label: this.$t('common.unitPrice'), align: 'right' },
+        { key: 'total', label: this.$t('common.total'), align: 'right' },
+      ],
     }
   },
+
   computed: {
+    ...mapGetters('invoices', ['currentInvoice', 'loading', 'error']),
+
     invoice() {
-      return this.$store.getters['invoices/currentInvoice']
+      return this.currentInvoice
+    },
+
+    storeError() {
+      return this.error
+    },
+
+    invoiceItems() {
+      if (!this.invoice) return []
+      return this.invoice.items || []
+    },
+
+    breadcrumbs() {
+      return [
+        { text: this.$t('invoices.title'), to: '/invoices' },
+        { text: `فاتورة #${this.$route.params.id}` },
+      ]
+    },
+
+    headerActions() {
+      const actions = [
+        {
+          text: this.$t('common.back'),
+          type: 'outline',
+          icon: ['fas', 'arrow-left'],
+          onClick: () => this.$router.push('/invoices'),
+        },
+      ]
+
+      if (this.invoice && this.hasPermission('edit_invoice') && this.invoice.status !== 'paid') {
+        actions.push({
+          text: this.$t('common.edit'),
+          type: 'primary',
+          icon: ['fas', 'edit'],
+          onClick: () => this.$router.push(`/invoices/${this.invoice.id}/edit`),
+        })
+      }
+
+      return actions
+    },
+
+    errorActions() {
+      return [
+        {
+          text: 'إعادة المحاولة',
+          onClick: this.loadInvoice,
+          type: 'danger',
+        },
+      ]
+    },
+
+    noInvoiceActions() {
+      return [
+        {
+          text: this.$t('common.back'),
+          onClick: () => this.$router.push('/invoices'),
+          type: 'primary',
+        },
+      ]
     },
   },
+
+  mounted() {
+    this.loadInvoice()
+  },
+
   methods: {
-    formatDate(dateString) {
-      if (!dateString) return '-'
-      return new Date(dateString).toLocaleDateString('ar-SA')
+    ...mapActions('invoices', ['fetchInvoice', 'updateInvoiceStatus', 'deleteInvoice']),
+
+    hasPermission(permission) {
+      if (this.$store.state.auth.is_admin) return true
+      const permissions = this.$store.state.auth.permissions || []
+      return permissions.includes(permission)
     },
+
+    formatDate(dateString) {
+      if (!dateString) return this.$t('common.notAvailable')
+      try {
+        const options = {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          timeZone: 'UTC',
+        }
+        return new Date(dateString).toLocaleDateString(
+          this.$i18n.locale === 'ar' ? 'ar-SA' : 'en-US',
+          options,
+        )
+      } catch (error) {
+        console.error('Error formatting date:', error)
+        return dateString
+      }
+    },
+
     formatCurrency(amount) {
-      if (!amount) return '0.00 ر.س'
-      return (
-        new Intl.NumberFormat('ar-SA', {
+      if (!amount && amount !== 0) return this.$t('common.notAvailable')
+      try {
+        const formatter = new Intl.NumberFormat(this.$i18n.locale === 'ar' ? 'ar-SA' : 'en-US', {
+          style: 'currency',
+          currency: this.$i18n.locale === 'ar' ? 'SAR' : 'USD',
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
-        }).format(amount) + ' ر.س'
-      )
-    },
-    getStatusText(status) {
-      const statusMap = {
-        draft: this.$t('invoices.statuses.draft'),
-        sent: this.$t('invoices.statuses.sent'),
-        paid: this.$t('invoices.statuses.paid'),
-        overdue: this.$t('invoices.statuses.overdue'),
+        })
+        return formatter.format(amount)
+      } catch (error) {
+        console.error('Error formatting currency:', error)
+        return amount
       }
-      return statusMap[status] || status
     },
+
     getInitials(name) {
       if (!name) return '?'
       return name
@@ -255,77 +358,190 @@ export default {
         .toUpperCase()
         .substring(0, 2)
     },
+
     getDaysRemaining(dueDate) {
       if (!dueDate) return this.$t('invoices.notSpecified')
-      const today = new Date()
-      const due = new Date(dueDate)
-      const diffTime = due - today
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-      if (diffDays < 0) return this.$t('invoices.expired')
-      if (diffDays === 0) return this.$t('invoices.today')
-      if (diffDays === 1) return this.$t('invoices.tomorrow')
-      return this.$t('invoices.days', { days: diffDays })
+      try {
+        const today = new Date()
+        const due = new Date(dueDate)
+        const diffTime = due - today
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+
+        if (diffDays < 0) return this.$t('invoices.expired')
+        if (diffDays === 0) return this.$t('invoices.today')
+        if (diffDays === 1) return this.$t('invoices.tomorrow')
+        return this.$t('invoices.days', { days: diffDays })
+      } catch (error) {
+        console.error('Error calculating days remaining:', error)
+        return this.$t('common.notAvailable')
+      }
     },
+
     getDaysRemainingClass(dueDate) {
       if (!dueDate) return 'text-gray-600'
-      const today = new Date()
-      const due = new Date(dueDate)
-      const diffTime = due - today
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-      if (diffDays < 0) return 'text-red-600 font-semibold'
-      if (diffDays <= 3) return 'text-yellow-600 font-semibold'
-      return 'text-green-600 font-semibold'
-    },
-    async updateStatus(status) {
       try {
-        await this.$store.dispatch('invoices/updateInvoiceStatus', {
+        const today = new Date()
+        const due = new Date(dueDate)
+        const diffTime = due - today
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+        if (diffDays < 0) return 'text-red-600 font-semibold'
+        if (diffDays <= 3) return 'text-yellow-600 font-semibold'
+        return 'text-green-600 font-semibold'
+      } catch (error) {
+        console.error('Error getting days remaining class:', error)
+        return 'text-gray-600'
+      }
+    },
+
+    async loadInvoice() {
+      const invoiceId = this.$route.params.id
+
+      if (!invoiceId) {
+        this.error = 'معرف الفاتورة غير صالح'
+        return
+      }
+
+      try {
+        await this.fetchInvoice(invoiceId)
+      } catch (error) {
+        console.error('❌ خطأ في تحميل الفاتورة:', error)
+      }
+    },
+
+    async updateStatus(status) {
+      if (!this.invoice?.id) {
+        this.$toast.error('لا يمكن تحديث حالة فاتورة غير موجودة')
+        return
+      }
+
+      if (!this.hasPermission('edit_invoice')) {
+        this.$toast.error('ليس لديك صلاحية لتحديث حالة الفاتورة')
+        return
+      }
+
+      this.updatingStatus = true
+      this.statusToUpdate = status
+
+      try {
+        await this.updateInvoiceStatus({
           id: this.invoice.id,
           status,
         })
-        this.$toast.success(this.$t('invoices.statusUpdated'))
+
+        this.$toast.success(`تم تحديث حالة الفاتورة إلى "${status}"`)
+        await this.loadInvoice()
       } catch (error) {
-        this.$toast.error(this.$t('invoices.updateFailed'))
+        console.error('Error updating invoice status:', error)
+        this.$toast.error(error.response?.data?.message || 'فشل في تحديث حالة الفاتورة')
+      } finally {
+        this.updatingStatus = false
+        this.statusToUpdate = ''
       }
     },
+
+    confirmDelete() {
+      if (!this.invoice) return
+
+      this.$toast.confirm(
+        `هل أنت متأكد من حذف الفاتورة "#${this.invoice.invoice_number}"؟`,
+        'هذا الإجراء لا يمكن التراجع عنه',
+        async () => {
+          await this.deleteInvoiceHandler()
+        },
+      )
+    },
+
+    async deleteInvoiceHandler() {
+      try {
+        await this.deleteInvoice(this.invoice.id)
+        this.$toast.success('تم حذف الفاتورة بنجاح')
+        this.$router.push('/invoices')
+      } catch (error) {
+        console.error('Error deleting invoice:', error)
+        this.$toast.error(error.response?.data?.message || 'فشل حذف الفاتورة')
+      }
+    },
+
     printInvoice() {
       window.print()
     },
-    async loadInvoice() {
-      try {
-        const invoiceId = this.$route.params.id
-        await this.$store.dispatch('invoices/fetchInvoice', invoiceId)
-      } catch (error) {
-        this.$toast.error(this.$t('invoices.loadFailed'))
-        this.$router.push('/invoices')
-      } finally {
-        this.loading = false
-      }
+
+    downloadPDF() {
+      this.$toast.info('سيتم إضافة خاصية تحميل PDF قريباً')
     },
   },
-  mounted() {
-    this.loadInvoice()
+
+  watch: {
+    '$route.params.id': {
+      handler(newId) {
+        if (newId) {
+          this.loadInvoice()
+        }
+      },
+    },
   },
 }
 </script>
 
 <style scoped>
-.status-badge {
-  @apply inline-flex px-3 py-1 text-sm font-semibold rounded-full;
+.invoice-header-card {
+  @apply border-primary-100;
 }
-.status-draft {
-  @apply bg-yellow-100 text-yellow-800;
+
+.section-title {
+  @apply text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200;
 }
-.status-sent {
-  @apply bg-blue-100 text-blue-800;
+
+.client-avatar {
+  @apply w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center text-primary-700 font-bold text-sm;
 }
-.status-paid {
-  @apply bg-green-100 text-green-800;
+
+.client-name {
+  @apply font-semibold text-gray-900;
 }
-.status-overdue {
-  @apply bg-red-100 text-red-800;
+
+.client-email {
+  @apply text-sm text-gray-600;
 }
+
+.client-details {
+  @apply space-y-2 mt-3;
+}
+
+.detail-item {
+  @apply flex items-center gap-2 text-sm text-gray-600;
+}
+
+.date-item {
+  @apply flex justify-between items-center py-2 border-b border-gray-100 last:border-0;
+}
+
+.date-label {
+  @apply text-gray-600;
+}
+
+.date-value {
+  @apply font-medium text-gray-900;
+}
+
+.summary-item {
+  @apply flex justify-between items-center py-2 border-b border-gray-100 last:border-0;
+}
+
+.summary-item.total {
+  @apply border-t border-gray-200 mt-2 pt-3;
+}
+
 @media print {
   .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: white !important;
+  }
+
+  .print\:hidden {
     display: none !important;
   }
 }

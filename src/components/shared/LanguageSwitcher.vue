@@ -1,71 +1,36 @@
 <template>
-  <div class="language-switcher">
-    <button
-      @click="toggleLanguage"
-      class="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors p-2 rounded-lg hover:bg-gray-100"
-      :class="isRTL ? 'space-x-reverse' : ''"
-    >
-      <svg
-        class="w-5 h-5"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"
-        />
-      </svg>
-      <span class="text-sm font-medium">
-        {{ currentLanguage === 'ar' ? 'English' : 'العربية' }}
-      </span>
-    </button>
+  <div class="flex items-center space-x-2" :class="isAr ? 'space-x-reverse' : ''">
+    <button @click="setLocale('ar')" :class="btnClass('ar')" aria-label="Arabic">ع</button>
+    <button @click="setLocale('en')" :class="btnClass('en')" aria-label="English">EN</button>
   </div>
 </template>
 
-<script>
-export default {
-  name: 'LanguageSwitcher',
-  data() {
-    return {
-      languages: [
-        { code: 'ar', name: 'العربية', dir: 'rtl' },
-        { code: 'en', name: 'English', dir: 'ltr' },
-      ],
-    }
-  },
-  computed: {
-    currentLanguage() {
-      return this.$i18n.locale
-    },
-    isRTL() {
-      return this.currentLanguage === 'ar'
-    },
-  },
-  methods: {
-    toggleLanguage() {
-      const newLang = this.currentLanguage === 'ar' ? 'en' : 'ar'
-      this.$i18n.locale = newLang
-      document.documentElement.dir = newLang === 'ar' ? 'rtl' : 'ltr'
-      document.documentElement.lang = newLang
+<script setup>
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { changeLanguage } from '@/plugins/i18n' // Adjust path as needed
 
-      // حفظ اللغة في localStorage
-      localStorage.setItem('language', newLang)
+const { locale } = useI18n()
 
-      // إعادة تحميل الصفحة لتطبيق التغييرات
-      window.location.reload()
-    },
-  },
-  mounted() {
-    // استعادة اللغة من localStorage
-    const savedLang = localStorage.getItem('language')
-    if (savedLang && this.languages.some(lang => lang.code === savedLang)) {
-      this.$i18n.locale = savedLang
-      document.documentElement.dir = savedLang === 'ar' ? 'rtl' : 'ltr'
-      document.documentElement.lang = savedLang
-    }
-  },
+const isAr = computed(() => locale.value === 'ar')
+
+const setLocale = (newLocale) => {
+  console.log(`🔄 Switching to: ${newLocale}`)
+
+  if (changeLanguage(newLocale)) {
+    // For immediate reactivity, you might need to force a small update
+    // The changeLanguage function already updates i18n.global.locale.value
+    console.log('✅ Language switch processed')
+  }
+}
+
+const btnClass = (l) => {
+  const isActive = locale.value === l
+  return [
+    'px-3 py-2 rounded-md transition-all duration-200 font-medium border min-w-[44px] text-sm',
+    isActive
+      ? 'bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-500/25'
+      : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50 hover:border-gray-400 hover:shadow-md',
+  ]
 }
 </script>

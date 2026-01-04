@@ -1,270 +1,301 @@
 <template>
-  <div class="container mx-auto px-4 py-8">
-    <div class="mb-6">
-      <h1 class="text-3xl font-bold text-gray-800">إدارة المستخدمين</h1>
-      <p class="text-gray-600 mt-2">إدارة حسابات المستخدمين والصلاحيات</p>
-    </div>
+  <div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Page Header -->
+      <PageHeader
+        :title="$t('users.management')"
+        :subtitle="$t('users.managementDescription')"
+        :breadcrumbs="breadcrumbs"
+        :actions="headerActions"
+      />
 
-    <!-- User List -->
-    <div class="bg-white rounded-lg shadow-md overflow-hidden">
-      <div class="px-6 py-4 border-b border-gray-200">
-        <div class="flex justify-between items-center">
-          <h2 class="text-xl font-semibold text-gray-800">المستخدمين</h2>
-          <button
+      <!-- Loading State -->
+      <div v-if="loading" class="flex justify-center py-12">
+        <LoadingSpinner />
+      </div>
+
+      <!-- Users Table -->
+      <BaseCard v-else>
+        <template #actions>
+          <div class="flex items-center space-x-2">
+            <BaseInput
+              v-model="searchQuery"
+              :placeholder="$t('users.searchPlaceholder')"
+              :prefix-icon="['fas', 'search']"
+              @input="onSearch"
+              size="sm"
+              class="w-64"
+            />
+
+            <BaseButton
+              v-if="hasPermission('create_user')"
+              @click="showAddUserModal = true"
+              type="primary"
+              icon="plus"
+            >
+              {{ $t('users.add') }}
+            </BaseButton>
+          </div>
+        </template>
+
+        <!-- Empty State -->
+        <div v-if="filteredUsers.length === 0" class="text-center py-12">
+          <font-awesome-icon :icon="['fas', 'users']" class="text-gray-300 text-4xl mb-3" />
+          <h3 class="text-lg font-medium text-gray-900 mb-2">{{ $t('users.noUsers') }}</h3>
+          <p class="text-gray-500 mb-4">{{ $t('users.startAdding') }}</p>
+          <BaseButton
+            v-if="hasPermission('create_user')"
             @click="showAddUserModal = true"
-            class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+            type="primary"
+            icon="plus"
           >
-            <i class="fas fa-plus ml-2"></i>
-            إضافة مستخدم
-          </button>
+            {{ $t('users.add') }}
+          </BaseButton>
         </div>
-      </div>
 
-      <div v-if="loading" class="text-center py-12">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
-        <p class="mt-4 text-gray-600">جاري التحميل...</p>
-      </div>
+        <!-- Users Table -->
+        <BaseTable
+          v-else
+          :columns="tableColumns"
+          :data="filteredUsers"
+          :show-actions="true"
+          bordered
+          striped
+          hoverable
+        >
+          <template #cell-name="{ row }">
+            <div class="flex items-center">
+              <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center ml-3">
+                <span class="text-blue-600 text-xs font-semibold">
+                  {{ getInitials(row.name) }}
+                </span>
+              </div>
+              <div>
+                <div class="text-sm font-medium text-gray-900">{{ row.name }}</div>
+                <div class="text-xs text-gray-500">{{ formatDate(row.created_at) }}</div>
+              </div>
+            </div>
+          </template>
 
-      <div v-else>
-        <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
-            <tr>
-              <th
-                class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+          <template #cell-email="{ row }">
+            <div class="text-sm text-gray-900">{{ row.email }}</div>
+          </template>
+
+          <template #cell-roles="{ row }">
+            <div class="flex flex-wrap gap-2">
+              <BaseBadge
+                v-for="role in row.roles || []"
+                :key="role.id"
+                :type="getRoleBadgeType(role.name)"
+                size="sm"
               >
-                الاسم
-              </th>
-              <th
-                class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                البريد الإلكتروني
-              </th>
-              <th
-                class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                الأدوار
-              </th>
-              <th
-                class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                تاريخ التسجيل
-              </th>
-              <th
-                class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                الإجراءات
-              </th>
-            </tr>
-          </thead>
-          <tbody class="bg-white divide-y divide-gray-200">
-            <tr v-for="user in users" :key="user.id">
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="flex items-center">
-                  <div class="flex-shrink-0 h-10 w-10">
-                    <div
-                      class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center"
-                    >
-                      <i class="fas fa-user text-gray-500"></i>
-                    </div>
-                  </div>
-                  <div class="mr-4">
-                    <div class="text-sm font-medium text-gray-900">
-                      {{ user.name }}
-                    </div>
-                  </div>
-                </div>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-sm text-gray-900">{{ user.email }}</div>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="flex flex-wrap gap-2">
-                  <span
-                    v-for="role in user.roles"
-                    :key="role.id"
-                    :class="{
-                      'bg-blue-100 text-blue-800': role.name === 'admin',
-                      'bg-green-100 text-green-800': role.name === 'user',
-                      'bg-purple-100 text-purple-800': role.name === 'accountant',
-                    }"
-                    class="px-2 py-1 text-xs rounded-full"
-                  >
-                    {{ role.name }}
-                  </span>
-                </div>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {{ formatDate(user.created_at) }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                <button @click="editUser(user)" class="text-blue-600 hover:text-blue-900 ml-4">
-                  <i class="fas fa-edit"></i>
-                </button>
-                <button
-                  @click="managePermissions(user)"
-                  class="text-purple-600 hover:text-purple-900 ml-4"
-                >
-                  <i class="fas fa-shield-alt"></i>
-                </button>
-                <button
-                  @click="confirmDeleteUser(user)"
-                  class="text-red-600 hover:text-red-900 ml-4"
-                  v-if="user.id !== currentUser.id"
-                >
-                  <i class="fas fa-trash"></i>
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+                {{ role.name }}
+              </BaseBadge>
+            </div>
+          </template>
+
+          <template #cell-status="{ row }">
+            <StatusBadge :status="row.status === 'active' ? 'paid' : 'overdue'" />
+          </template>
+
+          <template #actions="{ row }">
+            <div class="flex items-center space-x-2 space-x-reverse">
+              <BaseButton
+                @click="editUser(row)"
+                type="ghost"
+                size="sm"
+                icon="edit"
+                :title="$t('buttons.edit')"
+              />
+
+              <BaseButton
+                @click="managePermissions(row)"
+                type="ghost"
+                size="sm"
+                icon="shield-alt"
+                :title="$t('permissions.manage')"
+              />
+
+              <BaseButton
+                v-if="row.id !== currentUser.id && hasPermission('delete_user')"
+                @click="confirmDelete(row)"
+                type="ghost"
+                size="sm"
+                icon="trash"
+                :title="$t('buttons.delete')"
+                class="text-red-600 hover:text-red-700"
+              />
+            </div>
+          </template>
+        </BaseTable>
+
+        <!-- Pagination -->
+        <div v-if="pagination && pagination.total > pagination.per_page" class="mt-6">
+          <div class="flex items-center justify-between">
+            <div class="text-sm text-gray-700">
+              {{
+                $t('pagination.showing', {
+                  from: pagination.from,
+                  to: pagination.to,
+                  total: pagination.total,
+                })
+              }}
+            </div>
+            <div class="flex space-x-2">
+              <BaseButton
+                @click="previousPage"
+                :disabled="pagination.current_page === 1"
+                type="outline"
+                size="sm"
+                :icon="['fas', 'chevron-right']"
+              />
+
+              <span class="flex items-center px-3">
+                {{
+                  $t('pagination.pageOf', {
+                    current: pagination.current_page,
+                    total: pagination.last_page,
+                  })
+                }}
+              </span>
+
+              <BaseButton
+                @click="nextPage"
+                :disabled="pagination.current_page === pagination.last_page"
+                type="outline"
+                size="sm"
+                :icon="['fas', 'chevron-left']"
+              />
+            </div>
+          </div>
+        </div>
+      </BaseCard>
     </div>
 
     <!-- Add/Edit User Modal -->
-    <div
-      v-if="showAddUserModal || showEditUserModal"
-      class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full"
+    <BaseModal
+      v-model:show="showAddUserModal || showEditUserModal"
+      :title="showEditUserModal ? $t('users.edit') : $t('users.add')"
+      size="md"
+      :close-on-overlay="false"
     >
-      <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-        <div class="mt-3">
-          <h3 class="text-lg font-medium text-gray-900 mb-4">
-            {{ showEditUserModal ? 'تعديل مستخدم' : 'إضافة مستخدم جديد' }}
-          </h3>
+      <form @submit.prevent="showEditUserModal ? updateUser() : addUser()" class="space-y-4">
+        <BaseInput
+          v-model="userForm.name"
+          :label="$t('users.name')"
+          :placeholder="$t('users.namePlaceholder')"
+          required
+          :error="errors.name"
+        />
 
-          <form @submit.prevent="showEditUserModal ? updateUser() : addUser()">
-            <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700 mb-2"> الاسم الكامل * </label>
-              <input
-                type="text"
-                v-model="userForm.name"
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
-            </div>
+        <BaseInput
+          v-model="userForm.email"
+          type="email"
+          :label="$t('auth.email')"
+          :placeholder="$t('users.emailPlaceholder')"
+          required
+          :error="errors.email"
+        />
 
-            <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                البريد الإلكتروني *
-              </label>
-              <input
-                type="email"
-                v-model="userForm.email"
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
-            </div>
+        <BaseInput
+          v-model="userForm.password"
+          type="password"
+          :label="showEditUserModal ? $t('users.newPassword') : $t('auth.password')"
+          :required="!showEditUserModal"
+          :placeholder="$t('auth.passwordPlaceholder')"
+          :error="errors.password"
+        />
 
-            <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                {{ showEditUserModal ? 'كلمة المرور الجديدة (اختياري)' : 'كلمة المرور *' }}
-              </label>
-              <input
-                type="password"
-                v-model="userForm.password"
-                :required="!showEditUserModal"
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+        <BaseInput
+          v-model="userForm.password_confirmation"
+          type="password"
+          :label="$t('auth.confirm_password')"
+          :required="!showEditUserModal"
+          :placeholder="$t('auth.confirm_password')"
+          :error="errors.password_confirmation"
+        />
 
-            <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                تأكيد كلمة المرور *
-              </label>
-              <input
-                type="password"
-                v-model="userForm.password_confirmation"
-                :required="!showEditUserModal"
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+        <template #footer>
+          <div class="flex justify-end space-x-3 space-x-reverse">
+            <BaseButton type="outline" @click="closeModal" :disabled="submitting">
+              {{ $t('common.cancel') }}
+            </BaseButton>
 
-            <div class="flex justify-end space-x-3 space-x-reverse mt-6">
-              <button
-                type="button"
-                @click="closeModal"
-                class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
-              >
-                إلغاء
-              </button>
-              <button
-                type="submit"
-                :disabled="submitting"
-                class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:opacity-50"
-              >
-                {{ showEditUserModal ? 'تحديث' : 'إضافة' }}
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
+            <BaseButton
+              type="primary"
+              :loading="submitting"
+              :disabled="submitting"
+              icon="save"
+              html-type="submit"
+            >
+              {{ showEditUserModal ? $t('common.update') : $t('common.add') }}
+            </BaseButton>
+          </div>
+        </template>
+      </form>
+    </BaseModal>
 
     <!-- Manage Permissions Modal -->
-    <div
-      v-if="showPermissionsModal"
-      class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full"
+    <BaseModal
+      v-model:show="showPermissionsModal"
+      :title="$t('permissions.manageFor', { user: selectedUser?.name })"
+      size="md"
+      :close-on-overlay="false"
     >
-      <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-        <div class="mt-3">
-          <h3 class="text-lg font-medium text-gray-900 mb-4">
-            إدارة صلاحيات: {{ selectedUser?.name }}
-          </h3>
-
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-2"> الأدوار </label>
+      <div class="space-y-4">
+        <div>
+          <label class="form-label mb-3">{{ $t('roles.title') }}</label>
+          <div class="border border-gray-200 rounded-lg p-4 max-h-64 overflow-y-auto">
             <div class="space-y-2">
               <div v-for="role in roles" :key="role.id" class="flex items-center">
                 <input
-                  type="checkbox"
                   :id="`role-${role.id}`"
-                  :value="role.id"
                   v-model="selectedRoles"
-                  class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  :value="role.id"
+                  type="checkbox"
+                  class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
                 />
-                <label :for="`role-${role.id}`" class="mr-2 text-sm text-gray-900">
-                  {{ role.name }}
-                  <span class="text-gray-500 text-xs">({{ role.description }})</span>
+                <label :for="`role-${role.id}`" class="mr-3 text-sm text-gray-900">
+                  <span class="font-medium">{{ role.name }}</span>
+                  <span class="text-gray-500 text-xs block">{{ role.description }}</span>
                 </label>
               </div>
             </div>
           </div>
-
-          <div class="flex justify-end space-x-3 space-x-reverse mt-6">
-            <button
-              type="button"
-              @click="closeModal"
-              class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
-            >
-              إلغاء
-            </button>
-            <button
-              @click="savePermissions"
-              :disabled="submitting"
-              class="px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 disabled:opacity-50"
-            >
-              حفظ الصلاحيات
-            </button>
-          </div>
         </div>
+
+        <template #footer>
+          <div class="flex justify-end space-x-3 space-x-reverse">
+            <BaseButton type="outline" @click="closeModal" :disabled="submitting">
+              {{ $t('common.cancel') }}
+            </BaseButton>
+
+            <BaseButton
+              type="primary"
+              :loading="submitting"
+              :disabled="submitting"
+              icon="save"
+              @click="savePermissions"
+            >
+              {{ $t('common.save') }}
+            </BaseButton>
+          </div>
+        </template>
       </div>
-    </div>
+    </BaseModal>
   </div>
 </template>
 
 <script>
-import { mapState } from 'vuex'
-import axios from '@/api/axios'
-import { toast } from 'vue3-toastify'
-
 export default {
   name: 'UserManagement',
-
   data() {
     return {
       loading: false,
       submitting: false,
-      users: [],
-      roles: [],
+      searchQuery: '',
+      searchTimeout: null,
+      currentPage: 1,
 
       showAddUserModal: false,
       showEditUserModal: false,
@@ -273,57 +304,196 @@ export default {
       selectedUser: null,
       selectedRoles: [],
 
+      tableColumns: [
+        { key: 'name', label: this.$t('users.name'), align: 'right' },
+        { key: 'email', label: this.$t('auth.email'), align: 'right' },
+        { key: 'roles', label: this.$t('roles.title'), align: 'right' },
+        { key: 'status', label: this.$t('common.status'), align: 'center' },
+      ],
+
       userForm: {
         name: '',
         email: '',
         password: '',
         password_confirmation: '',
       },
+
+      errors: {},
     }
   },
 
   computed: {
-    ...mapState({
-      currentUser: (state) => state.auth.user,
-    }),
+    breadcrumbs() {
+      return [
+        { text: this.$t('dashboard.title'), to: '/dashboard' },
+        { text: this.$t('users.management') },
+      ]
+    },
+
+    headerActions() {
+      return [
+        {
+          text: this.$t('users.add'),
+          type: 'primary',
+          icon: 'plus',
+          onClick: () => (this.showAddUserModal = true),
+          disabled: !this.hasPermission('create_user'),
+        },
+      ]
+    },
+
+    currentUser() {
+      return this.$store.state.auth.user || {}
+    },
+
+    users() {
+      return this.$store.state.permissions?.users || []
+    },
+
+    filteredUsers() {
+      if (!this.searchQuery.trim()) {
+        return this.users
+      }
+
+      const query = this.searchQuery.toLowerCase()
+      return this.users.filter(
+        (user) =>
+          (user.name && user.name.toLowerCase().includes(query)) ||
+          (user.email && user.email.toLowerCase().includes(query)),
+      )
+    },
+
+    roles() {
+      return this.$store.state.permissions?.roles || []
+    },
+
+    pagination() {
+      return (
+        this.$store.state.permissions?.pagination || {
+          current_page: 1,
+          last_page: 1,
+          per_page: 10,
+          total: 0,
+          from: 0,
+          to: 0,
+        }
+      )
+    },
   },
 
   mounted() {
-    this.fetchUsers()
-    this.fetchRoles()
+    this.loadUsers()
+    this.loadRoles()
   },
 
   methods: {
-    async fetchUsers() {
+    hasPermission(permission) {
+      if (this.$store.state.auth.is_admin) return true
+      const permissions = this.$store.state.auth.permissions || []
+      return permissions.includes(permission)
+    },
+
+    formatDate(dateString) {
+      if (!dateString) return '-'
+      return new Date(dateString).toLocaleDateString(this.$i18n.locale)
+    },
+
+    getInitials(name) {
+      if (!name) return '?'
+      return name.substring(0, 2).toUpperCase()
+    },
+
+    getRoleBadgeType(roleName) {
+      const types = {
+        admin: 'danger',
+        user: 'primary',
+        accountant: 'warning',
+        manager: 'success',
+        editor: 'info',
+      }
+      return types[roleName] || 'default'
+    },
+
+    async loadUsers() {
       this.loading = true
       try {
-        const res = await axios.get('/api/permissions/users')
-        this.users = res.data
-      } catch (e) {
-        toast.error('فشل في تحميل المستخدمين')
+        await this.$store.dispatch('permissions/fetchUsers', {
+          page: this.currentPage,
+          search: this.searchQuery,
+        })
+      } catch (error) {
+        console.error('❌ ' + this.$t('errors.loadFailed'), error)
+        this.$toast.error(this.$t('errors.loadUsersFailed'))
       } finally {
         this.loading = false
       }
     },
 
-    async fetchRoles() {
+    async loadRoles() {
       try {
-        const res = await axios.get('/api/permissions/roles')
-        this.roles = res.data
-      } catch (e) {
-        console.error(e)
+        await this.$store.dispatch('permissions/fetchRoles')
+      } catch (error) {
+        console.error('❌ ' + this.$t('errors.loadFailed'), error)
       }
     },
 
+    onSearch() {
+      if (this.searchTimeout) {
+        clearTimeout(this.searchTimeout)
+      }
+
+      this.searchTimeout = setTimeout(() => {
+        this.currentPage = 1
+        this.loadUsers()
+      }, 500)
+    },
+
     async addUser() {
+      this.errors = {}
       this.submitting = true
+
       try {
-        const res = await axios.post('/api/register', this.userForm)
-        this.users.push(res.data.user)
+        // التحقق من البيانات
+        if (!this.userForm.name.trim()) {
+          this.errors.name = this.$t('validation.required', { field: this.$t('users.name') })
+          return
+        }
+
+        if (!this.userForm.email.trim()) {
+          this.errors.email = this.$t('validation.required', { field: this.$t('auth.email') })
+          return
+        }
+
+        if (!this.isValidEmail(this.userForm.email)) {
+          this.errors.email = this.$t('validation.email')
+          return
+        }
+
+        if (!this.userForm.password) {
+          this.errors.password = this.$t('validation.required', { field: this.$t('auth.password') })
+          return
+        }
+
+        if (this.userForm.password.length < 6) {
+          this.errors.password = this.$t('validation.minLength', {
+            field: this.$t('auth.password'),
+            min: 6,
+          })
+          return
+        }
+
+        if (this.userForm.password !== this.userForm.password_confirmation) {
+          this.errors.password_confirmation = this.$t('validation.passwordMatch')
+          return
+        }
+
+        await this.$store.dispatch('auth/register', this.userForm)
+        this.$toast.success(this.$t('messages.createSuccess', { item: this.$t('users.user') }))
         this.closeModal()
-        toast.success('تم إضافة المستخدم بنجاح')
-      } catch (e) {
-        toast.error(e.response?.data?.message || 'فشل في الإضافة')
+        await this.loadUsers()
+      } catch (error) {
+        console.error('❌ ' + this.$t('errors.createFailed'), error)
+        this.$toast.error(error.message || this.$t('errors.createError'))
       } finally {
         this.submitting = false
       }
@@ -331,21 +501,67 @@ export default {
 
     editUser(user) {
       this.selectedUser = user
-      this.userForm.name = user.name
-      this.userForm.email = user.email
+      this.userForm = {
+        name: user.name,
+        email: user.email,
+        password: '',
+        password_confirmation: '',
+      }
+      this.errors = {}
       this.showEditUserModal = true
     },
 
     async updateUser() {
+      this.errors = {}
       this.submitting = true
+
       try {
-        const res = await axios.put(`/api/users/${this.selectedUser.id}`, this.userForm)
-        const index = this.users.findIndex((u) => u.id === this.selectedUser.id)
-        if (index !== -1) this.users[index] = res.data.user
+        if (!this.userForm.name.trim()) {
+          this.errors.name = this.$t('validation.required', { field: this.$t('users.name') })
+          return
+        }
+
+        if (!this.userForm.email.trim()) {
+          this.errors.email = this.$t('validation.required', { field: this.$t('auth.email') })
+          return
+        }
+
+        if (!this.isValidEmail(this.userForm.email)) {
+          this.errors.email = this.$t('validation.email')
+          return
+        }
+
+        if (this.userForm.password && this.userForm.password.length < 6) {
+          this.errors.password = this.$t('validation.minLength', {
+            field: this.$t('auth.password'),
+            min: 6,
+          })
+          return
+        }
+
+        if (this.userForm.password !== this.userForm.password_confirmation) {
+          this.errors.password_confirmation = this.$t('validation.passwordMatch')
+          return
+        }
+
+        // إزالة الحقول الفارغة
+        const userData = { ...this.userForm }
+        if (!userData.password) {
+          delete userData.password
+          delete userData.password_confirmation
+        }
+
+        await this.$store.dispatch('users/updateUser', {
+          id: this.selectedUser.id,
+          data: userData,
+        })
+
+        this.$toast.success(this.$t('messages.updateSuccess', { item: this.$t('users.user') }))
         this.closeModal()
-        toast.success('تم التحديث بنجاح')
-      } catch (e) {
-        toast.error('فشل في التحديث')
+        await this.loadUsers()
+      } catch (error) {
+        console.error('❌ ' + this.$t('errors.updateFailed'), error)
+        this.$toast.error(error.message || this.$t('errors.updateError'))
       } finally {
         this.submitting = false
       }
@@ -353,46 +569,49 @@ export default {
 
     managePermissions(user) {
       this.selectedUser = user
-      this.selectedRoles = user.roles.map((r) => r.id)
+      this.selectedRoles = user.roles?.map((r) => r.id) || []
       this.showPermissionsModal = true
     },
 
     async savePermissions() {
       this.submitting = true
       try {
-        await axios.post(`/api/permissions/users/${this.selectedUser.id}/assign-roles`, {
+        await this.$store.dispatch('permissions/assignRolesToUser', {
+          userId: this.selectedUser.id,
           roles: this.selectedRoles,
         })
 
-        this.selectedUser.roles = this.roles.filter((r) => this.selectedRoles.includes(r.id))
-
+        this.$toast.success(
+          this.$t('messages.updateSuccess', { item: this.$t('permissions.title') }),
+        )
         this.closeModal()
-        toast.success('تم حفظ الصلاحيات')
-      } catch (e) {
-        toast.error('فشل في حفظ الصلاحيات')
+        await this.loadUsers()
+      } catch (error) {
+        console.error('❌ ' + this.$t('errors.updateFailed'), error)
+        this.$toast.error(error.message || this.$t('errors.updateError'))
       } finally {
         this.submitting = false
       }
     },
 
+    confirmDelete(user) {
+      this.$toast.confirm(
+        this.$t('messages.confirmDelete', { item: `${this.$t('users.user')} "${user.name}"` }),
+        async () => {
+          await this.deleteUser(user.id)
+        },
+      )
+    },
+
     async deleteUser(id) {
       try {
-        await axios.delete(`/api/users/${id}`)
-        this.users = this.users.filter((u) => u.id !== id)
-        toast.success('تم حذف المستخدم')
-      } catch {
-        toast.error('فشل في الحذف')
+        await this.$store.dispatch('users/deleteUser', id)
+        this.$toast.success(this.$t('messages.deleteSuccess', { item: this.$t('users.user') }))
+        await this.loadUsers()
+      } catch (error) {
+        console.error('❌ ' + this.$t('errors.deleteFailed'), error)
+        this.$toast.error(error.message || this.$t('errors.deleteError'))
       }
-    },
-
-    confirmDeleteUser(user) {
-      if (confirm(`هل أنت متأكد من حذف ${user.name}؟`)) {
-        this.deleteUser(user.id)
-      }
-    },
-
-    formatDate(date) {
-      return new Date(date).toLocaleDateString('ar-SA')
     },
 
     closeModal() {
@@ -406,6 +625,26 @@ export default {
         email: '',
         password: '',
         password_confirmation: '',
+      }
+      this.errors = {}
+    },
+
+    isValidEmail(email) {
+      const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      return re.test(email)
+    },
+
+    previousPage() {
+      if (this.currentPage > 1) {
+        this.currentPage--
+        this.loadUsers()
+      }
+    },
+
+    nextPage() {
+      if (this.currentPage < this.pagination.last_page) {
+        this.currentPage++
+        this.loadUsers()
       }
     },
   },
