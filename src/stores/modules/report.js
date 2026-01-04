@@ -38,16 +38,16 @@ export default {
         let endpoint
         switch (reportType) {
           case 'invoices':
-            endpoint = '/api/reports/invoices'
+            endpoint = '/admin/reports/invoices'
             break
           case 'clients':
-            endpoint = '/api/reports/invoices/clients'
+            endpoint = '/admin/reports/invoices/clients'
             break
           case 'revenue':
-            endpoint = '/api/reports/invoices/revenue'
+            endpoint = '/admin/reports/invoices/revenue'
             break
           case 'overdue':
-            endpoint = '/api/reports/invoices/overdue'
+            endpoint = '/admin/reports/invoices/overdue'
             break
           default:
             throw new Error('نوع التقرير غير معروف')

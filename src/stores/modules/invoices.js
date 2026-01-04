@@ -94,7 +94,7 @@ export default {
       console.log('🚀 Fetching invoices with params:', params)
 
       try {
-        const response = await axios.get('/api/invoices', {
+        const response = await axios.get('/admin/invoices', {
           params: {
             page: params.page || 1,
             status: params.status || '',
@@ -125,7 +125,7 @@ export default {
     async fetchInvoice({ commit }, id) {
       try {
         console.log(`📄 Fetching invoice with ID: ${id}`)
-        const response = await axios.get(`/api/invoices/${id}`)
+        const response = await axios.get(`/admin/invoices/${id}`)
 
         if (response.data.status) {
           commit('SET_CURRENT_INVOICE', response.data.data)
@@ -142,7 +142,7 @@ export default {
     async createInvoice({ commit }, invoiceData) {
       try {
         console.log('📝 Creating invoice:', invoiceData)
-        const response = await axios.post('/api/invoices', invoiceData)
+        const response = await axios.post('/admin/invoices', invoiceData)
 
         if (response.data.status) {
           commit('ADD_INVOICE', response.data.data)
@@ -164,7 +164,7 @@ export default {
     async updateInvoice({ commit }, { id, data }) {
       try {
         console.log('📝 Updating invoice:', { id, data })
-        const response = await axios.put(`/api/invoices/${id}`, data)
+        const response = await axios.put(`/admin/invoices/${id}`, data)
 
         if (response.data.status) {
           commit('UPDATE_INVOICE', response.data.data)
@@ -184,7 +184,7 @@ export default {
 
     async deleteInvoice({ commit }, id) {
       try {
-        const response = await axios.delete(`/api/invoices/${id}`)
+        const response = await axios.delete(`/admin/invoices/${id}`)
 
         if (response.data.status) {
           commit('DELETE_INVOICE', id)
@@ -201,7 +201,7 @@ export default {
     async updateInvoiceStatus({ commit, dispatch }, { id, status }) {
       try {
         console.log(`🔄 Updating invoice ${id} status to ${status}`)
-        const response = await axios.put(`/api/invoices/${id}/status`, { status })
+        const response = await axios.put(`/admin/invoices/${id}/status`, { status })
 
         if (response.data.status) {
           // إعادة تحميل الفاتورة الحالية

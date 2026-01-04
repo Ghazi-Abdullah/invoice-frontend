@@ -55,7 +55,7 @@ export default {
     async login({ commit, dispatch }, credentials) {
       commit('SET_LOADING', true)
       try {
-        const response = await axios.post('/api/login', credentials)
+        const response = await axios.post('/admin/login', credentials)
 
         if (response.data.status) {
           const { user, token, permissions, is_admin } = response.data.data
@@ -80,7 +80,7 @@ export default {
     async logout({ commit }) {
       commit('SET_LOADING', true)
       try {
-        await axios.post('/api/logout')
+        await axios.post('/admin/logout')
         commit('CLEAR_AUTH')
         localStorage.removeItem('token')
         delete axios.defaults.headers.common['Authorization']
@@ -99,7 +99,7 @@ export default {
 
       commit('SET_LOADING', true)
       try {
-        const response = await axios.get('/api/me')
+        const response = await axios.get('/admin/me')
 
         if (response.data.status) {
           const { user, permissions, is_admin } = response.data.data
@@ -130,7 +130,7 @@ export default {
     async register({ commit }, userData) {
       commit('SET_LOADING', true)
       try {
-        const response = await axios.post('/api/register', userData)
+        const response = await axios.post('/admin/register', userData)
 
         if (response.data.status) {
           const { user, token, permissions, is_admin } = response.data.data
