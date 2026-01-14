@@ -1,72 +1,149 @@
 <template>
+  <!-- Mobile Overlay -->
+  <div
+    v-if="isMobileOpen"
+    class="lg:hidden fixed inset-0 bg-black/50 z-30 transition-opacity duration-300"
+    @click="$emit('close-mobile')"
+  ></div>
+
+  <!-- Sidebar -->
   <aside
-    class="fixed lg:static h-screen w-64 bg-gradient-to-b from-gray-900 to-gray-800 text-white shadow-xl z-40 transition-all duration-300"
+    class="fixed lg:static h-screen flex flex-col bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white shadow-2xl z-40 transition-all duration-300 ease-in-out"
     :class="{
       '-translate-x-full lg:translate-x-0': !isMobileOpen,
       'w-20': isCollapsed,
-      open: isMobileOpen,
+      'w-64': !isCollapsed,
     }"
     ref="sidebarEl"
   >
-    <!-- Logo -->
-    <div class="flex items-center justify-between h-16 px-4 border-b border-gray-700">
+    <!-- Header with Logo & Collapse Toggle -->
+    <div class="flex items-center justify-between h-20 px-4 border-b border-gray-700/50">
       <router-link
         to="/dashboard"
-        class="flex items-center space-x-3 hover:opacity-80 transition-opacity"
+        class="flex items-center space-x-3 transition-all duration-300 hover:opacity-90"
         :class="{ 'justify-center w-full': isCollapsed }"
+        @click="closeMobileSidebar"
       >
-        <div
-          class="flex-shrink-0 w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center"
-        >
-          <i class="fas fa-file-invoice text-white text-lg"></i>
+        <div class="relative">
+          <div
+            class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg transform hover:scale-105 transition-transform duration-200"
+          >
+            <i class="fas fa-file-invoice text-white text-xl"></i>
+          </div>
+          <div
+            class="absolute -top-1 -right-1 w-5 h-5 bg-green-400 rounded-full border-2 border-gray-900 flex items-center justify-center"
+          >
+            <i class="fas fa-check text-white text-[8px]"></i>
+          </div>
         </div>
-        <div v-if="!isCollapsed" class="flex flex-col">
-          <span class="font-bold text-lg">{{ $t('app.name') }}</span>
-          <span class="text-xs text-blue-300">v2.0</span>
-        </div>
+        <transition name="slide-fade" mode="out-in">
+          <div v-if="!isCollapsed" class="flex flex-col">
+            <span
+              class="font-bold text-xl bg-gradient-to-r from-blue-400 to-blue-300 bg-clip-text text-transparent"
+            >
+              {{ $t('app.name') }}
+            </span>
+            <span class="text-xs text-gray-400 mt-1">Enterprise v2.0</span>
+          </div>
+        </transition>
       </router-link>
+
+      <button
+        v-if="!isCollapsed"
+        @click="toggleCollapse"
+        class="hidden lg:flex items-center justify-center w-10 h-10 rounded-full bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white transition-all duration-200"
+        :title="$t('buttons.collapse')"
+      >
+        <i class="fas fa-chevron-left text-sm"></i>
+      </button>
     </div>
 
-    <!-- User Profile -->
-    <div v-if="!isCollapsed && user" class="px-4 py-6 border-b border-gray-700">
-      <div class="flex items-center space-x-3">
-        <div
-          class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold"
-        >
-          {{ getUserInitials }}
-        </div>
-        <div class="flex-1 min-w-0">
-          <p class="font-semibold truncate">{{ user.name }}</p>
-          <p class="text-sm text-gray-300 truncate">{{ user.email }}</p>
-          <p class="text-xs text-blue-300 mt-1">
-            {{ userRole }}
-          </p>
+    <!-- User Profile Card -->
+    <transition name="slide-fade" mode="out-in">
+      <div v-if="!isCollapsed && user" class="px-5 py-4 border-b border-gray-700/50">
+        <div class="flex items-center space-x-3">
+          <div class="relative">
+            <div
+              class="w-14 h-14 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg overflow-hidden"
+            >
+              <div v-if="!user.avatar" class="text-white font-bold text-lg">
+                {{ getUserInitials }}
+              </div>
+              <img v-else :src="user.avatar" :alt="user.name" class="w-full h-full object-cover" />
+            </div>
+            <div
+              class="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-gray-900 flex items-center justify-center"
+            >
+              <i class="fas fa-check text-white text-[8px]"></i>
+            </div>
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="font-semibold text-base truncate">{{ user.name }}</p>
+            <p class="text-sm text-gray-300 truncate mt-0.5">{{ user.email }}</p>
+            <div class="flex items-center gap-2 mt-2">
+              <span
+                class="px-2 py-0.5 text-xs font-medium rounded-full"
+                :class="
+                  isAdmin ? 'bg-purple-500/20 text-purple-300' : 'bg-blue-500/20 text-blue-300'
+                "
+              >
+                {{ userRole }}
+              </span>
+              <span
+                v-if="user.is_online"
+                class="w-2 h-2 bg-green-500 rounded-full animate-pulse"
+              ></span>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </transition>
 
     <!-- Navigation Menu -->
-    <nav class="flex-1 py-4 overflow-y-auto">
-      <div class="px-4 mb-4" v-if="!isCollapsed">
-        <h3 class="text-xs uppercase text-gray-500 font-semibold tracking-wider">
-          {{ $t('common.navigation') }}
-        </h3>
-      </div>
+    <div class="flex-1 overflow-y-auto py-4 scrollbar-thin">
+      <transition name="slide-fade" mode="out-in">
+        <div v-if="!isCollapsed" class="px-5 mb-4">
+          <h3 class="text-xs uppercase text-gray-500 font-semibold tracking-wider">
+            {{ $t('common.navigation') }}
+          </h3>
+        </div>
+      </transition>
 
-      <ul class="space-y-1 px-2">
+      <ul class="space-y-1 px-3">
         <!-- Dashboard -->
         <li v-if="hasPermission('view_dashboard')">
           <router-link
             to="/dashboard"
-            class="flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-colors"
+            class="group flex items-center space-x-3 px-3 py-3 rounded-xl transition-all duration-200"
             :class="
-              isActive('/dashboard') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700'
+              isActive('/dashboard')
+                ? 'bg-gradient-to-r from-blue-600/30 to-blue-500/20 text-white border-r-4 border-blue-500'
+                : 'text-gray-300 hover:bg-gray-800/50 hover:text-white'
             "
             :title="isCollapsed ? $t('nav.dashboard') : ''"
             @click="closeMobileSidebar"
           >
-            <i class="fas fa-tachometer-alt w-5 text-center"></i>
-            <span v-if="!isCollapsed" class="flex-1">{{ $t('nav.dashboard') }}</span>
+            <div
+              class="w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-200"
+              :class="
+                isActive('/dashboard')
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-gray-800 text-gray-400 group-hover:bg-blue-500/20 group-hover:text-blue-400'
+              "
+            >
+              <i class="fas fa-tachometer-alt text-base"></i>
+            </div>
+            <transition name="slide-fade" mode="out-in">
+              <div v-if="!isCollapsed" class="flex-1">
+                <span class="font-medium">{{ $t('nav.dashboard') }}</span>
+              </div>
+            </transition>
+            <transition name="slide-fade" mode="out-in">
+              <span
+                v-if="!isCollapsed && isActive('/dashboard')"
+                class="w-2 h-2 bg-blue-400 rounded-full animate-pulse"
+              ></span>
+            </transition>
           </router-link>
         </li>
 
@@ -74,21 +151,45 @@
         <li v-if="hasPermission('view_invoices')">
           <router-link
             to="/invoices"
-            class="flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-colors"
+            class="group flex items-center space-x-3 px-3 py-3 rounded-xl transition-all duration-200"
             :class="
-              isActive('/invoices') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700'
+              isActive('/invoices')
+                ? 'bg-gradient-to-r from-green-600/30 to-green-500/20 text-white border-r-4 border-green-500'
+                : 'text-gray-300 hover:bg-gray-800/50 hover:text-white'
             "
             :title="isCollapsed ? $t('nav.invoices') : ''"
             @click="closeMobileSidebar"
           >
-            <i class="fas fa-file-invoice-dollar w-5 text-center"></i>
-            <span v-if="!isCollapsed" class="flex-1">{{ $t('nav.invoices') }}</span>
-            <span
-              v-if="!isCollapsed && pendingInvoices > 0"
-              class="px-2 py-1 text-xs bg-yellow-500 text-white rounded-full"
+            <div
+              class="w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-200 relative"
+              :class="
+                isActive('/invoices')
+                  ? 'bg-green-500 text-white'
+                  : 'bg-gray-800 text-gray-400 group-hover:bg-green-500/20 group-hover:text-green-400'
+              "
             >
-              {{ pendingInvoices }}
-            </span>
+              <i class="fas fa-file-invoice-dollar text-base"></i>
+              <transition name="bounce">
+                <span
+                  v-if="pendingInvoices > 0"
+                  class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center border-2 border-gray-900"
+                >
+                  {{ pendingInvoices > 9 ? '9+' : pendingInvoices }}
+                </span>
+              </transition>
+            </div>
+            <transition name="slide-fade" mode="out-in">
+              <div v-if="!isCollapsed" class="flex-1">
+                <span class="font-medium">{{ $t('nav.invoices') }}</span>
+                <p class="text-xs text-gray-400 mt-0.5">{{ $t('nav.invoices_desc') }}</p>
+              </div>
+            </transition>
+            <transition name="slide-fade" mode="out-in">
+              <i
+                v-if="!isCollapsed"
+                class="fas fa-chevron-left text-xs text-gray-500 group-hover:text-gray-300 transition-colors"
+              ></i>
+            </transition>
           </router-link>
         </li>
 
@@ -96,15 +197,37 @@
         <li v-if="hasPermission('view_clients')">
           <router-link
             to="/clients"
-            class="flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-colors"
+            class="group flex items-center space-x-3 px-3 py-3 rounded-xl transition-all duration-200"
             :class="
-              isActive('/clients') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700'
+              isActive('/clients')
+                ? 'bg-gradient-to-r from-purple-600/30 to-purple-500/20 text-white border-r-4 border-purple-500'
+                : 'text-gray-300 hover:bg-gray-800/50 hover:text-white'
             "
             :title="isCollapsed ? $t('nav.clients') : ''"
             @click="closeMobileSidebar"
           >
-            <i class="fas fa-users w-5 text-center"></i>
-            <span v-if="!isCollapsed" class="flex-1">{{ $t('nav.clients') }}</span>
+            <div
+              class="w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-200"
+              :class="
+                isActive('/clients')
+                  ? 'bg-purple-500 text-white'
+                  : 'bg-gray-800 text-gray-400 group-hover:bg-purple-500/20 group-hover:text-purple-400'
+              "
+            >
+              <i class="fas fa-users text-base"></i>
+            </div>
+            <transition name="slide-fade" mode="out-in">
+              <div v-if="!isCollapsed" class="flex-1">
+                <span class="font-medium">{{ $t('nav.clients') }}</span>
+                <p class="text-xs text-gray-400 mt-0.5">{{ $t('nav.clients_desc') }}</p>
+              </div>
+            </transition>
+            <transition name="slide-fade" mode="out-in">
+              <i
+                v-if="!isCollapsed"
+                class="fas fa-chevron-left text-xs text-gray-500 group-hover:text-gray-300 transition-colors"
+              ></i>
+            </transition>
           </router-link>
         </li>
 
@@ -112,136 +235,225 @@
         <li v-if="hasPermission('view_reports')">
           <router-link
             to="/reports"
-            class="flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-colors"
+            class="group flex items-center space-x-3 px-3 py-3 rounded-xl transition-all duration-200"
             :class="
-              isActive('/reports') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700'
+              isActive('/reports')
+                ? 'bg-gradient-to-r from-orange-600/30 to-orange-500/20 text-white border-r-4 border-orange-500'
+                : 'text-gray-300 hover:bg-gray-800/50 hover:text-white'
             "
             :title="isCollapsed ? $t('nav.reports') : ''"
             @click="closeMobileSidebar"
           >
-            <i class="fas fa-chart-line w-5 text-center"></i>
-            <span v-if="!isCollapsed" class="flex-1">{{ $t('nav.reports') }}</span>
+            <div
+              class="w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-200"
+              :class="
+                isActive('/reports')
+                  ? 'bg-orange-500 text-white'
+                  : 'bg-gray-800 text-gray-400 group-hover:bg-orange-500/20 group-hover:text-orange-400'
+              "
+            >
+              <i class="fas fa-chart-line text-base"></i>
+            </div>
+            <transition name="slide-fade" mode="out-in">
+              <div v-if="!isCollapsed" class="flex-1">
+                <span class="font-medium">{{ $t('nav.reports') }}</span>
+                <p class="text-xs text-gray-400 mt-0.5">{{ $t('nav.reports_desc') }}</p>
+              </div>
+            </transition>
+            <transition name="slide-fade" mode="out-in">
+              <i
+                v-if="!isCollapsed"
+                class="fas fa-chevron-left text-xs text-gray-500 group-hover:text-gray-300 transition-colors"
+              ></i>
+            </transition>
           </router-link>
         </li>
 
-        <!-- Admin Section -->
-        <template v-if="isAdmin && !isCollapsed">
-          <div class="px-4 pt-6 pb-2">
-            <h3 class="text-xs uppercase text-gray-500 font-semibold tracking-wider">
-              {{ $t('admin.section_title') }}
-            </h3>
+        <!-- Admin Section Header -->
+        <transition name="slide-fade" mode="out-in">
+          <div v-if="isAdmin && !isCollapsed" class="px-5 pt-8 pb-2">
+            <div class="flex items-center gap-2">
+              <div
+                class="w-full h-px bg-gradient-to-r from-transparent via-gray-700 to-transparent"
+              ></div>
+              <span
+                class="text-xs uppercase text-gray-500 font-semibold tracking-wider whitespace-nowrap"
+              >
+                {{ $t('admin.section_title') }}
+              </span>
+              <div
+                class="w-full h-px bg-gradient-to-r from-transparent via-gray-700 to-transparent"
+              ></div>
+            </div>
           </div>
+        </transition>
 
-          <!-- Users -->
-          <li>
-            <router-link
-              to="/users"
-              class="flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-colors"
+        <!-- Users -->
+        <li v-if="isAdmin">
+          <router-link
+            to="/users"
+            class="group flex items-center space-x-3 px-3 py-3 rounded-xl transition-all duration-200"
+            :class="
+              isActive('/users')
+                ? 'bg-gradient-to-r from-indigo-600/30 to-indigo-500/20 text-white border-r-4 border-indigo-500'
+                : 'text-gray-300 hover:bg-gray-800/50 hover:text-white'
+            "
+            :title="isCollapsed ? $t('nav.users') : ''"
+            @click="closeMobileSidebar"
+          >
+            <div
+              class="w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-200"
               :class="
-                isActive('/users') ? 'bg-purple-600 text-white' : 'text-gray-300 hover:bg-gray-700'
+                isActive('/users')
+                  ? 'bg-indigo-500 text-white'
+                  : 'bg-gray-800 text-gray-400 group-hover:bg-indigo-500/20 group-hover:text-indigo-400'
               "
-              @click="closeMobileSidebar"
             >
-              <i class="fas fa-user-shield w-5 text-center"></i>
-              <span class="flex-1">{{ $t('nav.users') }}</span>
-            </router-link>
-          </li>
+              <i class="fas fa-user-shield text-base"></i>
+            </div>
+            <transition name="slide-fade" mode="out-in">
+              <div v-if="!isCollapsed" class="flex-1">
+                <span class="font-medium">{{ $t('nav.users') }}</span>
+              </div>
+            </transition>
+          </router-link>
+        </li>
 
-          <!-- Groups -->
-          <li>
-            <router-link
-              to="/admin/groups"
-              class="flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-colors"
+        <!-- Groups -->
+        <li v-if="isAdmin">
+          <router-link
+            to="/admin/groups"
+            class="group flex items-center space-x-3 px-3 py-3 rounded-xl transition-all duration-200"
+            :class="
+              isActive('/admin/groups')
+                ? 'bg-gradient-to-r from-pink-600/30 to-pink-500/20 text-white border-r-4 border-pink-500'
+                : 'text-gray-300 hover:bg-gray-800/50 hover:text-white'
+            "
+            :title="isCollapsed ? $t('adminGroups.title') : ''"
+            @click="closeMobileSidebar"
+          >
+            <div
+              class="w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-200"
               :class="
                 isActive('/admin/groups')
-                  ? 'bg-purple-600 text-white'
-                  : 'text-gray-300 hover:bg-gray-700'
+                  ? 'bg-pink-500 text-white'
+                  : 'bg-gray-800 text-gray-400 group-hover:bg-pink-500/20 group-hover:text-pink-400'
               "
-              @click="closeMobileSidebar"
             >
-              <i class="fas fa-users-cog w-5 text-center"></i>
-              <span class="flex-1">{{ $t('adminGroups.title') }}</span>
-            </router-link>
-          </li>
+              <i class="fas fa-users-cog text-base"></i>
+            </div>
+            <transition name="slide-fade" mode="out-in">
+              <div v-if="!isCollapsed" class="flex-1">
+                <span class="font-medium">{{ $t('adminGroups.title') }}</span>
+              </div>
+            </transition>
+          </router-link>
+        </li>
 
-          <!-- Permissions -->
-          <li>
-            <router-link
-              to="/permissions"
-              class="flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-colors"
+        <!-- Permissions -->
+        <li v-if="isAdmin">
+          <router-link
+            to="/permissions"
+            class="group flex items-center space-x-3 px-3 py-3 rounded-xl transition-all duration-200"
+            :class="
+              isActive('/permissions')
+                ? 'bg-gradient-to-r from-teal-600/30 to-teal-500/20 text-white border-r-4 border-teal-500'
+                : 'text-gray-300 hover:bg-gray-800/50 hover:text-white'
+            "
+            :title="isCollapsed ? $t('nav.permissions') : ''"
+            @click="closeMobileSidebar"
+          >
+            <div
+              class="w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-200"
               :class="
                 isActive('/permissions')
-                  ? 'bg-purple-600 text-white'
-                  : 'text-gray-300 hover:bg-gray-700'
+                  ? 'bg-teal-500 text-white'
+                  : 'bg-gray-800 text-gray-400 group-hover:bg-teal-500/20 group-hover:text-teal-400'
               "
-              @click="closeMobileSidebar"
             >
-              <i class="fas fa-shield-alt w-5 text-center"></i>
-              <span class="flex-1">{{ $t('nav.permissions') }}</span>
-            </router-link>
-          </li>
-
-          <!-- Assign Permissions -->
-          <li>
-            <router-link
-              to="/admin/assign-permissions"
-              class="flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-colors"
-              :class="
-                isActive('/admin/assign-permissions')
-                  ? 'bg-purple-600 text-white'
-                  : 'text-gray-300 hover:bg-gray-700'
-              "
-              @click="closeMobileSidebar"
-            >
-              <i class="fas fa-key w-5 text-center"></i>
-              <span class="flex-1">تعيين الصلاحيات</span>
-            </router-link>
-          </li>
-        </template>
+              <i class="fas fa-shield-alt text-base"></i>
+            </div>
+            <transition name="slide-fade" mode="out-in">
+              <div v-if="!isCollapsed" class="flex-1">
+                <span class="font-medium">{{ $t('nav.permissions') }}</span>
+              </div>
+            </transition>
+          </router-link>
+        </li>
       </ul>
-    </nav>
+    </div>
 
     <!-- Bottom Actions -->
-    <div class="p-4 border-t border-gray-700">
+    <div class="p-4 border-t border-gray-700/50 space-y-2">
       <!-- Language Toggle -->
       <button
         @click="toggleLanguage"
-        class="flex items-center space-x-3 w-full px-3 py-2.5 rounded-lg text-gray-300 hover:bg-gray-700 transition-colors"
+        class="group flex items-center space-x-3 w-full px-3 py-3 rounded-xl text-gray-300 hover:bg-gray-800/50 hover:text-white transition-all duration-200"
         :title="isCollapsed ? $t('buttons.toggle_language') : ''"
       >
-        <i class="fas fa-language w-5 text-center"></i>
-        <span v-if="!isCollapsed" class="flex-1">
-          {{ isRTL ? 'English' : 'العربية' }}
-        </span>
+        <div
+          class="w-10 h-10 rounded-lg flex items-center justify-center bg-gray-800 text-gray-400 group-hover:bg-blue-500/20 group-hover:text-blue-400 transition-all duration-200"
+        >
+          <i class="fas fa-language text-base"></i>
+        </div>
+        <transition name="slide-fade" mode="out-in">
+          <div v-if="!isCollapsed" class="flex-1 text-right">
+            <span class="font-medium block">
+              {{ isRTL ? 'English' : 'العربية' }}
+            </span>
+            <span class="text-xs text-gray-400">{{ $t('buttons.toggle_language') }}</span>
+          </div>
+        </transition>
+      </button>
+
+      <!-- Expand/Collapse for Mobile -->
+      <button
+        v-if="isCollapsed && !isMobileOpen"
+        @click="toggleCollapse"
+        class="lg:hidden flex items-center justify-center w-full h-10 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white transition-all duration-200"
+        :title="$t('buttons.expand')"
+      >
+        <i class="fas fa-chevron-right text-sm"></i>
       </button>
 
       <!-- Logout -->
       <button
         @click="handleLogout"
-        class="flex items-center space-x-3 w-full px-3 py-2.5 rounded-lg text-red-300 hover:bg-red-600/10 transition-colors mt-2"
+        class="group flex items-center space-x-3 w-full px-3 py-3 rounded-xl text-gray-300 hover:bg-red-600/20 hover:text-red-300 transition-all duration-200"
         :title="isCollapsed ? $t('auth.logout') : ''"
       >
-        <i class="fas fa-sign-out-alt w-5 text-center"></i>
-        <span v-if="!isCollapsed" class="flex-1">{{ $t('auth.logout') }}</span>
+        <div
+          class="w-10 h-10 rounded-lg flex items-center justify-center bg-gray-800 text-gray-400 group-hover:bg-red-500/20 group-hover:text-red-400 transition-all duration-200"
+        >
+          <i class="fas fa-sign-out-alt text-base"></i>
+        </div>
+        <transition name="slide-fade" mode="out-in">
+          <div v-if="!isCollapsed" class="flex-1 text-right">
+            <span class="font-medium block">{{ $t('auth.logout') }}</span>
+            <span class="text-xs text-gray-400">{{ $t('auth.logout_desc') }}</span>
+          </div>
+        </transition>
       </button>
 
-      <!-- Collapse Toggle -->
-      <button
-        v-if="!isCollapsed"
-        @click="toggleCollapse"
-        class="hidden lg:flex items-center space-x-3 w-full px-3 py-2.5 rounded-lg text-gray-300 hover:bg-gray-700 transition-colors mt-2"
-      >
-        <i class="fas fa-chevron-left w-5 text-center"></i>
-        <span class="flex-1 text-left">{{ $t('buttons.collapse') }}</span>
-      </button>
-
-      <!-- Version Info -->
-      <div v-if="!isCollapsed" class="pt-4 mt-4 border-t border-gray-700">
-        <p class="text-xs text-gray-500 text-center">{{ $t('app.name') }} v2.0.0</p>
-        <p class="text-[10px] text-gray-600 text-center mt-1">
-          &copy; {{ new Date().getFullYear() }}
-        </p>
-      </div>
+      <!-- Version & Status -->
+      <transition name="slide-fade" mode="out-in">
+        <div v-if="!isCollapsed" class="pt-4 mt-4 border-t border-gray-700/50">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs text-gray-500">{{ $t('app.version') }}</span>
+            <span class="text-xs font-medium text-green-400">v2.0.0</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-xs text-gray-500">{{ $t('app.status') }}</span>
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+              <span class="text-xs text-green-400">{{ $t('app.online') }}</span>
+            </div>
+          </div>
+          <p class="text-[10px] text-gray-600 text-center mt-4">
+            &copy; {{ new Date().getFullYear() }} {{ $t('app.name') }}. {{ $t('app.rights') }}
+          </p>
+        </div>
+      </transition>
     </div>
   </aside>
 </template>
@@ -303,6 +515,11 @@ export default {
       this.isCollapsed = !this.isCollapsed
       localStorage.setItem('sidebarCollapsed', this.isCollapsed)
       this.$emit('toggle-collapse', this.isCollapsed)
+
+      // إضافة تأثير صوتي خفيف
+      const audio = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-select-click-1109.mp3')
+      audio.volume = 0.1
+      audio.play().catch(() => {})
     },
 
     closeMobileSidebar() {
@@ -318,22 +535,51 @@ export default {
       document.documentElement.dir = newLang === 'ar' ? 'rtl' : 'ltr'
       document.documentElement.lang = newLang
 
-      // إشعار بتغيير اللغة
+      // إشعار بتغيير اللغة مع تأثير مرئي
       this.$toast.info(
         this.$t('language.changed', {
           lang: newLang === 'ar' ? 'العربية' : 'English',
         }),
+        {
+          position: 'bottom-left',
+          icon: 'fas fa-language',
+          duration: 3000,
+        },
       )
     },
 
     async handleLogout() {
       try {
-        await this.$store.dispatch('auth/logout')
-        this.$toast.success(this.$t('auth.logout_success'))
-        this.$router.push('/login')
+        const confirmed = await this.$swal({
+          title: this.$t('auth.logout_confirm'),
+          text: this.$t('auth.logout_confirm_text'),
+          icon: 'question',
+          showCancelButton: true,
+          confirmButtonColor: '#EF4444',
+          cancelButtonColor: '#6B7280',
+          confirmButtonText: this.$t('auth.logout'),
+          cancelButtonText: this.$t('common.cancel'),
+          reverseButtons: true,
+          focusCancel: true,
+          customClass: {
+            popup: 'animated zoomIn',
+          },
+        })
+
+        if (confirmed.isConfirmed) {
+          await this.$store.dispatch('auth/logout')
+          this.$toast.success(this.$t('auth.logout_success'), {
+            position: 'bottom-left',
+            icon: 'fas fa-check-circle',
+          })
+          this.$router.push('/login')
+        }
       } catch (error) {
         console.error('Logout error:', error)
-        this.$toast.error(this.$t('auth.logout_error'))
+        this.$toast.error(this.$t('auth.logout_error'), {
+          position: 'bottom-left',
+          icon: 'fas fa-exclamation-circle',
+        })
       }
     },
   },
@@ -349,50 +595,206 @@ export default {
     if (!this.stats) {
       this.$store.dispatch('dashboard/fetchDashboardData')
     }
+
+    // إضافة تأثيرات صوتية خفيفة للتأكيد على التفاعل
+    this.$nextTick(() => {
+      const links = this.$el.querySelectorAll('a')
+      links.forEach((link) => {
+        link.addEventListener('click', () => {
+          const audio = new Audio(
+            'https://assets.mixkit.co/sfx/preview/mixkit-select-click-1109.mp3',
+          )
+          audio.volume = 0.05
+          audio.play().catch(() => {})
+        })
+      })
+    })
   },
 }
 </script>
 
 <style scoped>
-aside {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(156, 163, 175, 0.3) transparent;
+/* Custom Scrollbar */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 4px;
 }
 
-aside::-webkit-scrollbar {
-  width: 6px;
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
 }
 
-aside::-webkit-scrollbar-track {
-  background: transparent;
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
 }
 
-aside::-webkit-scrollbar-thumb {
-  background-color: rgba(156, 163, 175, 0.3);
-  border-radius: 3px;
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 
-aside::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(156, 163, 175, 0.5);
+/* Animations */
+.slide-fade-enter-active,
+.slide-fade-leave-active {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  opacity: 0;
+  transform: translateX(-10px);
+}
+
+.bounce-enter-active {
+  animation: bounce-in 0.5s;
+}
+
+.bounce-leave-active {
+  animation: bounce-in 0.5s reverse;
+}
+
+@keyframes bounce-in {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Active Link Indicator */
 .router-link-active {
   position: relative;
+  overflow: hidden;
 }
 
-.router-link-active::before {
+.router-link-active::after {
   content: '';
   position: absolute;
-  right: 0;
   top: 0;
+  left: 0;
+  right: 0;
   bottom: 0;
-  width: 3px;
-  background: linear-gradient(to bottom, #3b82f6, #1d4ed8);
-  border-radius: 0 3px 3px 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 100%);
+  pointer-events: none;
 }
 
-[dir='rtl'] .router-link-active::before {
-  right: auto;
-  left: 0;
+/* Gradient Border Effect */
+.router-link-active {
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.3);
+}
+
+/* Hover Effects */
+.group:hover .group-hover\:scale-105 {
+  transform: scale(1.05);
+}
+
+/* Glass Effect */
+.bg-gradient-to-br {
+  background-attachment: fixed;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 1024px) {
+  aside {
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* RTL Support */
+[dir='rtl'] .router-link-active {
+  border-right: none;
+  border-left: 4px solid;
+}
+
+[dir='rtl'] .slide-fade-enter-from,
+[dir='rtl'] .slide-fade-leave-to {
+  transform: translateX(10px);
+}
+
+/* Loading Animation */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 25%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* Icon Pulse Animation */
+@keyframes icon-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.fa-tachometer-alt,
+.fa-file-invoice-dollar,
+.fa-users,
+.fa-chart-line {
+  transition: transform 0.3s ease;
+}
+
+.group:hover .fa-tachometer-alt,
+.group:hover .fa-file-invoice-dollar,
+.group:hover .fa-users,
+.group:hover .fa-chart-line {
+  animation: icon-pulse 0.5s ease;
+}
+
+/* Notification Badge Animation */
+@keyframes badge-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.3);
+  }
+}
+
+.bg-red-500 {
+  animation: badge-pulse 2s infinite;
+}
+
+/* Smooth Transitions */
+* {
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease,
+    transform 0.3s ease,
+    opacity 0.3s ease;
+}
+
+/* Focus States */
+button:focus,
+a:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+}
+
+/* Active State Enhancement */
+.router-link-active {
+  backdrop-filter: blur(10px);
 }
 </style>

@@ -11,6 +11,7 @@ import report from './modules/report'
 import dashboard from './modules/dashboard'
 import invoiceManagement from './modules/invoiceManagement'
 import assignPermissions from './modules/assignPermissions'
+import payments from './modules/payments'
 
 export default createStore({
   state: {
@@ -63,6 +64,7 @@ export default createStore({
     dashboard: dashboard,
     invoiceManagement: invoiceManagement,
     assignPermissions: assignPermissions,
+    payments: payments,
 
 
   }

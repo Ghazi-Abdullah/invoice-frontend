@@ -1,63 +1,143 @@
-import axios from '../../api/axios'
+// src/store/modules/users.js
+import axios from '@/api/axios'
 
 export default {
   namespaced: true,
 
-  state: {
+  state: () => ({
     users: [],
-    user: null,
+    currentUser: null,
     groups: [],
-    isLoading: false,
-    error: null
-  },
+    loading: false,
+    error: null,
+    pagination: {
+      current_page: 1,
+      last_page: 1,
+      per_page: 10,
+      total: 0,
+      from: 0,
+      to: 0
+    },
+    filters: {
+      search: '',
+      page: 1
+    }
+  }),
 
   getters: {
-    users: (state) => state.users,
-    user: (state) => state.user,
-    groups: (state) => state.groups,
-    isLoading: (state) => state.isLoading,
-    error: (state) => state.error
+    users: state => state.users,
+    currentUser: state => state.currentUser,
+    groups: state => state.groups,
+    loading: state => state.loading,
+    error: state => state.error,
+    pagination: state => state.pagination,
+    userFilters: state => state.filters,
+
+    userById: (state) => (id) => {
+      return state.users.find(user => Number(user.id) === Number(id))
+    },
+
+    userStats: (state) => {
+      const users = state.users
+      return {
+        total: users.length,
+        active: users.filter(user => user.status === 'active' || user.is_active === true).length,
+        inactive: users.filter(user => user.status === 'inactive' || user.is_active === false).length,
+        suspended: users.filter(user => user.status === 'suspended').length
+      }
+    }
   },
 
   mutations: {
-    SET_USERS(state, users) {
-      state.users = users
+    SET_LOADING(state, loading) {
+      state.loading = loading
     },
-    SET_USER(state, user) {
-      state.user = user
-    },
-    SET_GROUPS(state, groups) {
-      state.groups = groups
-    },
-    SET_LOADING(state, isLoading) {
-      state.isLoading = isLoading
-    },
+
     SET_ERROR(state, error) {
       state.error = error
     },
+
     CLEAR_ERROR(state) {
       state.error = null
+    },
+
+    SET_USERS(state, data) {
+      // حفظ بيانات المستخدمين
+      state.users = data.users || data.data || []
+
+      // حفظ بيانات الترقيم إذا وجدت
+      if (data.pagination) {
+        state.pagination = data.pagination
+      } else if (data.meta) {
+        state.pagination = {
+          current_page: data.meta.current_page,
+          last_page: data.meta.last_page,
+          per_page: data.meta.per_page,
+          total: data.meta.total,
+          from: data.meta.from,
+          to: data.meta.to
+        }
+      }
+    },
+
+    SET_CURRENT_USER(state, user) {
+      state.currentUser = user
+    },
+
+    SET_GROUPS(state, groups) {
+      state.groups = groups
+    },
+
+    ADD_USER(state, user) {
+      state.users.unshift(user)
+    },
+
+    UPDATE_USER(state, updatedUser) {
+      const index = state.users.findIndex(u => u.id === updatedUser.id)
+      if (index !== -1) {
+        state.users.splice(index, 1, updatedUser)
+      }
+    },
+
+    DELETE_USER(state, id) {
+      state.users = state.users.filter(u => u.id !== id)
+    },
+
+    SET_FILTERS(state, filters) {
+      state.filters = { ...state.filters, ...filters }
+    },
+
+    CLEAR_FILTERS(state) {
+      state.filters = {
+        search: '',
+        page: 1
+      }
     }
   },
 
   actions: {
-    async getUsers({ commit }) {
+    async getUsers({ commit, state }, params = {}) {
       commit('SET_LOADING', true)
       commit('CLEAR_ERROR')
 
       try {
-        const response = await axios.get('/admin/users')
+        const filters = { ...state.filters, ...params }
 
-        if (response.data.status) {
-          const users = response.data.data
-          commit('SET_USERS', users)
-          return users
+        const response = await axios.get('/admin/users', { params: filters })
+
+        if (response.data) {
+          commit('SET_USERS', response.data)
         } else {
-          throw new Error(response.data.message || 'Failed to fetch users')
+          commit('SET_ERROR', 'لا توجد بيانات في الاستجابة')
         }
+
+        return response.data
       } catch (error) {
-        const errorMsg = error.response?.data?.message || error.message
-        commit('SET_ERROR', errorMsg)
+        const errorMessage = error.response?.data?.message ||
+          error.response?.data?.error ||
+          'حدث خطأ في جلب بيانات المستخدمين'
+
+        commit('SET_ERROR', errorMessage)
         throw error
       } finally {
         commit('SET_LOADING', false)
@@ -71,127 +151,127 @@ export default {
       try {
         const response = await axios.get('/admin/groups/simple-list')
 
-        if (response.data.status) {
-          const groups = response.data.data
+        if (response.data) {
+          const groups = response.data.data || response.data
           commit('SET_GROUPS', groups)
-          return groups
         } else {
-          throw new Error(response.data.message || 'Failed to fetch groups')
+          commit('SET_ERROR', 'فشل في تحميل المجموعات: لا توجد بيانات')
         }
+
+        return response.data
       } catch (error) {
-        const errorMsg = error.response?.data?.message || error.message
-        commit('SET_ERROR', errorMsg)
+        commit('SET_ERROR', error.response?.data?.message || 'فشل في تحميل المجموعات')
         throw error
       } finally {
         commit('SET_LOADING', false)
       }
     },
 
-    async createUser({ dispatch }, userData) {
+    async createUser({ commit, dispatch }, userData) {
+      commit('SET_LOADING', true)
+      commit('CLEAR_ERROR')
+
       try {
-        // التحقق الأساسي من كلمة المرور
-        if (userData.password && userData.password.length < 8) {
-          throw new Error('Password must be at least 8 characters')
-        }
-
-        if (userData.password && userData.password !== userData.password_confirmation) {
-          throw new Error('Password confirmation does not match')
-        }
-
         const response = await axios.post('/admin/users', userData)
 
-        if (response.data.status) {
+        if (response.data) {
+          // إعادة تحميل قائمة المستخدمين بعد الإضافة
           await dispatch('getUsers')
-          return response.data.data
         } else {
-          // عرض رسالة الخطأ من الخادم مباشرة
-          throw new Error(response.data.message || 'Failed to create user')
+          commit('SET_ERROR', 'فشل في إنشاء المستخدم: لا توجد بيانات')
         }
+
+        return response.data
       } catch (error) {
-        // معالجة جميع أنواع الأخطاء
-        if (error.response) {
-          // خطأ 422 من Laravel
-          if (error.response.status === 422) {
-            const serverMessage = error.response.data?.message
-            if (serverMessage) {
-              throw new Error(serverMessage)
-            }
-            // إذا كانت هناك أخطاء متعددة
-            if (error.response.data?.errors) {
-              const errors = error.response.data.errors
-              const errorMessages = Object.values(errors).flat().join(', ')
-              throw new Error(errorMessages)
-            }
+        const errorMessage = error.response?.data?.message ||
+          'فشل في إنشاء المستخدم'
+
+        if (error.response?.status === 422) {
+          const validationErrors = error.response.data.errors
+          if (validationErrors) {
+            const errorList = Object.values(validationErrors).flat().join(', ')
+            commit('SET_ERROR', errorList)
+          } else {
+            commit('SET_ERROR', errorMessage)
           }
-          throw new Error(error.response.data?.message || error.message)
+        } else {
+          commit('SET_ERROR', errorMessage)
         }
         throw error
+      } finally {
+        commit('SET_LOADING', false)
       }
     },
 
-    async updateUser({ dispatch }, { id, data }) {
+    async updateUser({ commit, dispatch }, { id, data }) {
+      commit('SET_LOADING', true)
+      commit('CLEAR_ERROR')
+
       try {
-        // إذا تم إرسال كلمة مرور جديدة، تأكد من صحتها
-        if (data.password) {
-          if (data.password.length < 8) {
-            throw new Error('Password must be at least 8 characters')
-          }
-
-          if (data.password !== data.password_confirmation) {
-            throw new Error('Password confirmation does not match')
-          }
-        }
-
         const response = await axios.put(`/admin/users/${id}`, data)
 
-        if (response.data.status) {
+        if (response.data) {
+          // إعادة تحميل قائمة المستخدمين بعد التحديث
           await dispatch('getUsers')
-          return response.data.data
         } else {
-          throw new Error(response.data.message || 'Failed to update user')
+          commit('SET_ERROR', 'فشل في تحديث المستخدم: لا توجد بيانات')
         }
+
+        return response.data
       } catch (error) {
-        if (error.response) {
-          if (error.response.status === 422) {
-            const serverMessage = error.response.data?.message
-            if (serverMessage) {
-              throw new Error(serverMessage)
-            }
+        const errorMessage = error.response?.data?.message ||
+          'فشل في تحديث المستخدم'
+
+        if (error.response?.status === 422) {
+          const validationErrors = error.response.data.errors
+          if (validationErrors) {
+            const errorList = Object.values(validationErrors).flat().join(', ')
+            commit('SET_ERROR', errorList)
+          } else {
+            commit('SET_ERROR', errorMessage)
           }
-          throw new Error(error.response.data?.message || error.message)
+        } else {
+          commit('SET_ERROR', errorMessage)
         }
         throw error
+      } finally {
+        commit('SET_LOADING', false)
       }
     },
 
-    async deleteUser({ dispatch }, id) {
+    async deleteUser({ commit, dispatch }, id) {
+      commit('SET_LOADING', true)
+      commit('CLEAR_ERROR')
+
       try {
         const response = await axios.delete(`/admin/users/${id}`)
 
-        if (response.data.status) {
+        if (response.data) {
+          // إعادة تحميل قائمة المستخدمين بعد الحذف
           await dispatch('getUsers')
-          return true
         } else {
-          throw new Error(response.data.message || 'Failed to delete user')
+          commit('SET_ERROR', 'فشل في حذف المستخدم: لا توجد بيانات')
         }
+
+        return response.data
       } catch (error) {
-        throw error.response?.data?.message || error.message
+        commit('SET_ERROR', error.response?.data?.message || 'فشل في حذف المستخدم')
+        throw error
+      } finally {
+        commit('SET_LOADING', false)
       }
     },
 
-    async updateUserStatus({ dispatch }, { id, is_active }) {
-      try {
-        const response = await axios.put(`/admin/users/${id}/status`, { is_active })
+    updateFilters({ commit }, filters) {
+      commit('SET_FILTERS', filters)
+    },
 
-        if (response.data.status) {
-          await dispatch('getUsers')
-          return response.data.data
-        } else {
-          throw new Error(response.data.message || 'Failed to update user status')
-        }
-      } catch (error) {
-        throw error.response?.data?.message || error.message
-      }
+    clearFilters({ commit }) {
+      commit('CLEAR_FILTERS')
+    },
+
+    clearError({ commit }) {
+      commit('CLEAR_ERROR')
     }
   }
 }

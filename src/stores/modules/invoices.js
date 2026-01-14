@@ -153,45 +153,62 @@ export default {
   },
 
   actions: {
+    async createInvoice({ commit }, invoiceData) {
+      commit('SET_LOADING', true)
+      commit('CLEAR_ERROR')
+
+      try {
+        console.log('🚀 Creating invoice:', invoiceData)
+        const response = await axios.post('/admin/invoices', invoiceData)
+        console.log('✅ Invoice created:', response.data)
+
+        if (response.data) {
+          const invoice = response.data.data || response.data
+          commit('ADD_INVOICE', invoice)
+          commit('SET_CURRENT_INVOICE', invoice)
+
+          // إضافة منطق Stripe إذا كان مفعلاً
+          if (invoiceData.enable_stripe_checkout) {
+            console.log('🎯 Stripe Checkout enabled for invoice:', invoice.id)
+            // يمكنك استدعاء PaymentController هنا لإنشاء جلسة Stripe
+          }
+        } else {
+          commit('SET_ERROR', 'فشل في إنشاء الفاتورة: لا توجد بيانات')
+        }
+        return response.data
+      } catch (error) {
+        console.error('❌ Error creating invoice:', error)
+        console.error('Error details:', error.response?.data || error.message)
+        commit('SET_ERROR', error.response?.data?.message || 'فشل في إنشاء الفاتورة')
+        throw error
+      } finally {
+        commit('SET_LOADING', false)
+      }
+    },
+
     async fetchInvoices({ commit, state }, params = {}) {
       commit('SET_LOADING', true)
       commit('CLEAR_ERROR')
 
       try {
-<<<<<<< HEAD
-        const response = await axios.get('/admin/invoices', {
-          params: {
-            page: params.page || 1,
-            status: params.status || '',
-            client_id: params.client_id || '',
-            search: params.search || ''
-          }
-        })
-=======
         const filters = { ...state.filters, ...params }
         console.log('📋 Fetching invoices with params:', filters)
->>>>>>> b6d1335e33cfc3f277e9b11cc891f6f9da45361f
 
         const response = await axios.get('/admin/invoices', { params: filters })
         console.log('✅ Invoices API Response:', response.data)
 
-        // معالجة الاستجابة بناءً على هيكل Laravel
         if (response.data) {
           if (response.data.status === true || response.data.success === true) {
-            // هيكل Laravel مع status/success
             const data = response.data.data || response.data
 
-            // إذا كان data يحتوي على pagination (كما في Laravel Paginator)
             if (data && data.data) {
               commit('SET_INVOICES', data)
             } else {
               commit('SET_INVOICES', data)
             }
           } else if (response.data.data) {
-            // إذا كان هناك data مباشرة
             commit('SET_INVOICES', response.data)
           } else if (Array.isArray(response.data)) {
-            // إذا كانت الاستجابة مصفوفة مباشرة
             commit('SET_INVOICES', response.data)
           } else {
             console.warn('⚠️ Unknown response structure:', response.data)
@@ -209,8 +226,8 @@ export default {
         console.error('Error details:', error.response?.data || error.message)
 
         const errorMessage = error.response?.data?.message ||
-                            error.response?.data?.error ||
-                            'حدث خطأ في جلب بيانات الفواتير'
+          error.response?.data?.error ||
+          'حدث خطأ في جلب بيانات الفواتير'
 
         commit('SET_ERROR', errorMessage)
         commit('SET_INVOICES', [])
@@ -221,14 +238,8 @@ export default {
     },
 
     async fetchInvoice({ commit }, id) {
-<<<<<<< HEAD
-      try {
-        console.log(`📄 Fetching invoice with ID: ${id}`)
-        const response = await axios.get(`/admin/invoices/${id}`)
-=======
       commit('SET_LOADING', true)
       commit('CLEAR_ERROR')
->>>>>>> b6d1335e33cfc3f277e9b11cc891f6f9da45361f
 
       try {
         console.log(`🚀 Fetching invoice with ID: ${id}`)
@@ -251,48 +262,9 @@ export default {
       }
     },
 
-    async createInvoice({ commit }, invoiceData) {
-<<<<<<< HEAD
-      try {
-        console.log('📝 Creating invoice:', invoiceData)
-        const response = await axios.post('/admin/invoices', invoiceData)
-=======
-      commit('SET_LOADING', true)
-      commit('CLEAR_ERROR')
->>>>>>> b6d1335e33cfc3f277e9b11cc891f6f9da45361f
-
-      try {
-        console.log('🚀 Creating invoice:', invoiceData)
-        const response = await axios.post('/admin/invoices', invoiceData)
-        console.log('✅ Invoice created:', response.data)
-
-        if (response.data) {
-          const invoice = response.data.data || response.data
-          commit('ADD_INVOICE', invoice)
-          commit('SET_CURRENT_INVOICE', invoice)
-        } else {
-          commit('SET_ERROR', 'فشل في إنشاء الفاتورة: لا توجد بيانات')
-        }
-        return response.data
-      } catch (error) {
-        console.error('❌ Error creating invoice:', error)
-        console.error('Error details:', error.response?.data || error.message)
-        commit('SET_ERROR', error.response?.data?.message || 'فشل في إنشاء الفاتورة')
-        throw error
-      } finally {
-        commit('SET_LOADING', false)
-      }
-    },
-
     async updateInvoice({ commit }, { id, data }) {
-<<<<<<< HEAD
-      try {
-        console.log('📝 Updating invoice:', { id, data })
-        const response = await axios.put(`/admin/invoices/${id}`, data)
-=======
       commit('SET_LOADING', true)
       commit('CLEAR_ERROR')
->>>>>>> b6d1335e33cfc3f277e9b11cc891f6f9da45361f
 
       try {
         console.log(`🚀 Updating invoice ${id}:`, data)
@@ -317,13 +289,8 @@ export default {
     },
 
     async deleteInvoice({ commit }, id) {
-<<<<<<< HEAD
-      try {
-        const response = await axios.delete(`/admin/invoices/${id}`)
-=======
       commit('SET_LOADING', true)
       commit('CLEAR_ERROR')
->>>>>>> b6d1335e33cfc3f277e9b11cc891f6f9da45361f
 
       try {
         console.log(`🚀 Deleting invoice ${id}`)
@@ -345,16 +312,9 @@ export default {
       }
     },
 
-<<<<<<< HEAD
-    async updateInvoiceStatus({ commit, dispatch }, { id, status }) {
-      try {
-        console.log(`🔄 Updating invoice ${id} status to ${status}`)
-        const response = await axios.put(`/admin/invoices/${id}/status`, { status })
-=======
     async updateInvoiceStatus({ commit }, { id, status, payment_date = null }) {
       commit('SET_LOADING', true)
       commit('CLEAR_ERROR')
->>>>>>> b6d1335e33cfc3f277e9b11cc891f6f9da45361f
 
       try {
         console.log(`🚀 Updating invoice ${id} status to: ${status}`)

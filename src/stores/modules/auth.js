@@ -90,12 +90,7 @@ export default {
   actions: {
     async login({ commit, dispatch }, credentials) {
       commit('SET_LOADING', true)
-<<<<<<< HEAD
-      try {
-        const response = await axios.post('/admin/login', credentials)
-=======
       commit('SET_LOGIN_ERROR', null)
->>>>>>> b6d1335e33cfc3f277e9b11cc891f6f9da45361f
 
       console.log('🔐 محاولة تسجيل الدخول:', credentials)
 
@@ -215,9 +210,6 @@ export default {
 
     async loadMenus({ commit, rootState }) {
       try {
-<<<<<<< HEAD
-        const response = await axios.post('/admin/register', userData)
-=======
         // تحميل القوائم بناءً على صلاحيات المستخدم
         const menus = [
           {
@@ -277,7 +269,6 @@ export default {
             permission: 'view_reports'
           }
         ]
->>>>>>> b6d1335e33cfc3f277e9b11cc891f6f9da45361f
 
         // إضافة قوائم الإدارة للمسؤولين
         if (rootState.auth.is_admin || (Array.isArray(rootState.auth.permissions) && rootState.auth.permissions.includes('view_admin_groups'))) {

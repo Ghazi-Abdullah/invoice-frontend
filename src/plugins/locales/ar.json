@@ -102,6 +102,8 @@
     "revenue": "الإيرادات"
   },
   "clients": {
+    "name": "اسم العميل",
+    "email": "البريد الإلكتروني",
     "title": "العملاء",
     "subtitle": "إدارة قاعدة بيانات العملاء بسهولة",
     "choose_client": "اختر عميل",
@@ -206,6 +208,7 @@
     "recent_activity": "العملاء الحديثين"
   },
   "invoices": {
+    "invoiceNumber": "رقم الفاتورة",
     "status_legend": "وسيلة إيضاح الحالة",
     "financial_summary": "ملخص مالي",
     "overdue_amount": "المبلغ المتأخر",
@@ -258,6 +261,29 @@
       "notFound": "لم يتم العثور على فاتورة",
       "notFoundMessage": "الفاتورة المطلوبة غير موجودة"
     },
+    "payment": {
+      "paymentOptions": "خيارات الدفع",
+      "securePayment": "دفع آمن",
+      "secureDescription": "جميع المدفوعات مشفرة وآمنة عبر Stripe",
+      "payNow": "ادفع الآن",
+      "payWithStripe": "الدفع عبر Stripe",
+      "processing": "جاري إعداد الدفع...",
+      "acceptedCards": "البطاقات المقبولة",
+      "secure": "آمن 100%",
+      "encrypted": "مدفوعات مشفرة",
+      "instant": "فوري",
+      "immediateConfirmation": "تأكيد فوري",
+      "receipt": "إيصال",
+      "receiptSent": "إيصال مرسل للبريد",
+      "paymentCompleted": "تم الدفع بنجاح",
+      "thankYou": "شكراً لك! تم دفع",
+      "paidOn": "تم الدفع في",
+      "paymentDetails": "تفاصيل الدفع",
+      "transactionId": "رقم العملية",
+      "paymentMethod": "طريقة الدفع",
+      "paymentDate": "تاريخ الدفع",
+      "resendReceipt": "إعادة إرسال الإيصال"
+    },
     "statuses": {
       "draft": "مسودة",
       "sent": "مرسلة",
@@ -268,7 +294,8 @@
       "markSent": "تعيين كمرسلة",
       "markPaid": "تعيين كمدفوعة",
       "print": "طباعة",
-      "downloadPDF": "تحميل PDF"
+      "downloadPDF": "تحميل PDF",
+      "markPaidManually": "وضع كمدفوعة يدوياً"
     },
     "messages": {
       "statusUpdated": "تم تحديث حالة الفاتورة بنجاح",
@@ -282,7 +309,12 @@
       "createSuccess": "تم إنشاء {item} بنجاح",
       "updateSuccess": "تم تحديث {item} بنجاح",
       "deleteSuccess": "تم حذف {item} بنجاح",
-      "confirmDelete": "هل أنت متأكد من حذف {item}؟"
+      "confirmDelete": "هل أنت متأكد من حذف {item}؟",
+      "reportLoaded": "تم تحميل التقرير بنجاح",
+      "reportExported": "تم تصدير التقرير بنجاح",
+      "filtersReset": "تم إعادة تعيين الفلاتر",
+      "reminderSent": "تم إرسال التذكير بنجاح",
+      "invoicePaid": "تم تسديد الفاتورة بنجاح"
     },
     "table": {
       "invoice_number": "رقم الفاتورة",
@@ -297,6 +329,12 @@
     },
     "stats": {
       "total": "الإجمالي",
+      "sent": "مرسلة",
+      "paid": "مدفوعة",
+      "overdue": "متأخرة"
+    },
+    "status": {
+      "draft": "مسودة",
       "sent": "مرسلة",
       "paid": "مدفوعة",
       "overdue": "متأخرة"
@@ -327,6 +365,14 @@
     "collapse_sidebar": "طي القائمة الجانبية"
   },
   "common": {
+    "dateFrom": "من تاريخ",
+    "dateTo": "إلى تاريخ",
+    "export": "تصدير",
+    "reset": "إعادة تعيين",
+    "amount": "المبلغ",
+    "month": "الشهر",
+    "days": "أيام",
+    "actions": "الإجراءات",
     "or": "أو",
     "filter": "فلتر",
     "general": "عام",
@@ -418,6 +464,11 @@
     "confirmDelete": "هل أنت متأكد من حذف {item}؟"
   },
   "errors": {
+    "failedToLoadReport": "فشل في تحميل التقرير",
+    "failedToExportReport": "فشل في تصدير التقرير",
+    "failedToLoadClients": "فشل في تحميل العملاء",
+    "failedToSendReminder": "فشل في إرسال التذكير",
+    "failedToMarkAsPaid": "فشل في تسديد الفاتورة",
     "saveClientFailed": "فشل في حفظ العميل",
     "deleteError": "خطأ في الحذف",
     "loadClientsError": "خطأ في تحميل بيانات العملاء",
@@ -504,9 +555,42 @@
     "pageOf": "صفحة {current} من {total}"
   },
   "reports": {
-    "title": "التقارير",
     "subtitle": "إحصائيات وبيانات شاملة لعملك",
-    "quick_stats": {
+    "title": "التقارير والإحصائيات",
+    "invoiceStatus": "حالة الفاتورة",
+    "invoicesReport": "تقرير الفواتير",
+    "clientsReport": "تقرير العملاء",
+    "revenueReport": "تقرير الإيرادات",
+    "overdueInvoices": "الفواتير المتأخرة",
+    "totalInvoices": "إجمالي الفواتير",
+    "totalAmount": "إجمالي المبلغ",
+    "totalPaid": "المبلغ المدفوع",
+    "totalDue": "المبلغ المستحق",
+    "invoicesList": "قائمة الفواتير",
+    "totalClients": "إجمالي العملاء",
+    "totalRevenue": "إجمالي الإيرادات",
+    "invoicesCount": "عدد الفواتير",
+    "totalSpent": "إجمالي المشتريات",
+    "averageInvoice": "متوسط الفاتورة",
+    "collectedRevenue": "المحصل فعلياً",
+    "outstandingRevenue": "المستحق تحصيله",
+    "collectionRate": "نسبة التحصيل",
+    "monthlyRevenue": "الإيرادات الشهرية",
+    "collectedAmount": "المحصل",
+    "outstandingAmount": "المستحق",
+    "totalOverdueAmount": "إجمالي المبلغ المتأخر",
+    "averageDaysOverdue": "متوسط أيام التأخير",
+    "overdueInvoicesList": "قائمة الفواتير المتأخرة",
+    "daysOverdue": "أيام التأخير",
+    "sendReminder": "تذكير",
+    "markAsPaid": "تسديد",
+    "confirmSendReminder": "هل تريد إرسال تذكير للعميل؟",
+    "confirmMarkAsPaid": "هل تريد تسديد هذه الفاتورة؟",
+    "noInvoices": "لا توجد فواتير في الفترة المحددة",
+    "noClients": "لا توجد بيانات للعملاء",
+    "noRevenue": "لا توجد بيانات للإيرادات",
+    "noOverdue": "لا توجد فواتير متأخرة",
+    "quick_stas": {
       "total_invoices": "إجمالي الفواتير",
       "total_amount": "المبلغ الإجمالي",
       "total_paid": "إجمالي المدفوع",
