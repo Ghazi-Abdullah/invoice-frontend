@@ -1134,6 +1134,8 @@ export default {
   computed: {
     ...mapState('auth', ['user', 'permissions', 'is_admin']),
     ...mapState('dashboard', ['stats', 'loading', 'error']),
+
+    
     ...mapGetters('dashboard', [
       'recentClients',
       'recentInvoices',
