@@ -1533,12 +1533,12 @@ export default {
     },
 
     // تصدير التقرير
-    async exportReport() {
-      try {
-        await this.exportReport(this.activeTab)
+    exportReport() {
+      if (this.loading) {
+        this.exportReport(this.activeTab)
         this.$toast.success(this.$t('messages.reportExported'))
-      } catch (error) {
-        this.$toast.error(error.message || this.$t('errors.failedToExportReport'))
+      } else {
+        this.$toast.error(this.$t('errors.failedToExportReport'))
       }
     },
 

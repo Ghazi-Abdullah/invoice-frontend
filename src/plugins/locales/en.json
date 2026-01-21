@@ -569,6 +569,7 @@
     "permission_description_placeholder": "Enter permission description",
     "child": "Child",
     "type": "Type",
+    "manage_for": "Manage Permissions for: {user}",
     "parent_permission_hint": "Select a parent permission to create a hierarchical structure"
   },
   "assign_permissions": {
