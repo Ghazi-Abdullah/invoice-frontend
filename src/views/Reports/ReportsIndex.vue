@@ -478,14 +478,19 @@
           </div>
 
           <!-- Invoices Table -->
-          <div v-if="reports.invoices.length > 0" class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+          <div
+            v-if="reports.invoices.length > 0"
+            class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6"
+          >
             <div class="px-6 py-4 border-b border-gray-200 bg-gray-50/50">
               <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div class="flex items-center gap-3">
                   <h3 class="text-lg font-semibold text-gray-800">
                     {{ $t('reports.invoicesList') }}
                   </h3>
-                  <span class="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
+                  <span
+                    class="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full"
+                  >
                     {{ reports.invoices.length }} {{ $t('common.total') }}
                   </span>
                 </div>
@@ -496,31 +501,49 @@
               <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                   <tr>
-                    <th class="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <th
+                      class="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider"
+                    >
                       {{ $t('invoices.table.invoice_number') }}
                     </th>
-                    <th class="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <th
+                      class="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider"
+                    >
                       {{ $t('invoices.table.client') }}
                     </th>
-                    <th class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <th
+                      class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider"
+                    >
                       {{ $t('invoices.table.date') }}
                     </th>
-                    <th class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <th
+                      class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider"
+                    >
                       {{ $t('invoices.table.due_date') }}
                     </th>
-                    <th class="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <th
+                      class="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider"
+                    >
                       {{ $t('invoices.table.amount') }}
                     </th>
-                    <th class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <th
+                      class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider"
+                    >
                       {{ $t('invoices.table.status') }}
                     </th>
                   </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                  <tr v-for="invoice in reports.invoices" :key="invoice.id" class="hover:bg-blue-50/30 transition-colors duration-150">
+                  <tr
+                    v-for="invoice in reports.invoices"
+                    :key="invoice.id"
+                    class="hover:bg-blue-50/30 transition-colors duration-150"
+                  >
                     <td class="px-6 py-4">
                       <router-link :to="`/invoices/${invoice.id}`" class="block group/link">
-                        <p class="text-base font-semibold text-gray-900 group-hover/link:text-blue-600 transition-colors">
+                        <p
+                          class="text-base font-semibold text-gray-900 group-hover/link:text-blue-600 transition-colors"
+                        >
                           {{ invoice.invoice_number || `#${invoice.id}` }}
                         </p>
                       </router-link>
@@ -528,7 +551,9 @@
                     <td class="px-6 py-4">
                       <div class="flex items-center">
                         <div class="flex-shrink-0 ml-3">
-                          <div class="w-10 h-10 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg flex items-center justify-center">
+                          <div
+                            class="w-10 h-10 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg flex items-center justify-center"
+                          >
                             <span class="text-blue-700 font-bold text-sm">
                               {{ getInitials(invoice.client?.name) }}
                             </span>
@@ -550,7 +575,10 @@
                       </div>
                     </td>
                     <td class="px-6 py-4 text-center">
-                      <div :class="getDaysRemainingClass(invoice.due_date)" class="flex flex-col items-center">
+                      <div
+                        :class="getDaysRemainingClass(invoice.due_date)"
+                        class="flex flex-col items-center"
+                      >
                         <span class="text-sm font-medium">
                           {{ formatDate(invoice.due_date) }}
                         </span>
@@ -565,8 +593,14 @@
                     </td>
                     <td class="px-6 py-4 text-center">
                       <div class="flex flex-col items-center">
-                        <span :class="getStatusBadgeClass(invoice.status)" class="px-3 py-1.5 rounded-full text-xs font-semibold inline-flex items-center gap-1">
-                          <span :class="getStatusDotClass(invoice.status)" class="w-2 h-2 rounded-full"></span>
+                        <span
+                          :class="getStatusBadgeClass(invoice.status)"
+                          class="px-3 py-1.5 rounded-full text-xs font-semibold inline-flex items-center gap-1"
+                        >
+                          <span
+                            :class="getStatusDotClass(invoice.status)"
+                            class="w-2 h-2 rounded-full"
+                          ></span>
                           {{ getStatusText(invoice.status) }}
                         </span>
                       </div>
@@ -579,8 +613,15 @@
 
           <!-- Empty State -->
           <div v-else class="bg-white rounded-xl border border-gray-200 shadow-sm p-12 text-center">
-            <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div
+              class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4"
+            >
+              <svg
+                class="w-8 h-8 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -694,14 +735,19 @@
           </div>
 
           <!-- Clients Table -->
-          <div v-if="reports.clients.length > 0" class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+          <div
+            v-if="reports.clients.length > 0"
+            class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6"
+          >
             <div class="px-6 py-4 border-b border-gray-200 bg-gray-50/50">
               <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div class="flex items-center gap-3">
                   <h3 class="text-lg font-semibold text-gray-800">
                     {{ $t('reports.clientsReport') }}
                   </h3>
-                  <span class="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
+                  <span
+                    class="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full"
+                  >
                     {{ reports.clients.length }} {{ $t('common.total') }}
                   </span>
                 </div>
@@ -712,29 +758,45 @@
               <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                   <tr>
-                    <th class="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <th
+                      class="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider"
+                    >
                       {{ $t('clients.name') }}
                     </th>
-                    <th class="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <th
+                      class="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider"
+                    >
                       {{ $t('clients.email') }}
                     </th>
-                    <th class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <th
+                      class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider"
+                    >
                       {{ $t('reports.invoicesCount') }}
                     </th>
-                    <th class="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <th
+                      class="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider"
+                    >
                       {{ $t('reports.totalSpent') }}
                     </th>
-                    <th class="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <th
+                      class="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider"
+                    >
                       {{ $t('reports.averageInvoice') }}
                     </th>
                   </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                  <tr v-for="client in reports.clients" :key="client.id" class="hover:bg-blue-50/30 transition-colors duration-150">
+                  <tr
+                    v-for="client in reports.clients"
+                    :key="client.id"
+                    class="hover:bg-blue-50/30 transition-colors duration-150"
+                  >
                     <td class="px-6 py-4">
                       <div class="flex items-center">
                         <div class="flex-shrink-0 ml-3">
-                          <div class="w-10 h-10 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg flex items-center justify-center">
+                          <div
+                            class="w-10 h-10 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg flex items-center justify-center"
+                          >
                             <span class="text-blue-700 font-bold text-sm">
                               {{ getInitials(client.name) }}
                             </span>
@@ -751,7 +813,9 @@
                       <div class="text-sm text-gray-900">{{ client.email }}</div>
                     </td>
                     <td class="px-6 py-4 text-center">
-                      <span class="px-3 py-1 bg-blue-100 text-blue-700 text-sm font-medium rounded-full">
+                      <span
+                        class="px-3 py-1 bg-blue-100 text-blue-700 text-sm font-medium rounded-full"
+                      >
                         {{ client.invoices_count || 0 }}
                       </span>
                     </td>
@@ -777,8 +841,15 @@
 
           <!-- Empty State -->
           <div v-else class="bg-white rounded-xl border border-gray-200 shadow-sm p-12 text-center">
-            <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div
+              class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4"
+            >
+              <svg
+                class="w-8 h-8 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -922,14 +993,19 @@
           </div>
 
           <!-- Revenue Table -->
-          <div v-if="reports.revenue.length > 0" class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+          <div
+            v-if="reports.revenue.length > 0"
+            class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6"
+          >
             <div class="px-6 py-4 border-b border-gray-200 bg-gray-50/50">
               <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div class="flex items-center gap-3">
                   <h3 class="text-lg font-semibold text-gray-800">
                     {{ $t('reports.monthlyRevenue') }}
                   </h3>
-                  <span class="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
+                  <span
+                    class="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full"
+                  >
                     {{ reports.revenue.length }} {{ $t('common.months') }}
                   </span>
                 </div>
@@ -940,30 +1016,46 @@
               <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                   <tr>
-                    <th class="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <th
+                      class="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider"
+                    >
                       {{ $t('common.month') }}
                     </th>
-                    <th class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <th
+                      class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider"
+                    >
                       {{ $t('reports.invoicesCount') }}
                     </th>
-                    <th class="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <th
+                      class="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider"
+                    >
                       {{ $t('reports.totalAmount') }}
                     </th>
-                    <th class="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <th
+                      class="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider"
+                    >
                       {{ $t('reports.collectedAmount') }}
                     </th>
-                    <th class="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <th
+                      class="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider"
+                    >
                       {{ $t('reports.outstandingAmount') }}
                     </th>
                   </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                  <tr v-for="month in reports.revenue" :key="month.month" class="hover:bg-blue-50/30 transition-colors duration-150">
+                  <tr
+                    v-for="month in reports.revenue"
+                    :key="month.month"
+                    class="hover:bg-blue-50/30 transition-colors duration-150"
+                  >
                     <td class="px-6 py-4">
                       <div class="text-sm font-medium text-gray-900">{{ month.month }}</div>
                     </td>
                     <td class="px-6 py-4 text-center">
-                      <span class="px-3 py-1 bg-blue-100 text-blue-700 text-sm font-medium rounded-full">
+                      <span
+                        class="px-3 py-1 bg-blue-100 text-blue-700 text-sm font-medium rounded-full"
+                      >
                         {{ month.invoice_count || 0 }}
                       </span>
                     </td>
@@ -996,8 +1088,15 @@
 
           <!-- Empty State -->
           <div v-else class="bg-white rounded-xl border border-gray-200 shadow-sm p-12 text-center">
-            <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div
+              class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4"
+            >
+              <svg
+                class="w-8 h-8 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -1088,7 +1187,8 @@
                     {{ $t('reports.averageDaysOverdue') }}
                   </p>
                   <p class="text-2xl font-bold text-red-600">
-                    {{ Math.round(stats.overdue.average_days_overdue || 0) }} {{ $t('common.days') }}
+                    {{ Math.round(stats.overdue.average_days_overdue || 0) }}
+                    {{ $t('common.days') }}
                   </p>
                 </div>
                 <div class="p-3 bg-red-50 rounded-lg">
@@ -1111,7 +1211,10 @@
           </div>
 
           <!-- Overdue Table -->
-          <div v-if="reports.overdue.length > 0" class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+          <div
+            v-if="reports.overdue.length > 0"
+            class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6"
+          >
             <div class="px-6 py-4 border-b border-gray-200 bg-gray-50/50">
               <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div class="flex items-center gap-3">
@@ -1129,31 +1232,49 @@
               <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                   <tr>
-                    <th class="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <th
+                      class="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider"
+                    >
                       {{ $t('invoices.table.invoice_number') }}
                     </th>
-                    <th class="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <th
+                      class="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider"
+                    >
                       {{ $t('invoices.table.client') }}
                     </th>
-                    <th class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <th
+                      class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider"
+                    >
                       {{ $t('invoices.table.due_date') }}
                     </th>
-                    <th class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <th
+                      class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider"
+                    >
                       {{ $t('reports.daysOverdue') }}
                     </th>
-                    <th class="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <th
+                      class="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider"
+                    >
                       {{ $t('invoices.table.amount') }}
                     </th>
-                    <th class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <th
+                      class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider"
+                    >
                       {{ $t('common.actions') }}
                     </th>
                   </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                  <tr v-for="invoice in reports.overdue" :key="invoice.id" class="hover:bg-red-50/30 transition-colors duration-150">
+                  <tr
+                    v-for="invoice in reports.overdue"
+                    :key="invoice.id"
+                    class="hover:bg-red-50/30 transition-colors duration-150"
+                  >
                     <td class="px-6 py-4">
                       <router-link :to="`/invoices/${invoice.id}`" class="block group/link">
-                        <p class="text-base font-semibold text-gray-900 group-hover/link:text-blue-600 transition-colors">
+                        <p
+                          class="text-base font-semibold text-gray-900 group-hover/link:text-blue-600 transition-colors"
+                        >
                           {{ invoice.invoice_number || `#${invoice.id}` }}
                         </p>
                       </router-link>
@@ -1161,7 +1282,9 @@
                     <td class="px-6 py-4">
                       <div class="flex items-center">
                         <div class="flex-shrink-0 ml-3">
-                          <div class="w-10 h-10 bg-gradient-to-br from-red-100 to-red-200 rounded-lg flex items-center justify-center">
+                          <div
+                            class="w-10 h-10 bg-gradient-to-br from-red-100 to-red-200 rounded-lg flex items-center justify-center"
+                          >
                             <span class="text-red-700 font-bold text-sm">
                               {{ getInitials(invoice.client?.name) }}
                             </span>
@@ -1180,7 +1303,9 @@
                       </div>
                     </td>
                     <td class="px-6 py-4 text-center">
-                      <span class="px-3 py-1.5 bg-red-100 text-red-700 text-sm font-semibold rounded-full">
+                      <span
+                        class="px-3 py-1.5 bg-red-100 text-red-700 text-sm font-semibold rounded-full"
+                      >
                         {{ invoice.days_overdue || 0 }} {{ $t('common.days') }}
                       </span>
                     </td>
@@ -1197,7 +1322,12 @@
                           @click="sendReminder(invoice.id)"
                           class="px-3 py-1.5 bg-yellow-500 hover:bg-yellow-600 text-white text-sm rounded-lg transition-colors duration-200 flex items-center gap-1"
                         >
-                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg
+                            class="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
                             <path
                               stroke-linecap="round"
                               stroke-linejoin="round"
@@ -1211,7 +1341,12 @@
                           @click="markAsPaid(invoice.id)"
                           class="px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white text-sm rounded-lg transition-colors duration-200 flex items-center gap-1"
                         >
-                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg
+                            class="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
                             <path
                               stroke-linecap="round"
                               stroke-linejoin="round"
@@ -1231,8 +1366,15 @@
 
           <!-- Empty State -->
           <div v-else class="bg-white rounded-xl border border-gray-200 shadow-sm p-12 text-center">
-            <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div
+              class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4"
+            >
+              <svg
+                class="w-8 h-8 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"

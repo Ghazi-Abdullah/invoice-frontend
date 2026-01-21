@@ -349,6 +349,9 @@
     "quick_create": "Quickly create a new invoice"
   },
   "admin_groups": {
+    "default_group": "Default Group",
+    "users": "Users",
+    "permissions": "Permissions",
     "title": "Groups",
     "subtitle": "Manage user groups and permissions",
     "add_permission": "Add Permission",
@@ -399,6 +402,7 @@
     "collapse_sidebar": "Collapse Sidebar"
   },
   "common": {
+    "created_at": "Created At",
     "date_from": "Date From",
     "per_page": "Per Page",
     "dateFrom": "From Date",
@@ -618,6 +622,7 @@
     "group": "Group",
     "create_new": "Create New User",
     "start_creating_message": "Start by creating a new user",
+    "user_list": "Users List",
     "status": {
       "active": "Active",
       "inactive": "Inactive"

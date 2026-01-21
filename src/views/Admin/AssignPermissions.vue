@@ -8,9 +8,11 @@
         >
           <div>
             <div class="flex items-center gap-3 mb-2">
-              <div class="p-2 bg-white rounded-xl shadow-sm border border-gray-200">
+              <div
+                class="p-3 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl shadow-lg shadow-purple-200/50 border border-purple-100"
+              >
                 <svg
-                  class="w-6 h-6 text-purple-600"
+                  class="w-7 h-7 text-white"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -27,7 +29,10 @@
                 <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">
                   {{ $t('assign_permissions.title') }}
                 </h1>
-                <p class="text-gray-600 text-sm mt-1">{{ $t('assign_permissions.subtitle') }}</p>
+                <p class="text-gray-600 text-sm mt-1 flex items-center gap-2">
+                  <span class="w-1 h-1 bg-purple-400 rounded-full"></span>
+                  {{ $t('assign_permissions.subtitle') }}
+                </p>
               </div>
             </div>
           </div>
@@ -35,52 +40,77 @@
       </div>
 
       <!-- Loading State -->
-      <div v-if="loading" class="bg-white rounded-xl border border-gray-200 shadow-sm p-12 mb-6">
-        <div class="text-center">
-          <div
-            class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-200 border-t-blue-600 mb-4"
-          ></div>
-          <p class="text-gray-700 font-medium">{{ $t('common.loading') }}</p>
-          <p class="text-sm text-gray-500 mt-2">{{ $t('assign_permissions.loading_subtitle') }}</p>
+      <div v-if="loading" class="mb-8">
+        <div class="bg-white/80 backdrop-blur-sm rounded-2xl border border-white/50 shadow-lg p-12">
+          <div class="text-center space-y-4">
+            <div class="relative inline-block">
+              <div class="w-16 h-16 border-4 border-blue-100 rounded-full"></div>
+              <div
+                class="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin absolute top-0 left-0"
+              ></div>
+            </div>
+            <div>
+              <p class="text-lg font-semibold text-gray-800">{{ $t('common.loading') }}</p>
+              <p class="text-sm text-gray-500 mt-2">
+                {{ $t('assign_permissions.loading_subtitle') }}
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 
       <!-- Error State -->
-      <div v-else-if="error" class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
-        <div class="flex items-start">
-          <div class="flex-shrink-0 pt-0.5">
-            <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
+      <div v-else-if="error" class="mb-8">
+        <div
+          class="bg-gradient-to-r from-red-50/80 to-red-100/50 backdrop-blur-sm border border-red-200/50 rounded-2xl p-6 shadow-lg"
+        >
+          <div class="flex items-start">
+            <div class="flex-shrink-0">
+              <div class="p-2 bg-red-100 rounded-lg">
+                <svg
+                  class="w-6 h-6 text-red-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </div>
+            </div>
+            <div class="mr-4 flex-1">
+              <h3 class="text-lg font-semibold text-red-800">{{ $t('errors.load_failed') }}</h3>
+              <p class="text-red-700 mt-2">{{ error }}</p>
+            </div>
+            <button
+              @click="loadData"
+              class="p-2 text-red-600 hover:text-red-800 hover:bg-red-100 rounded-lg transition-colors"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                />
+              </svg>
+            </button>
           </div>
-          <div class="mr-3 flex-1">
-            <h3 class="text-sm font-medium text-red-800">{{ $t('errors.load_failed') }}</h3>
-            <p class="text-sm text-red-700 mt-1">{{ error }}</p>
-          </div>
-          <button @click="loadData" class="p-1.5 text-red-700 hover:text-red-900">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-              />
-            </svg>
-          </button>
         </div>
       </div>
 
       <!-- Main Content -->
       <div v-else class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Groups List Card -->
-        <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+        <div
+          class="bg-white/80 backdrop-blur-sm rounded-2xl border border-white/50 shadow-lg shadow-blue-100/20 overflow-hidden"
+        >
           <div
-            class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50"
+            class="px-6 py-5 border-b border-gray-200/50 bg-gradient-to-r from-blue-50/80 to-indigo-50/80"
           >
             <div class="flex items-center gap-2">
               <svg
@@ -107,18 +137,18 @@
                 :key="group.id"
                 @click="selectGroup(group)"
                 :class="[
-                  'p-4 border rounded-xl cursor-pointer transition-all duration-200 group',
+                  'p-4 border rounded-xl cursor-pointer transition-all duration-200 group hover:-translate-y-0.5',
                   selectedGroup?.id === group.id
-                    ? 'border-blue-500 bg-blue-50 transform scale-[1.02] shadow-sm'
-                    : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50',
+                    ? 'border-blue-500 bg-gradient-to-r from-blue-50/80 to-blue-100/30 transform scale-[1.02] shadow-lg shadow-blue-100/30'
+                    : 'border-gray-200/50 hover:border-blue-300 hover:bg-gradient-to-r hover:from-gray-50/50 hover:to-gray-100/30',
                 ]"
               >
                 <div class="flex items-center">
                   <div
-                    class="w-12 h-12 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl flex items-center justify-center ml-3"
+                    class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center ml-3 shadow-md group-hover:scale-105 transition-transform duration-200"
                   >
                     <svg
-                      class="w-6 h-6 text-blue-600"
+                      class="w-6 h-6 text-white"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -132,7 +162,7 @@
                     </svg>
                   </div>
                   <div class="mr-3 flex-1">
-                    <h3 class="font-bold text-gray-900">
+                    <h3 class="font-bold text-gray-900 group-hover:text-blue-700">
                       {{ group.title_ar || group.title_en }}
                     </h3>
                     <p class="text-sm text-gray-500 mt-1">{{ group.title_en }}</p>
@@ -141,7 +171,7 @@
                 <div class="mt-4 flex items-center justify-between">
                   <div class="flex items-center gap-2">
                     <span
-                      class="px-2.5 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full inline-flex items-center gap-1"
+                      class="px-2.5 py-1 bg-gradient-to-r from-blue-100 to-blue-50 text-blue-700 text-xs font-semibold rounded-full inline-flex items-center gap-1 border border-blue-200/50"
                     >
                       <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path
@@ -154,7 +184,7 @@
                       {{ group.permissions_count || 0 }} {{ $t('permissions.permission') }}
                     </span>
                     <span
-                      class="px-2.5 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-full inline-flex items-center gap-1"
+                      class="px-2.5 py-1 bg-gradient-to-r from-green-100 to-green-50 text-green-700 text-xs font-semibold rounded-full inline-flex items-center gap-1 border border-green-200/50"
                     >
                       <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path
@@ -169,7 +199,7 @@
                   </div>
                   <div
                     v-if="selectedGroup?.id === group.id"
-                    class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"
+                    class="w-2 h-2 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full animate-pulse"
                   ></div>
                 </div>
               </div>
@@ -179,9 +209,11 @@
 
         <!-- Permissions Card -->
         <div class="lg:col-span-2">
-          <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+          <div
+            class="bg-white/80 backdrop-blur-sm rounded-2xl border border-white/50 shadow-xl shadow-purple-100/20 overflow-hidden"
+          >
             <div
-              class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-indigo-50"
+              class="px-6 py-5 border-b border-gray-200/50 bg-gradient-to-r from-purple-50/80 to-indigo-50/80"
             >
               <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
@@ -217,7 +249,7 @@
                 <div class="flex flex-wrap gap-2">
                   <button
                     @click="selectAllPermissions"
-                    class="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors duration-200 flex items-center gap-2 text-sm font-medium"
+                    class="px-5 py-2.5 bg-gradient-to-r from-blue-100 to-blue-50 text-blue-700 rounded-xl hover:bg-gradient-to-r hover:from-blue-200 hover:to-blue-100 transition-all duration-200 flex items-center gap-2 text-sm font-semibold transform hover:-translate-y-0.5 border border-blue-200/50"
                   >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
@@ -231,7 +263,7 @@
                   </button>
                   <button
                     @click="deselectAllPermissions"
-                    class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200 flex items-center gap-2 text-sm font-medium"
+                    class="px-5 py-2.5 bg-gradient-to-r from-gray-100 to-gray-50 text-gray-700 rounded-xl hover:bg-gradient-to-r hover:from-gray-200 hover:to-gray-100 transition-all duration-200 flex items-center gap-2 text-sm font-semibold transform hover:-translate-y-0.5 border border-gray-200/50"
                   >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
@@ -250,29 +282,33 @@
             <div class="p-6">
               <!-- No Group Selected -->
               <div v-if="!selectedGroup" class="text-center py-12">
-                <div
-                  class="w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-4"
-                >
-                  <svg
-                    class="w-8 h-8 text-gray-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                    />
-                  </svg>
+                <div class="max-w-md mx-auto">
+                  <div class="relative mb-6">
+                    <div
+                      class="w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-200 rounded-3xl mx-auto flex items-center justify-center shadow-lg"
+                    >
+                      <svg
+                        class="w-12 h-12 text-gray-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="1.5"
+                          d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                  <h3 class="text-2xl font-bold text-gray-900 mb-3">
+                    {{ $t('assign_permissions.select_group_first') }}
+                  </h3>
+                  <p class="text-gray-600 mb-8">
+                    {{ $t('assign_permissions.select_group_message') }}
+                  </p>
                 </div>
-                <h3 class="text-lg font-semibold text-gray-900 mb-2">
-                  {{ $t('assign_permissions.select_group_first') }}
-                </h3>
-                <p class="text-gray-600 mb-6 max-w-md mx-auto">
-                  {{ $t('assign_permissions.select_group_message') }}
-                </p>
               </div>
 
               <div v-else>
@@ -282,27 +318,29 @@
                     type="text"
                     v-model="searchQuery"
                     :placeholder="$t('common.search_permissions')"
-                    class="w-full px-3 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    class="w-full px-4 py-3.5 pl-11 bg-white/80 border border-gray-300/50 rounded-xl focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-200 placeholder:text-gray-400"
                   />
-                  <svg
-                    class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                    />
-                  </svg>
+                  <div class="absolute left-3 top-1/2 transform -translate-y-1/2">
+                    <svg
+                      class="w-5 h-5 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                      />
+                    </svg>
+                  </div>
                   <button
                     v-if="searchQuery"
                     @click="searchQuery = ''"
-                    class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                   >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
                         stroke-linecap="round"
                         stroke-linejoin="round"
@@ -315,36 +353,45 @@
 
                 <!-- Permissions Loading -->
                 <div v-if="permissionsLoading" class="text-center py-12">
-                  <div
-                    class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-blue-200 border-t-blue-600 mb-4"
-                  ></div>
-                  <p class="text-gray-700 font-medium">{{ $t('common.loading') }}</p>
+                  <div class="relative inline-block">
+                    <div class="w-16 h-16 border-4 border-blue-100 rounded-full"></div>
+                    <div
+                      class="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin absolute top-0 left-0"
+                    ></div>
+                  </div>
+                  <p class="text-lg font-semibold text-gray-800 mt-4">{{ $t('common.loading') }}</p>
                 </div>
 
                 <!-- Permissions List -->
                 <div v-else>
                   <div class="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="bg-blue-50 border border-blue-100 rounded-xl p-4">
+                    <div
+                      class="bg-gradient-to-br from-blue-50 to-blue-100/30 rounded-xl border border-blue-200/50 p-5"
+                    >
                       <div class="text-2xl font-bold text-blue-600 mb-1">
                         {{ selectedPermissionIds.length }}
                       </div>
-                      <div class="text-sm text-blue-800">
+                      <div class="text-sm text-blue-800 font-medium">
                         {{ $t('assign_permissions.selected') }}
                       </div>
                     </div>
-                    <div class="bg-gray-50 border border-gray-100 rounded-xl p-4">
+                    <div
+                      class="bg-gradient-to-br from-gray-50 to-gray-100/30 rounded-xl border border-gray-200/50 p-5"
+                    >
                       <div class="text-2xl font-bold text-gray-600 mb-1">
                         {{ filteredPermissions.length }}
                       </div>
-                      <div class="text-sm text-gray-800">
+                      <div class="text-sm text-gray-800 font-medium">
                         {{ $t('assign_permissions.filtered') }}
                       </div>
                     </div>
-                    <div class="bg-purple-50 border border-purple-100 rounded-xl p-4">
+                    <div
+                      class="bg-gradient-to-br from-purple-50 to-purple-100/30 rounded-xl border border-purple-200/50 p-5"
+                    >
                       <div class="text-2xl font-bold text-purple-600 mb-1">
                         {{ permissions.length }}
                       </div>
-                      <div class="text-sm text-purple-800">
+                      <div class="text-sm text-purple-800 font-medium">
                         {{ $t('assign_permissions.total') }}
                       </div>
                     </div>
@@ -357,10 +404,10 @@
                       v-for="permission in filteredPermissions"
                       :key="permission.id"
                       :class="[
-                        'border rounded-xl p-4 transition-all duration-200 cursor-pointer',
+                        'bg-gradient-to-br from-white to-gray-50/50 rounded-xl border p-5 transition-all duration-200 cursor-pointer hover:-translate-y-0.5',
                         selectedPermissionIds.includes(permission.id)
-                          ? 'border-blue-500 bg-blue-50 shadow-sm'
-                          : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50',
+                          ? 'border-blue-400 bg-gradient-to-br from-blue-50/50 to-blue-100/30 shadow-lg shadow-blue-100/30'
+                          : 'border-gray-200/50 hover:border-blue-300 hover:shadow-lg hover:shadow-blue-100/20',
                       ]"
                     >
                       <div class="flex items-start">
@@ -386,10 +433,10 @@
                               <span
                                 :class="
                                   permission.is_parent
-                                    ? 'bg-green-100 text-green-800'
-                                    : 'bg-blue-100 text-blue-800'
+                                    ? 'bg-gradient-to-r from-green-100 to-green-50 text-green-800 border-green-200/50'
+                                    : 'bg-gradient-to-r from-blue-100 to-blue-50 text-blue-800 border-blue-200/50'
                                 "
-                                class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold"
+                                class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border"
                               >
                                 {{
                                   permission.is_parent
@@ -406,40 +453,44 @@
 
                   <!-- No Results -->
                   <div v-if="filteredPermissions.length === 0" class="text-center py-12">
-                    <div
-                      class="w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-4"
-                    >
-                      <svg
-                        class="w-8 h-8 text-gray-400"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
+                    <div class="max-w-md mx-auto">
+                      <div class="relative mb-6">
+                        <div
+                          class="w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-200 rounded-3xl mx-auto flex items-center justify-center shadow-lg"
+                        >
+                          <svg
+                            class="w-12 h-12 text-gray-400"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="1.5"
+                              d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                            />
+                          </svg>
+                        </div>
+                      </div>
+                      <h3 class="text-2xl font-bold text-gray-900 mb-3">
+                        {{ $t('common.no_results') }}
+                      </h3>
+                      <p class="text-gray-600 mb-8">
+                        {{ $t('assign_permissions.no_results_message') }}
+                      </p>
+                      <button
+                        @click="searchQuery = ''"
+                        class="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2 mx-auto transform hover:-translate-y-0.5"
                       >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                        />
-                      </svg>
+                        {{ $t('assign_permissions.clear_search') }}
+                      </button>
                     </div>
-                    <h3 class="text-lg font-semibold text-gray-900 mb-2">
-                      {{ $t('common.no_results') }}
-                    </h3>
-                    <p class="text-gray-600 mb-6 max-w-md mx-auto">
-                      {{ $t('assign_permissions.no_results_message') }}
-                    </p>
-                    <button
-                      @click="searchQuery = ''"
-                      class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
-                    >
-                      {{ $t('assign_permissions.clear_search') }}
-                    </button>
                   </div>
                 </div>
 
                 <!-- Stats and Actions -->
-                <div class="mt-8 pt-6 border-t border-gray-200">
+                <div class="mt-8 pt-6 border-t border-gray-200/50">
                   <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div class="text-sm text-gray-600">
                       {{
@@ -453,18 +504,18 @@
                       <button
                         @click="resetSelection"
                         :disabled="saving"
-                        class="px-5 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200 disabled:opacity-50"
+                        class="px-6 py-3 bg-gradient-to-r from-gray-100 to-gray-50 hover:from-gray-200 hover:to-gray-100 text-gray-700 rounded-xl hover:shadow transition-all duration-200 transform hover:-translate-y-0.5 disabled:opacity-50 border border-gray-200/50"
                       >
                         {{ $t('common.cancel') }}
                       </button>
                       <button
                         @click="savePermissions"
                         :disabled="saving"
-                        class="px-5 py-2.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                        class="px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                       >
                         <svg
                           v-if="saving"
-                          class="w-4 h-4 animate-spin"
+                          class="w-5 h-5 animate-spin"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -478,7 +529,7 @@
                         </svg>
                         <svg
                           v-else
-                          class="w-4 h-4"
+                          class="w-5 h-5"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -490,7 +541,7 @@
                             d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
                           />
                         </svg>
-                        <span class="font-medium">
+                        <span class="font-semibold">
                           {{ saving ? $t('common.saving') : $t('buttons.save') }}
                         </span>
                       </button>
@@ -564,7 +615,10 @@ export default {
         this.permissions = this.allPermissions
       } catch (error) {
         console.error('❌ خطأ في تحميل البيانات:', error)
-        this.$toast.error(this.$t('errors.load_failed'))
+        this.$toast.error(this.$t('errors.load_failed'), {
+          icon: '❌',
+          position: 'top-right',
+        })
       }
     },
 
@@ -582,7 +636,10 @@ export default {
         }
       } catch (error) {
         console.error('❌ خطأ في تحميل صلاحيات المجموعة:', error)
-        this.$toast.error(this.$t('errors.load_failed'))
+        this.$toast.error(this.$t('errors.load_failed'), {
+          icon: '❌',
+          position: 'top-right',
+        })
       } finally {
         this.permissionsLoading = false
       }
@@ -604,7 +661,10 @@ export default {
 
     async savePermissions() {
       if (!this.selectedGroup) {
-        this.$toast.warning(this.$t('assign_permissions.select_group_first'))
+        this.$toast.warning(this.$t('assign_permissions.select_group_first'), {
+          icon: '⚠️',
+          position: 'top-right',
+        })
         return
       }
 
@@ -615,7 +675,10 @@ export default {
           permissions: this.selectedPermissionIds,
         })
 
-        this.$toast.success(this.$t('assign_permissions.messages.update_success'))
+        this.$toast.success(this.$t('assign_permissions.messages.update_success'), {
+          icon: '✅',
+          position: 'top-right',
+        })
 
         // تحديث بيانات المجموعات
         await this.getAdminGroups()
@@ -631,7 +694,10 @@ export default {
           error.response?.data?.message ||
           error.message ||
           this.$t('assign_permissions.messages.update_error')
-        this.$toast.error(errorMsg)
+        this.$toast.error(errorMsg, {
+          icon: '❌',
+          position: 'top-right',
+        })
       } finally {
         this.saving = false
       }
@@ -726,5 +792,50 @@ button:hover:not(:disabled) {
 .modal-enter-from,
 .modal-leave-to {
   opacity: 0;
+}
+
+/* تحسينات الاستجابة */
+@media (max-width: 640px) {
+  .table-responsive {
+    margin: 0 -1rem;
+    width: calc(100% + 2rem);
+  }
+
+  .mobile-stack {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
+
+/* تحسينات شريط التمرير */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* تأثيرات focus محسنة */
+.focus-ring {
+  transition: box-shadow 0.2s ease-in-out;
+}
+
+.focus-ring:focus {
+  box-shadow:
+    0 0 0 3px rgba(59, 130, 246, 0.1),
+    0 0 0 1px rgba(59, 130, 246, 0.2);
+  outline: none;
 }
 </style>

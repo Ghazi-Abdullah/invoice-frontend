@@ -1,16 +1,18 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-6 md:py-8">
-    <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
-      <!-- Header -->
+  <div class="min-h-screen py-6 md:py-8">
+    <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
+      <!-- Header with Glassmorphism -->
       <div class="mb-8">
         <div
           class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8"
         >
           <div>
             <div class="flex items-center gap-3 mb-2">
-              <div class="p-2 bg-white rounded-xl shadow-sm border border-gray-200">
+              <div
+                class="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl shadow-lg shadow-blue-200/50 border border-blue-100"
+              >
                 <svg
-                  class="w-6 h-6 text-blue-600"
+                  class="w-7 h-7 text-white"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -27,7 +29,10 @@
                 <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">
                   {{ $t('users.title') }}
                 </h1>
-                <p class="text-gray-600 text-sm mt-1">{{ $t('users.subtitle') }}</p>
+                <p class="text-gray-600 text-sm mt-1 flex items-center gap-2">
+                  <span class="w-1 h-1 bg-blue-400 rounded-full"></span>
+                  {{ $t('users.subtitle') }}
+                </p>
               </div>
             </div>
           </div>
@@ -35,10 +40,10 @@
           <div class="flex gap-3">
             <button
               @click="openAddModal"
-              class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2 group"
+              class="px-5 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2 group transform hover:-translate-y-0.5"
             >
               <svg
-                class="w-4 h-4 group-hover:rotate-90 transition-transform duration-300"
+                class="w-5 h-5 group-hover:rotate-90 transition-transform duration-300"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -50,36 +55,45 @@
                   d="M12 4v16m8-8H4"
                 />
               </svg>
-              <span class="font-medium">{{ $t('users.create_new') }}</span>
+              <span class="font-semibold">{{ $t('users.create_new') }}</span>
             </button>
           </div>
         </div>
       </div>
 
-      <!-- Filters -->
-      <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5 mb-6">
-        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-5">
-          <div class="flex items-center gap-2">
-            <svg
-              class="w-5 h-5 text-gray-500"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+      <!-- Filters Card with Glass Effect -->
+      <div
+        class="bg-white/80 backdrop-blur-sm rounded-2xl border border-white/50 shadow-lg shadow-blue-100/30 p-6 mb-8"
+      >
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
+          <div class="flex items-center gap-3">
+            <div
+              class="p-2 bg-gradient-to-br from-blue-100 to-blue-50 rounded-lg border border-blue-200/50"
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
-              />
-            </svg>
-            <h2 class="text-lg font-semibold text-gray-800">{{ $t('common.filters') }}</h2>
+              <svg
+                class="w-5 h-5 text-blue-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
+                />
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-lg font-semibold text-gray-800">{{ $t('common.filters') }}</h2>
+              <p class="text-sm text-gray-500">{{ $t('users.filter_subtitle') }}</p>
+            </div>
           </div>
 
-          <div class="flex gap-2">
+          <div class="flex gap-3">
             <button
               @click="loadData"
-              class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center gap-2"
+              class="px-5 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2 transform hover:-translate-y-0.5"
             >
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -93,7 +107,7 @@
             </button>
             <button
               @click="resetFilters"
-              class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200 flex items-center gap-2"
+              class="px-5 py-2.5 bg-gradient-to-r from-gray-100 to-gray-50 hover:from-gray-200 hover:to-gray-100 text-gray-700 rounded-lg shadow-sm hover:shadow transition-all duration-200 flex items-center gap-2 border border-gray-200/50"
             >
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -108,469 +122,22 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">{{
-              $t('common.search')
-            }}</label>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+          <!-- Search Input -->
+          <div class="space-y-2">
+            <label class="block text-sm font-semibold text-gray-700">
+              {{ $t('common.search') }}
+            </label>
             <div class="relative">
               <input
                 type="text"
                 v-model="filters.search"
                 :placeholder="$t('users.search_placeholder')"
-                class="w-full px-3 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                class="w-full px-4 py-3 pl-11 bg-white/80 border border-gray-300/50 rounded-xl focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-200 placeholder:text-gray-400"
               />
-              <svg
-                class="w-5 h-5 absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-              <button
-                v-if="filters.search"
-                @click="clearSearch"
-                class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-              >
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">{{
-              $t('users.group')
-            }}</label>
-            <div class="relative">
-              <select
-                v-model="filters.group_id"
-                class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white appearance-none pr-10"
-              >
-                <option value="">{{ $t('common.all') }}</option>
-                <option v-for="group in storeGroups" :key="group.id" :value="group.id">
-                  {{ group.title_ar || group.title_en }}
-                </option>
-              </select>
-              <svg
-                class="w-5 h-5 absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">{{
-              $t('common.status')
-            }}</label>
-            <div class="relative">
-              <select
-                v-model="filters.status"
-                class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white appearance-none pr-10"
-              >
-                <option value="all">{{ $t('common.all') }}</option>
-                <option value="active">{{ $t('users.status.active') }}</option>
-                <option value="inactive">{{ $t('users.status.inactive') }}</option>
-              </select>
-              <svg
-                class="w-5 h-5 absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">{{
-              $t('common.date_from')
-            }}</label>
-            <div class="relative">
-              <input
-                type="date"
-                v-model="filters.date_from"
-                class="w-full px-3 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-              <svg
-                class="w-5 h-5 absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                />
-              </svg>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Loading State -->
-      <div
-        v-if="storeLoading"
-        class="bg-white rounded-xl border border-gray-200 shadow-sm p-12 mb-6"
-      >
-        <div class="text-center">
-          <div
-            class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-200 border-t-blue-600 mb-4"
-          ></div>
-          <p class="text-gray-700 font-medium">{{ $t('common.loading') }}</p>
-          <p class="text-sm text-gray-500 mt-2">{{ $t('users.loading_subtitle') }}</p>
-        </div>
-      </div>
-
-      <!-- Error State -->
-      <div v-else-if="storeError" class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
-        <div class="flex items-start">
-          <div class="flex-shrink-0 pt-0.5">
-            <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          </div>
-          <div class="mr-3 flex-1">
-            <h3 class="text-sm font-medium text-red-800">{{ $t('errors.load_failed') }}</h3>
-            <p class="text-sm text-red-700 mt-1">{{ storeError }}</p>
-          </div>
-          <button @click="clearStoreError" class="p-1.5 text-red-700 hover:text-red-900">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      <!-- Table -->
-      <div v-else>
-        <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-          <!-- Table Header -->
-          <div class="px-6 py-4 border-b border-gray-200 bg-gray-50/50">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div class="flex items-center gap-3">
-                <h3 class="text-lg font-semibold text-gray-800">
-                  {{ $t('users.user_list') }}
-                </h3>
-                <span class="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
-                  {{ storeUsers.length }} {{ $t('common.total') }}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Empty State -->
-          <div v-if="storeUsers.length === 0" class="text-center py-12 px-4">
-            <div
-              class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4"
-            >
-              <svg
-                class="w-8 h-8 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-8a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z"
-                />
-              </svg>
-            </div>
-            <h3 class="text-lg font-semibold text-gray-900 mb-2">
-              {{ $t('users.no_users') }}
-            </h3>
-            <p class="text-gray-600 mb-6 max-w-md mx-auto">
-              {{ $t('users.start_creating_message') }}
-            </p>
-            <button
-              @click="openAddModal"
-              class="px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center gap-2 mx-auto"
-            >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 4v16m8-8H4"
-                />
-              </svg>
-              {{ $t('users.create_first') }}
-            </button>
-          </div>
-
-          <!-- Table Content -->
-          <div v-else class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-              <thead class="bg-gray-50">
-                <tr>
-                  <th
-                    class="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider"
-                  >
-                    {{ $t('users.name') }}
-                  </th>
-                  <th
-                    class="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider"
-                  >
-                    {{ $t('users.email') }}
-                  </th>
-                  <th
-                    class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider"
-                  >
-                    {{ $t('users.group') }}
-                  </th>
-                  <th
-                    class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider"
-                  >
-                    {{ $t('common.status') }}
-                  </th>
-                  <th
-                    class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider"
-                  >
-                    {{ $t('common.created_at') }}
-                  </th>
-                  <th
-                    class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider"
-                  >
-                    {{ $t('common.actions') }}
-                  </th>
-                </tr>
-              </thead>
-              <tbody class="bg-white divide-y divide-gray-200">
-                <tr
-                  v-for="user in storeUsers"
-                  :key="user.id"
-                  class="hover:bg-blue-50/30 transition-colors duration-150"
-                >
-                  <!-- Name -->
-                  <td class="px-6 py-4">
-                    <div class="flex items-center">
-                      <div class="flex-shrink-0 ml-3">
-                        <div
-                          class="w-10 h-10 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center"
-                        >
-                          <span class="text-blue-700 font-bold text-sm">
-                            {{ getInitials(user.name) }}
-                          </span>
-                        </div>
-                      </div>
-                      <div class="mr-3">
-                        <div class="text-base font-semibold text-gray-900">
-                          {{ user.name }}
-                        </div>
-                        <div class="text-xs text-gray-500 mt-1">ID: {{ user.id }}</div>
-                      </div>
-                    </div>
-                  </td>
-
-                  <!-- Email -->
-                  <td class="px-6 py-4">
-                    <div class="text-sm text-gray-900">{{ user.email }}</div>
-                  </td>
-
-                  <!-- Group -->
-                  <td class="px-6 py-4 text-center">
-                    <div>
-                      <span
-                        class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-800"
-                      >
-                        {{
-                          user.admin_group?.title_ar ||
-                          user.admin_group?.title_en ||
-                          $t('users.no_group')
-                        }}
-                      </span>
-                    </div>
-                  </td>
-
-                  <!-- Status -->
-                  <td class="px-6 py-4 text-center">
-                    <div class="flex flex-col items-center">
-                      <span
-                        :class="
-                          user.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                        "
-                        class="px-3 py-1.5 rounded-full text-xs font-semibold inline-flex items-center gap-1"
-                      >
-                        <span
-                          :class="user.is_active ? 'bg-green-500' : 'bg-red-500'"
-                          class="w-2 h-2 rounded-full"
-                        ></span>
-                        {{
-                          user.is_active ? $t('users.status.active') : $t('users.status.inactive')
-                        }}
-                      </span>
-                    </div>
-                  </td>
-
-                  <!-- Created Date -->
-                  <td class="px-6 py-4 text-center">
-                    <div class="text-sm text-gray-900 font-medium">
-                      {{ formatDate(user.created_at) }}
-                    </div>
-                    <div class="text-xs text-gray-500 mt-1">{{ $t('common.created') }}</div>
-                  </td>
-
-                  <!-- Actions -->
-                  <td class="px-6 py-4 text-center">
-                    <div class="flex items-center justify-center gap-1">
-                      <button
-                        @click="editUser(user)"
-                        class="p-2 text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors duration-200"
-                        :title="$t('buttons.edit')"
-                      >
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                          />
-                        </svg>
-                      </button>
-                      <button
-                        @click="toggleUserStatus(user)"
-                        :class="
-                          user.is_active
-                            ? 'hover:text-yellow-600 hover:bg-yellow-50'
-                            : 'hover:text-green-600 hover:bg-green-50'
-                        "
-                        class="p-2 text-gray-600 rounded-lg transition-colors duration-200"
-                        :title="user.is_active ? $t('users.deactivate') : $t('users.activate')"
-                      >
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path
-                            v-if="!user.is_active"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                          />
-                          <path
-                            v-else
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"
-                          />
-                        </svg>
-                      </button>
-                      <button
-                        v-if="user.id !== currentUser?.id"
-                        @click="confirmDelete(user)"
-                        class="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
-                        :title="$t('buttons.delete')"
-                      >
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                          />
-                        </svg>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Create/Edit Modal -->
-    <div
-      v-if="showModal"
-      class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center p-4 z-50"
-    >
-      <div class="bg-white rounded-xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-        <!-- Modal Header -->
-        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50/50">
-          <div class="flex justify-between items-center">
-            <div class="flex items-center gap-2">
-              <svg
-                class="w-5 h-5 text-blue-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-8a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z"
-                />
-              </svg>
-              <h3 class="text-lg font-semibold text-gray-800">
-                {{ editingUser ? $t('users.edit_user') : $t('users.create_user') }}
-              </h3>
-            </div>
-            <button
-              @click="closeModal"
-              class="p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-          </div>
-        </div>
-
-        <!-- Modal Body -->
-        <form @submit.prevent="editingUser ? updateUser() : addUser()" class="p-6">
-          <!-- Form Error -->
-          <div v-if="formError" class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-            <div class="flex items-start">
-              <div class="flex-shrink-0 pt-0.5">
+              <div class="absolute left-3 top-1/2 transform -translate-y-1/2">
                 <svg
-                  class="w-5 h-5 text-red-400"
+                  class="w-5 h-5 text-gray-400"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -579,15 +146,16 @@
                     stroke-linecap="round"
                     stroke-linejoin="round"
                     stroke-width="2"
-                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                   />
                 </svg>
               </div>
-              <div class="mr-3 flex-1">
-                <p class="text-sm text-red-700">{{ formError }}</p>
-              </div>
-              <button @click="formError = null" class="p-1.5 text-red-700 hover:text-red-900">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <button
+                v-if="filters.search"
+                @click="clearSearch"
+                class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     stroke-linecap="round"
                     stroke-linejoin="round"
@@ -599,53 +167,24 @@
             </div>
           </div>
 
-          <div class="space-y-4">
-            <!-- Full Name -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                {{ $t('users.full_name') }} *
-              </label>
-              <input
-                type="text"
-                v-model="userForm.name"
-                required
-                class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                :placeholder="$t('users.name_placeholder')"
-              />
-            </div>
-
-            <!-- Email -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                {{ $t('users.email') }} *
-              </label>
-              <input
-                type="email"
-                v-model="userForm.email"
-                required
-                class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                :placeholder="$t('users.email_placeholder')"
-              />
-            </div>
-
-            <!-- Group -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                {{ $t('users.group') }} *
-              </label>
-              <div class="relative">
-                <select
-                  v-model="userForm.admin_group_id"
-                  required
-                  class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white appearance-none pr-10"
-                >
-                  <option value="">{{ $t('users.select_group') }}</option>
-                  <option v-for="group in storeGroups" :key="group.id" :value="group.id">
-                    {{ group.title_ar || group.title_en }}
-                  </option>
-                </select>
+          <!-- Group Filter -->
+          <div class="space-y-2">
+            <label class="block text-sm font-semibold text-gray-700">
+              {{ $t('users.group') }}
+            </label>
+            <div class="relative">
+              <select
+                v-model="filters.group_id"
+                class="w-full px-4 py-3 bg-white/80 border border-gray-300/50 rounded-xl focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-200 appearance-none pr-10"
+              >
+                <option value="">{{ $t('common.all') }}</option>
+                <option v-for="group in storeGroups" :key="group.id" :value="group.id">
+                  {{ group.title_ar || group.title_en }}
+                </option>
+              </select>
+              <div class="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
                 <svg
-                  class="w-5 h-5 absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
+                  class="w-5 h-5 text-gray-400"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -659,138 +198,728 @@
                 </svg>
               </div>
             </div>
+          </div>
 
-            <!-- Password (for new users) -->
-            <div v-if="!editingUser">
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                {{ $t('users.password') }} *
-                <span class="text-xs text-gray-500">({{ $t('users.password_min_length') }})</span>
-              </label>
-              <input
-                type="password"
-                v-model="userForm.password"
-                required
-                minlength="8"
-                class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                :placeholder="$t('users.password_placeholder')"
-              />
-            </div>
-
-            <!-- Confirm Password (for new users) -->
-            <div v-if="!editingUser">
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                {{ $t('users.confirm_password') }} *
-              </label>
-              <input
-                type="password"
-                v-model="userForm.password_confirmation"
-                required
-                minlength="8"
-                class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                :placeholder="$t('users.confirm_password_placeholder')"
-              />
-            </div>
-
-            <!-- Password (for editing - optional) -->
-            <div v-if="editingUser">
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                {{ $t('users.new_password') }}
-                <span class="text-xs text-gray-500">({{ $t('users.password_optional') }})</span>
-              </label>
-              <input
-                type="password"
-                v-model="userForm.password"
-                minlength="8"
-                class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                :placeholder="$t('users.new_password_placeholder')"
-              />
-            </div>
-
-            <!-- Confirm Password (for editing - optional) -->
-            <div v-if="editingUser && userForm.password">
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                {{ $t('users.confirm_new_password') }}
-              </label>
-              <input
-                type="password"
-                v-model="userForm.password_confirmation"
-                minlength="8"
-                class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                :placeholder="$t('users.confirm_new_password_placeholder')"
-              />
-            </div>
-
-            <!-- Status -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                {{ $t('common.status') }}
-              </label>
-              <div class="mt-2">
-                <label class="inline-flex items-center cursor-pointer">
-                  <input type="checkbox" v-model="userForm.is_active" class="sr-only peer" />
-                  <div
-                    class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"
-                  ></div>
-                  <span class="mr-3 text-sm font-medium text-gray-700">
-                    {{
-                      userForm.is_active ? $t('users.status.active') : $t('users.status.inactive')
-                    }}
-                  </span>
-                </label>
+          <!-- Status Filter -->
+          <div class="space-y-2">
+            <label class="block text-sm font-semibold text-gray-700">
+              {{ $t('common.status') }}
+            </label>
+            <div class="relative">
+              <select
+                v-model="filters.status"
+                class="w-full px-4 py-3 bg-white/80 border border-gray-300/50 rounded-xl focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-200 appearance-none pr-10"
+              >
+                <option value="all">{{ $t('common.all') }}</option>
+                <option value="active">{{ $t('users.status.active') }}</option>
+                <option value="inactive">{{ $t('users.status.inactive') }}</option>
+              </select>
+              <div class="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                <svg
+                  class="w-5 h-5 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
               </div>
             </div>
           </div>
 
-          <!-- Modal Footer -->
-          <div class="mt-8 flex justify-end gap-3">
+          <!-- Date Filter -->
+          <div class="space-y-2">
+            <label class="block text-sm font-semibold text-gray-700">
+              {{ $t('common.date_from') }}
+            </label>
+            <div class="relative">
+              <input
+                type="date"
+                v-model="filters.date_from"
+                class="w-full px-4 py-3 bg-white/80 border border-gray-300/50 rounded-xl focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-200"
+              />
+              <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
+                <svg
+                  class="w-5 h-5 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div v-if="storeLoading" class="mb-8">
+        <div class="bg-white/80 backdrop-blur-sm rounded-2xl border border-white/50 shadow-lg p-12">
+          <div class="text-center space-y-4">
+            <div class="relative inline-block">
+              <div class="w-16 h-16 border-4 border-blue-100 rounded-full"></div>
+              <div
+                class="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin absolute top-0 left-0"
+              ></div>
+            </div>
+            <div>
+              <p class="text-lg font-semibold text-gray-800">{{ $t('common.loading') }}</p>
+              <p class="text-sm text-gray-500 mt-2">{{ $t('users.loading_subtitle') }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Error State -->
+      <div v-else-if="storeError" class="mb-8">
+        <div
+          class="bg-gradient-to-r from-red-50/80 to-red-100/50 backdrop-blur-sm border border-red-200/50 rounded-2xl p-6 shadow-lg"
+        >
+          <div class="flex items-start">
+            <div class="flex-shrink-0">
+              <div class="p-2 bg-red-100 rounded-lg">
+                <svg
+                  class="w-6 h-6 text-red-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </div>
+            </div>
+            <div class="mr-4 flex-1">
+              <h3 class="text-lg font-semibold text-red-800">{{ $t('errors.load_failed') }}</h3>
+              <p class="text-red-700 mt-2">{{ storeError }}</p>
+            </div>
             <button
-              type="button"
-              @click="closeModal"
-              class="px-5 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200"
+              @click="clearStoreError"
+              class="p-2 text-red-600 hover:text-red-800 hover:bg-red-100 rounded-lg transition-colors"
             >
-              {{ $t('common.cancel') }}
-            </button>
-            <button
-              type="submit"
-              :disabled="submitting"
-              class="px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-            >
-              <svg
-                v-if="submitting"
-                class="w-4 h-4 animate-spin"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
                   stroke-width="2"
-                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  d="M6 18L18 6M6 6l12 12"
                 />
               </svg>
-              <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
-                />
-              </svg>
-              <span class="font-medium">
-                {{
-                  submitting
-                    ? $t('common.saving')
-                    : editingUser
-                      ? $t('common.update')
-                      : $t('common.save')
-                }}
-              </span>
             </button>
           </div>
-        </form>
+        </div>
+      </div>
+
+      <!-- Table Section -->
+      <div v-else>
+        <div
+          class="bg-white/80 backdrop-blur-sm rounded-2xl border border-white/50 shadow-xl shadow-blue-100/20 overflow-hidden"
+        >
+          <!-- Table Header -->
+          <div
+            class="px-6 py-5 border-b border-gray-200/50 bg-gradient-to-r from-blue-50/50 to-white"
+          >
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div class="flex items-center gap-3">
+                <div>
+                  <h3 class="text-xl font-bold text-gray-900">{{ $t('users.user_list') }}</h3>
+                  <p class="text-sm text-gray-600 mt-1">{{ $t('users.list_subtitle') }}</p>
+                </div>
+              </div>
+              <div
+                class="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg shadow-sm"
+              >
+                <span class="font-bold">{{ storeUsers.length }}</span>
+                <span class="text-blue-100 ml-1">{{ $t('common.total') }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Empty State -->
+          <div v-if="storeUsers.length === 0" class="text-center py-16 px-4">
+            <div class="max-w-md mx-auto">
+              <div class="relative mb-6">
+                <div
+                  class="w-24 h-24 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-3xl mx-auto flex items-center justify-center shadow-lg"
+                >
+                  <svg
+                    class="w-12 h-12 text-blue-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="1.5"
+                      d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-8a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <h3 class="text-2xl font-bold text-gray-900 mb-3">{{ $t('users.no_users') }}</h3>
+              <p class="text-gray-600 mb-8">{{ $t('users.start_creating_message') }}</p>
+              <button
+                @click="openAddModal"
+                class="px-6 py-3.5 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2 mx-auto transform hover:-translate-y-0.5"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 4v16m8-8H4"
+                  />
+                </svg>
+                {{ $t('users.create_first') }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Table Content -->
+          <div v-else class="overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200/50">
+                <thead>
+                  <tr class="bg-gradient-to-r from-gray-50 to-gray-100/30">
+                    <th
+                      class="px-6 py-4 text-right text-xs font-bold text-gray-700 uppercase tracking-wider"
+                    >
+                      {{ $t('users.name') }}
+                    </th>
+                    <th
+                      class="px-6 py-4 text-right text-xs font-bold text-gray-700 uppercase tracking-wider"
+                    >
+                      {{ $t('users.email') }}
+                    </th>
+                    <th
+                      class="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider"
+                    >
+                      {{ $t('users.group') }}
+                    </th>
+                    <th
+                      class="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider"
+                    >
+                      {{ $t('common.status') }}
+                    </th>
+                    <th
+                      class="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider"
+                    >
+                      {{ $t('common.created_at') }}
+                    </th>
+                    <th
+                      class="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider"
+                    >
+                      {{ $t('common.actions') }}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200/30">
+                  <tr
+                    v-for="user in storeUsers"
+                    :key="user.id"
+                    class="hover:bg-gradient-to-r hover:from-blue-50/30 hover:to-white transition-all duration-200 group"
+                  >
+                    <!-- Name -->
+                    <td class="px-6 py-4">
+                      <div class="flex items-center">
+                        <div class="flex-shrink-0 ml-4">
+                          <div
+                            class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-md group-hover:scale-105 transition-transform duration-200"
+                          >
+                            <span class="text-white font-bold text-lg">
+                              {{ getInitials(user.name) }}
+                            </span>
+                          </div>
+                        </div>
+                        <div class="mr-4">
+                          <div class="text-base font-bold text-gray-900 group-hover:text-blue-700">
+                            {{ user.name }}
+                          </div>
+                          <div class="flex items-center gap-2 mt-1">
+                            <span class="text-xs text-gray-500">ID: {{ user.id }}</span>
+                            <span
+                              v-if="user.id === currentUser?.id"
+                              class="text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full font-medium"
+                            >
+                              {{ $t('users.you') }}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+
+                    <!-- Email -->
+                    <td class="px-6 py-4">
+                      <div class="flex flex-col">
+                        <span class="text-sm text-gray-900 font-medium">{{ user.email }}</span>
+                        <span class="text-xs text-gray-500 mt-1">{{
+                          $t('users.primary_email')
+                        }}</span>
+                      </div>
+                    </td>
+
+                    <!-- Group -->
+                    <td class="px-6 py-4">
+                      <div class="flex justify-center">
+                        <span
+                          class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-semibold bg-gradient-to-r from-blue-100 to-blue-50 text-blue-800 border border-blue-200/50"
+                        >
+                          {{
+                            user.admin_group?.title_ar ||
+                            user.admin_group?.title_en ||
+                            $t('users.no_group')
+                          }}
+                        </span>
+                      </div>
+                    </td>
+
+                    <!-- Status -->
+                    <td class="px-6 py-4">
+                      <div class="flex justify-center">
+                        <span
+                          :class="
+                            user.is_active
+                              ? 'bg-gradient-to-r from-green-100 to-green-50 text-green-800 border-green-200/50'
+                              : 'bg-gradient-to-r from-red-100 to-red-50 text-red-800 border-red-200/50'
+                          "
+                          class="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold border"
+                        >
+                          <span
+                            :class="user.is_active ? 'bg-green-500' : 'bg-red-500'"
+                            class="w-2 h-2 rounded-full ml-2"
+                          ></span>
+                          {{
+                            user.is_active ? $t('users.status.active') : $t('users.status.inactive')
+                          }}
+                        </span>
+                      </div>
+                    </td>
+
+                    <!-- Created Date -->
+                    <td class="px-6 py-4">
+                      <div class="text-center">
+                        <div class="text-sm text-gray-900 font-bold">
+                          {{ formatDate(user.created_at) }}
+                        </div>
+                        <div class="text-xs text-gray-500 mt-1">{{ $t('common.created') }}</div>
+                      </div>
+                    </td>
+
+                    <!-- Actions -->
+                    <td class="px-6 py-4">
+                      <div class="flex items-center justify-center gap-2">
+                        <button
+                          @click="editUser(user)"
+                          class="p-2.5 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-200 transform hover:scale-110"
+                          :title="$t('buttons.edit')"
+                        >
+                          <svg
+                            class="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                            />
+                          </svg>
+                        </button>
+                        <button
+                          @click="toggleUserStatus(user)"
+                          :class="
+                            user.is_active
+                              ? 'hover:text-yellow-600 hover:bg-yellow-50'
+                              : 'hover:text-green-600 hover:bg-green-50'
+                          "
+                          class="p-2.5 text-gray-600 rounded-xl transition-all duration-200 transform hover:scale-110"
+                          :title="user.is_active ? $t('users.deactivate') : $t('users.activate')"
+                        >
+                          <svg
+                            class="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              v-if="!user.is_active"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                            <path
+                              v-else
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"
+                            />
+                          </svg>
+                        </button>
+                        <button
+                          v-if="user.id !== currentUser?.id"
+                          @click="confirmDelete(user)"
+                          class="p-2.5 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200 transform hover:scale-110"
+                          :title="$t('buttons.delete')"
+                        >
+                          <svg
+                            class="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                            />
+                          </svg>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
+
+    <!-- Create/Edit Modal -->
+    <transition name="modal-fade">
+      <div
+        v-if="showModal"
+        class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+        @click.self="closeModal"
+      >
+        <div
+          class="bg-gradient-to-br from-white to-gray-50/50 rounded-3xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto border border-white/50"
+        >
+          <!-- Modal Header -->
+          <div class="px-8 py-6 border-b border-gray-200/50 bg-gradient-to-r from-blue-50 to-white">
+            <div class="flex justify-between items-center">
+              <div class="flex items-center gap-3">
+                <div class="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-md">
+                  <svg
+                    class="w-6 h-6 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-8a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="text-xl font-bold text-gray-900">
+                    {{ editingUser ? $t('users.edit_user') : $t('users.create_user') }}
+                  </h3>
+                  <p class="text-sm text-gray-600 mt-1">
+                    {{ editingUser ? $t('users.edit_subtitle') : $t('users.create_subtitle') }}
+                  </p>
+                </div>
+              </div>
+              <button
+                @click="closeModal"
+                class="p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-xl transition-colors"
+              >
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Modal Body -->
+          <form @submit.prevent="editingUser ? updateUser() : addUser()" class="p-8">
+            <!-- Form Error -->
+            <div
+              v-if="formError"
+              class="mb-6 bg-gradient-to-r from-red-50 to-red-100/50 border border-red-200/50 rounded-xl p-4"
+            >
+              <div class="flex items-start">
+                <div class="flex-shrink-0">
+                  <svg
+                    class="w-5 h-5 text-red-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                </div>
+                <div class="mr-3 flex-1">
+                  <p class="text-sm text-red-700">{{ formError }}</p>
+                </div>
+                <button @click="formError = null" class="p-1 text-red-500 hover:text-red-700">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="space-y-6">
+              <!-- Full Name -->
+              <div class="space-y-2">
+                <label class="block text-sm font-semibold text-gray-700">
+                  {{ $t('users.full_name') }}
+                  <span class="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  v-model="userForm.name"
+                  required
+                  class="w-full px-4 py-3.5 bg-white/80 border border-gray-300/50 rounded-xl focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-200 placeholder:text-gray-400"
+                  :placeholder="$t('users.name_placeholder')"
+                />
+              </div>
+
+              <!-- Email -->
+              <div class="space-y-2">
+                <label class="block text-sm font-semibold text-gray-700">
+                  {{ $t('users.email') }}
+                  <span class="text-red-500">*</span>
+                </label>
+                <input
+                  type="email"
+                  v-model="userForm.email"
+                  required
+                  class="w-full px-4 py-3.5 bg-white/80 border border-gray-300/50 rounded-xl focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-200 placeholder:text-gray-400"
+                  :placeholder="$t('users.email_placeholder')"
+                />
+              </div>
+
+              <!-- Group -->
+              <div class="space-y-2">
+                <label class="block text-sm font-semibold text-gray-700">
+                  {{ $t('users.group') }}
+                  <span class="text-red-500">*</span>
+                </label>
+                <div class="relative">
+                  <select
+                    v-model="userForm.admin_group_id"
+                    required
+                    class="w-full px-4 py-3.5 bg-white/80 border border-gray-300/50 rounded-xl focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-200 appearance-none pr-10"
+                  >
+                    <option value="">{{ $t('users.select_group') }}</option>
+                    <option v-for="group in storeGroups" :key="group.id" :value="group.id">
+                      {{ group.title_ar || group.title_en }}
+                    </option>
+                  </select>
+                  <div
+                    class="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none"
+                  >
+                    <svg
+                      class="w-5 h-5 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Password Section -->
+              <div
+                :class="
+                  !editingUser
+                    ? 'bg-gradient-to-r from-blue-50/50 to-blue-100/30 p-5 rounded-xl'
+                    : ''
+                "
+              >
+                <div v-if="!editingUser">
+                  <!-- Password for New User -->
+                  <div class="space-y-2">
+                    <label class="block text-sm font-semibold text-gray-700">
+                      {{ $t('users.password') }}
+                      <span class="text-red-500">*</span>
+                      <span class="text-xs text-gray-500 font-normal">
+                        ({{ $t('users.password_min_length') }})
+                      </span>
+                    </label>
+                    <input
+                      type="password"
+                      v-model="userForm.password"
+                      required
+                      minlength="8"
+                      class="w-full px-4 py-3.5 bg-white/80 border border-gray-300/50 rounded-xl focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-200"
+                      :placeholder="$t('users.password_placeholder')"
+                    />
+                  </div>
+
+                  <!-- Confirm Password for New User -->
+                  <div class="space-y-2 mt-4">
+                    <label class="block text-sm font-semibold text-gray-700">
+                      {{ $t('users.confirm_password') }}
+                      <span class="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="password"
+                      v-model="userForm.password_confirmation"
+                      required
+                      minlength="8"
+                      class="w-full px-4 py-3.5 bg-white/80 border border-gray-300/50 rounded-xl focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-200"
+                      :placeholder="$t('users.confirm_password_placeholder')"
+                    />
+                  </div>
+                </div>
+
+                <!-- Password for Editing User -->
+                <div v-if="editingUser" class="space-y-4">
+                  <div class="space-y-2">
+                    <label class="block text-sm font-semibold text-gray-700">
+                      {{ $t('users.new_password') }}
+                      <span class="text-xs text-gray-500 font-normal">
+                        ({{ $t('users.password_optional') }})
+                      </span>
+                    </label>
+                    <input
+                      type="password"
+                      v-model="userForm.password"
+                      minlength="8"
+                      class="w-full px-4 py-3.5 bg-white/80 border border-gray-300/50 rounded-xl focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-200"
+                      :placeholder="$t('users.new_password_placeholder')"
+                    />
+                  </div>
+
+                  <!-- Confirm Password for Editing User -->
+                  <div v-if="userForm.password" class="space-y-2">
+                    <label class="block text-sm font-semibold text-gray-700">
+                      {{ $t('users.confirm_new_password') }}
+                    </label>
+                    <input
+                      type="password"
+                      v-model="userForm.password_confirmation"
+                      minlength="8"
+                      class="w-full px-4 py-3.5 bg-white/80 border border-gray-300/50 rounded-xl focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-200"
+                      :placeholder="$t('users.confirm_new_password_placeholder')"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Status Toggle -->
+              <div class="space-y-2">
+                <label class="block text-sm font-semibold text-gray-700">
+                  {{ $t('common.status') }}
+                </label>
+                <div
+                  class="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-gray-100/30 rounded-xl border border-gray-200/50"
+                >
+                  <span class="text-gray-700 font-medium">
+                    {{
+                      userForm.is_active ? $t('users.status.active') : $t('users.status.inactive')
+                    }}
+                  </span>
+                  <label class="inline-flex items-center cursor-pointer">
+                    <input type="checkbox" v-model="userForm.is_active" class="sr-only peer" />
+                    <div
+                      class="relative w-12 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300/50 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gradient-to-r peer-checked:from-green-500 peer-checked:to-green-600"
+                    ></div>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="mt-10 flex justify-end gap-3">
+              <button
+                type="button"
+                @click="closeModal"
+                class="px-6 py-3 bg-gradient-to-r from-gray-100 to-gray-50 hover:from-gray-200 hover:to-gray-100 text-gray-700 rounded-xl hover:shadow transition-all duration-200 transform hover:-translate-y-0.5 border border-gray-200/50"
+              >
+                {{ $t('common.cancel') }}
+              </button>
+              <button
+                type="submit"
+                :disabled="submitting"
+                class="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center gap-2"
+              >
+                <svg
+                  v-if="submitting"
+                  class="w-5 h-5 animate-spin"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  />
+                </svg>
+                <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
+                  />
+                </svg>
+                <span class="font-semibold">
+                  {{
+                    submitting
+                      ? $t('common.saving')
+                      : editingUser
+                        ? $t('common.update')
+                        : $t('common.save')
+                  }}
+                </span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -872,7 +1001,10 @@ export default {
         date_from: '',
       }
       this.loadData()
-      this.$toast.info(this.$t('reports.buttons.reset_filters'))
+      this.$toast.info(this.$t('reports.buttons.reset_filters'), {
+        icon: '🔄',
+        position: 'top-right',
+      })
     },
 
     clearStoreError() {
@@ -929,12 +1061,10 @@ export default {
 
     validatePassword() {
       if (!this.editingUser) {
-        // عند الإضافة
         if (!this.userForm.password || this.userForm.password.length < 8) {
           throw new Error(this.$t('errors.password_min_length'))
         }
       } else {
-        // عند التحديث (إذا أدخل كلمة مرور جديدة)
         if (this.userForm.password && this.userForm.password.length < 8) {
           throw new Error(this.$t('errors.password_min_length'))
         }
@@ -955,10 +1085,16 @@ export default {
         await this.createUser(this.userForm)
         this.closeModal()
         await this.loadData()
-        this.$toast.success(this.$t('users.messages.create_success'))
+        this.$toast.success(this.$t('users.messages.create_success'), {
+          icon: '✅',
+          position: 'top-right',
+        })
       } catch (error) {
         this.formError = error.message || this.$t('errors.failed_to_create_user')
-        this.$toast.error(error.message || this.$t('errors.failed_to_create_user'))
+        this.$toast.error(error.message || this.$t('errors.failed_to_create_user'), {
+          icon: '❌',
+          position: 'top-right',
+        })
       } finally {
         this.submitting = false
       }
@@ -969,7 +1105,6 @@ export default {
       this.formError = null
 
       try {
-        // التحقق من كلمة المرور فقط إذا تم إدخالها
         if (this.userForm.password) {
           this.validatePassword()
         }
@@ -980,10 +1115,16 @@ export default {
         })
         this.closeModal()
         await this.loadData()
-        this.$toast.success(this.$t('users.messages.update_success'))
+        this.$toast.success(this.$t('users.messages.update_success'), {
+          icon: '✅',
+          position: 'top-right',
+        })
       } catch (error) {
         this.formError = error.message || this.$t('errors.failed_to_update_user')
-        this.$toast.error(error.message || this.$t('errors.failed_to_update_user'))
+        this.$toast.error(error.message || this.$t('errors.failed_to_update_user'), {
+          icon: '❌',
+          position: 'top-right',
+        })
       } finally {
         this.submitting = false
       }
@@ -1011,9 +1152,15 @@ export default {
             is_active: !user.is_active,
           })
           await this.loadData()
-          this.$toast.success(this.$t('users.messages.status_change_success', { action: action }))
+          this.$toast.success(this.$t('users.messages.status_change_success', { action: action }), {
+            icon: '✅',
+            position: 'top-right',
+          })
         } catch (error) {
-          this.$toast.error(error.message || this.$t('errors.failed_to_change_status'))
+          this.$toast.error(error.message || this.$t('errors.failed_to_change_status'), {
+            icon: '❌',
+            position: 'top-right',
+          })
         }
       }
     },
@@ -1036,9 +1183,15 @@ export default {
         try {
           await this.deleteUser(user.id)
           await this.loadData()
-          this.$toast.success(this.$t('users.messages.delete_success'))
+          this.$toast.success(this.$t('users.messages.delete_success'), {
+            icon: '✅',
+            position: 'top-right',
+          })
         } catch (error) {
-          this.$toast.error(error.message || this.$t('errors.failed_to_delete_user'))
+          this.$toast.error(error.message || this.$t('errors.failed_to_delete_user'), {
+            icon: '❌',
+            position: 'top-right',
+          })
         }
       }
     },
@@ -1067,31 +1220,40 @@ table {
   border-spacing: 0;
 }
 
-th {
-  font-weight: 600;
-  letter-spacing: 0.025em;
+th:first-child {
+  border-top-right-radius: 12px;
 }
 
-td {
-  border-bottom: 1px solid #f3f4f6;
+th:last-child {
+  border-top-left-radius: 12px;
 }
 
-tr:last-child td {
-  border-bottom: none;
+tr:last-child td:first-child {
+  border-bottom-right-radius: 12px;
+}
+
+tr:last-child td:last-child {
+  border-bottom-left-radius: 12px;
 }
 
 /* تأثيرات hover محسنة */
+tr {
+  transition: all 0.2s ease-in-out;
+}
+
 tr:hover {
-  background-color: rgba(59, 130, 246, 0.05);
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(255, 255, 255, 0.8) 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
 }
 
 /* تحسينات الأزرار */
 button {
-  transition: all 0.2s ease-in-out;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-button:hover {
-  transform: translateY(-1px);
+button:active {
+  transform: translateY(0);
 }
 
 /* تأثيرات الـ loading */
@@ -1105,19 +1267,127 @@ button:hover {
   animation: spin 1s linear infinite;
 }
 
-/* تدرجات لونية */
+/* تأثيرات المودال */
+.modal-fade-enter-active,
+.modal-fade-leave-active {
+  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modal-fade-enter-from,
+.modal-fade-leave-to {
+  opacity: 0;
+}
+
+/* تدرجات لونية محسنة */
 .bg-gradient-to-br {
   background-image: linear-gradient(to bottom right, var(--tw-gradient-stops));
 }
 
-/* تحسينات المودال */
-.modal-enter-active,
-.modal-leave-active {
-  transition: opacity 0.3s ease;
+/* ظلال ناعمة */
+.shadow-lg {
+  box-shadow:
+    0 10px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
-.modal-enter-from,
-.modal-leave-to {
-  opacity: 0;
+.shadow-xl {
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* تأثيرات النص */
+.text-shadow {
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* تحسينات الشعار الدائري */
+.avatar-gradient {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+}
+
+/* تحسينات الأيقونات */
+.icon-hover {
+  transition: all 0.2s ease-in-out;
+}
+
+.icon-hover:hover {
+  transform: scale(1.1);
+}
+
+/* تأثيرات الإدخال */
+input:focus,
+select:focus {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* تحسينات العناوين */
+h1,
+h2,
+h3 {
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+/* تحسينات التباين */
+.text-gray-900 {
+  color: #1f2937;
+}
+
+.text-gray-800 {
+  color: #374151;
+}
+
+.text-gray-700 {
+  color: #4b5563;
+}
+
+.text-gray-600 {
+  color: #6b7280;
+}
+
+/* تحسينات الاستجابة */
+@media (max-width: 640px) {
+  .table-responsive {
+    margin: 0 -1rem;
+    width: calc(100% + 2rem);
+  }
+
+  .mobile-stack {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
+
+/* تحسينات الشريط التمرير */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* تأثيرات focus محسنة */
+.focus-ring {
+  transition: box-shadow 0.2s ease-in-out;
+}
+
+.focus-ring:focus {
+  box-shadow:
+    0 0 0 3px rgba(59, 130, 246, 0.1),
+    0 0 0 1px rgba(59, 130, 246, 0.2);
+  outline: none;
 }
 </style>
