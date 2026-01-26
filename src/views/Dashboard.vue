@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50/30">
     <!-- Enhanced Header -->
-    <div
+    <!--<div
       class="bg-white/80 backdrop-blur-sm shadow-sm border-b border-gray-200/60 sticky top-0 z-10"
     >
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -58,7 +58,7 @@
           </div>
         </div>
       </div>
-    </div>
+    </div>-->
 
     <!-- Enhanced Loading State -->
     <div v-if="initialLoading" class="flex justify-center items-center min-h-[70vh]">
@@ -1135,7 +1135,6 @@ export default {
     ...mapState('auth', ['user', 'permissions', 'is_admin']),
     ...mapState('dashboard', ['stats', 'loading', 'error']),
 
-    
     ...mapGetters('dashboard', [
       'recentClients',
       'recentInvoices',

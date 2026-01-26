@@ -443,7 +443,8 @@
     "updating": "جاري التحديث...",
     "view_all": "عرض الكل",
     "from_last_month": "من الشهر الماضي",
-    "user": "مستخدم"
+    "user": "مستخدم",
+    "download": "تحميل"
   },
   "messages": {
     "welcome": "مرحباً {name}!",
@@ -485,7 +486,8 @@
     "notFoundReason": "يمكن أن يكون السبب خطأ في الرابط أو أن الصفحة قد تم نقلها.",
     "maybeLookingFor": "ربما كنت تبحث عن:",
     "stillHavingProblem": "لا زلت تواجه مشكلة؟",
-    "contactSupport": "اتصل بالدعم الفني"
+    "contactSupport": "اتصل بالدعم الفني",
+    "load_failed": "فشل في التحميل"
   },
   "validation": {
     "required": "حقل {field} مطلوب",
@@ -641,7 +643,10 @@
       "apply_filters": "تطبيق الفلاتر",
       "reset_filters": "إعادة تعيين",
       "try_again": "حاول مرة أخرى",
-      "search": "بحث..."
+      "search": "بحث...",
+      "export_report": "تصدير تقرير",
+      "close_exported": "إغلاق الملفات",
+      "view_exported": "عرض الملفات"
     },
     "charts": {
       "by_status": "الفواتير حسب الحالة",
@@ -693,7 +698,13 @@
       "amount": "المبلغ"
     },
     "currency": "ريال سعودي",
-    "view_insights": "عرض رؤى مفصلة للأعمال"
+    "view_insights": "عرض رؤى مفصلة للأعمال",
+    "loading_subtitle": "جاري تحميل بيانات التقرير...",
+    "exported_files": "الملفات المصدرة",
+    "fileName": "اسم الملف",
+    "fileSize": "حجم الملف",
+    "modifiedDate": "تاريخ التعديل",
+    "noFiles": "لا توجد ملفات"
   },
   "adminGroups": {
     "title": "إدارة المجموعات",

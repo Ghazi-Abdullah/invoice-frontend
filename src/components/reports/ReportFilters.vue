@@ -1,81 +1,173 @@
 <template>
-  <div class="filters-card bg-white rounded-lg shadow-md mb-6">
-    <div class="card-header px-6 py-4 border-b border-gray-200">
-      <h2 class="text-xl font-semibold text-gray-800">فلاتر البحث</h2>
-    </div>
-
-    <div class="card-body px-6 py-4">
-      <div class="filters-grid grid grid-cols-1 md:grid-cols-6 gap-4">
-        <!-- من تاريخ -->
-        <div class="filter-group">
-          <label class="block text-sm font-medium text-gray-700 mb-2"> من تاريخ </label>
-          <input
-            v-model="localFilters.start_date"
-            type="date"
-            class="filter-input"
-            @change="onFilterChange"
-          />
+  <div class="report-filters">
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-5">
+        <div class="flex items-center gap-2">
+          <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
+            />
+          </svg>
+          <h2 class="text-lg font-semibold text-gray-800">{{ $t('reports.filters') }}</h2>
         </div>
 
-        <!-- إلى تاريخ -->
-        <div class="filter-group">
-          <label class="block text-sm font-medium text-gray-700 mb-2"> إلى تاريخ </label>
-          <input
-            v-model="localFilters.end_date"
-            type="date"
-            class="filter-input"
-            @change="onFilterChange"
-          />
-        </div>
-
-        <!-- حالة الفاتورة -->
-        <div class="filter-group">
-          <label class="block text-sm font-medium text-gray-700 mb-2"> حالة الفاتورة </label>
-          <select v-model="localFilters.status" class="filter-select" @change="onFilterChange">
-            <option value="">الكل</option>
-            <option value="draft">مسودة</option>
-            <option value="sent">مرسلة</option>
-            <option value="paid">مدفوعة</option>
-            <option value="overdue">متأخرة</option>
-          </select>
-        </div>
-
-        <!-- العميل -->
-        <div class="filter-group">
-          <label class="block text-sm font-medium text-gray-700 mb-2"> العميل </label>
-          <select v-model="localFilters.client_id" class="filter-select" @change="onFilterChange">
-            <option value="">الكل</option>
-            <option v-for="client in clients" :key="client.id" :value="client.id">
-              {{ client.name }}
-            </option>
-          </select>
-        </div>
-
-        <!-- المستخدم -->
-        <div class="filter-group">
-          <label class="block text-sm font-medium text-gray-700 mb-2"> المستخدم </label>
-          <select v-model="localFilters.user_id" class="filter-select" @change="onFilterChange">
-            <option value="">الكل</option>
-            <option v-for="user in users" :key="user.id" :value="user.id">
-              {{ user.name }}
-            </option>
-          </select>
-        </div>
-
-        <!-- أزرار التحكم -->
-        <div class="filter-group flex items-end space-x-2 space-x-reverse">
-          <button @click="onSearch" class="btn-primary flex-1" :disabled="loading">
-            <i class="fas fa-search ml-2"></i>
-            بحث
+        <div class="flex gap-2">
+          <button
+            @click="applyFilters"
+            :disabled="loading"
+            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 flex items-center gap-2"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+            {{ $t('common.search') }}
           </button>
-
-          <button @click="onReset" class="btn-secondary" title="إعادة تعيين">
-            <i class="fas fa-redo"></i>
+          <button
+            @click="resetFilters"
+            class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200 flex items-center gap-2"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+              />
+            </svg>
+            {{ $t('common.reset') }}
           </button>
+        </div>
+      </div>
 
-          <button @click="onExport" class="btn-success" title="تصدير">
-            <i class="fas fa-file-export"></i>
-          </button>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Start Date -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            {{ $t('common.fromDate') }}
+          </label>
+          <div class="relative">
+            <input
+              type="date"
+              v-model="localFilters.start_date"
+              class="w-full px-3 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+            <svg
+              class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
+            </svg>
+          </div>
+        </div>
+
+        <!-- End Date -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            {{ $t('common.toDate') }}
+          </label>
+          <div class="relative">
+            <input
+              type="date"
+              v-model="localFilters.end_date"
+              class="w-full px-3 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+            <svg
+              class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
+            </svg>
+          </div>
+        </div>
+
+        <!-- Status Filter -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            {{ $t('reports.invoiceStatus') }}
+          </label>
+          <div class="relative">
+            <select
+              v-model="localFilters.status"
+              class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white appearance-none pr-10"
+            >
+              <option value="">{{ $t('common.all') }}</option>
+              <option value="draft">{{ $t('invoices.status.draft') }}</option>
+              <option value="sent">{{ $t('invoices.status.sent') }}</option>
+              <option value="paid">{{ $t('invoices.status.paid') }}</option>
+              <option value="overdue">{{ $t('invoices.status.overdue') }}</option>
+            </select>
+            <svg
+              class="w-5 h-5 absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </div>
+        </div>
+
+        <!-- Client Filter -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            {{ $t('clients.title') }}
+          </label>
+          <div class="relative">
+            <select
+              v-model="localFilters.client_id"
+              class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white appearance-none pr-10"
+            >
+              <option value="">{{ $t('common.all') }}</option>
+              <option
+                v-for="client in clients"
+                :key="client.id"
+                :value="client.id"
+                v-if="client && client.id"
+              >
+                {{ client.name }}
+              </option>
+            </select>
+            <svg
+              class="w-5 h-5 absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </div>
         </div>
       </div>
     </div>
@@ -89,13 +181,9 @@ export default {
   props: {
     filters: {
       type: Object,
-      required: true,
+      default: () => ({}),
     },
     clients: {
-      type: Array,
-      default: () => [],
-    },
-    users: {
       type: Array,
       default: () => [],
     },
@@ -121,40 +209,27 @@ export default {
   },
 
   methods: {
-    onFilterChange() {
-      this.$emit('update-filters', this.localFilters)
+    applyFilters() {
+      this.$emit('apply-filters', this.localFilters)
     },
 
-    onSearch() {
-      this.$emit('search')
-    },
+    resetFilters() {
+      const endDate = new Date()
+      const startDate = new Date()
+      startDate.setDate(startDate.getDate() - 30)
 
-    onReset() {
-      this.$emit('reset')
-    },
+      this.localFilters = {
+        start_date: startDate.toISOString().split('T')[0],
+        end_date: endDate.toISOString().split('T')[0],
+        status: '',
+        client_id: '',
+        user_id: '',
+        per_page: 20,
+        page: 1,
+      }
 
-    onExport() {
-      this.$emit('export')
+      this.$emit('apply-filters', this.localFilters)
     },
   },
 }
 </script>
-
-<style scoped>
-.filter-input,
-.filter-select {
-  @apply w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
-}
-
-.btn-primary {
-  @apply px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
-}
-
-.btn-secondary {
-  @apply px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2;
-}
-
-.btn-success {
-  @apply px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2;
-}
-</style>
