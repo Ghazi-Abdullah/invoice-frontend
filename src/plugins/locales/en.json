@@ -348,6 +348,41 @@
     "total_amount": "Total Amount",
     "quick_create": "Quickly create a new invoice"
   },
+  "admin_groups": {
+    "default_group": "Default Group",
+    "users": "Users",
+    "permissions": "Permissions",
+    "title": "Groups",
+    "subtitle": "Manage user groups and permissions",
+    "add_permission": "Add Permission",
+    "add_group": "Add Group",
+    "loading_subtitle": "Loading groups...",
+    "groups_list": "Groups List",
+    "no_groups": "No Groups Found",
+    "start_creating_message": "Start creating your first group to manage users and permissions.",
+    "total_users": "Total Users",
+    "total_permissions": "Total Permissions",
+    "group_name_ar": "Group Name (Arabic)",
+    "group_name_en": "Group Name (English)",
+    "description": "Description",
+    "actions": "Actions",
+    "group_name_ar_ placeholder": "Enter group name in Arabic",
+    "group_name_en_placeholder": "Enter group name in English",
+    "description_placeholder": "Enter group description",
+    "manage_permissions": "Manage Permissions"
+  },
+  "admin_permissions": {
+    "title": "Permissions",
+    "subtitle": "Manage user permissions",
+    "permissions_list": "Permissions List",
+    "no_permissions": "No Permissions Found",
+    "start_creating_message": "Start creating permissions to manage user access.",
+    "permission_name": "Permission Name",
+    "permission_description": "Description",
+    "actions": "Actions",
+    "permission_name_placeholder": "Enter permission name",
+    "permission_description_placeholder": "Enter permission description"
+  },
   "buttons": {
     "save": "Save",
     "cancel": "Cancel",
@@ -362,9 +397,14 @@
     "update": "Update",
     "refresh": "Refresh",
     "export": "Export",
+    "deselect_all": "Deselect All",
+    "select_all": "Select All",
     "collapse_sidebar": "Collapse Sidebar"
   },
   "common": {
+    "created_at": "Created At",
+    "date_from": "Date From",
+    "per_page": "Per Page",
     "dateFrom": "From Date",
     "dateTo": "To Date",
     "export": "Export",
@@ -413,6 +453,20 @@
     "search": "Search",
     "lastUpdated": "Last Updated",
     "pending": "Pending",
+    "months": {
+      "january": "January",
+      "february": "February",
+      "march": "March",
+      "april": "April",
+      "may": "May",
+      "june": "June",
+      "july": "July",
+      "august": "August",
+      "september": "September",
+      "october": "October",
+      "november": "November",
+      "december": "December"
+    },
     "timeAgo": {
       "minutes": "{minutes} minutes ago",
       "hours": "{hours} hours ago",
@@ -443,7 +497,8 @@
     "updating": "Updating...",
     "view_all": "View All",
     "from_last_month": "From last month",
-    "user": "User"
+    "user": "User",
+    "download": "Download"
   },
   "messages": {
     "welcome": "Welcome {name}!",
@@ -485,7 +540,8 @@
     "notFoundReason": "This could be due to a broken link or the page has been moved.",
     "maybeLookingFor": "Maybe you were looking for:",
     "stillHavingProblem": "Still having problems?",
-    "contactSupport": "Contact Technical Support"
+    "contactSupport": "Contact Technical Support",
+    "load_failed": "Failed to load"
   },
   "validation": {
     "required": "{field} is required",
@@ -513,7 +569,44 @@
     "assignRoles": "Assign Roles",
     "assignRolesToUser": "Assign Roles to User: {user}",
     "manage": "Manage Permissions",
-    "manageFor": "Manage Permissions for: {user}"
+    "manageFor": "Manage Permissions for: {user}",
+    "add_permission": "Add Permission",
+    "edit_permission": "Edit Permission",
+    "permission_list": "Permissions List",
+    "no_permissions": "No Permissions Found",
+    "parent_permissions": "Parent Permissions",
+    "child_permissions": "Child Permissions",
+    "search_placeholder": "Search permissions...",
+    "permission_name": "Permission Name",
+    "permission_description": "Permission Description",
+    "description_ar": "Description (Arabic)",
+    "description_en": "Description (English)",
+    "permission_name_placeholder": "Enter permission name",
+    "permission_description_placeholder": "Enter permission description",
+    "child": "Child",
+    "type": "Type",
+    "manage_for": "Manage Permissions for: {user}",
+    "parent_permission_hint": "Select a parent permission to create a hierarchical structure"
+  },
+  "assign_permissions": {
+    "title": "Assign Permissions",
+    "subtitle": "Assign roles and permissions to users",
+    "user": "User",
+    "select_user": "Select User",
+    "roles": "Roles",
+    "permissions": "Permissions",
+    "assign_roles_permissions": "Assign Roles & Permissions",
+    "search_user_placeholder": "Search by name or email...",
+    "no_users_found": "No users found",
+    "select_roles_permissions": "Select roles and permissions to assign to the user",
+    "save_changes": "Save Changes",
+    "filtered": "Filtered",
+    "total": "Total",
+    "select_group_message": "Please select a group to view its permissions",
+    "changes_saved": "Changes saved successfully",
+    "select_group_first": "Please select a group first",
+    "selected": "Selected",
+    "save_failed": "Failed to save changes"
   },
   "roles": {
     "title": "Roles",
@@ -541,7 +634,16 @@
     "searchPlaceholder": "Search by name or email...",
     "noUsers": "No users found",
     "startAdding": "Start by adding a new user",
-    "newPassword": "New Password (optional)"
+    "subtitle": "Manage user accounts and permissions",
+    "search_placeholder": "Search by name or email...",
+    "group": "Group",
+    "create_new": "Create New User",
+    "start_creating_message": "Start by creating a new user",
+    "user_list": "Users List",
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    }
   },
   "pagination": {
     "previous": "Previous",
@@ -555,9 +657,29 @@
     "pageOf": "Page {current} of {total}"
   },
   "reports": {
+    "export_options": "Export Options",
+    "export_choose_method ": "Choose Export Method",
+    "export_direct": "Export Direct",
+    "export_server": "Export Server",
+    "export_direct_desc": "Export directly to your device",
+    "export_server_desc": "Export to the server",
+    "export_choose_method": "Choose Export Method",
+    "invoice": "invoice",
+    "status": "Status",
+    "amount": "Amount",
+    "due_date": "Due Date",
+    "issue_date": "Issue Date",
+    "client": "Client",
+    "invoice_number": "No Invoices",
+    "noInvoicesMessage": "No data for the selected period",
+    "invoices_count": "Invoices Count",
+    "total_spent": "Total Spent",
+    "average_invoice": "Average Invoice",
+    "collected_revenue": "Collected Revenue",
+    "clientsList": "Clients List",
+    "client_name": "Client Name",
     "title": "Reports",
     "subtitle": "Comprehensive statistics and insights for your business",
-    "title": "Reports and Statistics",
     "filters": "Search Filters",
     "invoiceStatus": "Invoice Status",
     "invoicesReport": "Invoices Report",
@@ -613,7 +735,6 @@
       "revenue": "Track revenue and collections",
       "overdue": "Invoices past due date"
     },
-    "filters": "Filters",
     "filter_labels": {
       "date_range": "Date Range",
       "start_date": "Start Date",
@@ -643,7 +764,10 @@
       "apply_filters": "Apply Filters",
       "reset_filters": "Reset",
       "try_again": "Try Again",
-      "search": "Search..."
+      "search": "Search...",
+      "export_report": "Export Report",
+      "close_exported": "Close Exported",
+      "view_exported": "View Exported"
     },
     "charts": {
       "by_status": "Invoices by Status",
@@ -695,7 +819,13 @@
       "amount": "Amount"
     },
     "currency": "SAR",
-    "view_insights": "View detailed business insights"
+    "view_insights": "View detailed business insights",
+    "loading_subtitle": "Loading report data...",
+    "exported_files": "Exported Files",
+    "fileName": "File Name",
+    "fileSize": "File Size",
+    "modifiedDate": "Modified Date",
+    "noFiles": "No files found"
   },
   "adminGroups": {
     "title": "Groups Management",

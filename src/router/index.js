@@ -9,13 +9,13 @@ const routes = [
   {
     path: '/login',
     name: 'Login',
-    component: () => import('@/views/Login.vue'),
+    component: () => import('@/views/Auth/Login.vue'),
     meta: { guest: true, requiresGuest: true }
   },
   {
     path: '/register',
     name: 'Register',
-    component: () => import('@/views/Register.vue'),
+    component: () => import('@/views/Auth/Register.vue'),
     meta: { guest: true, requiresGuest: true }
   },
   {
@@ -27,56 +27,50 @@ const routes = [
   {
     path: '/invoices',
     name: 'Invoices',
-    component: () => import('@/views/Invoices.vue'),
+    component: () => import('@/views/invoices/InvoicesIndex.vue'),
     meta: { requiresAuth: true, permission: 'view_invoices' }
   },
   {
     path: '/invoices/create',
     name: 'CreateInvoice',
-    component: () => import('@/views/CreateInvoice.vue'),
+    component: () => import('@/views/invoices/CreateInvoice.vue'),
     meta: { requiresAuth: true, permission: 'create_invoice' }
   },
   {
     path: '/invoices/:id',
     name: 'InvoiceDetails',
-    component: () => import('@/views/InvoiceDetails.vue'),
+    component: () => import('@/views/invoices/InvoiceDetails.vue'),
     meta: { requiresAuth: true, permission: 'view_invoices' }
   },
   {
     path: '/invoices/:id/edit',
     name: 'EditInvoice',
-    component: () => import('@/views/invoices/Edit.vue'),
+    component: () => import('@/views/invoices/EditInvoice.vue'),
     meta: { requiresAuth: true, permission: 'edit_invoice' }
   },
   {
     path: '/clients',
     name: 'Clients',
-    component: () => import('@/views/Clients.vue'),
+    component: () => import('@/views/Clients/ClientsIndex.vue'),
     meta: { requiresAuth: true, permission: 'view_clients' }
   },
   {
     path: '/clients/create',
     name: 'CreateClient',
-    component: () => import('@/views/CreateClient.vue'),
+    component: () => import('@/views/Clients/CreateClient.vue'),
     meta: { requiresAuth: true, permission: 'create_client' }
   },
   {
     path: '/clients/:id',
     name: 'ClientDetails',
-    component: () => import('@/views/ClientDetails.vue'),
+    component: () => import('@/views/Clients/ClientDetails.vue'),
     meta: { requiresAuth: true, permission: 'view_clients' }
   },
   {
     path: '/clients/:id/edit',
     name: 'EditClient',
-    component: () => import('@/views/EditClient.vue'),
+    component: () => import('@/views/Clients/EditClient.vue'),
     meta: { requiresAuth: true, permission: 'edit_client' }
-  },
-  {
-    path: '/reports/sales',
-    name: 'SalesReport',
-    component: () => import('@/views/Reports/SalesReport.vue'),
-    meta: { requiresAuth: true, permission: 'view_sales_report' }
   },
   {
     path: '/reports',
@@ -133,7 +127,7 @@ const routes = [
   {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
-    component: () => import('@/views/NotFound.vue')
+    component: () => import('@/views/Auth/NotFound.vue')
   }
 ]
 

@@ -1,50 +1,37 @@
 import axios from '@/api/axios'
-import NProgress from 'nprogress'
 
 const state = {
-  stats: {
-    totalRevenue: 0,
-    totalInvoices: 0,
-    totalClients: 0,
-    paidInvoices: 0,
-    revenueGrowth: 0,
-    invoiceGrowth: 0,
-    clientsGrowth: 0,
-    paymentRate: 0,
-    averageInvoice: 0,
-    collectionRate: 0,
-    draftInvoices: 0,
-    sentInvoices: 0,
-    overdueInvoices: 0,
-    draftPercentage: 0,
-    sentPercentage: 0,
-    paidPercentage: 0,
-    overduePercentage: 0,
-    thisMonthInvoices: 0,
-    newClientsThisMonth: 0
-  },
+  stats: null,
   recentClients: [],
   recentInvoices: [],
   monthlyRevenue: [],
   overdueInvoices: [],
   recentActivity: [],
+  topClients: [],
+  invoiceStatuses: [],
+  performanceData: {},
   loading: false,
-  error: null
+  error: null,
+  lastUpdated: null
 }
 
 const getters = {
-  stats: (state) => state.stats,
+  stats: (state) => state.stats || {},
   recentClients: (state) => state.recentClients,
   recentInvoices: (state) => state.recentInvoices,
   monthlyRevenue: (state) => state.monthlyRevenue,
   overdueInvoices: (state) => state.overdueInvoices,
   recentActivity: (state) => state.recentActivity,
+  topClients: (state) => state.topClients,
+  invoiceStatuses: (state) => state.invoiceStatuses,
+  performanceData: (state) => state.performanceData,
   loading: (state) => state.loading,
   error: (state) => state.error,
+  lastUpdated: (state) => state.lastUpdated,
 
   // Helper functions
   formatCurrency: () => (amount) => {
-    if (!amount && amount !== 0) return '0.00 ر.س'
+    if (amount === null || amount === undefined) return '0.00 ر.س'
     const num = parseFloat(amount)
     if (isNaN(num)) return '0.00 ر.س'
     return num.toLocaleString('ar-SA', {
@@ -61,6 +48,21 @@ const getters = {
         year: 'numeric',
         month: 'short',
         day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+    } catch (error) {
+      return 'تاريخ غير صالح'
+    }
+  },
+
+  formatShortDate: () => (dateString) => {
+    if (!dateString) return 'غير محدد'
+    try {
+      const date = new Date(dateString)
+      return date.toLocaleDateString('ar-SA', {
+        month: 'short',
+        day: 'numeric'
       })
     } catch (error) {
       return 'تاريخ غير صالح'
@@ -99,12 +101,66 @@ const getters = {
       inactive: 'غير نشط'
     }
     return texts[status] || status
+  },
+
+  // حساب أداء اليوم
+  todayPerformance: (state) => {
+    const stats = state.stats || {}
+    const todayPaid = stats.todayPaidInvoices || 0
+    const todayTotal = stats.todayTotalInvoices || 0
+    return todayTotal > 0 ? Math.round((todayPaid / todayTotal) * 100) : 0
+  },
+
+  // بيانات الرسوم البيانية
+  chartData: (state) => {
+    return {
+      revenueChartData: {
+        labels: state.performanceData.months || [],
+        datasets: [
+          {
+            label: 'الإيرادات',
+            data: state.performanceData.revenues || [],
+            borderColor: '#3b82f6',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            fill: true,
+            tension: 0.4
+          }
+        ]
+      },
+      performanceChartData: {
+        labels: state.performanceData.months || [],
+        datasets: [
+          {
+            label: 'الفواتير',
+            data: state.performanceData.invoices || [],
+            backgroundColor: 'rgba(59, 130, 246, 0.8)',
+            borderRadius: 8
+          },
+          {
+            label: 'الإيرادات',
+            data: state.performanceData.revenues || [],
+            backgroundColor: 'rgba(16, 185, 129, 0.8)',
+            borderRadius: 8
+          }
+        ]
+      },
+      invoiceStatusChartData: {
+        labels: state.invoiceStatuses.map(s => s.label) || [],
+        datasets: [
+          {
+            data: state.invoiceStatuses.map(s => s.value) || [],
+            backgroundColor: state.invoiceStatuses.map(s => s.color) || [],
+            borderWidth: 0
+          }
+        ]
+      }
+    }
   }
 }
 
 const mutations = {
   SET_STATS(state, stats) {
-    state.stats = { ...state.stats, ...stats }
+    state.stats = stats
   },
   SET_RECENT_CLIENTS(state, clients) {
     state.recentClients = clients
@@ -121,87 +177,77 @@ const mutations = {
   SET_RECENT_ACTIVITY(state, activity) {
     state.recentActivity = activity
   },
+  SET_TOP_CLIENTS(state, clients) {
+    state.topClients = clients
+  },
+  SET_INVOICE_STATUSES(state, statuses) {
+    state.invoiceStatuses = statuses
+  },
+  SET_PERFORMANCE_DATA(state, data) {
+    state.performanceData = data
+  },
   SET_LOADING(state, loading) {
     state.loading = loading
   },
   SET_ERROR(state, error) {
     state.error = error
+  },
+  SET_LAST_UPDATED(state) {
+    state.lastUpdated = new Date().toISOString()
+  },
+  CLEAR_DATA(state) {
+    state.stats = null
+    state.recentClients = []
+    state.recentInvoices = []
+    state.monthlyRevenue = []
+    state.overdueInvoices = []
+    state.recentActivity = []
+    state.topClients = []
+    state.invoiceStatuses = []
+    state.performanceData = {}
   }
 }
 
 const actions = {
   async fetchDashboardData({ commit }) {
-    NProgress.start()
     commit('SET_LOADING', true)
     commit('SET_ERROR', null)
 
     try {
       const response = await axios.get('/admin/dashboard')
-      const data = response.data.data || response.data
 
-      if (response.data.code === 401) {
-        throw new Error('غير مصرح بالوصول')
+      if (response.data.status) {
+        const data = response.data.data
+
+        commit('SET_STATS', data.stats || {})
+        commit('SET_RECENT_CLIENTS', data.recentClients || [])
+        commit('SET_RECENT_INVOICES', data.recentInvoices || [])
+        commit('SET_MONTHLY_REVENUE', data.monthlyRevenue || [])
+        commit('SET_OVERDUE_INVOICES', data.overdueInvoices || [])
+        commit('SET_RECENT_ACTIVITY', data.recentActivity || [])
+        commit('SET_TOP_CLIENTS', data.topClients || [])
+        commit('SET_INVOICE_STATUSES', data.invoiceStatuses || [])
+        commit('SET_PERFORMANCE_DATA', data.performanceData || {})
+        commit('SET_LAST_UPDATED')
+
+        return data
+      } else {
+        throw new Error(response.data.message || 'فشل في جلب البيانات')
       }
-
-      commit('SET_STATS', data.stats || {})
-      commit('SET_RECENT_CLIENTS', data.recentClients || [])
-      commit('SET_RECENT_INVOICES', data.recentInvoices || [])
-      commit('SET_MONTHLY_REVENUE', data.monthlyRevenue || [])
-      commit('SET_OVERDUE_INVOICES', data.overdueInvoices || [])
-      commit('SET_RECENT_ACTIVITY', data.recentActivity || [])
     } catch (error) {
-      commit('SET_ERROR', error.response?.data?.message || error.message || 'فشل في تحميل بيانات لوحة التحكم')
+      const errorMessage = error.response?.data?.message ||
+        error.message ||
+        'فشل في تحميل بيانات لوحة التحكم'
 
-      // استخدام بيانات وهمية للعرض فقط في حالة التطوير
-      if (process.env.NODE_ENV === 'development') {
-        commit('SET_STATS', {
-          totalRevenue: 1250000,
-          totalInvoices: 150,
-          totalClients: 85,
-          paidInvoices: 120,
-          revenueGrowth: 12.5,
-          invoiceGrowth: 8.3,
-          clientsGrowth: 5.2,
-          paymentRate: 80,
-          averageInvoice: 8333.33,
-          collectionRate: 85,
-          draftInvoices: 15,
-          sentInvoices: 25,
-          overdueInvoices: 10,
-          draftPercentage: 8.8,
-          sentPercentage: 14.7,
-          paidPercentage: 70.6,
-          overduePercentage: 5.9,
-          thisMonthInvoices: 25,
-          newClientsThisMonth: 12
-        })
-
-        commit('SET_RECENT_CLIENTS', [
-          { id: 1, name: 'شركة النور للتجارة', email: 'info@alnoor.com', status: 'active', created_at: '2024-01-15' },
-          { id: 2, name: 'مؤسسة التقنية المتقدمة', email: 'contact@tech.com', status: 'active', created_at: '2024-01-10' },
-          { id: 3, name: 'محمد أحمد', email: 'mohamed@email.com', status: 'active', created_at: '2024-01-05' }
-        ])
-
-        commit('SET_RECENT_INVOICES', [
-          { id: 1, invoice_number: 'INV-2024-001', client_name: 'شركة النور للتجارة', total: 15000, status: 'paid', issue_date: '2024-01-15', due_date: '2024-02-15' },
-          { id: 2, invoice_number: 'INV-2024-002', client_name: 'مؤسسة التقنية المتقدمة', total: 25000, status: 'sent', issue_date: '2024-01-10', due_date: '2024-02-10' },
-          { id: 3, invoice_number: 'INV-2024-003', client_name: 'محمد أحمد', total: 8000, status: 'draft', issue_date: '2024-01-05', due_date: '2024-02-05' }
-        ])
-
-        commit('SET_MONTHLY_REVENUE', [
-          { month: 'يناير', revenue: 1200000 },
-          { month: 'فبراير', revenue: 1500000 },
-          { month: 'مارس', revenue: 1300000 }
-        ])
-      }
+      commit('SET_ERROR', errorMessage)
+      throw error
     } finally {
-      NProgress.done()
       commit('SET_LOADING', false)
     }
   },
 
   async refreshDashboardData({ dispatch }) {
-    await dispatch('fetchDashboardData')
+    return await dispatch('fetchDashboardData')
   }
 }
 
