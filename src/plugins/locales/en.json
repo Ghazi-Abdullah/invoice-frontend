@@ -401,7 +401,59 @@
     "select_all": "Select All",
     "collapse_sidebar": "Collapse Sidebar"
   },
+  
+  "groups": {
+    "title": "User Groups",
+    "subtitle": "Manage user groups and permissions",
+    "create_new": "Add New Group",
+    "total_groups": "Total Groups",
+    "active_groups": "Active Groups",
+    "inactive_groups": "Inactive Groups",
+    "total_users": "Total Users",
+    "filter_subtitle": "Filter groups by criteria",
+    "search_placeholder": "Search by name or description...",
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "system_group": "System Group",
+    "group_list": "Groups List",
+    "list_subtitle": "View and manage user groups",
+    "no_groups": "No Groups Found",
+    "start_creating_message": "Start by adding a new group to manage users and permissions",
+    "create_first": "Create First Group",
+    "name_en": "Name (English)",
+    "name_ar": "Name (Arabic)",
+    "users_count": "Users Count",
+    "permissions_count": "Permissions Count",
+    "manage_permissions": "Manage Permissions",
+    "deactivate": "Deactivate",
+    "activate": "Activate",
+    "edit_group": "Edit Group",
+    "create_group": "Create New Group",
+    "edit_subtitle": "Edit group details",
+    "create_subtitle": "Enter new group details",
+    "name_en_placeholder": "Enter group name in English",
+    "name_ar_placeholder": "Enter group name in Arabic",
+    "description": "Description",
+    "description_placeholder": "Group description (optional)",
+    "select_permissions": "Select Permissions",
+    "permissions_subtitle": "Choose the required permissions for this group",
+    "messages": {
+      "create_success": "Group created successfully",
+      "update_success": "Group updated successfully",
+      "status_change_success": "Group status changed successfully",
+      "delete_success": "Group deleted successfully",
+      "permissions_updated": "Permissions updated successfully"
+    },
+    "confirm_status_change_title": "Confirm Status Change",
+    "confirm_status_change": "Are you sure you want to {action} the group \"{name}\"?",
+    "delete_confirm_title": "Confirm Deletion",
+    "delete_confirm": "Are you sure you want to delete the group \"{name}\"? This action cannot be undone."
+  },
+
   "common": {
+    "yes": "Yes",
     "created_at": "Created At",
     "date_from": "Date From",
     "per_page": "Per Page",
@@ -446,6 +498,7 @@
     "active": "Active",
     "inactive": "Inactive",
     "currency": "SAR",
+    "created": "Created",
     "none": "None",
     "notAvailable": "Not Available",
     "error": "Error",
@@ -550,6 +603,8 @@
     "passwordMatch": "Passwords do not match"
   },
   "permissions": {
+    "total_permissions": "Total Permissions",
+    "list_subtitle":"View and manage user groups",
     "hasPermission": "Has Permission",
     "view_clients": "View Clients",
     "create_client": "Create Client",
@@ -623,6 +678,13 @@
   },
   "users": {
     "title": "Users",
+    "total_users": "Total Users",
+    "inactive_users": "Inactive Users",
+    "active_users": "Active Users",
+    "total_groups": "Total Groups",
+    "email": "Email",
+    "list_subtitle": "View and manage user accounts",
+    "filter_subtitle": "Filter users by criteria",
     "management": "User Management",
     "managementDescription": "Manage user accounts and permissions",
     "name": "Name",
@@ -657,7 +719,12 @@
     "pageOf": "Page {current} of {total}"
   },
   "reports": {
+    "refresh_list": "Refresh List",
     "export_options": "Export Options",
+    "actions": "Actions",
+    "total_amount": "Total Amount",
+    "due_amount": "Due Amount",
+    "days_overdue": "Days Overdue",
     "export_choose_method ": "Choose Export Method",
     "export_direct": "Export Direct",
     "export_server": "Export Server",

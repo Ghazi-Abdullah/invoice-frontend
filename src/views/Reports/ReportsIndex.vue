@@ -54,7 +54,6 @@
               <span class="font-medium">{{ $t('reports.buttons.export_report') }}</span>
             </button>
 
-            <!-- View Exported Files Button -->
             <button
               @click="toggleExportedFiles"
               class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2 group"
@@ -72,11 +71,13 @@
                   d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                 />
               </svg>
-              <span class="font-medium">{{
-                showExportedFiles
-                  ? $t('reports.buttons.close_exported')
-                  : $t('reports.buttons.view_exported')
-              }}</span>
+              <span class="font-medium">
+                {{
+                  showExportedFiles
+                    ? $t('reports.buttons.close_exported')
+                    : $t('reports.buttons.view_exported')
+                }}
+              </span>
             </button>
           </div>
         </div>
@@ -176,21 +177,15 @@
                       <div class="text-sm font-medium text-gray-900 truncate max-w-xs">
                         {{ file.name }}
                       </div>
-                      <div class="text-xs text-gray-500 mt-1">
-                        {{ formatDate(file.modified) }}
-                      </div>
+                      <div class="text-xs text-gray-500 mt-1">{{ formatDate(file.modified) }}</div>
                     </div>
                   </div>
                 </td>
                 <td class="px-4 py-3 text-center">
-                  <span class="text-sm text-gray-900 font-medium">
-                    {{ file.size }}
-                  </span>
+                  <span class="text-sm text-gray-900 font-medium">{{ file.size }}</span>
                 </td>
                 <td class="px-4 py-3 text-center">
-                  <span class="text-sm text-gray-500">
-                    {{ formatRelativeTime(file.modified) }}
-                  </span>
+                  <span class="text-sm text-gray-500">{{ formatRelativeTime(file.modified) }}</span>
                 </td>
                 <td class="px-4 py-3 text-center">
                   <div class="flex items-center justify-center gap-2">
@@ -253,8 +248,8 @@
         <div v-if="exportedFiles.length > 0" class="mt-6 pt-6 border-t border-gray-200">
           <div class="flex items-center justify-between">
             <div class="text-sm text-gray-600">
-              {{ $t('reports.total_files') }}:
-              <span class="font-semibold">{{ exportedFiles.length }}</span>
+             <!-- {{ $t('reports.total_files') }}:
+              <span class="font-semibold">{{ exportedFiles.length }}</span>-->
             </div>
             <button
               @click="refreshExportedFiles"
@@ -330,9 +325,9 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <!-- Start Date -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-              {{ $t('common.fromDate') }}
-            </label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">{{
+              $t('common.fromDate')
+            }}</label>
             <div class="relative">
               <input
                 type="date"
@@ -357,9 +352,9 @@
 
           <!-- End Date -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-              {{ $t('common.toDate') }}
-            </label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">{{
+              $t('common.toDate')
+            }}</label>
             <div class="relative">
               <input
                 type="date"
@@ -384,9 +379,9 @@
 
           <!-- Status Filter -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-              {{ $t('reports.invoiceStatus') }}
-            </label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">{{
+              $t('reports.invoiceStatus')
+            }}</label>
             <div class="relative">
               <select
                 v-model="filters.status"
@@ -416,21 +411,16 @@
 
           <!-- Client Filter -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-              {{ $t('clients.title') }}
-            </label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">{{
+              $t('clients.title')
+            }}</label>
             <div class="relative">
               <select
                 v-model="filters.client_id"
                 class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white appearance-none pr-10"
               >
                 <option value="">{{ $t('common.all') }}</option>
-                <option
-                  v-for="client in clients"
-                  :key="client.id"
-                  :value="client.id"
-                  v-if="client && client.id"
-                >
+                <option v-for="client in clients" :key="client.id" :value="client.id">
                   {{ client.name }}
                 </option>
               </select>
@@ -480,7 +470,6 @@
                 d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-
             <!-- Client Icon -->
             <svg
               v-else-if="tab.id === 'clients'"
@@ -496,7 +485,6 @@
                 d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
               />
             </svg>
-
             <!-- Revenue Icon -->
             <svg
               v-else-if="tab.id === 'revenue'"
@@ -512,7 +500,6 @@
                 d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-
             <!-- Overdue Icon -->
             <svg
               v-else-if="tab.id === 'overdue'"
@@ -528,13 +515,12 @@
                 d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-
             {{ tab.label }}
             <span
-              v-if="tab.badge"
+              v-if="tab.id === 'overdue' && overdueCount > 0"
               class="px-2 py-0.5 text-xs font-medium rounded-full bg-red-100 text-red-700"
             >
-              {{ tab.badge }}
+              {{ overdueCount }}
             </span>
           </button>
         </div>
@@ -599,6 +585,7 @@
             :clients="reports.clients.items"
             :stats="reports.clients.stats"
             :pagination="reports.clients.pagination"
+            @page-change="handlePageChange"
           />
         </div>
 
@@ -608,6 +595,7 @@
             :revenue="reports.revenue.items"
             :stats="reports.revenue.stats"
             :pagination="reports.revenue.pagination"
+            @page-change="handlePageChange"
           />
         </div>
 
@@ -619,6 +607,7 @@
             :pagination="reports.overdue.pagination"
             @send-reminder="handleSendReminder"
             @mark-paid="handleMarkAsPaid"
+            @page-change="handlePageChange"
           />
         </div>
       </div>
@@ -629,7 +618,7 @@
       v-if="showExportModal"
       :active-tab="activeTab"
       :loading="exportLoading"
-      @close="showExportModal = false"
+      @close="closeExportModal"
       @export-direct="handleDirectExport"
       @export-server="handleServerExport"
     />
@@ -637,8 +626,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
-import axios from '@/api/axios'
+import { mapState, mapActions, mapGetters } from 'vuex'
 import InvoiceReportSection from '@/components/reports/InvoiceReportSection.vue'
 import ClientReportSection from '@/components/reports/ClientReportSection.vue'
 import RevenueReportSection from '@/components/reports/RevenueReportSection.vue'
@@ -655,319 +643,95 @@ export default {
     ExportModal,
   },
 
-  data() {
-    return {
-      activeTab: 'invoices',
-      filters: {
-        start_date: '',
-        end_date: '',
-        status: '',
-        client_id: '',
-        user_id: '',
-        per_page: 20,
-        page: 1,
-      },
-      clients: [],
-      showExportModal: false,
-      showExportedFiles: false,
-      tabs: [
+  computed: {
+    ...mapState('report', [
+      'loading',
+      'exportLoading',
+      'error',
+      'reports',
+      'exportedFiles',
+      'clients',
+      'activeTab',
+      'showExportModal',
+      'showExportedFiles',
+    ]),
+    ...mapGetters('report', ['overdueCount']),
+    tabs() {
+      return [
         { id: 'invoices', label: this.$t('reports.types.invoices') },
         { id: 'clients', label: this.$t('reports.types.clients') },
         { id: 'revenue', label: this.$t('reports.types.revenue') },
-        {
-          id: 'overdue',
-          label: this.$t('reports.overdueInvoices'),
-          badge: null,
-        },
-      ],
-    }
-  },
-
-  computed: {
-    ...mapGetters('report', [
-      'invoicesReport',
-      'clientsReport',
-      'revenueReport',
-      'overdueReport',
-      'invoiceStats',
-      'clientStats',
-      'revenueStats',
-      'overdueStats',
-      'isLoading',
-      'isExporting',
-      'reportError',
-      'reportFilters',
-      'exportedFiles',
-    ]),
-
-    loading() {
-      return this.isLoading
+        { id: 'overdue', label: this.$t('reports.types.overdue') },
+      ]
     },
-
-    exportLoading() {
-      return this.isExporting
-    },
-
-    error() {
-      return this.reportError
-    },
-
-    reports() {
-      return {
-        invoices: this.invoicesReport || { items: [], stats: {}, pagination: {} },
-        clients: this.clientsReport || { items: [], stats: {} },
-        revenue: this.revenueReport || { items: [], stats: {} },
-        overdue: this.overdueReport || { items: [], stats: {} },
-      }
-    },
-
-    stats() {
-      return {
-        invoices: this.invoiceStats || {},
-        clients: this.clientStats || {},
-        revenue: this.revenueStats || {},
-        overdue: this.overdueStats || {},
-      }
+    filters: {
+      get() {
+        return this.$store.state.report.filters
+      },
+      set(value) {
+        this.$store.commit('report/SET_FILTERS', value)
+      },
     },
   },
 
   watch: {
-    reportFilters: {
-      immediate: true,
-      handler(newFilters) {
-        this.filters = { ...newFilters }
+    filters: {
+      deep: true,
+      handler() {
+        this.loadReport()
       },
     },
-
-    'stats.overdue.total_overdue': {
-      immediate: true,
-      handler(count) {
-        const overdueTab = this.tabs.find((tab) => tab.id === 'overdue')
-        if (overdueTab) {
-          overdueTab.badge = count > 0 ? count : null
-        }
-      },
-    },
-  },
-
-  mounted() {
-    this.initFilters()
-    this.loadReport()
-    this.loadClients()
-    this.loadExportedFiles()
   },
 
   methods: {
     ...mapActions('report', [
-      'getInvoicesReport',
-      'getClientsReport',
-      'getRevenueReport',
-      'getOverdueReport',
-      'exportReport',
-      'getExportedFiles',
-      'deleteExportedFile',
-      'updateFilters',
+      'init',
+      'loadReport',
+      'switchTab',
+      'handlePageChange',
       'resetFilters',
+      'openExportModal',
+      'closeExportModal',
+      'toggleExportedFiles',
+      'handleDirectExport',
+      'handleServerExport',
+      'refreshExportedFiles',
+      'deleteExportedFile',
       'clearError',
     ]),
-
-    initFilters() {
-      const endDate = new Date()
-      const startDate = new Date()
-      startDate.setDate(startDate.getDate() - 30)
-
-      this.filters = {
-        start_date: startDate.toISOString().split('T')[0],
-        end_date: endDate.toISOString().split('T')[0],
-        status: '',
-        client_id: '',
-        user_id: '',
-        per_page: 20,
-        page: 1,
-      }
-
-      this.updateFilters(this.filters)
-    },
-
-    async loadReport() {
-      this.updateFilters(this.filters)
-
-      const actions = {
-        invoices: 'getInvoicesReport',
-        clients: 'getClientsReport',
-        revenue: 'getRevenueReport',
-        overdue: 'getOverdueReport',
-      }
-
-      try {
-        await this[actions[this.activeTab]](this.filters)
-        this.$toast.success(this.$t('reports.load_success'))
-      } catch (error) {
-        this.$toast.error(error.message || this.$t('errors.failedToLoadReport'))
-      }
-    },
-
-    async handlePageChange(page) {
-      this.filters.page = page
-      await this.loadReport()
-    },
-
-    switchTab(tab) {
-      this.activeTab = tab
-      this.filters.page = 1
-      this.loadReport()
-    },
-
-    async loadClients() {
-      try {
-        const response = await axios.get('/admin/clients', {
-          params: { per_page: 100, is_active: true },
-        })
-
-        if (response.data && response.data.data) {
-          this.clients = response.data.data.filter((client) => client && client.id)
-        } else {
-          this.clients = []
-        }
-      } catch (error) {
-        console.error('Failed to load clients:', error)
-        this.clients = []
-      }
-    },
-
-    openExportModal() {
-      this.showExportModal = true
-    },
-
-    async handleDirectExport() {
-      try {
-        this.showExportModal = false
-        this.$toast.info(this.$t('reports.exporting'))
-
-        await this.exportReport({
-          type: this.activeTab,
-          download: true,
-        })
-
-        this.$toast.success(this.$t('reports.export_success'))
-      } catch (error) {
-        this.$toast.error(error.message || this.$t('errors.failedToExportReport'))
-      }
-    },
-
-    async handleServerExport() {
-      try {
-        this.showExportModal = false
-        this.$toast.info(this.$t('reports.exporting'))
-
-        const result = await this.exportReport({
-          type: this.activeTab,
-          download: false,
-        })
-
-        if (result && result.success) {
-          this.$toast.success(this.$t('reports.export_success'))
-          this.showExportedFiles = true
-          await this.loadExportedFiles()
-        }
-      } catch (error) {
-        this.$toast.error(error.message || this.$t('errors.failedToExportReport'))
-      }
-    },
-
-    toggleExportedFiles() {
-      this.showExportedFiles = !this.showExportedFiles
-      if (this.showExportedFiles) {
-        this.loadExportedFiles()
-      }
-    },
-
-    async loadExportedFiles() {
-      try {
-        await this.getExportedFiles()
-      } catch (error) {
-        console.error('Error loading exported files:', error)
-      }
-    },
-
-    async refreshExportedFiles() {
-      await this.loadExportedFiles()
-      this.$toast.info(this.$t('reports.refresh_success'))
-    },
+    // استخدام كائن لإعادة تسمية الإجراءات لتتناسب مع الأحداث في القالب
+    ...mapActions('report', {
+      handleSendReminder: 'sendReminder',
+      handleMarkAsPaid: 'markAsPaid',
+    }),
 
     async confirmDeleteFile(fileName) {
-      const confirmed = await this.$swal({
-        title: this.$t('common.delete_confirm_title'),
-        text: this.$t('common.delete_confirm_text'),
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#EF4444',
-        cancelButtonColor: '#6B7280',
-        confirmButtonText: this.$t('common.delete_confirm'),
-        cancelButtonText: this.$t('common.cancel'),
-        reverseButtons: true,
-      })
+      let confirmed = false
 
-      if (confirmed.isConfirmed) {
+      // التحقق من وجود SweetAlert
+      if (this.$swal) {
+        const result = await this.$swal({
+          title: this.$t('common.delete_confirm_title'),
+          text: this.$t('common.delete_confirm_text'),
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#EF4444',
+          cancelButtonColor: '#6B7280',
+          confirmButtonText: this.$t('common.delete_confirm'),
+          cancelButtonText: this.$t('common.cancel'),
+          reverseButtons: true,
+        })
+        confirmed = result.isConfirmed
+      } else {
+        confirmed = window.confirm(this.$t('common.delete_confirm_text'))
+      }
+
+      if (confirmed) {
         try {
           await this.deleteExportedFile(fileName)
           this.$toast.success(this.$t('messages.deleteSuccess'))
         } catch (error) {
           this.$toast.error(this.$t('errors.deleteFailed'))
-        }
-      }
-    },
-
-    async handleSendReminder(invoiceId) {
-      const confirmed = await this.$swal({
-        title: this.$t('reports.sendReminder'),
-        text: this.$t('reports.confirmSendReminder'),
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#EAB308',
-        cancelButtonColor: '#6B7280',
-        confirmButtonText: this.$t('reports.sendReminder'),
-        cancelButtonText: this.$t('common.cancel'),
-        reverseButtons: true,
-      })
-
-      if (confirmed.isConfirmed) {
-        try {
-          const response = await axios.post(`/admin/reports/send-reminder/${invoiceId}`)
-          if (response.data.success) {
-            this.$toast.success(this.$t('reports.reminderSent'))
-            this.getOverdueReport()
-          }
-        } catch (error) {
-          this.$toast.error(error.message || this.$t('errors.failedToSendReminder'))
-        }
-      }
-    },
-
-    async handleMarkAsPaid(invoiceId) {
-      const confirmed = await this.$swal({
-        title: this.$t('reports.markAsPaid'),
-        text: this.$t('reports.confirmMarkAsPaid'),
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonColor: '#10B981',
-        cancelButtonColor: '#6B7280',
-        confirmButtonText: this.$t('reports.markAsPaid'),
-        cancelButtonText: this.$t('common.cancel'),
-        reverseButtons: true,
-      })
-
-      if (confirmed.isConfirmed) {
-        try {
-          const response = await axios.post(`/admin/reports/mark-paid/${invoiceId}`)
-          if (response.data.success) {
-            this.$toast.success(this.$t('reports.invoicePaid'))
-            setTimeout(() => {
-              this.getOverdueReport()
-            }, 1000)
-          }
-        } catch (error) {
-          this.$toast.error(error.message || this.$t('errors.failedToMarkAsPaid'))
         }
       }
     },
@@ -1006,6 +770,10 @@ export default {
       })
       return formatter.format(amount)
     },
+  },
+
+  mounted() {
+    this.init()
   },
 }
 </script>

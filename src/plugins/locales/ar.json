@@ -101,6 +101,57 @@
     "invoices": "الفواتير",
     "revenue": "الإيرادات"
   },
+
+  "groups": {
+    "title": "مجموعات المستخدمين",
+    "subtitle": "إدارة مجموعات المستخدمين والصلاحيات",
+    "create_new": "إضافة مجموعة جديدة",
+    "total_groups": "إجمالي المجموعات",
+    "active_groups": "المجموعات النشطة",
+    "inactive_groups": "المجموعات غير النشطة",
+    "total_users": "إجمالي المستخدمين",
+    "filter_subtitle": "تصفية المجموعات حسب المعايير",
+    "search_placeholder": "بحث بالاسم أو الوصف...",
+    "status": {
+      "active": "نشط",
+      "inactive": "غير نشط"
+    },
+    "system_group": "مجموعة نظامية",
+    "group_list": "قائمة المجموعات",
+    "list_subtitle": "عرض وإدارة مجموعات المستخدمين",
+    "no_groups": "لا توجد مجموعات",
+    "start_creating_message": "ابدأ بإضافة مجموعة جديدة لإدارة المستخدمين والصلاحيات",
+    "create_first": "إنشاء أول مجموعة",
+    "name_en": "الاسم (إنجليزي)",
+    "name_ar": "الاسم (عربي)",
+    "users_count": "عدد المستخدمين",
+    "permissions_count": "عدد الصلاحيات",
+    "manage_permissions": "إدارة الصلاحيات",
+    "deactivate": "تعطيل",
+    "activate": "تفعيل",
+    "edit_group": "تعديل المجموعة",
+    "create_group": "إضافة مجموعة جديدة",
+    "edit_subtitle": "تعديل بيانات المجموعة",
+    "create_subtitle": "إدخال بيانات المجموعة الجديدة",
+    "name_en_placeholder": "أدخل اسم المجموعة بالإنجليزية",
+    "name_ar_placeholder": "أدخل اسم المجموعة بالعربية",
+    "description": "الوصف",
+    "description_placeholder": "وصف المجموعة (اختياري)",
+    "select_permissions": "اختر الصلاحيات",
+    "permissions_subtitle": "حدد الصلاحيات المطلوبة لهذه المجموعة",
+    "messages": {
+      "create_success": "تم إنشاء المجموعة بنجاح",
+      "update_success": "تم تحديث المجموعة بنجاح",
+      "status_change_success": "تم تغيير حالة المجموعة بنجاح",
+      "delete_success": "تم حذف المجموعة بنجاح",
+      "permissions_updated": "تم تحديث الصلاحيات بنجاح"
+    },
+    "confirm_status_change_title": "تأكيد تغيير الحالة",
+    "confirm_status_change": "هل أنت متأكد من {action} المجموعة \"{name}\"?",
+    "delete_confirm_title": "تأكيد الحذف",
+    "delete_confirm": "هل أنت متأكد من حذف المجموعة \"{name}\"؟ لا يمكن التراجع عن هذا الإجراء."
+  },
+
   "clients": {
     "name": "اسم العميل",
     "email": "البريد الإلكتروني",
@@ -388,6 +439,7 @@
     "cancel": "إلغاء",
     "save": "حفظ",
     "create": "إنشاء",
+    "yes": "نعم",
     "edit": "تعديل",
     "description": "الوصف",
     "quantity": "الكمية",
@@ -496,6 +548,7 @@
     "passwordMatch": "كلمتا المرور غير متطابقتين"
   },
   "permissions": {
+    "list_subtitle":"عرض وادارة مجموعات المستخدمين",
     "hasPermission": "لديه الصلاحية",
     "view_clients": "عرض العملاء",
     "create_client": "إنشاء عميل",

@@ -121,7 +121,7 @@
               </td>
               <td class="table-cell">
                 <div class="client-cell">
-                  <div class="client-avatar">
+                  <div class="client-avatar mr-8">
                     {{ getInitials(invoice.client?.name) }}
                   </div>
                   <div>

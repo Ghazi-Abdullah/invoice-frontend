@@ -19,16 +19,16 @@
                     stroke-linecap="round"
                     stroke-linejoin="round"
                     stroke-width="2"
-                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-8a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z"
+                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
                   />
                 </svg>
               </div>
               <div>
                 <h1 class="text-2xl md:text-3xl font-bold text-gray-900">
-                  {{ $t('users.title') }}
+                  {{ $t('groups.title') }}
                 </h1>
                 <p class="text-sm text-gray-600 mt-1">
-                  {{ $t('users.subtitle') }}
+                  {{ $t('groups.subtitle') }}
                 </p>
               </div>
             </div>
@@ -47,8 +47,83 @@
                   d="M12 4v16m8-8H4"
                 />
               </svg>
-              <span class="font-medium">{{ $t('users.create_new') }}</span>
+              <span class="font-medium">{{ $t('groups.create_new') }}</span>
             </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <!-- Total Groups -->
+        <div class="stats-card bg-gradient-to-br from-blue-50 to-blue-100">
+          <div class="stats-icon bg-blue-100">
+            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+              />
+            </svg>
+          </div>
+          <div>
+            <p class="stats-label">{{ $t('groups.total_groups') }}</p>
+            <p class="stats-value">{{ storeGroups.length }}</p>
+          </div>
+        </div>
+
+        <!-- Active Groups -->
+        <div class="stats-card bg-gradient-to-br from-green-50 to-green-100">
+          <div class="stats-icon bg-green-100">
+            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </div>
+          <div>
+            <p class="stats-label">{{ $t('groups.active_groups') }}</p>
+            <p class="stats-value">{{ activeGroupsCount }}</p>
+          </div>
+        </div>
+
+        <!-- Inactive Groups -->
+        <div class="stats-card bg-gradient-to-br from-red-50 to-red-100">
+          <div class="stats-icon bg-red-100">
+            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636"
+              />
+            </svg>
+          </div>
+          <div>
+            <p class="stats-label">{{ $t('groups.inactive_groups') }}</p>
+            <p class="stats-value">{{ inactiveGroupsCount }}</p>
+          </div>
+        </div>
+
+        <!-- Total Users in Groups (optional) -->
+        <div class="stats-card bg-gradient-to-br from-purple-50 to-purple-100">
+          <div class="stats-icon bg-purple-100">
+            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197"
+              />
+            </svg>
+          </div>
+          <div>
+            <p class="stats-label">{{ $t('groups.total_users') }}</p>
+            <p class="stats-value">{{ totalUsersInGroups }}</p>
           </div>
         </div>
       </div>
@@ -77,7 +152,7 @@
                 {{ $t('common.filters') }}
               </h2>
               <p class="text-sm text-gray-500">
-                {{ $t('users.filter_subtitle') }}
+                {{ $t('groups.filter_subtitle') }}
               </p>
             </div>
           </div>
@@ -124,7 +199,7 @@
               <input
                 type="text"
                 v-model="filters.search"
-                :placeholder="$t('users.search_placeholder')"
+                :placeholder="$t('groups.search_placeholder')"
                 class="w-full px-4 py-2.5 pl-10 pr-10 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
               />
               <svg
@@ -157,20 +232,19 @@
             </div>
           </div>
 
-          <!-- Group Filter -->
+          <!-- Status Filter -->
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">
-              {{ $t('users.group') }}
+              {{ $t('common.status') }}
             </label>
             <div class="relative">
               <select
-                v-model="filters.group_id"
+                v-model="filters.status"
                 class="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 appearance-none pr-10"
               >
-                <option value="">{{ $t('common.all') }}</option>
-                <option v-for="group in storeGroups" :key="group.id" :value="group.id">
-                  {{ group.title_ar || group.title_en }}
-                </option>
+                <option value="all">{{ $t('common.all') }}</option>
+                <option value="active">{{ $t('groups.status.active') }}</option>
+                <option value="inactive">{{ $t('groups.status.inactive') }}</option>
               </select>
               <svg
                 class="w-5 h-5 absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
@@ -188,19 +262,19 @@
             </div>
           </div>
 
-          <!-- Status Filter -->
+          <!-- System Filter -->
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">
-              {{ $t('common.status') }}
+              {{ $t('groups.system_group') }}
             </label>
             <div class="relative">
               <select
-                v-model="filters.status"
+                v-model="filters.is_system"
                 class="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 appearance-none pr-10"
               >
-                <option value="all">{{ $t('common.all') }}</option>
-                <option value="active">{{ $t('users.status.active') }}</option>
-                <option value="inactive">{{ $t('users.status.inactive') }}</option>
+                <option value="">{{ $t('common.all') }}</option>
+                <option value="1">{{ $t('common.yes') }}</option>
+                <option value="0">{{ $t('common.no') }}</option>
               </select>
               <svg
                 class="w-5 h-5 absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
@@ -260,7 +334,7 @@
             ></div>
           </div>
           <p class="text-gray-700 font-medium mt-4">{{ $t('common.loading') }}</p>
-          <p class="text-sm text-gray-500 mt-2">{{ $t('users.loading_subtitle') }}</p>
+          <p class="text-sm text-gray-500 mt-2">{{ $t('groups.loading_subtitle') }}</p>
         </div>
       </div>
 
@@ -305,20 +379,20 @@
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div class="flex items-center gap-3">
                 <h3 class="text-lg font-semibold text-gray-800">
-                  {{ $t('users.user_list') }}
+                  {{ $t('groups.group_list') }}
                 </h3>
                 <span class="px-3 py-1 bg-blue-100 text-blue-700 text-sm font-medium rounded-full">
-                  {{ storeUsers.length }} {{ $t('common.total') }}
+                  {{ storeGroups.length }} {{ $t('common.total') }}
                 </span>
               </div>
               <div class="text-sm text-gray-500">
-                {{ $t('users.list_subtitle') }}
+                {{ $t('groups.list_subtitle') }}
               </div>
             </div>
           </div>
 
           <!-- Empty State -->
-          <div v-if="storeUsers.length === 0" class="text-center py-16 px-4">
+          <div v-if="storeGroups.length === 0" class="text-center py-16 px-4">
             <div class="max-w-sm mx-auto">
               <div
                 class="w-20 h-20 bg-blue-50 rounded-2xl mx-auto mb-6 flex items-center justify-center"
@@ -333,14 +407,14 @@
                     stroke-linecap="round"
                     stroke-linejoin="round"
                     stroke-width="1.5"
-                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-8a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z"
+                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
                   />
                 </svg>
               </div>
               <h3 class="text-xl font-semibold text-gray-900 mb-2">
-                {{ $t('users.no_users') }}
+                {{ $t('groups.no_groups') }}
               </h3>
-              <p class="text-gray-600 mb-6">{{ $t('users.start_creating_message') }}</p>
+              <p class="text-gray-600 mb-6">{{ $t('groups.start_creating_message') }}</p>
               <button
                 @click="openAddModal"
                 class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-sm hover:shadow transition-colors duration-200 flex items-center gap-2 mx-auto"
@@ -353,7 +427,7 @@
                     d="M12 4v16m8-8H4"
                   />
                 </svg>
-                {{ $t('users.create_first') }}
+                {{ $t('groups.create_first') }}
               </button>
             </div>
           </div>
@@ -366,22 +440,32 @@
                   <th
                     class="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider"
                   >
-                    {{ $t('users.name') }}
+                    {{ $t('groups.name_en') }}
                   </th>
                   <th
                     class="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider"
                   >
-                    {{ $t('users.email') }}
+                    {{ $t('groups.name_ar') }}
                   </th>
                   <th
                     class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider"
                   >
-                    {{ $t('users.group') }}
+                    {{ $t('groups.users_count') }}
+                  </th>
+                  <th
+                    class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider"
+                  >
+                    {{ $t('groups.permissions_count') }}
                   </th>
                   <th
                     class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider"
                   >
                     {{ $t('common.status') }}
+                  </th>
+                  <th
+                    class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider"
+                  >
+                    {{ $t('groups.system_group') }}
                   </th>
                   <th
                     class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider"
@@ -397,96 +481,83 @@
               </thead>
               <tbody class="bg-white divide-y divide-gray-200">
                 <tr
-                  v-for="user in storeUsers"
-                  :key="user.id"
+                  v-for="group in filteredGroups"
+                  :key="group.id"
                   class="hover:bg-blue-50/50 transition-colors duration-150"
                 >
-                  <!-- Name -->
+                  <!-- Name English -->
                   <td class="px-6 py-4">
-                    <div class="flex items-center">
-                      <div class="flex-shrink-0 ml-4">
-                        <div
-                          class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center"
-                        >
-                          <span class="text-white font-bold text-sm">
-                            {{ getInitials(user.name) }}
-                          </span>
-                        </div>
-                      </div>
-                      <div class="mr-4">
-                        <div class="text-sm font-semibold text-gray-900">
-                          {{ user.name }}
-                        </div>
-                        <div class="flex items-center gap-2 mt-1">
-                          <span class="text-xs text-gray-500">ID: {{ user.id }}</span>
-                          <span
-                            v-if="user.id === currentUser?.id"
-                            class="text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full font-medium"
-                          >
-                            {{ $t('users.you') }}
-                          </span>
-                        </div>
-                      </div>
+                    <div class="text-sm font-semibold text-gray-900">
+                      {{ group.title_en }}
+                    </div>
+                    <div class="text-xs text-gray-500 mt-1" v-if="group.description">
+                      {{ group.description }}
                     </div>
                   </td>
 
-                  <!-- Email -->
+                  <!-- Name Arabic -->
                   <td class="px-6 py-4">
-                    <div class="text-sm text-gray-900">{{ user.email }}</div>
+                    <div class="text-sm text-gray-900 font-medium">{{ group.title_ar }}</div>
                   </td>
 
-                  <!-- Group -->
-                  <td class="px-6 py-4">
-                    <div class="flex justify-center">
-                      <span
-                        class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-800"
-                      >
-                        {{
-                          user.admin_group?.title_ar ||
-                          user.admin_group?.title_en ||
-                          $t('users.no_group')
-                        }}
-                      </span>
-                    </div>
+                  <!-- Users Count -->
+                  <td class="px-6 py-4 text-center">
+                    <span class="px-3 py-1 bg-blue-100 text-blue-700 text-sm font-medium rounded-full">
+                      {{ group.users_count || 0 }}
+                    </span>
+                  </td>
+
+                  <!-- Permissions Count -->
+                  <td class="px-6 py-4 text-center">
+                    <span class="px-3 py-1 bg-purple-100 text-purple-700 text-sm font-medium rounded-full">
+                      {{ group.permissions_count || 0 }}
+                    </span>
                   </td>
 
                   <!-- Status -->
-                  <td class="px-6 py-4">
-                    <div class="flex justify-center">
+                  <td class="px-6 py-4 text-center">
+                    <span
+                      :class="
+                        group.is_active
+                          ? 'bg-green-100 text-green-800 border-green-200'
+                          : 'bg-red-100 text-red-800 border-red-200'
+                      "
+                      class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold border"
+                    >
                       <span
-                        :class="
-                          user.is_active
-                            ? 'bg-green-100 text-green-800 border-green-200'
-                            : 'bg-red-100 text-red-800 border-red-200'
-                        "
-                        class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold border"
-                      >
-                        <span
-                          :class="user.is_active ? 'bg-green-500' : 'bg-red-500'"
-                          class="w-2 h-2 rounded-full ml-2"
-                        ></span>
-                        {{
-                          user.is_active ? $t('users.status.active') : $t('users.status.inactive')
-                        }}
-                      </span>
-                    </div>
+                        :class="group.is_active ? 'bg-green-500' : 'bg-red-500'"
+                        class="w-2 h-2 rounded-full ml-2"
+                      ></span>
+                      {{
+                        group.is_active ? $t('groups.status.active') : $t('groups.status.inactive')
+                      }}
+                    </span>
+                  </td>
+
+                  <!-- System Group -->
+                  <td class="px-6 py-4 text-center">
+                    <span
+                      v-if="group.is_system"
+                      class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-800 border border-gray-200"
+                    >
+                      {{ $t('common.yes') }}
+                    </span>
+                    <span v-else class="text-gray-400">-</span>
                   </td>
 
                   <!-- Created Date -->
-                  <td class="px-6 py-4">
-                    <div class="text-center">
-                      <div class="text-sm text-gray-900 font-medium">
-                        {{ formatDate(user.created_at) }}
-                      </div>
-                      <div class="text-xs text-gray-500 mt-1">{{ $t('common.created') }}</div>
+                  <td class="px-6 py-4 text-center">
+                    <div class="text-sm text-gray-900 font-medium">
+                      {{ formatDate(group.created_at) }}
                     </div>
+                    <div class="text-xs text-gray-500 mt-1">{{ $t('common.created') }}</div>
                   </td>
 
                   <!-- Actions -->
-                  <td class="px-6 py-4">
+                  <td class="px-6 py-4 text-center">
                     <div class="flex items-center justify-center gap-2">
                       <button
-                        @click="editUser(user)"
+                        @click="editGroup(group)"
                         class="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200"
                         :title="$t('buttons.edit')"
                       >
@@ -500,18 +571,32 @@
                         </svg>
                       </button>
                       <button
-                        @click="toggleUserStatus(user)"
+                        @click="managePermissions(group)"
+                        class="p-2 text-gray-600 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors duration-200"
+                        :title="$t('groups.manage_permissions')"
+                      >
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                          />
+                        </svg>
+                      </button>
+                      <button
+                        @click="toggleGroupStatus(group)"
                         :class="
-                          user.is_active
+                          group.is_active
                             ? 'hover:text-yellow-600 hover:bg-yellow-50'
                             : 'hover:text-green-600 hover:bg-green-50'
                         "
                         class="p-2 text-gray-600 rounded-lg transition-colors duration-200"
-                        :title="user.is_active ? $t('users.deactivate') : $t('users.activate')"
+                        :title="group.is_active ? $t('groups.deactivate') : $t('groups.activate')"
                       >
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path
-                            v-if="!user.is_active"
+                            v-if="!group.is_active"
                             stroke-linecap="round"
                             stroke-linejoin="round"
                             stroke-width="2"
@@ -527,8 +612,8 @@
                         </svg>
                       </button>
                       <button
-                        v-if="user.id !== currentUser?.id"
-                        @click="confirmDelete(user)"
+                        v-if="!group.is_system"
+                        @click="confirmDelete(group)"
                         class="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
                         :title="$t('buttons.delete')"
                       >
@@ -574,16 +659,16 @@
                       stroke-linecap="round"
                       stroke-linejoin="round"
                       stroke-width="2"
-                      d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-8a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z"
+                      d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
                     />
                   </svg>
                 </div>
                 <div>
                   <h3 class="text-lg font-semibold text-gray-800">
-                    {{ editingUser ? $t('users.edit_user') : $t('users.create_user') }}
+                    {{ editingGroup ? $t('groups.edit_group') : $t('groups.create_group') }}
                   </h3>
                   <p class="text-sm text-gray-500 mt-1">
-                    {{ editingUser ? $t('users.edit_subtitle') : $t('users.create_subtitle') }}
+                    {{ editingGroup ? $t('groups.edit_subtitle') : $t('groups.create_subtitle') }}
                   </p>
                 </div>
               </div>
@@ -604,7 +689,7 @@
           </div>
 
           <!-- Modal Body -->
-          <form @submit.prevent="editingUser ? updateUser() : addUser()" class="p-6">
+          <form @submit.prevent="editingGroup ? updateGroup() : addGroup()" class="p-6">
             <!-- Form Error -->
             <div v-if="formError" class="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
               <div class="flex items-start">
@@ -640,137 +725,47 @@
             </div>
 
             <div class="space-y-4">
-              <!-- Full Name -->
+              <!-- Name English -->
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">
-                  {{ $t('users.full_name') }}
+                  {{ $t('groups.name_en') }}
                   <span class="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
-                  v-model="userForm.name"
+                  v-model="groupForm.title_en"
                   required
                   class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                  :placeholder="$t('users.name_placeholder')"
+                  :placeholder="$t('groups.name_en_placeholder')"
                 />
               </div>
 
-              <!-- Email -->
+              <!-- Name Arabic -->
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">
-                  {{ $t('users.email') }}
+                  {{ $t('groups.name_ar') }}
                   <span class="text-red-500">*</span>
                 </label>
                 <input
-                  type="email"
-                  v-model="userForm.email"
+                  type="text"
+                  v-model="groupForm.title_ar"
                   required
                   class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                  :placeholder="$t('users.email_placeholder')"
+                  :placeholder="$t('groups.name_ar_placeholder')"
                 />
               </div>
 
-              <!-- Group -->
+              <!-- Description -->
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">
-                  {{ $t('users.group') }}
-                  <span class="text-red-500">*</span>
+                  {{ $t('groups.description') }}
                 </label>
-                <div class="relative">
-                  <select
-                    v-model="userForm.admin_group_id"
-                    required
-                    class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 appearance-none pr-10"
-                  >
-                    <option value="">{{ $t('users.select_group') }}</option>
-                    <option v-for="group in storeGroups" :key="group.id" :value="group.id">
-                      {{ group.title_ar || group.title_en }}
-                    </option>
-                  </select>
-                  <svg
-                    class="w-5 h-5 absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg>
-                </div>
-              </div>
-
-              <!-- Password Section -->
-              <div v-if="!editingUser" class="space-y-4">
-                <!-- Password for New User -->
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">
-                    {{ $t('users.password') }}
-                    <span class="text-red-500">*</span>
-                    <span class="text-xs text-gray-500">
-                      ({{ $t('users.password_min_length') }})
-                    </span>
-                  </label>
-                  <input
-                    type="password"
-                    v-model="userForm.password"
-                    required
-                    minlength="8"
-                    class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                    :placeholder="$t('users.password_placeholder')"
-                  />
-                </div>
-
-                <!-- Confirm Password for New User -->
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">
-                    {{ $t('users.confirm_password') }}
-                    <span class="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="password"
-                    v-model="userForm.password_confirmation"
-                    required
-                    minlength="8"
-                    class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                    :placeholder="$t('users.confirm_password_placeholder')"
-                  />
-                </div>
-              </div>
-
-              <!-- Password Section for Editing -->
-              <div v-if="editingUser" class="space-y-4">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">
-                    {{ $t('users.new_password') }}
-                    <span class="text-xs text-gray-500">
-                      ({{ $t('users.password_optional') }})
-                    </span>
-                  </label>
-                  <input
-                    type="password"
-                    v-model="userForm.password"
-                    minlength="8"
-                    class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                    :placeholder="$t('users.new_password_placeholder')"
-                  />
-                </div>
-
-                <div v-if="userForm.password">
-                  <label class="block text-sm font-medium text-gray-700 mb-2">
-                    {{ $t('users.confirm_new_password') }}
-                  </label>
-                  <input
-                    type="password"
-                    v-model="userForm.password_confirmation"
-                    minlength="8"
-                    class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                    :placeholder="$t('users.confirm_new_password_placeholder')"
-                  />
-                </div>
+                <textarea
+                  v-model="groupForm.description"
+                  rows="3"
+                  class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                  :placeholder="$t('groups.description_placeholder')"
+                ></textarea>
               </div>
 
               <!-- Status Toggle -->
@@ -783,11 +778,11 @@
                 >
                   <span class="text-gray-700">
                     {{
-                      userForm.is_active ? $t('users.status.active') : $t('users.status.inactive')
+                      groupForm.is_active ? $t('groups.status.active') : $t('groups.status.inactive')
                     }}
                   </span>
                   <label class="inline-flex items-center cursor-pointer">
-                    <input type="checkbox" v-model="userForm.is_active" class="sr-only peer" />
+                    <input type="checkbox" v-model="groupForm.is_active" class="sr-only peer" />
                     <div
                       class="relative w-11 h-6 bg-gray-300 peer-focus:ring-4 peer-focus:ring-blue-300/50 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"
                     ></div>
@@ -836,7 +831,7 @@
                   {{
                     submitting
                       ? $t('common.saving')
-                      : editingUser
+                      : editingGroup
                         ? $t('common.update')
                         : $t('common.save')
                   }}
@@ -847,6 +842,138 @@
         </div>
       </div>
     </transition>
+
+    <!-- Permissions Modal -->
+    <transition name="modal-fade">
+      <div
+        v-if="showPermissionsModal"
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+        @click.self="closePermissionsModal"
+      >
+        <div class="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <!-- Modal Header -->
+          <div class="px-6 py-5 border-b border-gray-200 bg-gray-50">
+            <div class="flex justify-between items-center">
+              <div class="flex items-center gap-3">
+                <div class="p-2.5 bg-purple-100 rounded-lg">
+                  <svg
+                    class="w-5 h-5 text-purple-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="text-lg font-semibold text-gray-800">
+                    {{ $t('groups.manage_permissions') }}: {{ selectedGroup?.title_ar }}
+                  </h3>
+                  <p class="text-sm text-gray-500 mt-1">
+                    {{ $t('groups.permissions_subtitle') }}
+                  </p>
+                </div>
+              </div>
+              <button
+                @click="closePermissionsModal"
+                class="p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Modal Body -->
+          <div class="p-6">
+            <div v-if="permissionsLoading" class="text-center py-8">
+              <div class="inline-block relative">
+                <div class="w-10 h-10 border-4 border-purple-100 rounded-full"></div>
+                <div
+                  class="w-10 h-10 border-4 border-purple-600 border-t-transparent rounded-full animate-spin absolute top-0 left-0"
+                ></div>
+              </div>
+              <p class="text-gray-600 mt-4">{{ $t('common.loading') }}</p>
+            </div>
+
+            <div v-else>
+              <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  {{ $t('groups.select_permissions') }}
+                </label>
+                <div class="space-y-3 max-h-96 overflow-y-auto border border-gray-200 rounded-lg p-4">
+                  <div v-for="permission in availablePermissions" :key="permission.id" class="flex items-center">
+                    <input
+                      type="checkbox"
+                      :id="'perm_' + permission.id"
+                      :value="permission.id"
+                      v-model="selectedPermissions"
+                      class="ml-3 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    />
+                    <label :for="'perm_' + permission.id" class="text-sm text-gray-700">
+                      {{ permission.title }}
+                      <span class="text-xs text-gray-500 block">
+                        {{ permission.description_ar || permission.description_en }}
+                      </span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-6 flex justify-end gap-3">
+                <button
+                  type="button"
+                  @click="closePermissionsModal"
+                  class="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors duration-200 border border-gray-300"
+                >
+                  {{ $t('common.cancel') }}
+                </button>
+                <button
+                  @click="savePermissions"
+                  :disabled="permissionsSubmitting"
+                  class="px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  <svg
+                    v-if="permissionsSubmitting"
+                    class="w-4 h-4 animate-spin"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                    />
+                  </svg>
+                  <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
+                    />
+                  </svg>
+                  <span>{{ $t('common.save') }}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -854,41 +981,74 @@
 import { mapState, mapActions } from 'vuex'
 
 export default {
-  name: 'AdminUsers',
+  name: 'AdminGroups',
 
   data() {
     return {
       showModal: false,
+      showPermissionsModal: false,
       submitting: false,
-      editingUser: null,
+      permissionsSubmitting: false,
+      permissionsLoading: false,
+      editingGroup: null,
+      selectedGroup: null,
       formError: null,
       filters: {
         search: '',
-        group_id: '',
         status: 'all',
+        is_system: '',
         date_from: '',
       },
-      userForm: {
-        name: '',
-        email: '',
-        password: '',
-        password_confirmation: '',
-        admin_group_id: '',
+      groupForm: {
+        title_en: '',
+        title_ar: '',
+        description: '',
         is_active: true,
       },
+      availablePermissions: [],
+      selectedPermissions: [],
     }
   },
 
   computed: {
-    ...mapState('users', {
-      storeUsers: (state) => state.users,
-      storeGroups: (state) => state.groups,
+    ...mapState('groups', {
+      storeGroups: (state) => state.adminGroups,
       storeLoading: (state) => state.isLoading,
       storeError: (state) => state.error,
     }),
-    ...mapState('auth', {
-      currentUser: (state) => state.user,
-    }),
+    activeGroupsCount() {
+      return this.storeGroups.filter((g) => g.is_active).length
+    },
+    inactiveGroupsCount() {
+      return this.storeGroups.filter((g) => !g.is_active).length
+    },
+    totalUsersInGroups() {
+      return this.storeGroups.reduce((sum, g) => sum + (g.users_count || 0), 0)
+    },
+    filteredGroups() {
+      let groups = this.storeGroups
+      if (this.filters.search) {
+        const search = this.filters.search.toLowerCase()
+        groups = groups.filter(g =>
+          g.title_en.toLowerCase().includes(search) ||
+          g.title_ar.includes(search) ||
+          (g.description && g.description.toLowerCase().includes(search))
+        )
+      }
+      if (this.filters.status !== 'all') {
+        const active = this.filters.status === 'active'
+        groups = groups.filter(g => g.is_active === active)
+      }
+      if (this.filters.is_system !== '') {
+        const isSystem = this.filters.is_system === '1'
+        groups = groups.filter(g => g.is_system === isSystem)
+      }
+      if (this.filters.date_from) {
+        const fromDate = new Date(this.filters.date_from)
+        groups = groups.filter(g => new Date(g.created_at) >= fromDate)
+      }
+      return groups
+    },
   },
 
   async mounted() {
@@ -896,21 +1056,22 @@ export default {
   },
 
   methods: {
-    ...mapActions('users', [
-      'getUsers',
-      'getUserGroups',
-      'createUser',
-      'updateUser',
-      'deleteUser',
-      'updateUserStatus',
+    ...mapActions('groups', [
+      'getAdminGroups',
+      'createAdminGroup',
+      'updateAdminGroup',
+      'deleteAdminGroup',
+      'updateGroupStatus',
+      'getAvailablePermissions',
+      'updateGroupPermissions',
       'clearError',
     ]),
 
     async loadData() {
       try {
-        await Promise.all([this.getUsers(this.filters), this.getUserGroups()])
+        await this.getAdminGroups()
       } catch (error) {
-        console.error('Error loading data:', error)
+        console.error('Error loading groups:', error)
         this.$toast.error(this.$t('errors.failed_to_load_data'))
       }
     },
@@ -923,8 +1084,8 @@ export default {
     resetFilters() {
       this.filters = {
         search: '',
-        group_id: '',
         status: 'all',
+        is_system: '',
         date_from: '',
       }
       this.loadData()
@@ -933,16 +1094,6 @@ export default {
 
     clearStoreError() {
       this.clearError()
-    },
-
-    getInitials(name) {
-      if (!name) return '؟؟'
-      return name
-        .split(' ')
-        .map((word) => word[0])
-        .join('')
-        .toUpperCase()
-        .substring(0, 2)
     },
 
     formatDate(date) {
@@ -956,100 +1107,88 @@ export default {
     },
 
     openAddModal() {
-      this.editingUser = null
+      this.editingGroup = null
       this.formError = null
-      this.userForm = {
-        name: '',
-        email: '',
-        password: '',
-        password_confirmation: '',
-        admin_group_id: '',
+      this.groupForm = {
+        title_en: '',
+        title_ar: '',
+        description: '',
         is_active: true,
       }
       this.showModal = true
     },
 
-    editUser(user) {
-      this.editingUser = user
+    editGroup(group) {
+      this.editingGroup = group
       this.formError = null
-      this.userForm = {
-        name: user.name,
-        email: user.email,
-        admin_group_id: user.admin_group_id,
-        is_active: user.is_active,
-        password: '',
-        password_confirmation: '',
+      this.groupForm = {
+        title_en: group.title_en,
+        title_ar: group.title_ar,
+        description: group.description || '',
+        is_active: group.is_active,
       }
       this.showModal = true
     },
 
-    validatePassword() {
-      if (!this.editingUser) {
-        if (!this.userForm.password || this.userForm.password.length < 8) {
-          throw new Error(this.$t('errors.password_min_length'))
-        }
-      } else {
-        if (this.userForm.password && this.userForm.password.length < 8) {
-          throw new Error(this.$t('errors.password_min_length'))
-        }
-      }
-
-      if (this.userForm.password !== this.userForm.password_confirmation) {
-        throw new Error(this.$t('errors.password_mismatch'))
-      }
-    },
-
-    async addUser() {
+    async addGroup() {
       this.submitting = true
       this.formError = null
 
       try {
-        this.validatePassword()
+        if (!this.groupForm.title_en.trim()) {
+          throw new Error(this.$t('validation.title_en_required'))
+        }
+        if (!this.groupForm.title_ar.trim()) {
+          throw new Error(this.$t('validation.title_ar_required'))
+        }
 
-        await this.createUser(this.userForm)
+        await this.createAdminGroup(this.groupForm)
         this.closeModal()
         await this.loadData()
-        this.$toast.success(this.$t('users.messages.create_success'))
+        this.$toast.success(this.$t('groups.messages.create_success'))
       } catch (error) {
-        this.formError = error.message || this.$t('errors.failed_to_create_user')
-        this.$toast.error(error.message || this.$t('errors.failed_to_create_user'))
+        this.formError = error.message || this.$t('errors.failed_to_create_group')
+        this.$toast.error(error.message || this.$t('errors.failed_to_create_group'))
       } finally {
         this.submitting = false
       }
     },
 
-    async updateUser() {
+    async updateGroup() {
       this.submitting = true
       this.formError = null
 
       try {
-        if (this.userForm.password) {
-          this.validatePassword()
+        if (!this.groupForm.title_en.trim()) {
+          throw new Error(this.$t('validation.title_en_required'))
+        }
+        if (!this.groupForm.title_ar.trim()) {
+          throw new Error(this.$t('validation.title_ar_required'))
         }
 
-        await this.updateUser({
-          id: this.editingUser.id,
-          data: this.userForm,
+        await this.updateAdminGroup({
+          id: this.editingGroup.id,
+          data: this.groupForm,
         })
         this.closeModal()
         await this.loadData()
-        this.$toast.success(this.$t('users.messages.update_success'))
+        this.$toast.success(this.$t('groups.messages.update_success'))
       } catch (error) {
-        this.formError = error.message || this.$t('errors.failed_to_update_user')
-        this.$toast.error(error.message || this.$t('errors.failed_to_update_user'))
+        this.formError = error.message || this.$t('errors.failed_to_update_group')
+        this.$toast.error(error.message || this.$t('errors.failed_to_update_group'))
       } finally {
         this.submitting = false
       }
     },
 
-    async toggleUserStatus(user) {
-      const action = user.is_active ? this.$t('users.deactivate') : this.$t('users.activate')
+    async toggleGroupStatus(group) {
+      const action = group.is_active ? this.$t('groups.deactivate') : this.$t('groups.activate')
       const confirmed = await this.$swal({
-        title: this.$t('users.confirm_status_change_title'),
-        text: this.$t('users.confirm_status_change', { name: user.name, action: action }),
+        title: this.$t('groups.confirm_status_change_title'),
+        text: this.$t('groups.confirm_status_change', { name: group.title_ar, action: action }),
         icon: 'question',
         showCancelButton: true,
-        confirmButtonColor: user.is_active ? '#EAB308' : '#10B981',
+        confirmButtonColor: group.is_active ? '#EAB308' : '#10B981',
         cancelButtonColor: '#6B7280',
         confirmButtonText: action,
         cancelButtonText: this.$t('common.cancel'),
@@ -1059,22 +1198,22 @@ export default {
 
       if (confirmed.isConfirmed) {
         try {
-          await this.updateUserStatus({
-            id: user.id,
-            is_active: !user.is_active,
+          await this.updateGroupStatus({
+            id: group.id,
+            is_active: !group.is_active,
           })
           await this.loadData()
-          this.$toast.success(this.$t('users.messages.status_change_success', { action: action }))
+          this.$toast.success(this.$t('groups.messages.status_change_success', { action: action }))
         } catch (error) {
           this.$toast.error(error.message || this.$t('errors.failed_to_change_status'))
         }
       }
     },
 
-    async confirmDelete(user) {
+    async confirmDelete(group) {
       const confirmed = await this.$swal({
-        title: this.$t('users.delete_confirm_title'),
-        text: this.$t('users.delete_confirm', { name: user.name }),
+        title: this.$t('groups.delete_confirm_title'),
+        text: this.$t('groups.delete_confirm', { name: group.title_ar }),
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#EF4444',
@@ -1087,229 +1226,242 @@ export default {
 
       if (confirmed.isConfirmed) {
         try {
-          await this.deleteUser(user.id)
+          await this.deleteAdminGroup(group.id)
           await this.loadData()
-          this.$toast.success(this.$t('users.messages.delete_success'))
+          this.$toast.success(this.$t('groups.messages.delete_success'))
         } catch (error) {
-          this.$toast.error(error.message || this.$t('errors.failed_to_delete_user'))
+          this.$toast.error(error.message || this.$t('errors.failed_to_delete_group'))
         }
+      }
+    },
+
+    async managePermissions(group) {
+      this.selectedGroup = group
+      this.selectedPermissions = []
+      this.availablePermissions = []
+      this.showPermissionsModal = true
+      this.permissionsLoading = true
+
+      try {
+        const { permissions, selectedPermissions } = await this.getAvailablePermissions(group.id)
+        this.availablePermissions = permissions
+        this.selectedPermissions = selectedPermissions
+      } catch (error) {
+        this.$toast.error(error.message || this.$t('errors.failed_to_load_permissions'))
+        this.closePermissionsModal()
+      } finally {
+        this.permissionsLoading = false
+      }
+    },
+
+    async savePermissions() {
+      if (!this.selectedGroup) return
+
+      this.permissionsSubmitting = true
+      try {
+        await this.updateGroupPermissions({
+          id: this.selectedGroup.id,
+          permissions: this.selectedPermissions,
+        })
+        this.$toast.success(this.$t('groups.messages.permissions_updated'))
+        this.closePermissionsModal()
+        await this.loadData()
+      } catch (error) {
+        this.$toast.error(error.message || this.$t('errors.failed_to_update_permissions'))
+      } finally {
+        this.permissionsSubmitting = false
       }
     },
 
     closeModal() {
       this.showModal = false
-      this.editingUser = null
+      this.editingGroup = null
       this.formError = null
-      this.userForm = {
-        name: '',
-        email: '',
-        password: '',
-        password_confirmation: '',
-        admin_group_id: '',
+      this.groupForm = {
+        title_en: '',
+        title_ar: '',
+        description: '',
         is_active: true,
       }
+    },
+
+    closePermissionsModal() {
+      this.showPermissionsModal = false
+      this.selectedGroup = null
+      this.selectedPermissions = []
+      this.availablePermissions = []
     },
   },
 }
 </script>
 
 <style scoped>
-/* تحسينات القياسات والمسافات */
+/* استيراد أنماط التصميم الموحدة من InvoiceReportSection */
+.stats-card {
+  @apply rounded-xl p-5 border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300;
+}
+.stats-icon {
+  @apply p-3 rounded-lg w-fit mb-3;
+}
+.stats-label {
+  @apply text-sm font-medium text-gray-500 mb-1;
+}
+.stats-value {
+  @apply text-2xl font-bold text-gray-900;
+}
+.table-header {
+  @apply px-6 py-4 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider;
+}
+.table-cell {
+  @apply px-6 py-4;
+}
+.status-badge {
+  @apply px-3 py-1.5 rounded-full text-xs font-semibold inline-flex items-center gap-1;
+}
+.status-dot {
+  @apply w-2 h-2 rounded-full;
+}
+/* باقي الأنماط من النسخة السابقة */
 .modal-fade-enter-active,
 .modal-fade-leave-active {
   transition: opacity 0.2s ease;
 }
-
 .modal-fade-enter-from,
 .modal-fade-leave-to {
   opacity: 0;
 }
-
-/* تحسينات الجدول */
 table {
   border-collapse: separate;
   border-spacing: 0;
 }
-
 th {
   font-weight: 600;
   letter-spacing: 0.025em;
 }
-
 td {
   border-bottom: 1px solid #f3f4f6;
 }
-
 tr:last-child td {
   border-bottom: none;
 }
-
-/* تأثيرات hover محسنة */
 tr:hover {
   background-color: rgba(59, 130, 246, 0.05);
 }
-
-/* تحسينات الأزرار */
 button {
   transition: all 0.15s ease-in-out;
 }
-
 button:active {
   transform: translateY(0);
 }
-
-/* تأثيرات الـ loading */
 @keyframes spin {
   to {
     transform: rotate(360deg);
   }
 }
-
 .animate-spin {
   animation: spin 1s linear infinite;
 }
-
-/* تدرجات لونية محسنة */
 .bg-gradient-to-br {
   background-image: linear-gradient(to bottom right, var(--tw-gradient-stops));
 }
-
-/* تأثيرات focus محسنة */
 input:focus,
 select:focus {
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
   outline: 2px solid transparent;
   outline-offset: 2px;
 }
-
-/* تحسينات للشاشات الصغيرة */
 @media (max-width: 640px) {
   .container-padding {
     padding-left: 1rem;
     padding-right: 1rem;
   }
-
   .mobile-stack {
     flex-direction: column;
     gap: 0.75rem;
   }
 }
-
-/* تحسينات لعناصر النموذج */
 .form-input {
   transition: all 0.2s ease;
 }
-
 .form-input:focus {
   border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
-
-/* تحسينات للأيقونات */
 .icon-button {
   transition: all 0.15s ease;
 }
-
 .icon-button:hover {
   transform: scale(1.05);
 }
-
-/* تحسينات المسافات الداخلية */
 .padding-consistent {
   padding: 1rem 1.5rem;
 }
-
-/* تحسينات للعناوين */
 .heading-large {
   font-size: 1.875rem;
   line-height: 2.25rem;
 }
-
 .heading-medium {
   font-size: 1.25rem;
   line-height: 1.75rem;
 }
-
 .heading-small {
   font-size: 1.125rem;
   line-height: 1.75rem;
 }
-
-/* تحسينات للنصوص */
 .text-body {
   font-size: 0.875rem;
   line-height: 1.25rem;
 }
-
 .text-small {
   font-size: 0.75rem;
   line-height: 1rem;
 }
-
-/* تحسينات للبطاقات */
 .card-shadow {
   box-shadow:
     0 1px 3px 0 rgba(0, 0, 0, 0.1),
     0 1px 2px 0 rgba(0, 0, 0, 0.06);
 }
-
 .card-shadow-lg {
   box-shadow:
     0 10px 15px -3px rgba(0, 0, 0, 0.1),
     0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
-
-/* تحسينات للألوان */
 .text-primary {
   color: #1f2937;
 }
-
 .text-secondary {
   color: #6b7280;
 }
-
 .text-accent {
   color: #3b82f6;
 }
-
 .bg-primary {
   background-color: #ffffff;
 }
-
 .bg-secondary {
   background-color: #f9fafb;
 }
-
 .bg-accent {
   background-color: #3b82f6;
 }
-
-/* تحسينات الحدود */
 .border-light {
   border-color: #e5e7eb;
 }
-
 .border-medium {
   border-color: #d1d5db;
 }
-
-/* تحسينات الزوايا */
 .rounded-sm {
   border-radius: 0.25rem;
 }
-
 .rounded-md {
   border-radius: 0.375rem;
 }
-
 .rounded-lg {
   border-radius: 0.5rem;
 }
-
 .rounded-xl {
   border-radius: 0.75rem;
 }
-
 .rounded-2xl {
   border-radius: 1rem;
 }

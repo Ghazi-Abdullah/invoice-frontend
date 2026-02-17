@@ -61,6 +61,81 @@
         </div>
       </div>
 
+      <!-- Stats Cards (New) -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <!-- Total Users -->
+        <div class="stats-card bg-gradient-to-br from-blue-50 to-blue-100">
+          <div class="stats-icon bg-blue-100">
+            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197"
+              />
+            </svg>
+          </div>
+          <div>
+            <p class="stats-label">{{ $t('users.total_users') }}</p>
+            <p class="stats-value">{{ storeUsers.length }}</p>
+          </div>
+        </div>
+
+        <!-- Active Users -->
+        <div class="stats-card bg-gradient-to-br from-green-50 to-green-100">
+          <div class="stats-icon bg-green-100">
+            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </div>
+          <div>
+            <p class="stats-label">{{ $t('users.active_users') }}</p>
+            <p class="stats-value">{{ activeUsersCount }}</p>
+          </div>
+        </div>
+
+        <!-- Inactive Users -->
+        <div class="stats-card bg-gradient-to-br from-red-50 to-red-100">
+          <div class="stats-icon bg-red-100">
+            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636"
+              />
+            </svg>
+          </div>
+          <div>
+            <p class="stats-label">{{ $t('users.inactive_users') }}</p>
+            <p class="stats-value">{{ inactiveUsersCount }}</p>
+          </div>
+        </div>
+
+        <!-- Total Groups -->
+        <div class="stats-card bg-gradient-to-br from-purple-50 to-purple-100">
+          <div class="stats-icon bg-purple-100">
+            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+              />
+            </svg>
+          </div>
+          <div>
+            <p class="stats-label">{{ $t('users.total_groups') }}</p>
+            <p class="stats-value">{{ storeGroups.length }}</p>
+          </div>
+        </div>
+      </div>
+
       <!-- Filters Card with Glass Effect -->
       <div
         class="bg-white/80 backdrop-blur-sm rounded-2xl border border-white/50 shadow-lg shadow-blue-100/30 p-6 mb-8"
@@ -341,12 +416,12 @@
                   <p class="text-sm text-gray-600 mt-1">{{ $t('users.list_subtitle') }}</p>
                 </div>
               </div>
-              <div
+              <!--<div
                 class="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg shadow-sm"
               >
-                <span class="font-bold">{{ storeUsers.length }}</span>
-                <span class="text-blue-100 ml-1">{{ $t('common.total') }}</span>
-              </div>
+                 <span class="font-bold">{{ storeUsers.length }}</span>
+                <span class="text-blue-100 mr-1">{{ $t('common.total') }}</span>
+              </div>-->
             </div>
           </div>
 
@@ -397,50 +472,26 @@
               <table class="min-w-full divide-y divide-gray-200/50">
                 <thead>
                   <tr class="bg-gradient-to-r from-gray-50 to-gray-100/30">
-                    <th
-                      class="px-6 py-4 text-right text-xs font-bold text-gray-700 uppercase tracking-wider"
-                    >
-                      {{ $t('users.name') }}
-                    </th>
-                    <th
-                      class="px-6 py-4 text-right text-xs font-bold text-gray-700 uppercase tracking-wider"
-                    >
-                      {{ $t('users.email') }}
-                    </th>
-                    <th
-                      class="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider"
-                    >
-                      {{ $t('users.group') }}
-                    </th>
-                    <th
-                      class="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider"
-                    >
-                      {{ $t('common.status') }}
-                    </th>
-                    <th
-                      class="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider"
-                    >
-                      {{ $t('common.created_at') }}
-                    </th>
-                    <th
-                      class="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider"
-                    >
-                      {{ $t('common.actions') }}
-                    </th>
+                    <th class="table-header text-right">{{ $t('users.name') }}</th>
+                    <th class="table-header text-right">{{ $t('users.email') }}</th>
+                    <th class="table-header text-center">{{ $t('users.group') }}</th>
+                    <th class="table-header text-center">{{ $t('common.status') }}</th>
+                    <th class="table-header text-center">{{ $t('common.created_at') }}</th>
+                    <th class="table-header text-center">{{ $t('common.actions') }}</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200/30">
                   <tr
                     v-for="user in storeUsers"
                     :key="user.id"
-                    class="hover:bg-gradient-to-r hover:from-blue-50/30 hover:to-white transition-all duration-200 group"
+                    class="hover:bg-blue-50/30 transition-colors"
                   >
                     <!-- Name -->
-                    <td class="px-6 py-4">
-                      <div class="flex items-center">
+                    <td class="table-cell">
+                      <div class="flex items-center ">
                         <div class="flex-shrink-0 ml-4">
                           <div
-                            class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-md group-hover:scale-105 transition-transform duration-200"
+                            class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-md mr-4"
                           >
                             <span class="text-white font-bold text-lg">
                               {{ getInitials(user.name) }}
@@ -448,9 +499,7 @@
                           </div>
                         </div>
                         <div class="mr-4">
-                          <div class="text-base font-bold text-gray-900 group-hover:text-blue-700">
-                            {{ user.name }}
-                          </div>
+                          <div class="text-base font-bold text-gray-900">{{ user.name }}</div>
                           <div class="flex items-center gap-2 mt-1">
                             <span class="text-xs text-gray-500">ID: {{ user.id }}</span>
                             <span
@@ -465,7 +514,7 @@
                     </td>
 
                     <!-- Email -->
-                    <td class="px-6 py-4">
+                    <td class="table-cell">
                       <div class="flex flex-col">
                         <span class="text-sm text-gray-900 font-medium">{{ user.email }}</span>
                         <span class="text-xs text-gray-500 mt-1">{{
@@ -475,45 +524,45 @@
                     </td>
 
                     <!-- Group -->
-                    <td class="px-6 py-4">
-                      <div class="flex justify-center">
-                        <span
-                          class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-semibold bg-gradient-to-r from-blue-100 to-blue-50 text-blue-800 border border-blue-200/50"
-                        >
-                          {{
-                            user.admin_group?.title_ar ||
-                            user.admin_group?.title_en ||
-                            $t('users.no_group')
-                          }}
-                        </span>
-                      </div>
+                    <td class="table-cell text-center">
+                      <span
+                        class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-semibold bg-gradient-to-r from-blue-100 to-blue-50 text-blue-800 border border-blue-200/50"
+                      >
+                        {{
+                          user.admin_group?.title_ar ||
+                          user.admin_group?.title_en ||
+                          $t('users.no_group')
+                        }}
+                      </span>
                     </td>
 
                     <!-- Status -->
-                    <td class="px-6 py-4">
-                      <div class="flex justify-center">
+                    <td class="table-cell text-center">
+                      <span
+                        :class="[
+                          'status-badge',
+                          user.is_active
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-red-100 text-red-800',
+                        ]"
+                      >
                         <span
-                          :class="
-                            user.is_active
-                              ? 'bg-gradient-to-r from-green-100 to-green-50 text-green-800 border-green-200/50'
-                              : 'bg-gradient-to-r from-red-100 to-red-50 text-red-800 border-red-200/50'
-                          "
-                          class="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold border"
-                        >
-                          <span
-                            :class="user.is_active ? 'bg-green-500' : 'bg-red-500'"
-                            class="w-2 h-2 rounded-full ml-2"
-                          ></span>
-                          {{
-                            user.is_active ? $t('users.status.active') : $t('users.status.inactive')
-                          }}
-                        </span>
-                      </div>
+                          :class="[
+                            'status-dot',
+                            user.is_active ? 'bg-green-500' : 'bg-red-500',
+                          ]"
+                        ></span>
+                        {{
+                          user.is_active
+                            ? $t('users.status.active')
+                            : $t('users.status.inactive')
+                        }}
+                      </span>
                     </td>
 
                     <!-- Created Date -->
-                    <td class="px-6 py-4">
-                      <div class="text-center">
+                    <td class="table-cell text-center">
+                      <div>
                         <div class="text-sm text-gray-900 font-bold">
                           {{ formatDate(user.created_at) }}
                         </div>
@@ -522,19 +571,14 @@
                     </td>
 
                     <!-- Actions -->
-                    <td class="px-6 py-4">
+                    <td class="table-cell text-center">
                       <div class="flex items-center justify-center gap-2">
                         <button
                           @click="editUser(user)"
                           class="p-2.5 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-200 transform hover:scale-110"
                           :title="$t('buttons.edit')"
                         >
-                          <svg
-                            class="w-5 h-5"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
+                          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path
                               stroke-linecap="round"
                               stroke-linejoin="round"
@@ -545,20 +589,15 @@
                         </button>
                         <button
                           @click="toggleUserStatus(user)"
-                          :class="
+                          :class="[
+                            'p-2.5 rounded-xl transition-all duration-200 transform hover:scale-110',
                             user.is_active
-                              ? 'hover:text-yellow-600 hover:bg-yellow-50'
-                              : 'hover:text-green-600 hover:bg-green-50'
-                          "
-                          class="p-2.5 text-gray-600 rounded-xl transition-all duration-200 transform hover:scale-110"
+                              ? 'text-gray-600 hover:text-yellow-600 hover:bg-yellow-50'
+                              : 'text-gray-600 hover:text-green-600 hover:bg-green-50',
+                          ]"
                           :title="user.is_active ? $t('users.deactivate') : $t('users.activate')"
                         >
-                          <svg
-                            class="w-5 h-5"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
+                          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path
                               v-if="!user.is_active"
                               stroke-linecap="round"
@@ -571,7 +610,7 @@
                               stroke-linecap="round"
                               stroke-linejoin="round"
                               stroke-width="2"
-                              d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"
+                              d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636"
                             />
                           </svg>
                         </button>
@@ -581,12 +620,7 @@
                           class="p-2.5 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200 transform hover:scale-110"
                           :title="$t('buttons.delete')"
                         >
-                          <svg
-                            class="w-5 h-5"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
+                          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path
                               stroke-linecap="round"
                               stroke-linejoin="round"
@@ -606,7 +640,7 @@
       </div>
     </div>
 
-    <!-- Create/Edit Modal -->
+    <!-- Create/Edit Modal (لم يتغير) -->
     <transition name="modal-fade">
       <div
         v-if="showModal"
@@ -660,7 +694,7 @@
             </div>
           </div>
 
-          <!-- Modal Body -->
+          <!-- Modal Body (نفس الكود السابق) -->
           <form @submit.prevent="editingUser ? updateUser() : addUser()" class="p-8">
             <!-- Form Error -->
             <div
@@ -962,6 +996,12 @@ export default {
     ...mapState('auth', {
       currentUser: (state) => state.user,
     }),
+    activeUsersCount() {
+      return this.storeUsers.filter((u) => u.is_active).length
+    },
+    inactiveUsersCount() {
+      return this.storeUsers.filter((u) => !u.is_active).length
+    },
   },
 
   async mounted() {
@@ -1214,180 +1254,30 @@ export default {
 </script>
 
 <style scoped>
-/* تحسينات الجدول */
-table {
-  border-collapse: separate;
-  border-spacing: 0;
+/* استيراد أنماط التصميم الموحدة من InvoiceReportSection */
+.stats-card {
+  @apply rounded-xl p-5 border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300;
 }
-
-th:first-child {
-  border-top-right-radius: 12px;
+.stats-icon {
+  @apply p-3 rounded-lg w-fit mb-3;
 }
-
-th:last-child {
-  border-top-left-radius: 12px;
+.stats-label {
+  @apply text-sm font-medium text-gray-500 mb-1;
 }
-
-tr:last-child td:first-child {
-  border-bottom-right-radius: 12px;
+.stats-value {
+  @apply text-2xl font-bold text-gray-900;
 }
-
-tr:last-child td:last-child {
-  border-bottom-left-radius: 12px;
+.table-header {
+  @apply px-6 py-4 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider;
 }
-
-/* تأثيرات hover محسنة */
-tr {
-  transition: all 0.2s ease-in-out;
+.table-cell {
+  @apply px-6 py-4;
 }
-
-tr:hover {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(255, 255, 255, 0.8) 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+.status-badge {
+  @apply px-3 py-1.5 rounded-full text-xs font-semibold inline-flex items-center gap-1;
 }
-
-/* تحسينات الأزرار */
-button {
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+.status-dot {
+  @apply w-2 h-2 rounded-full;
 }
-
-button:active {
-  transform: translateY(0);
-}
-
-/* تأثيرات الـ loading */
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.animate-spin {
-  animation: spin 1s linear infinite;
-}
-
-/* تأثيرات المودال */
-.modal-fade-enter-active,
-.modal-fade-leave-active {
-  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.modal-fade-enter-from,
-.modal-fade-leave-to {
-  opacity: 0;
-}
-
-/* تدرجات لونية محسنة */
-.bg-gradient-to-br {
-  background-image: linear-gradient(to bottom right, var(--tw-gradient-stops));
-}
-
-/* ظلال ناعمة */
-.shadow-lg {
-  box-shadow:
-    0 10px 25px -5px rgba(0, 0, 0, 0.1),
-    0 10px 10px -5px rgba(0, 0, 0, 0.04);
-}
-
-.shadow-xl {
-  box-shadow:
-    0 20px 25px -5px rgba(0, 0, 0, 0.1),
-    0 10px 10px -5px rgba(0, 0, 0, 0.04);
-}
-
-/* تأثيرات النص */
-.text-shadow {
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* تحسينات الشعار الدائري */
-.avatar-gradient {
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-}
-
-/* تحسينات الأيقونات */
-.icon-hover {
-  transition: all 0.2s ease-in-out;
-}
-
-.icon-hover:hover {
-  transform: scale(1.1);
-}
-
-/* تأثيرات الإدخال */
-input:focus,
-select:focus {
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-/* تحسينات العناوين */
-h1,
-h2,
-h3 {
-  font-weight: 700;
-  letter-spacing: -0.025em;
-}
-
-/* تحسينات التباين */
-.text-gray-900 {
-  color: #1f2937;
-}
-
-.text-gray-800 {
-  color: #374151;
-}
-
-.text-gray-700 {
-  color: #4b5563;
-}
-
-.text-gray-600 {
-  color: #6b7280;
-}
-
-/* تحسينات الاستجابة */
-@media (max-width: 640px) {
-  .table-responsive {
-    margin: 0 -1rem;
-    width: calc(100% + 2rem);
-  }
-
-  .mobile-stack {
-    flex-direction: column;
-    gap: 1rem;
-  }
-}
-
-/* تحسينات الشريط التمرير */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f1f5f9;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-}
-
-/* تأثيرات focus محسنة */
-.focus-ring {
-  transition: box-shadow 0.2s ease-in-out;
-}
-
-.focus-ring:focus {
-  box-shadow:
-    0 0 0 3px rgba(59, 130, 246, 0.1),
-    0 0 0 1px rgba(59, 130, 246, 0.2);
-  outline: none;
-}
+/* باقي الأنماط الأخرى (اختياري) */
 </style>

@@ -1,6 +1,6 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-6 md:py-8">
-    <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
+  <div class="min-h-screen py-6 md:py-8">
+    <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
       <!-- Header -->
       <div class="mb-8">
         <div
@@ -35,6 +35,63 @@
                 </p>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+        <!-- Total Groups -->
+        <div class="stats-card bg-gradient-to-br from-blue-50 to-blue-100">
+          <div class="stats-icon bg-blue-100">
+            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+              />
+            </svg>
+          </div>
+          <div>
+            <p class="stats-label">{{ $t('nav.groups') }}</p>
+            <p class="stats-value">{{ adminGroups.length }}</p>
+          </div>
+        </div>
+
+        <!-- Total Permissions -->
+        <div class="stats-card bg-gradient-to-br from-purple-50 to-purple-100">
+          <div class="stats-icon bg-purple-100">
+            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+              />
+            </svg>
+          </div>
+          <div>
+            <p class="stats-label">{{ $t('permissions.list') }}</p>
+            <p class="stats-value">{{ permissions.length }}</p>
+          </div>
+        </div>
+
+        <!-- Selected Permissions (if group selected) -->
+        <div class="stats-card bg-gradient-to-br from-green-50 to-green-100">
+          <div class="stats-icon bg-green-100">
+            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </div>
+          <div>
+            <p class="stats-label">{{ $t('assign_permissions.selected') }}</p>
+            <p class="stats-value">{{ selectedPermissionIds.length }}</p>
           </div>
         </div>
       </div>
@@ -107,7 +164,7 @@
       <div v-else class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Groups List Card -->
         <div
-          class="bg-white/80 backdrop-blur-sm rounded-2xl border border-white/50 shadow-lg shadow-blue-100/20 overflow-hidden"
+          class="bg-white/80 backdrop-blur-sm rounded-2xl border border-white/50 shadow-xl shadow-blue-100/20 overflow-hidden"
         >
           <div
             class="px-6 py-5 border-b border-gray-200/50 bg-gradient-to-r from-blue-50/80 to-indigo-50/80"
@@ -145,7 +202,7 @@
               >
                 <div class="flex items-center">
                   <div
-                    class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center ml-3 shadow-md group-hover:scale-105 transition-transform duration-200"
+                    class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center ml-3 shadow-md group-hover:scale-105 transition-transform duration-200 mr-4"
                   >
                     <svg
                       class="w-6 h-6 text-white"
@@ -318,7 +375,7 @@
                     type="text"
                     v-model="searchQuery"
                     :placeholder="$t('common.search_permissions')"
-                    class="w-full px-4 py-3.5 pl-11 bg-white/80 border border-gray-300/50 rounded-xl focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-200 placeholder:text-gray-400"
+                    class="w-full px-4 py-3 pr-11 bg-white/80 border border-gray-300/50 rounded-xl focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-200 placeholder:text-gray-400"
                   />
                   <div class="absolute left-3 top-1/2 transform -translate-y-1/2">
                     <svg
@@ -366,7 +423,7 @@
                 <div v-else>
                   <div class="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div
-                      class="bg-gradient-to-br from-blue-50 to-blue-100/30 rounded-xl border border-blue-200/50 p-5"
+                      class="bg-gradient-to-br from-blue-50 to-blue-100/30 rounded-xl border border-blue-200/50 p-5 "
                     >
                       <div class="text-2xl font-bold text-blue-600 mb-1">
                         {{ selectedPermissionIds.length }}
@@ -416,7 +473,7 @@
                           :id="`perm-${permission.id}`"
                           :value="permission.id"
                           v-model="selectedPermissionIds"
-                          class="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded ml-3 mt-0.5"
+                          class="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded ml-3 mr-3 mt-0.5"
                         />
                         <label :for="`perm-${permission.id}`" class="flex-1 cursor-pointer">
                           <div class="flex justify-between items-start">
@@ -431,13 +488,19 @@
                                 {{ permission.title }}
                               </p>
                               <span
-                                :class="
+                                :class="[
+                                  'status-badge',
                                   permission.is_parent
-                                    ? 'bg-gradient-to-r from-green-100 to-green-50 text-green-800 border-green-200/50'
-                                    : 'bg-gradient-to-r from-blue-100 to-blue-50 text-blue-800 border-blue-200/50'
-                                "
-                                class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border"
+                                    ? 'bg-green-100 text-green-800'
+                                    : 'bg-blue-100 text-blue-800',
+                                ]"
                               >
+                                <span
+                                  :class="[
+                                    'status-dot',
+                                    permission.is_parent ? 'bg-green-500' : 'bg-blue-500',
+                                  ]"
+                                ></span>
                                 {{
                                   permission.is_parent
                                     ? $t('permissions.parent')
@@ -493,12 +556,12 @@
                 <div class="mt-8 pt-6 border-t border-gray-200/50">
                   <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div class="text-sm text-gray-600">
-                      {{
+                       <!--{{
                         $t('permissions.selected_count', {
                           selected: selectedPermissionIds.length,
                           total: permissions.length,
                         })
-                      }}
+                      }}-->
                     </div>
                     <div class="flex gap-3">
                       <button
@@ -713,6 +776,26 @@ export default {
 </script>
 
 <style scoped>
+/* استيراد أنماط التصميم الموحدة من InvoiceReportSection */
+.stats-card {
+  @apply rounded-xl p-5 border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300;
+}
+.stats-icon {
+  @apply p-3 rounded-lg w-fit mb-3;
+}
+.stats-label {
+  @apply text-sm font-medium text-gray-500 mb-1;
+}
+.stats-value {
+  @apply text-2xl font-bold text-gray-900;
+}
+.status-badge {
+  @apply px-3 py-1.5 rounded-full text-xs font-semibold inline-flex items-center gap-1;
+}
+.status-dot {
+  @apply w-2 h-2 rounded-full;
+}
+
 .line-clamp-2 {
   overflow: hidden;
   display: -webkit-box;
@@ -720,31 +803,7 @@ export default {
   -webkit-line-clamp: 2;
 }
 
-/* تحسينات الجداول */
-table {
-  border-collapse: separate;
-  border-spacing: 0;
-}
-
-th {
-  font-weight: 600;
-  letter-spacing: 0.025em;
-}
-
-td {
-  border-bottom: 1px solid #f3f4f6;
-}
-
-tr:last-child td {
-  border-bottom: none;
-}
-
 /* تأثيرات hover محسنة */
-tr:hover {
-  background-color: rgba(59, 130, 246, 0.05);
-}
-
-/* تحسينات الأزرار */
 button {
   transition: all 0.2s ease-in-out;
 }
@@ -778,22 +837,6 @@ button:hover:not(:disabled) {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-/* تدرجات لونية */
-.bg-gradient-to-br {
-  background-image: linear-gradient(to bottom right, var(--tw-gradient-stops));
-}
-
-/* تحسينات المودال */
-.modal-enter-active,
-.modal-leave-active {
-  transition: opacity 0.3s ease;
-}
-
-.modal-enter-from,
-.modal-leave-to {
-  opacity: 0;
-}
-
 /* تحسينات الاستجابة */
 @media (max-width: 640px) {
   .table-responsive {
@@ -825,17 +868,5 @@ button:hover:not(:disabled) {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
-}
-
-/* تأثيرات focus محسنة */
-.focus-ring {
-  transition: box-shadow 0.2s ease-in-out;
-}
-
-.focus-ring:focus {
-  box-shadow:
-    0 0 0 3px rgba(59, 130, 246, 0.1),
-    0 0 0 1px rgba(59, 130, 246, 0.2);
-  outline: none;
 }
 </style>

@@ -22,7 +22,11 @@ export default {
       per_page: 20,
       page: 1
     },
-    exportedFiles: []
+    exportedFiles: [],
+    activeTab: 'invoices',
+    showExportModal: false,
+    showExportedFiles: false,
+    clients: []
   }),
 
   getters: {
@@ -30,22 +34,35 @@ export default {
     clientsReport: (state) => state.reports.clients,
     revenueReport: (state) => state.reports.revenue,
     overdueReport: (state) => state.reports.overdue,
-
     invoiceStats: (state) => state.reports.invoices.stats,
     clientStats: (state) => state.reports.clients.stats,
     revenueStats: (state) => state.reports.revenue.stats,
     overdueStats: (state) => state.reports.overdue.stats,
-
     isLoading: (state) => state.loading,
     isExporting: (state) => state.exportLoading,
     reportError: (state) => state.error,
     reportFilters: (state) => state.filters,
     exportedFiles: (state) => state.exportedFiles,
-
+    activeTab: (state) => state.activeTab,
+    showExportModal: (state) => state.showExportModal,
+    showExportedFiles: (state) => state.showExportedFiles,
+    clients: (state) => state.clients,
     overdueCount: (state) => state.reports.overdue.stats?.total_overdue || 0
   },
 
   mutations: {
+    SET_ACTIVE_TAB(state, tab) {
+      state.activeTab = tab
+    },
+    SET_SHOW_EXPORT_MODAL(state, value) {
+      state.showExportModal = value
+    },
+    SET_SHOW_EXPORTED_FILES(state, value) {
+      state.showExportedFiles = value
+    },
+    SET_CLIENTS(state, clients) {
+      state.clients = clients
+    },
     SET_INVOICES_REPORT(state, data) {
       state.reports.invoices = {
         items: data.items || [],
@@ -53,61 +70,49 @@ export default {
         pagination: data.pagination || {}
       }
     },
-
     SET_CLIENTS_REPORT(state, data) {
       state.reports.clients = {
         items: data.items || [],
         stats: data.stats || {}
       }
     },
-
     SET_REVENUE_REPORT(state, data) {
       state.reports.revenue = {
         items: data.items || [],
         stats: data.stats || {}
       }
     },
-
     SET_OVERDUE_REPORT(state, data) {
       state.reports.overdue = {
         items: data.items || [],
         stats: data.stats || {}
       }
     },
-
     SET_LOADING(state, loading) {
       state.loading = loading
     },
-
     SET_EXPORT_LOADING(state, loading) {
       state.exportLoading = loading
     },
-
     SET_ERROR(state, error) {
       state.error = error
     },
-
     SET_FILTERS(state, filters) {
       state.filters = { ...state.filters, ...filters }
     },
-
     SET_EXPORTED_FILES(state, files) {
       state.exportedFiles = files
     },
-
     ADD_EXPORTED_FILE(state, file) {
       state.exportedFiles.unshift(file)
     },
-
     REMOVE_EXPORTED_FILE(state, fileName) {
       state.exportedFiles = state.exportedFiles.filter(file => file.name !== fileName)
     },
-
     RESET_FILTERS(state) {
       const endDate = new Date()
       const startDate = new Date()
       startDate.setDate(startDate.getDate() - 30)
-
       state.filters = {
         start_date: startDate.toISOString().split('T')[0],
         end_date: endDate.toISOString().split('T')[0],
@@ -118,253 +123,284 @@ export default {
         page: 1
       }
     },
-
     CLEAR_ERROR(state) {
       state.error = null
     }
   },
 
   actions: {
-    async getInvoicesReport({ commit, state }, data = {}) {
+    // تحميل العملاء
+    async loadClients({ commit }) {
+      try {
+        const response = await axios.get('/admin/clients', {
+          params: { per_page: 100, is_active: true }
+        })
+        commit('SET_CLIENTS', response.data?.data?.filter(c => c && c.id) || [])
+      } catch (error) {
+        console.error('Failed to load clients:', error)
+        commit('SET_CLIENTS', [])
+      }
+    },
+
+    // تحميل التقرير حسب التبويب النشط
+    async loadReport({ state, commit, dispatch }) {
       commit('SET_LOADING', true)
       commit('CLEAR_ERROR')
-
-      const params = { ...state.filters, ...data }
-
       try {
-        console.log('📤 Fetching invoices report...')
-        const response = await axios.get('/admin/reports/invoices', { params })
+        switch (state.activeTab) {
+          case 'invoices':
+            await dispatch('getInvoicesReport')
+            break
+          case 'clients':
+            await dispatch('getClientsReport')
+            break
+          case 'revenue':
+            await dispatch('getRevenueReport')
+            break
+          case 'overdue':
+            await dispatch('getOverdueReport')
+            break
+        }
+      } catch (error) {
+        commit('SET_ERROR', error.message)
+        throw error
+      } finally {
+        commit('SET_LOADING', false)
+      }
+    },
 
-        console.log('✅ Invoices report response:', response.data)
+    // تغيير التبويب
+    switchTab({ commit, dispatch }, tab) {
+      commit('SET_ACTIVE_TAB', tab)
+      commit('SET_FILTERS', { page: 1 })
+      dispatch('loadReport')
+    },
 
-        if (response.data && response.data.success) {
+    // تغيير الصفحة
+    handlePageChange({ commit, dispatch }, page) {
+      commit('SET_FILTERS', { page })
+      dispatch('loadReport')
+    },
+
+    // إعادة تعيين الفلاتر
+    resetFilters({ commit, dispatch }) {
+      commit('RESET_FILTERS')
+      dispatch('loadReport')
+    },
+
+    // تحديث الفلاتر
+    updateFilters({ commit, dispatch }, filters) {
+      commit('SET_FILTERS', filters)
+      dispatch('loadReport')
+    },
+
+    // جلب تقرير الفواتير
+    async getInvoicesReport({ commit, state }) {
+      try {
+        const response = await axios.get('/admin/reports/invoices', { params: state.filters })
+        if (response.data?.success) {
           commit('SET_INVOICES_REPORT', response.data.data)
           return response.data
         } else {
           throw new Error(response.data?.message || 'فشل في تحميل تقرير الفواتير')
         }
       } catch (error) {
-        console.error('❌ Error fetching invoices report:', error)
-        const errorMessage = error.response?.data?.message || error.message || 'فشل في تحميل تقرير الفواتير'
-        commit('SET_ERROR', errorMessage)
-        throw new Error(errorMessage)
-      } finally {
-        commit('SET_LOADING', false)
+        commit('SET_ERROR', error.message)
+        throw error
       }
     },
 
-    async getClientsReport({ commit, state }, data = {}) {
-      commit('SET_LOADING', true)
-      commit('CLEAR_ERROR')
-
-      const params = { ...state.filters, ...data }
-
+    // جلب تقرير العملاء
+    async getClientsReport({ commit, state }) {
       try {
-        console.log('📤 Fetching clients report...')
-        const response = await axios.get('/admin/reports/clients', { params })
-
-        console.log('✅ Clients report response:', response.data)
-
-        if (response.data && response.data.success) {
+        const response = await axios.get('/admin/reports/clients', { params: state.filters })
+        if (response.data?.success) {
           commit('SET_CLIENTS_REPORT', response.data.data)
           return response.data
         } else {
           throw new Error(response.data?.message || 'فشل في تحميل تقرير العملاء')
         }
       } catch (error) {
-        console.error('❌ Error fetching clients report:', error)
-        const errorMessage = error.response?.data?.message || error.message || 'فشل في تحميل تقرير العملاء'
-        commit('SET_ERROR', errorMessage)
-        throw new Error(errorMessage)
-      } finally {
-        commit('SET_LOADING', false)
+        commit('SET_ERROR', error.message)
+        throw error
       }
     },
 
-    async getRevenueReport({ commit, state }, data = {}) {
-      commit('SET_LOADING', true)
-      commit('CLEAR_ERROR')
-
-      const params = { ...state.filters, ...data }
-
+    // جلب تقرير الإيرادات
+    async getRevenueReport({ commit, state }) {
       try {
-        console.log('📤 Fetching revenue report...')
-        const response = await axios.get('/admin/reports/revenue', { params })
-
-        console.log('✅ Revenue report response:', response.data)
-
-        if (response.data && response.data.success) {
+        const response = await axios.get('/admin/reports/revenue', { params: state.filters })
+        if (response.data?.success) {
           commit('SET_REVENUE_REPORT', response.data.data)
           return response.data
         } else {
           throw new Error(response.data?.message || 'فشل في تحميل تقرير الإيرادات')
         }
       } catch (error) {
-        console.error('❌ Error fetching revenue report:', error)
-        const errorMessage = error.response?.data?.message || error.message || 'فشل في تحميل تقرير الإيرادات'
-        commit('SET_ERROR', errorMessage)
-        throw new Error(errorMessage)
-      } finally {
-        commit('SET_LOADING', false)
+        commit('SET_ERROR', error.message)
+        throw error
       }
     },
 
-    async getOverdueReport({ commit, state }, data = {}) {
-      commit('SET_LOADING', true)
-      commit('CLEAR_ERROR')
-
-      const params = { ...state.filters, ...data }
-
+    // جلب تقرير المتأخرات
+    async getOverdueReport({ commit, state }) {
       try {
-        console.log('📤 Fetching overdue report...')
-        const response = await axios.get('/admin/reports/overdue', { params })
-
-        console.log('✅ Overdue report response:', response.data)
-
-        if (response.data && response.data.success) {
+        const response = await axios.get('/admin/reports/overdue', { params: state.filters })
+        if (response.data?.success) {
           commit('SET_OVERDUE_REPORT', response.data.data)
           return response.data
         } else {
           throw new Error(response.data?.message || 'فشل في تحميل تقرير المتأخرات')
         }
       } catch (error) {
-        console.error('❌ Error fetching overdue report:', error)
-        const errorMessage = error.response?.data?.message || error.message || 'فشل في تحميل تقرير المتأخرات'
-        commit('SET_ERROR', errorMessage)
-        throw new Error(errorMessage)
-      } finally {
-        commit('SET_LOADING', false)
+        commit('SET_ERROR', error.message)
+        throw error
       }
     },
 
-    async exportReport({ commit, state, dispatch }, { type, download = false }) {
+    // تصدير التقرير (دالة مشتركة)
+    async exportReport({ commit }, { type, download, filters, lang }) {
       commit('SET_EXPORT_LOADING', true)
-      commit('CLEAR_ERROR')
-
-      const params = {
-        ...state.filters,
-        download: download ? '1' : '0'
-      }
-
       try {
-        const endpoint = `/admin/reports/export/${type}`
-        console.log(`📤 Exporting ${type} report...`, { endpoint, params })
+        const params = { ...filters, download: download ? '1' : '0', lang }
+        const response = await axios.get(`/admin/reports/export/${type}`, {
+          params,
+          responseType: download ? 'blob' : 'json'
+        })
 
         if (download) {
-          // تحميل مباشر
-          const response = await axios.get(endpoint, {
-            params,
-            responseType: 'blob'
-          })
-
-          // إنشاء رابط تحميل
+          // استخراج اسم الملف من الهيدر إذا أمكن
+          const contentDisposition = response.headers['content-disposition']
+          let filename = `report.${type}.xlsx`
+          if (contentDisposition) {
+            const match = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/)
+            if (match && match[1]) {
+              filename = match[1].replace(/['"]/g, '')
+            }
+          }
           const url = window.URL.createObjectURL(new Blob([response.data]))
           const link = document.createElement('a')
           link.href = url
-
-          // استخراج اسم الملف
-          const contentDisposition = response.headers['content-disposition']
-          let fileName = `${type}_report_${new Date().toISOString().split('T')[0]}.xlsx`
-
-          if (contentDisposition) {
-            const fileNameMatch = contentDisposition.match(/filename\*?=["']?(?:UTF-\d["']*)?([^;\r\n"]*)["']?;?/i)
-            if (fileNameMatch && fileNameMatch[1]) {
-              fileName = decodeURI(fileNameMatch[1])
-            } else {
-              const fileNameMatch2 = contentDisposition.match(/filename=["']?([^"]+)["']?/i)
-              if (fileNameMatch2 && fileNameMatch2[1]) {
-                fileName = fileNameMatch2[1]
-              }
-            }
-          }
-
-          link.setAttribute('download', fileName)
+          link.setAttribute('download', filename)
           document.body.appendChild(link)
           link.click()
           link.remove()
           window.URL.revokeObjectURL(url)
-
-          return { success: true, fileName, directDownload: true }
+          return { success: true }
         } else {
-          // حفظ في الخادم
-          const response = await axios.get(endpoint, { params })
-
-          if (response.data && response.data.success) {
-            // جلب الملفات المحدثة
-            await dispatch('getExportedFiles')
-            return response.data
-          } else {
-            throw new Error(response.data?.message || 'فشل في تصدير التقرير')
-          }
+          commit('SET_EXPORTED_FILES', response.data.data)
+          return { success: true, data: response.data.data }
         }
       } catch (error) {
-        console.error(`❌ Error exporting ${type} report:`, error)
-
-        let errorMessage = 'فشل في تصدير التقرير'
-        if (error.response) {
-          if (error.response.data && error.response.data.message) {
-            errorMessage = error.response.data.message
-          } else if (error.response.status === 413) {
-            errorMessage = 'حجم البيانات كبير جداً، حاول تطبيق المزيد من الفلاتر'
-          }
-        } else if (error.message) {
-          errorMessage = error.message
-        }
-
-        commit('SET_ERROR', errorMessage)
-        throw new Error(errorMessage)
+        commit('SET_ERROR', error.response?.data?.message || 'Export failed')
+        throw error
       } finally {
         commit('SET_EXPORT_LOADING', false)
       }
     },
 
+    // دالة للتصدير المباشر (تستخدمها المكونات)
+    async handleDirectExport({ state, dispatch }, payload) {
+      return await dispatch('exportReport', {
+        type: state.activeTab,
+        download: true,
+        filters: state.filters,
+        lang: payload?.lang || 'ar'
+      })
+    },
+
+    // دالة للتصدير إلى الخادم
+    async handleServerExport({ state, commit, dispatch }) {
+      const result = await dispatch('exportReport', {
+        type: state.activeTab,
+        download: false,
+        filters: state.filters
+      })
+      if (result?.success) {
+        commit('SET_SHOW_EXPORTED_FILES', true)
+        await dispatch('getExportedFiles')
+      }
+      return result
+    },
+
+    // جلب الملفات المصدرة
     async getExportedFiles({ commit }) {
       try {
-        console.log('📤 Fetching exported files...')
         const response = await axios.get('/admin/reports/exported-files')
-
-        console.log('✅ Exported files response:', response.data)
-
-        if (response.data && response.data.success) {
+        if (response.data?.success) {
           commit('SET_EXPORTED_FILES', response.data.data)
           return response.data.data
         }
-
         return []
       } catch (error) {
-        console.error('❌ Error fetching exported files:', error)
+        console.error('Error fetching exported files:', error)
         return []
       }
     },
 
+    // حذف ملف مصدر
     async deleteExportedFile({ commit }, fileName) {
       try {
         const response = await axios.delete('/admin/reports/exported-files/delete', {
           data: { file_name: fileName }
         })
-
-        if (response.data && response.data.success) {
+        if (response.data?.success) {
           commit('REMOVE_EXPORTED_FILE', fileName)
           return true
         }
-
         return false
       } catch (error) {
-        console.error('❌ Error deleting exported file:', error)
+        console.error('Error deleting exported file:', error)
         throw error
       }
     },
 
-    async updateFilters({ commit }, filters) {
-      commit('SET_FILTERS', filters)
+    // إرسال تذكير
+    async sendReminder({ dispatch, state }, invoiceId) {
+      try {
+        const response = await axios.post(`/admin/reports/send-reminder/${invoiceId}`)
+        if (response.data.success) {
+          await dispatch('getOverdueReport', state.filters)
+          return true
+        }
+        return false
+      } catch (error) {
+        throw error
+      }
     },
 
-    resetFilters({ commit }) {
-      commit('RESET_FILTERS')
+    // تعليم الفاتورة كمدفوعة
+    async markAsPaid({ dispatch, state }, invoiceId) {
+      try {
+        const response = await axios.post(`/admin/reports/mark-paid/${invoiceId}`)
+        if (response.data.success) {
+          setTimeout(async () => {
+            await dispatch('getOverdueReport', state.filters)
+          }, 1000)
+          return true
+        }
+        return false
+      } catch (error) {
+        throw error
+      }
     },
 
-    clearError({ commit }) {
-      commit('CLEAR_ERROR')
+    // دوال التحكم في النوافذ
+    openExportModal({ commit }) {
+      commit('SET_SHOW_EXPORT_MODAL', true)
+    },
+    closeExportModal({ commit }) {
+      commit('SET_SHOW_EXPORT_MODAL', false)
+    },
+    toggleExportedFiles({ commit, state }) {
+      commit('SET_SHOW_EXPORTED_FILES', !state.showExportedFiles)
+    },
+
+    // دالة التهيئة
+    async init({ dispatch }) {
+      await dispatch('loadClients')
+      await dispatch('getExportedFiles')
+      await dispatch('loadReport')
     }
   }
 }

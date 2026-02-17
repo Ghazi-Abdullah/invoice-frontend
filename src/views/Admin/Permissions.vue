@@ -1,6 +1,6 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-6 md:py-8">
-    <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
+  <div class="min-h-screen py-6 md:py-8">
+    <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
       <!-- Header -->
       <div class="mb-8">
         <div
@@ -61,6 +61,63 @@
         </div>
       </div>
 
+      <!-- Stats Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+        <!-- Total Permissions -->
+        <div class="stats-card bg-gradient-to-br from-blue-50 to-blue-100">
+          <div class="stats-icon bg-blue-100">
+            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+              />
+            </svg>
+          </div>
+          <div>
+            <p class="stats-label">{{ $t('permissions.total_permissions') }}</p>
+            <p class="stats-value">{{ permissions.length }}</p>
+          </div>
+        </div>
+
+        <!-- Parent Permissions -->
+        <div class="stats-card bg-gradient-to-br from-green-50 to-green-100">
+          <div class="stats-icon bg-green-100">
+            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+              />
+            </svg>
+          </div>
+          <div>
+            <p class="stats-label">{{ $t('permissions.parent_permissions') }}</p>
+            <p class="stats-value">{{ parentPermissionsCount }}</p>
+          </div>
+        </div>
+
+        <!-- Child Permissions -->
+        <div class="stats-card bg-gradient-to-br from-purple-50 to-purple-100">
+          <div class="stats-icon bg-purple-100">
+            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
+              />
+            </svg>
+          </div>
+          <div>
+            <p class="stats-label">{{ $t('permissions.child_permissions') }}</p>
+            <p class="stats-value">{{ childPermissionsCount }}</p>
+          </div>
+        </div>
+      </div>
+
       <!-- Search Card -->
       <div
         class="bg-white/80 backdrop-blur-sm rounded-2xl border border-white/50 shadow-lg shadow-blue-100/30 p-6 mb-8"
@@ -96,7 +153,7 @@
                 type="text"
                 v-model="searchQuery"
                 :placeholder="$t('permissions.search_placeholder')"
-                class="w-full px-4 py-3 pl-11 bg-white/80 border border-gray-300/50 rounded-xl focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-200 placeholder:text-gray-400"
+                class="w-full px-4 py-3 pr-11 bg-white/80 border border-gray-300/50 rounded-xl focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-200 placeholder:text-gray-400"
               />
               <div class="absolute left-3 top-1/2 transform -translate-y-1/2">
                 <svg
@@ -212,20 +269,12 @@
                   <p class="text-sm text-gray-600 mt-1">{{ $t('permissions.list_subtitle') }}</p>
                 </div>
               </div>
-              <div class="flex items-center gap-4">
-                <div class="text-sm text-gray-600 hidden md:block">
-                  <span class="font-semibold text-green-600">{{ parentPermissionsCount }}</span>
-                  {{ $t('permissions.parent_permissions') }} •
-                  <span class="font-semibold text-blue-600">{{ childPermissionsCount }}</span>
-                  {{ $t('permissions.child_permissions') }}
-                </div>
-                <div
-                  class="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg shadow-sm"
-                >
-                  <span class="font-bold">{{ filteredPermissions.length }}</span>
-                  <span class="text-blue-100 ml-1">{{ $t('common.total') }}</span>
-                </div>
-              </div>
+              <!--<div
+                class="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg shadow-sm"
+              >
+                <span class="font-bold">{{ filteredPermissions.length }}</span>
+                <span class="text-blue-100 mr-1">{{ $t('common.total') }}</span>
+              </div>-->
             </div>
           </div>
 
@@ -278,45 +327,25 @@
               <table class="min-w-full divide-y divide-gray-200/50">
                 <thead>
                   <tr class="bg-gradient-to-r from-gray-50 to-gray-100/30">
-                    <th
-                      class="px-6 py-4 text-right text-xs font-bold text-gray-700 uppercase tracking-wider"
-                    >
-                      {{ $t('permissions.permission_name') }}
-                    </th>
-                    <th
-                      class="px-6 py-4 text-right text-xs font-bold text-gray-700 uppercase tracking-wider"
-                    >
-                      {{ $t('permissions.description_ar') }}
-                    </th>
-                    <th
-                      class="px-6 py-4 text-right text-xs font-bold text-gray-700 uppercase tracking-wider"
-                    >
-                      {{ $t('permissions.description_en') }}
-                    </th>
-                    <th
-                      class="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider"
-                    >
-                      {{ $t('permissions.type') }}
-                    </th>
-                    <th
-                      class="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider"
-                    >
-                      {{ $t('common.actions') }}
-                    </th>
+                    <th class="table-header text-right">{{ $t('permissions.permission_name') }}</th>
+                    <th class="table-header text-right">{{ $t('permissions.description_ar') }}</th>
+                    <th class="table-header text-right">{{ $t('permissions.description_en') }}</th>
+                    <th class="table-header text-center">{{ $t('permissions.type') }}</th>
+                    <th class="table-header text-center">{{ $t('common.actions') }}</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200/30">
                   <tr
                     v-for="permission in filteredPermissions"
                     :key="permission.id"
-                    class="hover:bg-gradient-to-r hover:from-blue-50/30 hover:to-white transition-all duration-200 group"
+                    class="hover:bg-blue-50/30 transition-colors"
                   >
                     <!-- Permission Name -->
-                    <td class="px-6 py-4">
+                    <td class="table-cell">
                       <div class="flex items-center">
                         <div class="flex-shrink-0 ml-4">
                           <div
-                            class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-md group-hover:scale-105 transition-transform duration-200"
+                            class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-md mr-4"
                           >
                             <svg
                               class="w-6 h-6 text-white"
@@ -334,72 +363,58 @@
                           </div>
                         </div>
                         <div class="mr-4">
-                          <div class="text-base font-bold text-gray-900 group-hover:text-blue-700">
-                            {{ permission.title }}
-                          </div>
+                          <div class="text-base font-bold text-gray-900">{{ permission.title }}</div>
                           <div class="flex items-center gap-2 mt-1">
                             <span class="text-xs text-gray-500">ID: {{ permission.id }}</span>
-                            <span
-                              v-if="permission.menu"
-                              class="text-xs px-2 py-0.5 bg-indigo-100 text-indigo-700 rounded-full font-medium"
-                            >
-                              {{ permission.menu.title_ar || permission.menu.title_en }}
-                            </span>
                           </div>
                         </div>
                       </div>
                     </td>
 
                     <!-- Arabic Description -->
-                    <td class="px-6 py-4">
+                    <td class="table-cell">
                       <div class="flex flex-col">
                         <span class="text-sm text-gray-900 font-medium">
                           {{ permission.description_ar || $t('common.notAvailable') }}
-                        </span>
-                        <span v-if="!permission.description_ar" class="text-xs text-gray-400 mt-1">
-                          {{ $t('common.no_arabic_description') }}
                         </span>
                       </div>
                     </td>
 
                     <!-- English Description -->
-                    <td class="px-6 py-4">
+                    <td class="table-cell">
                       <div class="flex flex-col">
                         <span class="text-sm text-gray-900 font-medium">
                           {{ permission.description_en || $t('common.notAvailable') }}
-                        </span>
-                        <span v-if="!permission.description_en" class="text-xs text-gray-400 mt-1">
-                          {{ $t('common.no_english_description') }}
                         </span>
                       </div>
                     </td>
 
                     <!-- Type -->
-                    <td class="px-6 py-4">
-                      <div class="flex justify-center">
+                    <td class="table-cell text-center">
+                      <span
+                        :class="[
+                          'status-badge',
+                          permission.is_parent
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-blue-100 text-blue-800',
+                        ]"
+                      >
                         <span
-                          :class="
-                            permission.is_parent
-                              ? 'bg-gradient-to-r from-green-100 to-green-50 text-green-800 border-green-200/50'
-                              : 'bg-gradient-to-r from-blue-100 to-blue-50 text-blue-800 border-blue-200/50'
-                          "
-                          class="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold border"
-                        >
-                          <span
-                            :class="permission.is_parent ? 'bg-green-500' : 'bg-blue-500'"
-                            class="w-2 h-2 rounded-full ml-2"
-                          ></span>
-                          {{
-                            permission.is_parent
-                              ? $t('permissions.parent')
-                              : $t('permissions.child')
-                          }}
-                        </span>
-                      </div>
+                          :class="[
+                            'status-dot',
+                            permission.is_parent ? 'bg-green-500' : 'bg-blue-500',
+                          ]"
+                        ></span>
+                        {{
+                          permission.is_parent
+                            ? $t('permissions.parent')
+                            : $t('permissions.child')
+                        }}
+                      </span>
                     </td>
 
                     <!-- Actions -->
-                    <td class="px-6 py-4">
+                    <td class="table-cell text-center">
                       <div class="flex items-center justify-center gap-2">
                         <button
                           @click="openEditModal(permission)"
@@ -450,7 +465,7 @@
       </div>
     </div>
 
-    <!-- Create/Edit Permission Modal -->
+    <!-- Create/Edit Permission Modal (لم يتغير) -->
     <transition name="modal-fade">
       <div
         v-if="showModal"
@@ -512,7 +527,7 @@
             </div>
           </div>
 
-          <!-- Modal Body -->
+          <!-- Modal Body (نفس الكود الأصلي) -->
           <form
             @submit.prevent="editingPermission ? updatePermission() : createPermission()"
             class="p-8"
@@ -841,180 +856,31 @@ export default {
 </script>
 
 <style scoped>
-/* تحسينات الجدول */
-table {
-  border-collapse: separate;
-  border-spacing: 0;
+/* استيراد أنماط التصميم الموحدة من InvoiceReportSection */
+.stats-card {
+  @apply rounded-xl p-5 border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300;
+}
+.stats-icon {
+  @apply p-3 rounded-lg w-fit mb-3;
+}
+.stats-label {
+  @apply text-sm font-medium text-gray-500 mb-1;
+}
+.stats-value {
+  @apply text-2xl font-bold text-gray-900;
+}
+.table-header {
+  @apply px-6 py-4 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider;
+}
+.table-cell {
+  @apply px-6 py-4;
+}
+.status-badge {
+  @apply px-3 py-1.5 rounded-full text-xs font-semibold inline-flex items-center gap-1;
+}
+.status-dot {
+  @apply w-2 h-2 rounded-full;
 }
 
-th:first-child {
-  border-top-right-radius: 12px;
-}
-
-th:last-child {
-  border-top-left-radius: 12px;
-}
-
-tr:last-child td:first-child {
-  border-bottom-right-radius: 12px;
-}
-
-tr:last-child td:last-child {
-  border-bottom-left-radius: 12px;
-}
-
-/* تأثيرات hover محسنة */
-tr {
-  transition: all 0.2s ease-in-out;
-}
-
-tr:hover {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(255, 255, 255, 0.8) 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
-}
-
-/* تحسينات الأزرار */
-button {
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-button:active {
-  transform: translateY(0);
-}
-
-/* تأثيرات الـ loading */
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.animate-spin {
-  animation: spin 1s linear infinite;
-}
-
-/* تأثيرات المودال */
-.modal-fade-enter-active,
-.modal-fade-leave-active {
-  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.modal-fade-enter-from,
-.modal-fade-leave-to {
-  opacity: 0;
-}
-
-/* تدرجات لونية محسنة */
-.bg-gradient-to-br {
-  background-image: linear-gradient(to bottom right, var(--tw-gradient-stops));
-}
-
-/* ظلال ناعمة */
-.shadow-lg {
-  box-shadow:
-    0 10px 25px -5px rgba(0, 0, 0, 0.1),
-    0 10px 10px -5px rgba(0, 0, 0, 0.04);
-}
-
-.shadow-xl {
-  box-shadow:
-    0 20px 25px -5px rgba(0, 0, 0, 0.1),
-    0 10px 10px -5px rgba(0, 0, 0, 0.04);
-}
-
-/* تأثيرات النص */
-.text-shadow {
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* تحسينات الشعار الدائري */
-.avatar-gradient {
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-}
-
-/* تحسينات الأيقونات */
-.icon-hover {
-  transition: all 0.2s ease-in-out;
-}
-
-.icon-hover:hover {
-  transform: scale(1.1);
-}
-
-/* تأثيرات الإدخال */
-input:focus,
-select:focus {
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-/* تحسينات العناوين */
-h1,
-h2,
-h3 {
-  font-weight: 700;
-  letter-spacing: -0.025em;
-}
-
-/* تحسينات التباين */
-.text-gray-900 {
-  color: #1f2937;
-}
-
-.text-gray-800 {
-  color: #374151;
-}
-
-.text-gray-700 {
-  color: #4b5563;
-}
-
-.text-gray-600 {
-  color: #6b7280;
-}
-
-/* تحسينات الاستجابة */
-@media (max-width: 640px) {
-  .table-responsive {
-    margin: 0 -1rem;
-    width: calc(100% + 2rem);
-  }
-
-  .mobile-stack {
-    flex-direction: column;
-    gap: 1rem;
-  }
-}
-
-/* تحسينات شريط التمرير */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f1f5f9;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-}
-
-/* تأثيرات focus محسنة */
-.focus-ring {
-  transition: box-shadow 0.2s ease-in-out;
-}
-
-.focus-ring:focus {
-  box-shadow:
-    0 0 0 3px rgba(59, 130, 246, 0.1),
-    0 0 0 1px rgba(59, 130, 246, 0.2);
-  outline: none;
-}
+/* باقي الأنماط الخاصة بالجدول والتأثيرات يمكن الاحتفاظ بها أو دمجها */
 </style>
