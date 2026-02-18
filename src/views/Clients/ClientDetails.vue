@@ -1,13 +1,89 @@
 <template>
-  <div class="min-h-screen bg-gray-50 py-8">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <!-- Page Header -->
-      <PageHeader
-        :title="$t('clients.clientDetails')"
-        :subtitle="$t('clients.clientDetailsDescription')"
-        :breadcrumbs="breadcrumbs"
-        :actions="headerActions"
-      />
+  <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-6 md:py-8">
+    <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
+      <!-- Header -->
+      <div class="mb-8">
+        <div
+          class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6"
+        >
+          <div>
+            <div class="flex items-center gap-3 mb-2">
+              <div class="p-2 bg-white rounded-xl shadow-sm border border-gray-200">
+                <svg
+                  class="w-6 h-6 text-blue-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                  />
+                </svg>
+              </div>
+              <div>
+                <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">
+                  {{ $t('clients.clientDetails') }}
+                </h1>
+                <p class="text-gray-600 text-sm mt-1">{{ $t('clients.clientDetailsDescription') }}</p>
+              </div>
+            </div>
+
+            <!-- Breadcrumbs -->
+            <nav class="flex mt-3" aria-label="Breadcrumb">
+              <ol class="flex items-center space-x-1 space-x-reverse">
+                <li>
+                  <router-link
+                    to="/clients"
+                    class="text-sm text-gray-500 hover:text-gray-700 transition-colors"
+                  >
+                    {{ $t('clients.title') }}
+                  </router-link>
+                </li>
+                <li>
+                  <svg class="w-4 h-4 text-gray-400 mx-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path
+                      fill-rule="evenodd"
+                      d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                </li>
+                <li class="text-sm font-medium text-blue-600">
+                  {{ client?.name || '...' }}
+                </li>
+              </ol>
+            </nav>
+          </div>
+
+          <div class="flex gap-3">
+            <button
+              @click="$router.push('/clients')"
+              class="px-4 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200 flex items-center gap-2"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                />
+              </svg>
+              {{ $t('common.back') }}
+            </button>
+            <BaseButton
+              v-if="hasPermission('edit_client')"
+              @click="editClient"
+              variant="primary"
+              icon="edit"
+            >
+              {{ $t('common.edit') }}
+            </BaseButton>
+          </div>
+        </div>
+      </div>
 
       <!-- Loading State -->
       <div v-if="loading" class="flex flex-col items-center justify-center py-12">
@@ -18,8 +94,8 @@
       <!-- Error State -->
       <BaseAlert
         v-else-if="error"
-        type="error"
-        title="حدث خطأ"
+        type="danger"
+        :title="$t('common.error')"
         :message="error"
         :actions="errorActions"
         class="mb-6"
@@ -28,134 +104,202 @@
       <!-- Client Details -->
       <div v-else-if="client" class="space-y-6">
         <!-- Client Info Card -->
-        <BaseCard class="client-info-card">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <!-- Client Avatar and Basic Info -->
-            <div class="info-section">
-              <div class="flex items-center space-x-4">
-                <div class="client-avatar">
-                  {{ getInitials(client.name) }}
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+          <!-- Card Header with gradient -->
+          <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-white">
+            <div class="flex items-center gap-3">
+              <div class="p-2.5 bg-blue-100 rounded-lg">
+                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                  />
+                </svg>
+              </div>
+              <div>
+                <h2 class="text-lg font-semibold text-gray-800">{{ $t('clients.basicInfo') }}</h2>
+                <p class="text-sm text-gray-600">{{ $t('clients.basicInfoDescription') }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <!-- Column 1: Avatar + Name + Status -->
+              <div class="info-section ">
+                <div class="flex items-center space-x-4">
+                  <div class="client-avatar">
+                    {{ getInitials(client.name) }}
+                  </div>
+                  <div>
+                    <h2 class="client-name">{{ client.name }}</h2>
+                    <p class="client-email">{{ client.email || $t('common.notAvailable') }}</p>
+                  </div>
+                </div>
+                <div class="mt-4">
+                  <StatusBadge :status="client.status === 'active' ? 'paid' : 'overdue'" />
+                </div>
+              </div>
+
+              <!-- Column 2: Contact Info -->
+              <div class="info-section">
+                <h3 class="section-title">
+                  <font-awesome-icon :icon="['fas', 'address-card']" class="ml-2 text-blue-500" />
+                  {{ $t('clients.contactInfo') }}
+                </h3>
+                <div class="space-y-3">
+                  <div class="contact-item">
+                    <font-awesome-icon :icon="['fas', 'phone']" class="w-4 text-gray-500" />
+                    <span>{{ client.phone || $t('common.notAvailable') }}</span>
+                  </div>
+                  <div class="contact-item">
+                    <font-awesome-icon :icon="['fas', 'map-marker-alt']" class="w-4 text-gray-500" />
+                    <span>{{ client.address || $t('common.notAvailable') }}</span>
+                  </div>
+                  <div class="contact-item">
+                    <font-awesome-icon :icon="['fas', 'building']" class="w-4 text-gray-500" />
+                    <span>{{ client.company_name || $t('common.notAvailable') }}</span>
+                  </div>
+                  <div class="contact-item" v-if="client.tax_number">
+                    <font-awesome-icon :icon="['fas', 'receipt']" class="w-4 text-gray-500" />
+                    <span>{{ $t('clients.taxNumber') }}: {{ client.tax_number }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Column 3: Stats -->
+              <div class="info-section">
+                <h3 class="section-title">
+                  <font-awesome-icon :icon="['fas', 'chart-bar']" class="ml-2 text-green-500" />
+                  {{ $t('clients.stats') }}
+                </h3>
+                <div class="space-y-2">
+                  <div class="stat-item">
+                    <span>{{ $t('clients.stats.totalInvoices') }}:</span>
+                    <span class="font-semibold">{{ stats.totalInvoices }}</span>
+                  </div>
+                  <div class="stat-item">
+                    <span>{{ $t('clients.stats.paidInvoices') }}:</span>
+                    <span class="font-semibold text-green-600">{{ stats.paidInvoices }}</span>
+                  </div>
+                  <div class="stat-item">
+                    <span>{{ $t('clients.stats.overdueInvoices') }}:</span>
+                    <span class="font-semibold text-red-600">{{ stats.overdueInvoices }}</span>
+                  </div>
+                  <div class="stat-item">
+                    <span>{{ $t('clients.stats.totalAmount') }}:</span>
+                    <span class="font-semibold text-blue-600">{{ formatCurrency(stats.totalAmount) }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Client Invoices Card -->
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-white">
+            <div class="flex items-center gap-3">
+              <div class="p-2.5 bg-blue-100 rounded-lg">
+                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                  />
+                </svg>
+              </div>
+              <div>
+                <h2 class="text-lg font-semibold text-gray-800">{{ $t('clients.clientInvoices') }}</h2>
+                <p class="text-sm text-gray-600">{{ $t('clients.clientInvoicesDescription') }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-6">
+            <div v-if="clientInvoices.length === 0" class="text-center py-8">
+              <font-awesome-icon
+                :icon="['fas', 'file-invoice']"
+                class="text-gray-300 text-4xl mb-3"
+              />
+              <p class="text-gray-500">{{ $t('clients.noInvoicesForClient') }}</p>
+            </div>
+
+            <BaseTable
+              v-else
+              :columns="invoiceColumns"
+              :data="clientInvoices"
+              bordered
+              striped
+              class="mt-4"
+            >
+              <template #cell-invoice_number="{ row }">
+                <div class="font-medium text-gray-900">{{ row.invoice_number }}</div>
+                <div class="text-sm text-gray-500">#{{ row.id }}</div>
+              </template>
+
+              <template #cell-issue_date="{ row }">
+                {{ formatDate(row.issue_date) }}
+              </template>
+
+              <template #cell-due_date="{ row }">
+                <span :class="getDaysRemainingClass(row.due_date)">
+                  {{ getDaysRemaining(row.due_date) }}
+                </span>
+              </template>
+
+              <template #cell-total_amount="{ row }">
+                <span class="font-semibold">{{ formatCurrency(row.total_amount) }}</span>
+              </template>
+
+              <template #cell-status="{ row }">
+                <StatusBadge :status="row.status" />
+              </template>
+
+              <template #actions="{ row }">
+                <BaseButton
+                  @click="$router.push(`/invoices/${row.id}`)"
+                  variant="ghost"
+                  size="sm"
+                  icon="eye"
+                  :title="$t('common.view')"
+                />
+              </template>
+            </BaseTable>
+          </div>
+        </div>
+
+        <!-- Quick Actions & Notes -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Quick Actions Card -->
+          <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-white">
+              <div class="flex items-center gap-3">
+                <div class="p-2.5 bg-blue-100 rounded-lg">
+                  <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M13 10V3L4 14h7v7l9-11h-7z"
+                    />
+                  </svg>
                 </div>
                 <div>
-                  <h2 class="client-name">{{ client.name }}</h2>
-                  <p class="client-email">{{ client.email || $t('common.notAvailable') }}</p>
-                </div>
-              </div>
-              <div class="mt-4">
-                <StatusBadge :status="client.status === 'active' ? 'paid' : 'overdue'" />
-              </div>
-            </div>
-
-            <!-- Contact Info -->
-            <div class="info-section">
-              <h3 class="section-title">{{ $t('clients.contactInfo') }}</h3>
-              <div class="space-y-3">
-                <div class="contact-item">
-                  <font-awesome-icon :icon="['fas', 'phone']" />
-                  <span>{{ client.phone || $t('common.notAvailable') }}</span>
-                </div>
-                <div class="contact-item">
-                  <font-awesome-icon :icon="['fas', 'map-marker-alt']" />
-                  <span>{{ client.address || $t('common.notAvailable') }}</span>
-                </div>
-                <div class="contact-item">
-                  <font-awesome-icon :icon="['fas', 'building']" />
-                  <span>{{ client.company_name || $t('common.notAvailable') }}</span>
-                </div>
-                <div class="contact-item" v-if="client.tax_number">
-                  <font-awesome-icon :icon="['fas', 'receipt']" />
-                  <span>{{ $t('clients.taxNumber') }}: {{ client.tax_number }}</span>
+                  <h2 class="text-lg font-semibold text-gray-800">{{ $t('common.actions') }}</h2>
+                  <p class="text-sm text-gray-600">{{ $t('clients.quickActionsDescription') }}</p>
                 </div>
               </div>
             </div>
-
-            <!-- Stats Info -->
-            <div class="info-section">
-              <h3 class="section-title">{{ $t('clients.stats') }}</h3>
-              <div class="space-y-2">
-                <div class="stat-item">
-                  <span>{{ $t('clients.stats.totalInvoices') }}:</span>
-                  <span class="font-semibold">{{ stats.totalInvoices }}</span>
-                </div>
-                <div class="stat-item">
-                  <span>{{ $t('clients.stats.paidInvoices') }}:</span>
-                  <span class="font-semibold text-green-600">{{ stats.paidInvoices }}</span>
-                </div>
-                <div class="stat-item">
-                  <span>{{ $t('clients.stats.overdueInvoices') }}:</span>
-                  <span class="font-semibold text-red-600">{{ stats.overdueInvoices }}</span>
-                </div>
-                <div class="stat-item">
-                  <span>{{ $t('clients.stats.totalAmount') }}:</span>
-                  <span class="font-semibold text-blue-600">{{ stats.totalAmount }}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </BaseCard>
-
-        <!-- Client Invoices -->
-        <BaseCard :title="$t('clients.clientInvoices')" class="invoices-card">
-          <div v-if="clientInvoices.length === 0" class="text-center py-8">
-            <font-awesome-icon
-              :icon="['fas', 'file-invoice']"
-              class="text-gray-300 text-4xl mb-3"
-            />
-            <p class="text-gray-500">{{ $t('clients.noInvoicesForClient') }}</p>
-          </div>
-
-          <BaseTable
-            v-else
-            :columns="invoiceColumns"
-            :data="clientInvoices"
-            bordered
-            striped
-            class="mt-4"
-          >
-            <template #cell-invoice_number="{ row }">
-              <div class="font-medium text-gray-900">{{ row.invoice_number }}</div>
-              <div class="text-sm text-gray-500">#{{ row.id }}</div>
-            </template>
-
-            <template #cell-issue_date="{ row }">
-              {{ formatDate(row.issue_date) }}
-            </template>
-
-            <template #cell-due_date="{ row }">
-              <span :class="getDaysRemainingClass(row.due_date)">
-                {{ getDaysRemaining(row.due_date) }}
-              </span>
-            </template>
-
-            <template #cell-total_amount="{ row }">
-              <span class="font-semibold">{{ formatCurrency(row.total_amount) }}</span>
-            </template>
-
-            <template #cell-status="{ row }">
-              <StatusBadge :status="row.status" />
-            </template>
-
-            <template #actions="{ row }">
-              <BaseButton
-                @click="$router.push(`/invoices/${row.id}`)"
-                type="ghost"
-                size="sm"
-                :icon="['fas', 'eye']"
-                title="عرض"
-              />
-            </template>
-          </BaseTable>
-        </BaseCard>
-
-        <!-- Quick Actions -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <BaseCard :title="$t('common.actions')">
-            <div class="space-y-3">
+            <div class="p-6 space-y-3">
               <BaseButton
                 v-if="hasPermission('edit_client')"
                 @click="editClient"
-                type="primary"
-                :icon="['fas', 'edit']"
+                type="success"
+                icon="edit"
                 block
               >
                 {{ $t('common.edit') }}
@@ -163,14 +307,14 @@
 
               <BaseButton
                 @click="$router.push(`/invoices/create?client_id=${client.id}`)"
-                type="success"
-                :icon="['fas', 'plus']"
+                type=""
+                icon="plus"
                 block
               >
                 {{ $t('invoices.createForClient') }}
               </BaseButton>
 
-              <BaseButton @click="sendEmail" type="outline" :icon="['fas', 'envelope']" block>
+              <BaseButton @click="sendEmail" variant="outline" icon="envelope" block>
                 {{ $t('clients.sendEmail') }}
               </BaseButton>
 
@@ -178,17 +322,38 @@
                 v-if="hasPermission('delete_client')"
                 @click="confirmDelete"
                 type="danger"
-                :icon="['fas', 'trash']"
+                icon="trash"
                 block
               >
                 {{ $t('common.delete') }}
               </BaseButton>
             </div>
-          </BaseCard>
+          </div>
 
-          <BaseCard v-if="client.notes" :title="$t('common.notes')">
-            <p class="text-gray-700 whitespace-pre-line">{{ client.notes }}</p>
-          </BaseCard>
+          <!-- Notes Card -->
+          <div v-if="client.notes" class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-white">
+              <div class="flex items-center gap-3">
+                <div class="p-2.5 bg-blue-100 rounded-lg">
+                  <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <h2 class="text-lg font-semibold text-gray-800">{{ $t('common.notes') }}</h2>
+                  <p class="text-sm text-gray-600">{{ $t('clients.notesDescription') }}</p>
+                </div>
+              </div>
+            </div>
+            <div class="p-6">
+              <p class="text-gray-700 whitespace-pre-line">{{ client.notes }}</p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -221,42 +386,19 @@ export default {
         totalAmount: 0,
       },
       invoiceColumns: [
-        { key: 'invoice_number', label: 'رقم الفاتورة', align: 'right' },
-        { key: 'issue_date', label: 'تاريخ الإصدار', align: 'center' },
-        { key: 'due_date', label: 'تاريخ الاستحقاق', align: 'center' },
-        { key: 'total_amount', label: 'المبلغ', align: 'right' },
-        { key: 'status', label: 'الحالة', align: 'center' },
+        { key: 'invoice_number', label: this.$t('invoices.number'), align: 'center' },
+        { key: 'issue_date', label: this.$t('invoices.issueDate'), align: 'center' },
+        { key: 'due_date', label: this.$t('invoices.dueDate'), align: 'center' },
+        { key: 'total_amount', label: this.$t('invoices.amount'), align: 'center' },
+        { key: 'status', label: this.$t('common.status'), align: 'center' },
       ],
     }
   },
   computed: {
-    breadcrumbs() {
-      return [
-        { text: this.$t('clients.title'), to: '/clients' },
-        { text: this.client?.name || 'تفاصيل العميل' },
-      ]
-    },
-    headerActions() {
-      return [
-        {
-          text: this.$t('common.back'),
-          type: 'outline',
-          icon: ['fas', 'arrow-left'],
-          onClick: () => this.$router.push('/clients'),
-        },
-        {
-          text: this.$t('common.edit'),
-          type: 'primary',
-          icon: ['fas', 'edit'],
-          onClick: () => this.editClient(),
-          disabled: !this.hasPermission('edit_client') || !this.client,
-        },
-      ]
-    },
     errorActions() {
       return [
         {
-          text: 'إعادة المحاولة',
+          text: this.$t('common.retry'),
           onClick: this.loadClientDetails,
           type: 'danger',
         },
@@ -357,7 +499,7 @@ export default {
       const clientId = this.$route.params.id
 
       if (!clientId) {
-        this.error = 'معرف العميل غير صالح'
+        this.error = this.$t('errors.invalidClientId')
         this.loading = false
         return
       }
@@ -404,12 +546,12 @@ export default {
       if (this.client?.email) {
         window.location.href = `mailto:${this.client.email}`
       } else {
-        this.$toast.warning('لا يوجد بريد إلكتروني لهذا العميل')
+        this.$toast.warning(this.$t('clients.noEmail'))
       }
     },
     confirmDelete() {
       this.$toast.confirm(
-        `هل أنت متأكد من حذف العميل "${this.client.name}"؟`,
+        this.$t('clients.deleteConfirm', { name: this.client.name }),
         async () => {
           await this.deleteClient()
         }
@@ -438,39 +580,32 @@ export default {
 </script>
 
 <style scoped>
-.client-info-card {
-  @apply border-primary-100;
-}
-
-.info-section {
-  @apply p-4;
+.client-avatar {
+  @apply w-16 h-16 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center text-blue-700 font-bold text-xl shadow-sm border border-blue-300;
 }
 
 .section-title {
-  @apply text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200;
-}
-
-.client-avatar {
-  @apply w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center text-primary-700 font-bold text-xl;
-}
-
-.client-name {
-  @apply text-xl font-bold text-gray-900;
-}
-
-.client-email {
-  @apply text-gray-600;
+  @apply text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200 flex items-center;
 }
 
 .contact-item {
-  @apply flex items-center gap-3 text-gray-700;
+  @apply flex items-center gap-3 text-gray-700 text-sm;
 }
 
 .stat-item {
-  @apply flex justify-between items-center py-2 border-b border-gray-100 last:border-0;
+  @apply flex justify-between items-center py-2 border-b border-gray-100 last:border-0 text-sm;
 }
 
-.invoices-card {
-  @apply border-gray-200;
+.info-section {
+  @apply p-2;
+}
+
+/* تحسينات عامة */
+button {
+  transition: all 0.2s ease-in-out;
+}
+
+button:hover:not(:disabled) {
+  transform: translateY(-1px);
 }
 </style>

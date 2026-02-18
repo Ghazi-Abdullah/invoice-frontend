@@ -74,7 +74,7 @@
     <!-- Invoices Table -->
     <div
       v-if="invoices.length > 0"
-      class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden"
+      class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden "
     >
       <div class="px-6 py-4 border-b border-gray-200 bg-gray-50/50">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -97,14 +97,14 @@
       </div>
 
       <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
+        <table class="min-w-full divide-y divide-gray-200 ">
           <thead>
             <tr>
-              <th class="table-header">{{ $t('reports.invoice_number') }}</th>
-              <th class="table-header">{{ $t('reports.client') }}</th>
+              <th class="table-header text-center">{{ $t('reports.invoice_number') }}</th>
+              <th class="table-header text-center">{{ $t('reports.client') }}</th>
               <th class="table-header text-center">{{ $t('reports.issue_date') }}</th>
               <th class="table-header text-center">{{ $t('reports.due_date') }}</th>
-              <th class="table-header text-right">{{ $t('reports.amount') }}</th>
+              <th class="table-header text-center">{{ $t('reports.amount') }}</th>
               <th class="table-header text-center">{{ $t('reports.status') }}</th>
             </tr>
           </thead>
@@ -114,21 +114,21 @@
               :key="invoice.id"
               class="hover:bg-blue-50/30 transition-colors"
             >
-              <td class="table-cell">
+              <td class="table-cell text-center">
                 <router-link :to="`/invoices/${invoice.id}`" class="invoice-link">
                   {{ invoice.invoice_number || `#${invoice.id}` }}
                 </router-link>
               </td>
-              <td class="table-cell">
-                <div class="client-cell">
-                  <div class="client-avatar mr-8">
+              <td class="table-cell text-center">
+                <div class="client-cell ">
+                  <div class="client-avatar mr-4">
                     {{ getInitials(invoice.client?.name) }}
                   </div>
                   <div>
-                    <div class="client-name">
+                    <div class="client-name text-center">
                       {{ invoice.client?.name || $t('common.notProvided') }}
                     </div>
-                    <div class="client-email">
+                    <div class="client-email text-center">
                       {{ invoice.client?.email || $t('common.notProvided') }}
                     </div>
                   </div>

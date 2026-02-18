@@ -105,7 +105,7 @@
               :key="month.month"
               class="hover:bg-blue-50/30 transition-colors"
             >
-              <td class="table-cell">
+              <td class="table-cell text-center">
                 <div class="text-sm font-medium text-gray-900">
                   {{ formatMonth(month.month) }}
                 </div>

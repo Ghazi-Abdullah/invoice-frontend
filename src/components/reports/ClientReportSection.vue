@@ -59,7 +59,12 @@
       <!-- total_revenue -->
       <div class="stats-card bg-gradient-to-br from-purple-50 to-purple-100">
         <div class="stats-icon bg-purple-100">
-          <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            class="w-6 h-6 text-purple-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -104,13 +109,13 @@
         <table class="min-w-full divide-y divide-gray-200">
           <thead>
             <tr>
-              <th class="table-header">{{ $t('reports.client_name') }}</th>
-              <th class="table-header">{{ $t('reports.company') }}</th>
+              <th class="table-header text-center">{{ $t('reports.client_name') }}</th>
+              <th class="table-header text-center">{{ $t('reports.company') }}</th>
               <th class="table-header text-center">{{ $t('reports.email') }}</th>
               <th class="table-header text-center">{{ $t('reports.phone') }}</th>
               <th class="table-header text-center">{{ $t('reports.invoices_count') }}</th>
-              <th class="table-header text-right">{{ $t('reports.total_spent') }}</th>
-              <th class="table-header text-right">{{ $t('reports.average_invoice') }}</th>
+              <th class="table-header text-center">{{ $t('reports.total_spent') }}</th>
+              <th class="table-header text-center">{{ $t('reports.average_invoice') }}</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-200">
@@ -119,7 +124,7 @@
               :key="client.id"
               class="hover:bg-blue-50/30 transition-colors"
             >
-              <td class="table-cell">
+              <td class="table-cell text-center">
                 <div class="client-cell">
                   <div class="client-avatar mr-8">
                     {{ getInitials(client.name) }}
@@ -134,7 +139,7 @@
                   </div>
                 </div>
               </td>
-              <td class="table-cell">
+              <td class="table-cell text-center">
                 <div class="text-sm text-gray-900">
                   {{ client.company_name || $t('common.notProvided') }}
                 </div>

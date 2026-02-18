@@ -129,7 +129,7 @@
             <thead class="bg-gray-50">
               <tr>
                 <th
-                  class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
                   {{ $t('reports.fileName') }}
                 </th>
@@ -248,7 +248,7 @@
         <div v-if="exportedFiles.length > 0" class="mt-6 pt-6 border-t border-gray-200">
           <div class="flex items-center justify-between">
             <div class="text-sm text-gray-600">
-             <!-- {{ $t('reports.total_files') }}:
+              <!-- {{ $t('reports.total_files') }}:
               <span class="font-semibold">{{ exportedFiles.length }}</span>-->
             </div>
             <button
@@ -410,7 +410,7 @@
           </div>
 
           <!-- Client Filter -->
-          <div>
+         <!-- <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">{{
               $t('clients.title')
             }}</label>
@@ -437,6 +437,51 @@
                   d="M19 9l-7 7-7-7"
                 />
               </svg>
+            </div>
+          </div>-->
+
+           <!-- Search -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">{{
+              $t('common.search')
+            }}</label>
+            <div class="relative">
+              <input
+                type="text"
+                v-model="filters.search"
+                @input="onSearch"
+                :placeholder="$t('invoices.searchPlaceholder')"
+                class="w-full px-3 py-2.5 pr-10 pl-8 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+              <!-- أيقونة البحث على اليمين (مناسبة للعربية) -->
+              <svg
+                class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+              <!-- زر المسح على اليسار -->
+              <button
+                v-if="filters.search"
+                @click="clearSearch"
+                class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
             </div>
           </div>
         </div>

@@ -102,11 +102,11 @@
         <table class="min-w-full divide-y divide-gray-200">
           <thead>
             <tr>
-              <th class="table-header">{{ $t('reports.invoice_number') }}</th>
-              <th class="table-header">{{ $t('reports.client') }}</th>
+              <th class="table-header text-center">{{ $t('reports.invoice_number') }}</th>
+              <th class="table-header text-center">{{ $t('reports.client') }}</th>
               <th class="table-header text-center">{{ $t('reports.due_date') }}</th>
-              <th class="table-header text-right">{{ $t('reports.total_amount') }}</th>
-              <th class="table-header text-right">{{ $t('reports.due_amount') }}</th>
+              <th class="table-header text-center">{{ $t('reports.total_amount') }}</th>
+              <th class="table-header text-center">{{ $t('reports.due_amount') }}</th>
               <th class="table-header text-center">{{ $t('reports.days_overdue') }}</th>
               <th class="table-header text-center">{{ $t('reports.actions') }}</th>
             </tr>
@@ -117,21 +117,21 @@
               :key="invoice.id"
               class="hover:bg-red-50/30 transition-colors"
             >
-              <td class="table-cell">
+              <td class="table-cell text-center">
                 <router-link :to="`/invoices/${invoice.id}`" class="invoice-link">
                   {{ invoice.invoice_number || `#${invoice.id}` }}
                 </router-link>
               </td>
-              <td class="table-cell">
+              <td class="table-cell text-center">
                 <div class="client-cell">
                   <div class="client-avatar mr-8">
                     {{ getInitials(invoice.client?.name) }}
                   </div>
                   <div>
-                    <div class="client-name">
+                    <div class="client-name text-center">
                       {{ invoice.client?.name || $t('common.notProvided') }}
                     </div>
-                    <div class="client-email">
+                    <div class="client-email text-center">
                       {{ invoice.client?.email || $t('common.notProvided') }}
                     </div>
                   </div>
@@ -167,6 +167,7 @@
               </td>
               <td class="table-cell text-center">
                 <div class="flex items-center justify-center gap-2">
+
                   <button
                     @click="sendReminder(invoice)"
                     class="px-3 py-1.5 bg-yellow-100 text-yellow-700 hover:bg-yellow-200 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center gap-1"
@@ -181,6 +182,7 @@
                     </svg>
                     {{ $t('reports.sendReminder') }}
                   </button>
+
                   <button
                     @click="markAsPaid(invoice)"
                     class="px-3 py-1.5 bg-green-100 text-green-700 hover:bg-green-200 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center gap-1"
@@ -195,6 +197,7 @@
                     </svg>
                     {{ $t('reports.markAsPaid') }}
                   </button>
+
                 </div>
               </td>
             </tr>

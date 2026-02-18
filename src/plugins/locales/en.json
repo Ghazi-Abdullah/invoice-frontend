@@ -102,12 +102,18 @@
     "revenue": "Revenue"
   },
   "clients": {
+    "additionalInfo": "Additional Information",
+    "businessSettings": "Business Settings",
+    "createClientTitle": "Create Client",
+    "createInfo": "Create a new client",
+    "basicInfo": "Basic Information",
     "name": "Client Name",
     "email": "Email",
     "title": "Clients",
     "subtitle": "Manage your client database with ease",
     "choose_client": "Choose Client",
     "no_clients": "No Clients",
+    "sendEmail": "Send Email",
     "emptyState": "No clients have been added yet",
     "addClient": "Add Client",
     "add_new": "Add New Client",
@@ -150,6 +156,7 @@
     "createError": "Failed to add client",
     "updateSuccess": "Client updated successfully",
     "updateError": "Failed to update client",
+    "basicInfoDescription": "Enter the basic information for the client",
     "table": {
       "title": "Clients List",
       "client": "Client",
@@ -165,6 +172,7 @@
       "invoice_list": "Invoices List"
     },
     "stats": {
+      "totalAmount": "Total Amount",
       "totalInvoices": "Total Invoices",
       "paidInvoices": "Paid Invoices",
       "overdueInvoices": "Overdue Invoices",
@@ -209,6 +217,7 @@
   },
   "invoices": {
     "invoiceNumber": "Invoice Number",
+    "createForClient": "Create Invoice For Client",
     "status_legend": "Status Legend",
     "financial_summary": "Financial Summary",
     "overdue_amount": "Overdue Amount",
