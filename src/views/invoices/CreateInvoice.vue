@@ -24,8 +24,10 @@
                 </svg>
               </div>
               <div>
-                <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">إنشاء فاتورة جديدة</h1>
-                <p class="text-gray-600 text-sm mt-1">املأ تفاصيل الفاتورة خطوة بخطوة</p>
+                <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">
+                  {{ $t('invoices.create.title') }}
+                </h1>
+                <p class="text-gray-600 text-sm mt-1">{{ $t('invoices.create.subtitle') }}</p>
               </div>
             </div>
           </div>
@@ -43,7 +45,7 @@
                   d="M10 19l-7-7m0 0l7-7m-7 7h18"
                 />
               </svg>
-              <span class="hidden sm:inline">رجوع</span>
+              <span class="hidden sm:inline">{{ $t('common.back') }}</span>
             </button>
           </div>
         </div>
@@ -52,11 +54,14 @@
         <div class="mb-8">
           <div class="flex justify-between items-center mb-4">
             <div class="text-sm text-gray-600">
-              الخطوة <span class="font-bold text-blue-600">{{ currentStep + 1 }}</span> من
+              {{ $t('common.step') }}
+              <span class="font-bold text-blue-600">{{ currentStep + 1 }}</span>
+              {{ $t('common.of') }}
               {{ steps.length }}
             </div>
             <div class="text-sm text-gray-600">
-              <span class="font-bold text-gray-900">{{ getStepProgress() }}%</span> مكتمل
+              <span class="font-bold text-gray-900">{{ getStepProgress() }}%</span>
+              {{ $t('common.completed') }}
             </div>
           </div>
 
@@ -105,7 +110,7 @@
                       : 'text-gray-500',
                 ]"
               >
-                {{ step.label }}
+                {{ $t(step.labelKey) }}
               </span>
             </div>
           </div>
@@ -139,7 +144,9 @@
                       />
                     </svg>
                   </div>
-                  <h3 class="text-lg font-semibold text-gray-800">معلومات الفاتورة الأساسية</h3>
+                  <h3 class="text-lg font-semibold text-gray-800">
+                    {{ $t('invoices.create.basic_info') }}
+                  </h3>
                 </div>
               </div>
 
@@ -148,7 +155,9 @@
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Client Selection -->
                     <div>
-                      <label class="block text-sm font-medium text-gray-700 mb-2"> العميل * </label>
+                      <label class="block text-sm font-medium text-gray-700 mb-2"
+                        >{{ $t('invoices.create.client') }} *</label
+                      >
                       <div class="relative">
                         <select
                           v-model="invoiceData.client_id"
@@ -156,9 +165,9 @@
                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white appearance-none pr-10"
                           :class="{ 'border-red-500': errors.client_id }"
                         >
-                          <option value="">اختر عميلاً</option>
+                          <option value="">{{ $t('common.select_client') }}</option>
                           <option v-for="client in clients" :key="client.id" :value="client.id">
-                            {{ client.name }} - {{ client.company_name || 'لا توجد شركة' }}
+                            {{ client.name }} - {{ client.company_name || $t('common.no_company') }}
                           </option>
                         </select>
                         <svg
@@ -187,7 +196,7 @@
                             d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                           />
                         </svg>
-                        {{ errors.client_id }}
+                        {{ $t('validation.client_required') }}
                       </div>
 
                       <!-- Client Preview -->
@@ -240,7 +249,7 @@
                                     d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
                                   />
                                 </svg>
-                                {{ selectedClient.phone || 'لا يوجد هاتف' }}
+                                {{ selectedClient.phone || $t('common.no_phone') }}
                               </span>
                               <span
                                 v-if="selectedClient.company_name"
@@ -269,13 +278,13 @@
 
                     <!-- Invoice Number -->
                     <div>
-                      <label class="block text-sm font-medium text-gray-700 mb-2">
-                        رقم الفاتورة
-                      </label>
+                      <label class="block text-sm font-medium text-gray-700 mb-2">{{
+                        $t('invoices.create.invoice_number')
+                      }}</label>
                       <div class="flex gap-2">
                         <input
                           v-model="invoiceData.invoice_number"
-                          placeholder="سيتم توليده تلقائياً"
+                          :placeholder="$t('common.auto_generated')"
                           class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           :class="{ 'border-red-500': errors.invoice_number }"
                         />
@@ -296,7 +305,7 @@
                               d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
                             />
                           </svg>
-                          <span class="hidden sm:inline">توليد</span>
+                          <span class="hidden sm:inline">{{ $t('common.generate') }}</span>
                         </button>
                       </div>
                     </div>
@@ -304,20 +313,19 @@
 
                   <!-- Dates -->
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Issue Date -->
                     <div>
-                      <label class="block text-sm font-medium text-gray-700 mb-2">
-                        تاريخ الإصدار *
-                      </label>
+                      <label class="block text-sm font-medium text-gray-700 mb-2">{{
+                        $t('common.fromDate')
+                      }}</label>
                       <div class="relative">
                         <input
-                          v-model="invoiceData.invoice_date"
                           type="date"
-                          required
-                          class="w-full px-4 py-3 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                          :class="{ 'border-red-500': errors.invoice_date }"
+                          v-model="invoiceData.invoice_date"
+                          class="w-full px-3 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         />
                         <svg
-                          class="w-5 h-5 absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                          class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -332,20 +340,19 @@
                       </div>
                     </div>
 
+                    <!-- Due Date -->
                     <div>
-                      <label class="block text-sm font-medium text-gray-700 mb-2">
-                        تاريخ الاستحقاق *
-                      </label>
+                      <label class="block text-sm font-medium text-gray-700 mb-2">{{
+                        $t('common.toDate')
+                      }}</label>
                       <div class="relative">
                         <input
-                          v-model="invoiceData.due_date"
                           type="date"
-                          required
-                          class="w-full px-4 py-3 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                          :class="{ 'border-red-500': errors.due_date }"
+                          v-model="invoiceData.due_date"
+                          class="w-full px-3 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         />
                         <svg
-                          class="w-5 h-5 absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                          class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -357,46 +364,6 @@
                             d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                           />
                         </svg>
-                      </div>
-                      <div class="mt-2">
-                        <span
-                          v-if="daysUntilDue > 0"
-                          class="text-sm text-green-600 flex items-center gap-1"
-                        >
-                          <svg
-                            class="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2"
-                              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                            />
-                          </svg>
-                          {{ daysUntilDue }} يوم حتى الاستحقاق
-                        </span>
-                        <span
-                          v-else-if="daysUntilDue === 0"
-                          class="text-sm text-yellow-600 flex items-center gap-1"
-                        >
-                          <svg
-                            class="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2"
-                              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                            />
-                          </svg>
-                          مستحق اليوم
-                        </span>
                       </div>
                     </div>
                   </div>
@@ -416,14 +383,14 @@
                         d="M10 19l-7-7m0 0l7-7m-7 7h18"
                       />
                     </svg>
-                    إلغاء
+                    {{ $t('common.cancel') }}
                   </button>
                   <button
                     @click="nextStep"
                     :disabled="!canProceedToStep1"
                     class="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    التالي: العناصر
+                    {{ $t('common.next') }}: {{ $t('invoices.create.items') }}
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
                         stroke-linecap="round"
@@ -462,7 +429,9 @@
                         />
                       </svg>
                     </div>
-                    <h3 class="text-lg font-semibold text-gray-800">عناصر الفاتورة</h3>
+                    <h3 class="text-lg font-semibold text-gray-800">
+                      {{ $t('invoices.create.items') }}
+                    </h3>
                   </div>
                   <button
                     @click="addItem"
@@ -476,7 +445,7 @@
                         d="M12 4v16m8-8H4"
                       />
                     </svg>
-                    إضافة عنصر
+                    {{ $t('invoices.create.add_item') }}
                   </button>
                 </div>
               </div>
@@ -490,27 +459,27 @@
                         <th
                           class="px-4 py-3 text-right text-sm font-semibold text-gray-700 uppercase tracking-wider"
                         >
-                          الوصف
+                          {{ $t('invoices.create.description') }}
                         </th>
                         <th
                           class="px-4 py-3 text-center text-sm font-semibold text-gray-700 uppercase tracking-wider"
                         >
-                          الكمية
+                          {{ $t('invoices.create.quantity') }}
                         </th>
                         <th
                           class="px-4 py-3 text-right text-sm font-semibold text-gray-700 uppercase tracking-wider"
                         >
-                          السعر
+                          {{ $t('invoices.create.unit_price') }}
                         </th>
                         <th
                           class="px-4 py-3 text-right text-sm font-semibold text-gray-700 uppercase tracking-wider"
                         >
-                          المجموع
+                          {{ $t('invoices.create.total') }}
                         </th>
                         <th
                           class="px-4 py-3 text-center text-sm font-semibold text-gray-700 uppercase tracking-wider"
                         >
-                          الإجراءات
+                          {{ $t('common.actions') }}
                         </th>
                       </tr>
                     </thead>
@@ -524,7 +493,7 @@
                           <input
                             v-model="item.description"
                             type="text"
-                            placeholder="وصف العنصر..."
+                            :placeholder="$t('invoices.create.description_placeholder')"
                             class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             required
                           />
@@ -623,7 +592,9 @@
 
                 <!-- Quick Add Items -->
                 <div class="mt-6 p-4 bg-gray-50 border border-gray-200 rounded-xl">
-                  <h4 class="font-medium text-gray-700 mb-3">أضف عناصر سريعة</h4>
+                  <h4 class="font-medium text-gray-700 mb-3">
+                    {{ $t('invoices.create.quick_add') }}
+                  </h4>
                   <div class="flex flex-wrap gap-2">
                     <button
                       v-for="quickItem in quickItems"
@@ -653,14 +624,14 @@
                         d="M10 19l-7-7m0 0l7-7m-7 7h18"
                       />
                     </svg>
-                    السابق
+                    {{ $t('common.previous') }}
                   </button>
                   <button
                     @click="nextStep"
                     :disabled="!canProceedToStep2"
                     class="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    التالي: الدفع
+                    {{ $t('common.next') }}: {{ $t('invoices.create.payment_settings') }}
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
                         stroke-linecap="round"
@@ -698,17 +669,19 @@
                       />
                     </svg>
                   </div>
-                  <h3 class="text-lg font-semibold text-gray-800">إعدادات الدفع والحالة</h3>
+                  <h3 class="text-lg font-semibold text-gray-800">
+                    {{ $t('invoices.create.payment_settings') }}
+                  </h3>
                 </div>
               </div>
 
               <div class="p-6">
                 <div class="space-y-8">
-                  <!-- Invoice Status -->
+                  <!-- invoices Status -->
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-4">
-                      حالة الفاتورة *
-                    </label>
+                    <label class="block text-sm font-medium text-gray-700 mb-4"
+                      >{{ $t('invoices.create.status') }} *</label
+                    >
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                       <div
                         v-for="status in statusOptions"
@@ -737,8 +710,12 @@
                               />
                             </svg>
                           </div>
-                          <span class="font-semibold mb-1">{{ status.label }}</span>
-                          <span class="text-xs text-gray-500">{{ status.description }}</span>
+                          <span class="font-semibold mb-1">{{
+                            $t(`invoices.status.${status.value}`)
+                          }}</span>
+                          <span class="text-xs text-gray-500">{{
+                            status.descriptionKey ? $t(status.descriptionKey) : ''
+                          }}</span>
                         </div>
                       </div>
                     </div>
@@ -746,9 +723,9 @@
 
                   <!-- Payment Method -->
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-4">
-                      طريقة الدفع
-                    </label>
+                    <label class="block text-sm font-medium text-gray-700 mb-4">{{
+                      $t('invoices.create.payment_method')
+                    }}</label>
                     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
                       <div
                         v-for="method in paymentMethods"
@@ -775,7 +752,9 @@
                               :d="method.icon"
                             />
                           </svg>
-                          <span class="text-sm font-medium">{{ method.label }}</span>
+                          <span class="text-sm font-medium">{{
+                            $t(`payment.methods.${method.value}`)
+                          }}</span>
                         </div>
                       </div>
                     </div>
@@ -786,7 +765,9 @@
                     <div class="flex items-center justify-between mb-6">
                       <div>
                         <h4 class="text-lg font-bold text-gray-900">Stripe Checkout</h4>
-                        <p class="text-gray-600 mt-1">تفعيل الدفع الإلكتروني الآمن للعميل</p>
+                        <p class="text-gray-600 mt-1">
+                          {{ $t('invoices.create.stripe_description') }}
+                        </p>
                       </div>
                       <label class="relative inline-flex items-center cursor-pointer">
                         <input
@@ -820,9 +801,11 @@
                           </svg>
                         </div>
                         <div class="flex-1">
-                          <h5 class="font-bold text-gray-900 text-lg">Stripe Checkout مفعل</h5>
+                          <h5 class="font-bold text-gray-900 text-lg">
+                            {{ $t('invoices.create.stripe_enabled') }}
+                          </h5>
                           <p class="text-gray-700 mt-2">
-                            سيتم إنشاء رابط دفع آمن يمكن مشاركته مع العميل.
+                            {{ $t('invoices.create.stripe_enabled_desc') }}
                           </p>
                         </div>
                       </div>
@@ -844,13 +827,13 @@
                         d="M10 19l-7-7m0 0l7-7m-7 7h18"
                       />
                     </svg>
-                    السابق
+                    {{ $t('common.previous') }}
                   </button>
                   <button
                     @click="nextStep"
                     class="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2"
                   >
-                    التالي: المراجعة
+                    {{ $t('common.next') }}: {{ $t('invoices.create.review') }}
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
                         stroke-linecap="round"
@@ -888,18 +871,22 @@
                       />
                     </svg>
                   </div>
-                  <h3 class="text-lg font-semibold text-gray-800">مراجعة الفاتورة</h3>
+                  <h3 class="text-lg font-semibold text-gray-800">
+                    {{ $t('invoices.create.review') }}
+                  </h3>
                 </div>
               </div>
 
               <div class="p-6">
-                <!-- Invoice Preview -->
+                <!-- invoices Preview -->
                 <div
                   class="bg-gradient-to-br from-gray-50 to-gray-100 border-2 border-gray-200 rounded-2xl p-6"
                 >
                   <div class="flex flex-col md:flex-row justify-between items-start gap-6 mb-8">
                     <div>
-                      <h2 class="text-2xl font-bold text-gray-900">فاتورة</h2>
+                      <h2 class="text-2xl font-bold text-gray-900">
+                        {{ $t('invoices.create.invoice') }}
+                      </h2>
                       <div class="flex items-center gap-2 mt-2">
                         <span
                           :class="getStatusBadgeClass(invoiceData.status)"
@@ -909,10 +896,10 @@
                             :class="getStatusDotClass(invoiceData.status)"
                             class="w-2 h-2 rounded-full"
                           ></span>
-                          {{ getStatusText(invoiceData.status) }}
+                          {{ $t(`invoice.status.${invoiceData.status}`) }}
                         </span>
                         <span class="text-sm text-gray-500">
-                          #{{ invoiceData.invoice_number || 'سيتم توليده' }}
+                          #{{ invoiceData.invoice_number || $t('common.auto_generated') }}
                         </span>
                       </div>
                     </div>
@@ -920,14 +907,18 @@
                       <div class="text-3xl font-bold text-blue-600">
                         {{ formatCurrency(invoiceData.total || 0) }}
                       </div>
-                      <div class="text-sm text-gray-500 mt-1">المبلغ الإجمالي</div>
+                      <div class="text-sm text-gray-500 mt-1">
+                        {{ $t('invoices.create.total') }}
+                      </div>
                     </div>
                   </div>
 
                   <!-- Summary Details -->
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <h4 class="font-semibold text-gray-700 mb-3">معلومات العميل</h4>
+                      <h4 class="font-semibold text-gray-700 mb-3">
+                        {{ $t('invoices.create.client_info') }}
+                      </h4>
                       <div class="space-y-2">
                         <div
                           v-if="selectedClient"
@@ -945,7 +936,7 @@
                               <div class="font-medium text-gray-900">{{ selectedClient.name }}</div>
                               <div class="text-sm text-gray-600">{{ selectedClient.email }}</div>
                               <div class="text-sm text-gray-600">
-                                {{ selectedClient.phone || 'لا يوجد هاتف' }}
+                                {{ selectedClient.phone || $t('common.no_phone') }}
                               </div>
                             </div>
                           </div>
@@ -954,12 +945,14 @@
                     </div>
 
                     <div>
-                      <h4 class="font-semibold text-gray-700 mb-3">تفاصيل الفاتورة</h4>
+                      <h4 class="font-semibold text-gray-700 mb-3">
+                        {{ $t('invoices.create.invoice_details') }}
+                      </h4>
                       <div class="space-y-3">
                         <div
                           class="flex justify-between items-center p-3 bg-white rounded-xl border border-gray-200"
                         >
-                          <span class="text-gray-600">تاريخ الإصدار:</span>
+                          <span class="text-gray-600">{{ $t('invoices.create.issue_date') }}:</span>
                           <span class="font-medium">{{
                             formatDate(invoiceData.invoice_date)
                           }}</span>
@@ -967,17 +960,48 @@
                         <div
                           class="flex justify-between items-center p-3 bg-white rounded-xl border border-gray-200"
                         >
-                          <span class="text-gray-600">تاريخ الاستحقاق:</span>
+                          <span class="text-gray-600">{{ $t('invoices.create.due_date') }}:</span>
                           <span class="font-medium">{{ formatDate(invoiceData.due_date) }}</span>
                         </div>
                         <div
                           v-if="invoiceData.payment_date"
                           class="flex justify-between items-center p-3 bg-white rounded-xl border border-gray-200"
                         >
-                          <span class="text-gray-600">تاريخ الدفع:</span>
+                          <span class="text-gray-600"
+                            >{{ $t('invoices.create.payment_date') }}:</span
+                          >
                           <span class="font-medium text-green-600">{{
                             formatDate(invoiceData.payment_date)
                           }}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Date Filter -->
+                    <div class="space-y-2">
+                      <label class="block text-sm font-semibold text-gray-700">
+                        {{ $t('common.date_from') }}
+                      </label>
+                      <div class="relative">
+                        <input
+                          type="date"
+                          v-model="filters.date_from"
+                          class="w-full px-4 py-3 bg-white/80 border border-gray-300/50 rounded-xl focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-200"
+                        />
+                        <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
+                          <svg
+                            class="w-5 h-5 text-gray-400"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                            />
+                          </svg>
                         </div>
                       </div>
                     </div>
@@ -989,7 +1013,7 @@
                       <div
                         class="flex justify-between items-center p-4 bg-white rounded-xl border border-gray-200"
                       >
-                        <span class="text-gray-600">الإجمالي الفرعي:</span>
+                        <span class="text-gray-600">{{ $t('invoices.create.subtotal') }}:</span>
                         <span class="font-medium">{{
                           formatCurrency(invoiceData.subtotal || 0)
                         }}</span>
@@ -997,7 +1021,9 @@
                       <div
                         class="flex justify-between items-center p-4 bg-white rounded-xl border border-gray-200"
                       >
-                        <span class="text-gray-600">الضريبة ({{ invoiceData.tax_rate }}%):</span>
+                        <span class="text-gray-600"
+                          >{{ $t('invoices.create.tax') }} ({{ invoiceData.tax_rate }}%):</span
+                        >
                         <span class="font-medium">{{
                           formatCurrency(invoiceData.tax_amount || 0)
                         }}</span>
@@ -1005,7 +1031,7 @@
                       <div
                         class="flex justify-between items-center p-4 bg-white rounded-xl border border-gray-200"
                       >
-                        <span class="text-gray-600">الإجمالي النهائي:</span>
+                        <span class="text-gray-600">{{ $t('invoices.create.total') }}:</span>
                         <span class="text-xl font-bold text-blue-600">{{
                           formatCurrency(invoiceData.total || 0)
                         }}</span>
@@ -1030,7 +1056,7 @@
                         d="M10 19l-7-7m0 0l7-7m-7 7h18"
                       />
                     </svg>
-                    السابق
+                    {{ $t('common.previous') }}
                   </button>
                   <div class="flex flex-col sm:flex-row gap-3">
                     <button
@@ -1046,7 +1072,7 @@
                           d="M5 13l4 4L19 7"
                         />
                       </svg>
-                      حفظ كمسودة
+                      {{ $t('common.save_draft') }}
                     </button>
                     <button
                       @click="submitInvoice"
@@ -1090,7 +1116,7 @@
                   />
                 </svg>
               </div>
-              <h3 class="font-bold text-gray-900">ملخص الفاتورة</h3>
+              <h3 class="font-bold text-gray-900">{{ $t('invoice.create.summary') }}</h3>
             </div>
 
             <div class="space-y-4">
@@ -1103,27 +1129,29 @@
                     :class="getStatusDotClass(invoiceData.status)"
                     class="w-2 h-2 rounded-full"
                   ></span>
-                  {{ getStatusText(invoiceData.status) }}
+                  {{ $t(`invoices.status.${invoiceData.status}`) }}
                 </span>
               </div>
 
               <div class="space-y-3">
                 <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                  <span class="text-gray-600">عدد العناصر:</span>
+                  <span class="text-gray-600">{{ $t('invoices.create.items_count') }}:</span>
                   <span class="font-medium">{{ invoiceData.items.length }}</span>
                 </div>
                 <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                  <span class="text-gray-600">الإجمالي الفرعي:</span>
+                  <span class="text-gray-600">{{ $t('invoices.create.subtotal') }}:</span>
                   <span class="font-medium">{{ formatCurrency(invoiceData.subtotal || 0) }}</span>
                 </div>
                 <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                  <span class="text-gray-600">الضريبة:</span>
+                  <span class="text-gray-600">{{ $t('invoices.create.tax') }}:</span>
                   <span class="font-medium">{{ formatCurrency(invoiceData.tax_amount || 0) }}</span>
                 </div>
                 <div
                   class="flex justify-between items-center p-4 bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-xl"
                 >
-                  <span class="font-semibold text-gray-900">الإجمالي النهائي:</span>
+                  <span class="font-semibold text-gray-900"
+                    >{{ $t('invoices.create.total') }}:</span
+                  >
                   <span class="text-xl font-bold text-blue-600">{{
                     formatCurrency(invoiceData.total || 0)
                   }}</span>
@@ -1132,11 +1160,13 @@
 
               <div class="grid grid-cols-2 gap-3 mt-6">
                 <div class="text-center p-3 bg-blue-50 rounded-xl border border-blue-100">
-                  <div class="text-sm text-gray-600">أيام الاستحقاق</div>
+                  <div class="text-sm text-gray-600">
+                    {{ $t('invoices.create.days_until_due') }}
+                  </div>
                   <div class="text-lg font-bold text-blue-700">{{ daysUntilDue }}</div>
                 </div>
                 <div class="text-center p-3 bg-green-50 rounded-xl border border-green-100">
-                  <div class="text-sm text-gray-600">متوسط السعر</div>
+                  <div class="text-sm text-gray-600">{{ $t('invoices.create.average_price') }}</div>
                   <div class="text-lg font-bold text-green-700">
                     {{ formatCurrency(averagePrice) }}
                   </div>
@@ -1163,25 +1193,21 @@
                   />
                 </svg>
               </div>
-              <h3 class="font-bold text-gray-900">مساعدة سريعة</h3>
+              <h3 class="font-bold text-gray-900">{{ $t('invoices.create.help_title') }}</h3>
             </div>
 
             <div class="space-y-3">
               <div class="flex items-start gap-2">
                 <div class="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                <p class="text-sm text-gray-600">
-                  استخدم Stripe Checkout لتلقي المدفوعات أونلاين بسهولة.
-                </p>
+                <p class="text-sm text-gray-600">{{ $t('invoices.create.help_stripe') }}</p>
               </div>
               <div class="flex items-start gap-2">
                 <div class="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
-                <p class="text-sm text-gray-600">انقر على العناصر السريعة لإضافة بنود شائعة.</p>
+                <p class="text-sm text-gray-600">{{ $t('invoices.create.help_quick') }}</p>
               </div>
               <div class="flex items-start gap-2">
                 <div class="w-2 h-2 bg-yellow-500 rounded-full mt-2 flex-shrink-0"></div>
-                <p class="text-sm text-gray-600">
-                  تأكد من اختيار العميل وتاريخ الاستحقاق قبل المتابعة.
-                </p>
+                <p class="text-sm text-gray-600">{{ $t('invoices.create.help_client') }}</p>
               </div>
             </div>
           </div>
@@ -1201,10 +1227,10 @@ export default {
     return {
       currentStep: 0,
       steps: [
-        { label: 'المعلومات الأساسية' },
-        { label: 'عناصر الفاتورة' },
-        { label: 'إعدادات الدفع' },
-        { label: 'المراجعة النهائية' },
+        { labelKey: 'steps.basic' },
+        { labelKey: 'steps.items' },
+        { labelKey: 'steps.payment' },
+        { labelKey: 'steps.review' },
       ],
       invoiceData: {
         client_id: '',
@@ -1233,71 +1259,61 @@ export default {
       },
       errors: {},
       quickItems: [
-        { id: 1, description: 'تصميم موقع', unit_price: 500 },
-        { id: 2, description: 'استضافة سنوية', unit_price: 300 },
-        { id: 3, description: 'صيانة شهرية', unit_price: 200 },
-        { id: 4, description: 'استشارة تقنية', unit_price: 150 },
-        { id: 5, description: 'تدريب', unit_price: 400 },
+        { id: 1, description: this.$t('quick_items.web_design'), unit_price: 500 },
+        { id: 2, description: this.$t('quick_items.hosting'), unit_price: 300 },
+        { id: 3, description: this.$t('quick_items.maintenance'), unit_price: 200 },
+        { id: 4, description: this.$t('quick_items.consulting'), unit_price: 150 },
+        { id: 5, description: this.$t('quick_items.training'), unit_price: 400 },
       ],
       statusOptions: [
         {
           value: 'draft',
-          label: 'مسودة',
-          description: 'فاتورة تحت الإنشاء',
           icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
           iconBg: 'bg-gray-100',
+          descriptionKey: 'invoice.status.draft_desc',
         },
         {
           value: 'sent',
-          label: 'مرسلة',
-          description: 'أرسلت للعميل',
           icon: 'M3 8l7.89-4.26a2 2 0 012.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z',
           iconBg: 'bg-blue-100',
+          descriptionKey: 'invoice.status.sent_desc',
         },
         {
           value: 'paid',
-          label: 'مدفوعة',
-          description: 'تم السداد',
           icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
           iconBg: 'bg-green-100',
+          descriptionKey: 'invoice.status.paid_desc',
         },
         {
           value: 'overdue',
-          label: 'متأخرة',
-          description: 'تجاوزت الموعد',
           icon: 'M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
           iconBg: 'bg-red-100',
+          descriptionKey: 'invoice.status.overdue_desc',
         },
       ],
       paymentMethods: [
         {
           value: 'cash',
-          label: 'نقدي',
           icon: 'M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z',
         },
         {
           value: 'bank_transfer',
-          label: 'تحويل بنكي',
           icon: 'M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z',
         },
         {
           value: 'check',
-          label: 'شيك',
           icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
         },
         {
           value: 'credit_card',
-          label: 'بطاقة ائتمان',
           icon: 'M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z',
         },
         {
           value: 'paypal',
-          label: 'PayPal',
           icon: 'M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z',
         },
         {
           value: 'other',
-          label: 'أخرى',
           icon: 'M8 12h.01M12 12h.01M16 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
         },
       ],
@@ -1464,14 +1480,14 @@ export default {
     },
 
     formatCurrency(amount) {
-      if (!amount && amount !== 0) return '0.00 ر.س'
-      return parseFloat(amount).toFixed(2) + ' ر.س'
+      if (!amount && amount !== 0) return '0.00 ' + this.$t('currency.sar')
+      return parseFloat(amount).toFixed(2) + ' ' + this.$t('currency.sar')
     },
 
     formatDate(dateString) {
-      if (!dateString) return 'غير محدد'
+      if (!dateString) return this.$t('common.not_specified')
       const date = new Date(dateString)
-      return date.toLocaleDateString('ar-SA', {
+      return date.toLocaleDateString(this.$i18n.locale, {
         year: 'numeric',
         month: 'long',
         day: 'numeric',
@@ -1499,38 +1515,37 @@ export default {
     },
 
     getStatusText(status) {
-      const map = { draft: 'مسودة', sent: 'مرسلة', paid: 'مدفوعة', overdue: 'متأخرة' }
-      return map[status] || status
+      return this.$t(`invoice.status.${status}`)
     },
 
     getSubmitButtonText() {
-      if (this.invoiceData.status === 'paid') return 'إنشاء وتعيين كمدفوعة'
-      if (this.invoiceData.status === 'sent') return 'إنشاء وإرسال'
-      if (this.invoiceData.enable_stripe_checkout) return 'إنشاء وتفعيل Stripe'
-      return 'إنشاء الفاتورة'
+      if (this.invoiceData.status === 'paid') return this.$t('common.create_and_mark_paid')
+      if (this.invoiceData.status === 'sent') return this.$t('common.create_and_send')
+      if (this.invoiceData.enable_stripe_checkout) return this.$t('common.create_and_enable_stripe')
+      return this.$t('common.create_invoice')
     },
 
     async submitInvoice() {
       this.errors = {}
 
       if (!this.invoiceData.client_id) {
-        this.errors.client_id = 'الرجاء اختيار عميل'
+        this.errors.client_id = this.$t('validation.client_required')
       }
 
       if (!this.invoiceData.invoice_date) {
-        this.errors.invoice_date = 'الرجاء اختيار تاريخ الإصدار'
+        this.errors.invoice_date = this.$t('validation.date_required')
       }
 
       if (!this.invoiceData.due_date) {
-        this.errors.due_date = 'الرجاء اختيار تاريخ الاستحقاق'
+        this.errors.due_date = this.$t('validation.date_required')
       }
 
       if (!this.invoiceData.status) {
-        this.errors.status = 'الرجاء اختيار حالة الفاتورة'
+        this.errors.status = this.$t('validation.status_required')
       }
 
       if (this.invoiceData.status === 'paid' && !this.invoiceData.payment_method) {
-        this.errors.payment_method = 'الرجاء اختيار طريقة الدفع'
+        this.errors.payment_method = this.$t('validation.payment_method_required')
       }
 
       if (Object.keys(this.errors).length > 0) {
@@ -1564,11 +1579,11 @@ export default {
 
         await this.createInvoice(data)
 
-        let successMessage = 'تم إنشاء الفاتورة بنجاح'
+        let successMessage = this.$t('invoice.messages.created')
         if (this.invoiceData.status === 'paid') {
-          successMessage = 'تم إنشاء الفاتورة وتعيينها كمدفوعة'
+          successMessage = this.$t('invoice.messages.created_paid')
         } else if (this.invoiceData.enable_stripe_checkout) {
-          successMessage = 'تم إنشاء الفاتورة وتفعيل Stripe Checkout'
+          successMessage = this.$t('invoice.messages.created_stripe')
         }
 
         this.$toast.success(successMessage)
@@ -1578,7 +1593,7 @@ export default {
         if (error.response?.data?.errors) {
           this.errors = error.response.data.errors
         } else {
-          this.$toast.error(error.response?.data?.message || 'حدث خطأ في إنشاء الفاتورة')
+          this.$toast.error(error.response?.data?.message || this.$t('invoice.messages.error'))
         }
       }
     },
@@ -1605,83 +1620,4 @@ export default {
 }
 </script>
 
-<style scoped>
-.fade-enter-active,
-.fade-leave-active {
-  transition:
-    opacity 0.3s,
-    transform 0.3s;
-}
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-  transform: translateY(10px);
-}
-
-/* تحسينات الجدول */
-table {
-  border-collapse: separate;
-  border-spacing: 0;
-}
-
-th {
-  font-weight: 600;
-  letter-spacing: 0.025em;
-}
-
-td {
-  border-bottom: 1px solid #f3f4f6;
-}
-
-tr:last-child td {
-  border-bottom: none;
-}
-
-/* تحسينات الأيقونات */
-svg {
-  display: inline-block;
-  vertical-align: middle;
-}
-
-/* تأثيرات hover محسنة */
-tr:hover {
-  background-color: rgba(59, 130, 246, 0.05);
-}
-
-/* تحسينات الأزرار */
-button:not(:disabled):hover {
-  transform: translateY(-1px);
-}
-
-/* تخصيص شريط التمرير */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #a1a1a1;
-}
-
-/* تحسينات للجوّال */
-@media (max-width: 768px) {
-  .table-responsive {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  table {
-    min-width: 768px;
-  }
-}
-</style>
+<style scoped></style>

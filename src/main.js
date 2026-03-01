@@ -140,6 +140,11 @@ app.component('LoadingSpinner', LoadingSpinner)
 app.component('PageHeader', PageHeader)
 app.component('StatusBadge', StatusBadge)
 
+import VueSweetalert2 from 'vue-sweetalert2'
+import 'sweetalert2/dist/sweetalert2.min.css'
+
+app.use(VueSweetalert2);
+
 // Vuex + Router + i18n
 app.use(store)
 app.use(router)

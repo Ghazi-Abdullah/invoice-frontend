@@ -13,6 +13,8 @@ import invoiceManagement from './modules/invoiceManagement'
 import assignPermissions from './modules/assignPermissions'
 import payments from './modules/payments'
 import groups from './modules/adminGroups'
+import profile from './modules/profile'
+import activity from './modules/activity'
 
 export default createStore({
   state: {
@@ -67,6 +69,8 @@ export default createStore({
     assignPermissions: assignPermissions,
     payments: payments,
     groups: groups,
+    profile: profile,
+    activity: activity
 
 
   }

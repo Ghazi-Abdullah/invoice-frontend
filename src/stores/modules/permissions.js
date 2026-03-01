@@ -14,6 +14,9 @@ export default {
     loading: false,
     error: null,
 
+    // ✅ خاصية لتتبع ما إذا تم تحميل الصلاحيات مرة واحدة
+    loaded: false,
+
     // التصفية والترتيب
     filters: {
       search: '',
@@ -49,32 +52,22 @@ export default {
   }),
 
   getters: {
-    // بيانات أساسية
     permissions: (state) => Array.isArray(state.permissions) ? state.permissions : [],
     menus: (state) => state.menus,
     parentPermissions: (state) => state.parentPermissions,
     currentPermission: (state) => state.currentPermission,
-
-    // حالة النظام
     isLoading: (state) => state.loading,
     error: (state) => state.error,
-
-    // تصفية وترتيب
     filters: (state) => state.filters,
     pagination: (state) => state.pagination,
-
-    // نموذج
     form: (state) => state.form,
-
-    // بحث عن صلاحية معينة
     permissionById: (state) => (id) => {
       if (!Array.isArray(state.permissions)) return null
-      return state.permissions.find(permission => Number(permission.id) === Number(id))
+      return state.permissions.find(p => Number(p.id) === Number(id))
     }
   },
 
   mutations: {
-    // تحميل البيانات
     SET_LOADING(state, loading) {
       state.loading = loading
     },
@@ -87,12 +80,15 @@ export default {
       state.error = null
     },
 
-    // البيانات الرئيسية
+    // ✅ تعيين حالة التحميل
+    SET_LOADED(state, loaded) {
+      state.loaded = loaded
+    },
+
     SET_PERMISSIONS(state, response) {
       console.log('📊 SET_PERMISSIONS mutation:', response)
 
       if (response && response.data) {
-        // إذا كان الرد يحتوي على pagination
         if (response.data.data) {
           state.permissions = response.data.data || []
           state.pagination = {
@@ -111,6 +107,9 @@ export default {
         state.permissions = []
         state.pagination = {}
       }
+
+      // ✅ بعد تحميل البيانات، نضع loaded = true
+      state.loaded = true
     },
 
     SET_MENUS(state, response) {
@@ -133,7 +132,6 @@ export default {
       state.currentPermission = permission
     },
 
-    // التصفية والترتيب
     SET_FILTERS(state, filters) {
       state.filters = { ...state.filters, ...filters }
     },
@@ -149,7 +147,6 @@ export default {
       }
     },
 
-    // إدارة الصلاحيات
     ADD_PERMISSION(state, permission) {
       if (!Array.isArray(state.permissions)) {
         state.permissions = []
@@ -172,7 +169,6 @@ export default {
       }
     },
 
-    // إدارة النموذج
     SET_FORM_DATA(state, formData) {
       state.form = { ...state.form, ...formData }
     },
@@ -191,7 +187,6 @@ export default {
       }
     },
 
-    // تحميل بيانات النموذج من صلاحية موجودة
     LOAD_FORM_FROM_PERMISSION(state, permission) {
       state.form = {
         id: permission.id,
@@ -208,8 +203,14 @@ export default {
   },
 
   actions: {
-    // جلب الصلاحيات - التصحيح: استخدم اسم واحد فقط
+    // جلب الصلاحيات مع منع التكرار باستخدام loaded
     async fetchPermissions({ commit, state }, params = {}) {
+      // ✅ إذا كانت الصلاحيات محملة مسبقاً وليس هناك طلب force، نتخطى التحميل
+      if (state.loaded && !params.force) {
+        console.log('⏭️ Permissions already loaded, skipping fetch')
+        return
+      }
+
       commit('SET_LOADING', true)
       commit('CLEAR_ERROR')
 
@@ -236,12 +237,8 @@ export default {
       }
     },
 
-    // إضافة اسم بديل لـ fetchPermissions لتجنب الخطأ
-    async getPermissions(context, params) {
-      return context.dispatch('fetchPermissions', params)
-    },
+    // ❌ تم إزالة action getPermissions لأنه مكرر وغير ضروري
 
-    // بقية الإجراءات
     async fetchPermission({ commit }, id) {
       try {
         const response = await axios.get(`/admin/permissions/${id}`)
@@ -258,7 +255,8 @@ export default {
         const response = await axios.post('/admin/permissions', permissionData)
         const permission = response.data.data || response.data
         commit('ADD_PERMISSION', permission)
-        await dispatch('fetchPermissions')
+        // ✅ بعد الإضافة، نطلب تحميل جديد مع force=true
+        await dispatch('fetchPermissions', { force: true })
         return permission
       } catch (error) {
         throw new Error(error.response?.data?.message || 'فشل في إنشاء الصلاحية')
@@ -270,7 +268,7 @@ export default {
         const response = await axios.put(`/admin/permissions/${id}`, data)
         const permission = response.data.data || response.data
         commit('UPDATE_PERMISSION', permission)
-        await dispatch('fetchPermissions')
+        await dispatch('fetchPermissions', { force: true })
         return permission
       } catch (error) {
         throw new Error(error.response?.data?.message || 'فشل في تحديث الصلاحية')
@@ -281,7 +279,7 @@ export default {
       try {
         await axios.delete(`/admin/permissions/${id}`)
         commit('DELETE_PERMISSION', id)
-        await dispatch('fetchPermissions')
+        await dispatch('fetchPermissions', { force: true })
         return true
       } catch (error) {
         throw new Error(error.response?.data?.message || 'فشل في حذف الصلاحية')
@@ -308,7 +306,6 @@ export default {
       }
     },
 
-    // إجراءات محلية
     updateFilters({ commit }, filters) {
       commit('SET_FILTERS', filters)
     },

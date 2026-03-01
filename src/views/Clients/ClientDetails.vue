@@ -173,7 +173,7 @@
               <div class="info-section">
                 <h3 class="section-title">
                   <font-awesome-icon :icon="['fas', 'chart-bar']" class="ml-2 text-green-500" />
-                  {{ $t('clients.stats') }}
+                  {{ $t('clients.clientstats') }}
                 </h3>
                 <div class="space-y-2">
                   <div class="stat-item">

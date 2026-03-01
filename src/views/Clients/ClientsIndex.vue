@@ -863,21 +863,48 @@ export default {
       this.loadClients()
     },
 
-    async confirmDelete(client) {
-      if (confirm(this.$t('clients.deleteConfirm', { name: client.name }))) {
-        await this.deleteClientHandler(client.id)
+
+
+     // ✅ method جديد للحذف (موجود سابقاً)
+    async handleDelete(id) {
+      try {
+        await this.deleteClient(id)
+        this.$swal?.fire({
+          icon: 'success',
+          title: this.$t('permissions.messages.delete_success'),
+          showConfirmButton: false,
+          timer: 1500,
+        })
+      } catch (error) {
+        console.error('Error deleting permission:', error)
+        this.$swal?.fire({
+          icon: 'error',
+          title: this.$t('errors.failed_to_delete_permission'),
+          text: error.message,
+        })
       }
     },
 
-    async deleteClientHandler(id) {
-      try {
-        await this.deleteClient(id)
-        this.$toast.success(this.$t('messages.deleteSuccess'))
-        this.loadClients()
-      } catch (error) {
-        this.$toast.error(error.message || this.$t('errors.deleteFailed'))
+    async confirmDelete(permission) {
+      const result = await this.$swal?.fire({
+        title: this.$t('permissions.delete_confirm_title'),
+        text: this.$t('permissions.delete_confirm', {
+          name: permission.description_ar || permission.title,
+        }),
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#EF4444',
+        cancelButtonColor: '#6B7280',
+        confirmButtonText: this.$t('common.delete'),
+        cancelButtonText: this.$t('common.cancel'),
+        reverseButtons: true,
+      })
+
+      if (result?.isConfirmed) {
+        await this.handleDelete(permission.id)
       }
     },
+
 
     goToPage(page) {
       if (page === '...' || page === this.pagination.current_page) return

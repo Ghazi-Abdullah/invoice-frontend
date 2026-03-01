@@ -45,6 +45,34 @@
 
         <!-- Navigation -->
         <nav class="space-y-1 flex-1">
+          <!-- Profile -->
+          <div v-if="user">
+            <router-link
+              to="/profile"
+              class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700/50 transition group"
+              :class="{
+                'bg-gradient-to-r from-green-600/20 to-green-600/10 border-r-2 border-green-500':
+                  $route.path === '/profile',
+              }"
+            >
+              <i
+                class="fas fa-user w-5 text-center text-gray-300 group-hover:text-green-400 transition"
+              ></i>
+              <span v-if="sidebarOpen" class="text-gray-300 group-hover:text-green-400 transition">
+                {{ $t('nav.profile') }}
+              </span>
+            </router-link>
+          </div>
+
+          <!-- Admin Section -->
+          <div v-if="isAdmin && sidebarOpen" class="pt-4 mt-4 border-t border-gray-700">
+            <div class="px-3 mb-2">
+              <!-- <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">
+                {{ $t('admin.title') }}
+              </p>-->
+            </div>
+          </div>
+
           <!-- Dashboard -->
           <router-link
             v-if="hasPermission('dashboard')"
@@ -122,9 +150,9 @@
           <!-- Admin Section -->
           <div v-if="isAdmin && sidebarOpen" class="pt-4 mt-4 border-t border-gray-700">
             <div class="px-3 mb-2">
-              <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">
+              <!-- <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">
                 {{ $t('admin.title') }}
-              </p>
+              </p>-->
             </div>
 
             <router-link
@@ -195,6 +223,45 @@
                 {{ $t('nav.assign_permissions') }}
               </span>
             </router-link>
+
+            <div v-if="isAdmin && sidebarOpen" class="pt-4 mt-4 border-t border-gray-700">
+              <div class="px-3 mb-2">
+                <!-- <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">
+                {{ $t('admin.title') }}
+              </p>-->
+              </div>
+            </div>
+
+            <!-- Activity log -->
+            <div v-if="hasPermission('administration')">
+              <router-link
+                to="/activitylog"
+                class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700/50 transition group"
+                :class="{
+                  'bg-gradient-to-r from-orange-600/20 to-orange-600/10 border-r-2 border-orange-500':
+                    $route.path === '/activitylog',
+                }"
+              >
+                <i
+                  class="fas fa-user w-5 text-center text-gray-300 group-hover:text-orange-400 transition"
+                ></i>
+                <span
+                  v-if="sidebarOpen"
+                  class="text-gray-300 group-hover:text-orange-400 transition"
+                >
+                  {{ $t('nav.activitylog') }}
+                </span>
+              </router-link>
+            </div>
+
+            <!-- Admin Section -->
+            <div v-if="isAdmin && sidebarOpen" class="pt-4 mt-4 border-t border-gray-700">
+              <div class="px-3 mb-2">
+                <!-- <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">
+                {{ $t('admin.title') }}
+              </p>-->
+              </div>
+            </div>
           </div>
         </nav>
 

@@ -36,7 +36,6 @@
               </div>
             </div>
           </div>
-
           <div class="flex gap-3">
             <button
               @click="openCreateModal"
@@ -63,10 +62,14 @@
 
       <!-- Stats Cards -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-        <!-- Total Permissions -->
         <div class="stats-card bg-gradient-to-br from-blue-50 to-blue-100">
           <div class="stats-icon bg-blue-100">
-            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              class="w-6 h-6 text-blue-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -80,11 +83,14 @@
             <p class="stats-value">{{ permissions.length }}</p>
           </div>
         </div>
-
-        <!-- Parent Permissions -->
         <div class="stats-card bg-gradient-to-br from-green-50 to-green-100">
           <div class="stats-icon bg-green-100">
-            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              class="w-6 h-6 text-green-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -98,11 +104,14 @@
             <p class="stats-value">{{ parentPermissionsCount }}</p>
           </div>
         </div>
-
-        <!-- Child Permissions -->
         <div class="stats-card bg-gradient-to-br from-purple-50 to-purple-100">
           <div class="stats-icon bg-purple-100">
-            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              class="w-6 h-6 text-purple-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -146,7 +155,6 @@
               <p class="text-sm text-gray-500">{{ $t('permissions.search_subtitle') }}</p>
             </div>
           </div>
-
           <div class="flex-1 max-w-lg">
             <div class="relative">
               <input
@@ -256,7 +264,6 @@
         <div
           class="bg-white/80 backdrop-blur-sm rounded-2xl border border-white/50 shadow-xl shadow-blue-100/20 overflow-hidden"
         >
-          <!-- Table Header -->
           <div
             class="px-6 py-5 border-b border-gray-200/50 bg-gradient-to-r from-blue-50/50 to-white"
           >
@@ -269,12 +276,13 @@
                   <p class="text-sm text-gray-600 mt-1">{{ $t('permissions.list_subtitle') }}</p>
                 </div>
               </div>
-              <!--<div
+              <!-- عرض عدد الصلاحيات -->
+              <div
                 class="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg shadow-sm"
               >
                 <span class="font-bold">{{ filteredPermissions.length }}</span>
                 <span class="text-blue-100 mr-1">{{ $t('common.total') }}</span>
-              </div>-->
+              </div>
             </div>
           </div>
 
@@ -337,10 +345,9 @@
                 <tbody class="divide-y divide-gray-200/30">
                   <tr
                     v-for="permission in filteredPermissions"
-                    :key="permission.id"
+                    :key="'perm-' + permission.id"
                     class="hover:bg-blue-50/30 transition-colors"
                   >
-                    <!-- Permission Name -->
                     <td class="table-cell">
                       <div class="flex items-center">
                         <div class="flex-shrink-0 ml-4">
@@ -363,7 +370,9 @@
                           </div>
                         </div>
                         <div class="mr-4">
-                          <div class="text-base font-bold text-gray-900">{{ permission.title }}</div>
+                          <div class="text-base font-bold text-gray-900">
+                            {{ permission.title }}
+                          </div>
                           <div class="flex items-center gap-2 mt-1">
                             <span class="text-xs text-gray-500">ID: {{ permission.id }}</span>
                           </div>
@@ -371,7 +380,6 @@
                       </div>
                     </td>
 
-                    <!-- Arabic Description -->
                     <td class="table-cell">
                       <div class="flex flex-col">
                         <span class="text-sm text-gray-900 font-medium">
@@ -380,7 +388,6 @@
                       </div>
                     </td>
 
-                    <!-- English Description -->
                     <td class="table-cell">
                       <div class="flex flex-col">
                         <span class="text-sm text-gray-900 font-medium">
@@ -389,7 +396,6 @@
                       </div>
                     </td>
 
-                    <!-- Type -->
                     <td class="table-cell text-center">
                       <span
                         :class="[
@@ -406,14 +412,11 @@
                           ]"
                         ></span>
                         {{
-                          permission.is_parent
-                            ? $t('permissions.parent')
-                            : $t('permissions.child')
+                          permission.is_parent ? $t('permissions.parent') : $t('permissions.child')
                         }}
                       </span>
                     </td>
 
-                    <!-- Actions -->
                     <td class="table-cell text-center">
                       <div class="flex items-center justify-center gap-2">
                         <button
@@ -465,227 +468,44 @@
       </div>
     </div>
 
-    <!-- Create/Edit Permission Modal (لم يتغير) -->
-    <transition name="modal-fade">
-      <div
-        v-if="showModal"
-        class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
-        @click.self="closeModal"
-      >
-        <div
-          class="bg-gradient-to-br from-white to-gray-50/50 rounded-3xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto border border-white/50"
-        >
-          <!-- Modal Header -->
-          <div class="px-8 py-6 border-b border-gray-200/50 bg-gradient-to-r from-blue-50 to-white">
-            <div class="flex justify-between items-center">
-              <div class="flex items-center gap-3">
-                <div class="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-md">
-                  <svg
-                    class="w-6 h-6 text-white"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                    />
-                  </svg>
-                </div>
-                <div>
-                  <h3 class="text-xl font-bold text-gray-900">
-                    {{
-                      editingPermission
-                        ? $t('permissions.edit_permission')
-                        : $t('permissions.add_permission')
-                    }}
-                  </h3>
-                  <p class="text-sm text-gray-600 mt-1">
-                    {{
-                      editingPermission
-                        ? $t('permissions.edit_subtitle')
-                        : $t('permissions.create_subtitle')
-                    }}
-                  </p>
-                </div>
-              </div>
-              <button
-                @click="closeModal"
-                class="p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-xl transition-colors"
-              >
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
-            </div>
-          </div>
-
-          <!-- Modal Body (نفس الكود الأصلي) -->
-          <form
-            @submit.prevent="editingPermission ? updatePermission() : createPermission()"
-            class="p-8"
-          >
-            <div class="space-y-6">
-              <div class="space-y-4">
-                <div class="space-y-2">
-                  <label class="block text-sm font-semibold text-gray-700">
-                    {{ $t('permissions.permission_name') }}
-                    <span class="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    v-model="permissionForm.title"
-                    required
-                    class="w-full px-4 py-3.5 bg-white/80 border border-gray-300/50 rounded-xl focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-200 placeholder:text-gray-400"
-                    :placeholder="$t('permissions.name_placeholder')"
-                  />
-                </div>
-
-                <div class="space-y-2">
-                  <label class="block text-sm font-semibold text-gray-700">
-                    {{ $t('permissions.description_ar') }}
-                    <span class="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    v-model="permissionForm.description_ar"
-                    required
-                    class="w-full px-4 py-3.5 bg-white/80 border border-gray-300/50 rounded-xl focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-200 placeholder:text-gray-400"
-                    :placeholder="$t('permissions.description_ar_placeholder')"
-                  />
-                </div>
-
-                <div class="space-y-2">
-                  <label class="block text-sm font-semibold text-gray-700">
-                    {{ $t('permissions.description_en') }}
-                    <span class="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    v-model="permissionForm.description_en"
-                    required
-                    class="w-full px-4 py-3.5 bg-white/80 border border-gray-300/50 rounded-xl focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-200 placeholder:text-gray-400"
-                    :placeholder="$t('permissions.description_en_placeholder')"
-                  />
-                </div>
-
-                <div class="space-y-2">
-                  <label class="block text-sm font-semibold text-gray-700">
-                    {{ $t('permissions.type') }}
-                  </label>
-                  <div
-                    class="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-gray-100/30 rounded-xl border border-gray-200/50"
-                  >
-                    <span class="text-gray-700 font-medium">
-                      {{
-                        permissionForm.is_parent
-                          ? $t('permissions.parent')
-                          : $t('permissions.child')
-                      }}
-                    </span>
-                    <label class="inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        v-model="permissionForm.is_parent"
-                        class="sr-only peer"
-                      />
-                      <div
-                        class="relative w-12 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300/50 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gradient-to-r peer-checked:from-green-500 peer-checked:to-green-600"
-                      ></div>
-                    </label>
-                  </div>
-                  <p class="text-xs text-gray-500 mt-2">
-                    {{ $t('permissions.parent_permission_hint') }}
-                  </p>
-                </div>
-              </div>
-
-              <!-- Modal Footer -->
-              <div class="mt-10 flex justify-end gap-3">
-                <button
-                  type="button"
-                  @click="closeModal"
-                  class="px-6 py-3 bg-gradient-to-r from-gray-100 to-gray-50 hover:from-gray-200 hover:to-gray-100 text-gray-700 rounded-xl hover:shadow transition-all duration-200 transform hover:-translate-y-0.5 border border-gray-200/50"
-                >
-                  {{ $t('common.cancel') }}
-                </button>
-                <button
-                  type="submit"
-                  :disabled="submitting"
-                  class="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                >
-                  <svg
-                    v-if="submitting"
-                    class="w-5 h-5 animate-spin"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                    />
-                  </svg>
-                  <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
-                    />
-                  </svg>
-                  <span class="font-semibold">
-                    {{
-                      submitting
-                        ? $t('common.saving')
-                        : editingPermission
-                          ? $t('common.update')
-                          : $t('common.save')
-                    }}
-                  </span>
-                </button>
-              </div>
-            </div>
-          </form>
-        </div>
-      </div>
-    </transition>
+    <!-- Permission Form Modal -->
+    <PermissionForm
+      :show="showModal"
+      :permission="editingPermission"
+      :menus="menus"
+      :parent-permissions="parentPermissions"
+      @close="closeModal"
+      @saved="refreshPermissions"
+    />
   </div>
 </template>
 
 <script>
 import { mapState, mapActions } from 'vuex'
+import PermissionForm from './PermissionForm.vue'
 
 export default {
   name: 'AdminPermissions',
-
+  components: { PermissionForm },
   data() {
     return {
       searchQuery: '',
       showModal: false,
-      submitting: false,
       editingPermission: null,
-      permissionForm: {
-        title: '',
-        description_ar: '',
-        description_en: '',
-        is_parent: false,
-      },
     }
   },
 
   computed: {
     ...mapState('permissions', {
-      permissions: (state) => state.permissions || [],
+      permissions: (state) => {
+        console.log('🟢 permissions from state:', state.permissions)
+        return state.permissions || []
+      },
+      menus: (state) => {
+        console.log('🟢 menus from state:', state.menus)
+        return state.menus || []
+      },
+      parentPermissions: (state) => state.parentPermissions || [],
       loading: (state) => state.isLoading,
       error: (state) => state.error,
     }),
@@ -715,113 +535,68 @@ export default {
   },
 
   async mounted() {
+    console.log('🟢 AdminPermissions mounted')
     await this.loadPermissions()
+    await this.fetchMenus()
+    await this.fetchParentPermissions()
   },
 
   methods: {
     ...mapActions('permissions', [
-      'getPermissions',
-      'createPermission',
-      'updatePermission',
+      'fetchPermissions',
       'deletePermission',
+      'fetchMenus',
+      'fetchParentPermissions',
       'clearError',
     ]),
 
     async loadPermissions() {
+      console.trace('🔍 loadPermissions called')
       try {
-        await this.getPermissions()
+        console.log('🟢 Loading permissions...')
+        await this.fetchPermissions()
+        console.log('🟢 Permissions loaded successfully')
       } catch (error) {
-        console.error('Failed to load permissions:', error)
-        this.$toast.error(this.$t('errors.failed_to_load_permissions'))
+        console.error('🔴 Failed to load permissions:', error)
+        this.$toast?.error?.(this.$t('errors.failed_to_load_permissions'))
       }
+    },
+
+    async refreshPermissions() {
+      await this.fetchPermissions({ force: true })
     },
 
     openCreateModal() {
       this.editingPermission = null
-      this.permissionForm = {
-        title: '',
-        description_ar: '',
-        description_en: '',
-        is_parent: false,
-      }
       this.showModal = true
     },
 
     openEditModal(permission) {
       this.editingPermission = permission
-      this.permissionForm = {
-        title: permission.title,
-        description_ar: permission.description_ar,
-        description_en: permission.description_en,
-        is_parent: permission.is_parent || false,
-      }
       this.showModal = true
     },
 
-    async createPermission() {
-      this.submitting = true
-      try {
-        await this.createPermission(this.permissionForm)
-        this.closeModal()
-        this.$toast.success(this.$t('permissions.messages.create_success'), {
-          icon: '✅',
-          position: 'top-right',
-        })
-        await this.getPermissions()
-      } catch (error) {
-        console.error('Error creating permission:', error)
-        this.$toast.error(error.message || this.$t('errors.failed_to_create_permission'), {
-          icon: '❌',
-          position: 'top-right',
-        })
-      } finally {
-        this.submitting = false
-      }
-    },
-
-    async updatePermission() {
-      this.submitting = true
-      try {
-        await this.updatePermission({
-          id: this.editingPermission.id,
-          data: this.permissionForm,
-        })
-        this.closeModal()
-        this.$toast.success(this.$t('permissions.messages.update_success'), {
-          icon: '✅',
-          position: 'top-right',
-        })
-        await this.getPermissions()
-      } catch (error) {
-        console.error('Error updating permission:', error)
-        this.$toast.error(error.message || this.$t('errors.failed_to_update_permission'), {
-          icon: '❌',
-          position: 'top-right',
-        })
-      } finally {
-        this.submitting = false
-      }
-    },
-
-    async deletePermission(id) {
+    async handleDelete(id) {
       try {
         await this.deletePermission(id)
-        this.$toast.success(this.$t('permissions.messages.delete_success'), {
-          icon: '✅',
-          position: 'top-right',
+        this.$swal?.fire({
+          icon: 'success',
+          title: this.$t('permissions.messages.delete_success'),
+          showConfirmButton: false,
+          timer: 1500,
         })
-        await this.getPermissions()
       } catch (error) {
         console.error('Error deleting permission:', error)
-        this.$toast.error(error.message || this.$t('errors.failed_to_delete_permission'), {
-          icon: '❌',
-          position: 'top-right',
+        this.$swal?.fire({
+          icon: 'error',
+          title: this.$t('errors.failed_to_delete_permission'),
+          text: error.message,
         })
       }
     },
 
     async confirmDelete(permission) {
-      const confirmed = await this.$swal({
+      const result = await this.$swal?.fire({
         title: this.$t('permissions.delete_confirm_title'),
         text: this.$t('permissions.delete_confirm', {
           name: permission.description_ar || permission.title,
@@ -833,30 +608,22 @@ export default {
         confirmButtonText: this.$t('common.delete'),
         cancelButtonText: this.$t('common.cancel'),
         reverseButtons: true,
-        focusCancel: true,
       })
 
-      if (confirmed.isConfirmed) {
-        await this.deletePermission(permission.id)
+      if (result?.isConfirmed) {
+        await this.handleDelete(permission.id)
       }
     },
 
     closeModal() {
       this.showModal = false
       this.editingPermission = null
-      this.permissionForm = {
-        title: '',
-        description_ar: '',
-        description_en: '',
-        is_parent: false,
-      }
     },
   },
 }
 </script>
 
 <style scoped>
-/* استيراد أنماط التصميم الموحدة من InvoiceReportSection */
 .stats-card {
   @apply rounded-xl p-5 border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300;
 }
@@ -881,6 +648,4 @@ export default {
 .status-dot {
   @apply w-2 h-2 rounded-full;
 }
-
-/* باقي الأنماط الخاصة بالجدول والتأثيرات يمكن الاحتفاظ بها أو دمجها */
 </style>

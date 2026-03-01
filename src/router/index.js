@@ -124,10 +124,19 @@ const routes = [
       requiresAdmin: true
     }
   },
+    {
+    path: '/activitylog',
+    name: 'activitylog',
+    component: () => import('@/views/ActivityLog.vue'),
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: true
+    }
+  },
   {
     path: '/profile',
-    name: 'Profile',
-    component: () => import('@/views/Auth/profile.vue'),
+    name: 'profile',
+    component: () => import('@/views/Profile.vue'),
   },
   {
     path: '/:pathMatch(.*)*',
