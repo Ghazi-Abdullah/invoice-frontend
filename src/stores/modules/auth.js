@@ -168,6 +168,73 @@ export default {
       }
     },
 
+    // في قسم actions أضف بعد دالة login():
+
+    async sendOtp({ commit }, email) {
+      commit('SET_LOADING', true)
+      commit('SET_LOGIN_ERROR', null)
+
+      try {
+        const response = await axios.post('/admin/send-otp', { email })
+
+        if (response.data.status) {
+          commit('SET_LOADING', false)
+          return {
+            success: true,
+            user_id: response.data.data.user_id
+          }
+        } else {
+          const errorMsg = response.data.message || 'فشل إرسال الرمز'
+          commit('SET_LOGIN_ERROR', errorMsg)
+          commit('SET_LOADING', false)
+          return { success: false, message: errorMsg }
+        }
+      } catch (error) {
+        const errorMsg = error.response?.data?.message || 'حدث خطأ أثناء إرسال الرمز'
+        commit('SET_LOGIN_ERROR', errorMsg)
+        commit('SET_LOADING', false)
+        return { success: false, message: errorMsg }
+      }
+    },
+
+    async verifyOtp({ commit, dispatch }, { user_id, otp }) {
+      commit('SET_LOADING', true)
+      commit('SET_LOGIN_ERROR', null)
+
+      try {
+        const response = await axios.post('/admin/verify-otp', { user_id, otp })
+
+        if (response.data.status && response.data.data) {
+          const { user, token, permissions, is_admin } = response.data.data
+
+          localStorage.setItem('token', token)
+          localStorage.setItem('user', JSON.stringify(user))
+          axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+
+          commit('SET_USER', user)
+          commit('SET_TOKEN', token)
+          commit('SET_PERMISSIONS', permissions || [])
+          commit('SET_IS_ADMIN', is_admin || false)
+          commit('SET_LOGIN_ERROR', null)
+
+          await dispatch('loadMenus')
+
+          commit('SET_LOADING', false)
+          return { success: true }
+        } else {
+          const errorMsg = response.data.message || 'رمز التحقق غير صحيح'
+          commit('SET_LOGIN_ERROR', errorMsg)
+          commit('SET_LOADING', false)
+          return { success: false, message: errorMsg }
+        }
+      } catch (error) {
+        const errorMsg = error.response?.data?.message || 'حدث خطأ أثناء التحقق'
+        commit('SET_LOGIN_ERROR', errorMsg)
+        commit('SET_LOADING', false)
+        return { success: false, message: errorMsg }
+      }
+    },
+
     async checkAuth({ commit, state }) {
       if (!state.token) {
         return false

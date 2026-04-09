@@ -1050,7 +1050,10 @@
     "this_year": "This Year"
   },
   "profile": {
+    "password": "Password",
+    "personal_details": "Personal Details",
     "title": "Profile",
+    "password_weak": "Password is weak",
     "subtitle": "View and update your personal information",
     "active": "Active",
     "inactive": "Inactive",

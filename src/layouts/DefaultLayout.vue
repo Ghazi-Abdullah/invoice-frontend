@@ -3,17 +3,21 @@
     <!-- Sidebar -->
     <aside
       :class="[
-        'bg-gradient-to-b from-gray-900 to-gray-800 text-white shadow-xl overflow-y-auto transition-all duration-300',
+        'bg-gradient-to-b from-gray-900 to-gray-800 text-white shadow-xl overflow-y-auto transition-all duration-300 z-50',
         sidebarOpen ? 'w-64' : 'w-0 md:w-20',
       ]"
     >
       <div class="p-4 h-full flex flex-col">
         <!-- Logo and Toggle -->
-        <div class="flex items-center justify-between mb-6">
+        <!--<div class="flex items-center justify-between mb-6">
           <div v-if="sidebarOpen" class="flex items-center gap-3">
             <div
               class="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg"
             >
+              <div class="logo">
+                <i class="fas fa-file-invoice" style="color: #3b82f6"></i>
+                <span style="font-weight: bold; color: #1f2937">فاتورة</span>
+              </div>
               <i class="fas fa-file-invoice text-xl"></i>
             </div>
             <h1 class="text-lg font-bold text-white">{{ $t('app.name') }}</h1>
@@ -21,15 +25,25 @@
           <button @click="toggleSidebar" class="text-white hover:text-blue-300 transition p-2">
             <i :class="sidebarOpen ? 'fas fa-chevron-right' : 'fas fa-bars'"></i>
           </button>
-        </div>
+        </div>-->
 
         <!-- User Info -->
         <div v-if="sidebarOpen && user" class="mb-6 p-3 bg-gray-800/50 rounded-xl">
           <div class="flex items-center gap-3">
-            <div
-              class="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-lg"
-            >
-              <span class="text-sm font-bold text-white">{{ getInitials(user.name) }}</span>
+            <!-- صورة المستخدم -->
+            <div class="relative w-10 h-10 flex-shrink-0">
+              <img
+                v-if="user.img_url"
+                :src="user.img_url"
+                class="w-full h-full rounded-full object-cover border-2 border-blue-500 shadow-lg"
+                :alt="user.name"
+              />
+              <div
+                v-else
+                class="w-full h-full rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-lg"
+              >
+                {{ getInitials(user.name) }}
+              </div>
             </div>
             <div class="flex-1 min-w-0">
               <p class="text-sm font-medium text-white truncate">{{ user.name }}</p>
@@ -64,14 +78,7 @@
             </router-link>
           </div>
 
-          <!-- Admin Section -->
-          <div v-if="isAdmin && sidebarOpen" class="pt-4 mt-4 border-t border-gray-700">
-            <div class="px-3 mb-2">
-              <!-- <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">
-                {{ $t('admin.title') }}
-              </p>-->
-            </div>
-          </div>
+          <div v-if="sidebarOpen" class="pt-4 mt-4 border-t border-gray-700"></div>
 
           <!-- Dashboard -->
           <router-link
@@ -92,42 +99,40 @@
           </router-link>
 
           <!-- Clients -->
-          <div v-if="hasPermission('view_clients')">
-            <router-link
-              to="/clients"
-              class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700/50 transition group"
-              :class="{
-                'bg-gradient-to-r from-blue-600/20 to-blue-600/10 border-r-2 border-blue-500':
-                  $route.path === '/clients',
-              }"
-            >
-              <i
-                class="fas fa-users w-5 text-center text-gray-300 group-hover:text-white transition"
-              ></i>
-              <span v-if="sidebarOpen" class="text-gray-300 group-hover:text-white transition">
-                {{ $t('nav.clients') }}
-              </span>
-            </router-link>
-          </div>
+          <router-link
+            v-if="hasPermission('view_clients')"
+            to="/clients"
+            class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700/50 transition group"
+            :class="{
+              'bg-gradient-to-r from-blue-600/20 to-blue-600/10 border-r-2 border-blue-500':
+                $route.path === '/clients',
+            }"
+          >
+            <i
+              class="fas fa-users w-5 text-center text-gray-300 group-hover:text-white transition"
+            ></i>
+            <span v-if="sidebarOpen" class="text-gray-300 group-hover:text-white transition">
+              {{ $t('nav.clients') }}
+            </span>
+          </router-link>
 
           <!-- Invoices -->
-          <div v-if="hasPermission('view_invoices')">
-            <router-link
-              to="/invoices"
-              class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700/50 transition group"
-              :class="{
-                'bg-gradient-to-r from-blue-600/20 to-blue-600/10 border-r-2 border-blue-500':
-                  $route.path.includes('/invoices'),
-              }"
-            >
-              <i
-                class="fas fa-file-invoice w-5 text-center text-gray-300 group-hover:text-white transition"
-              ></i>
-              <span v-if="sidebarOpen" class="text-gray-300 group-hover:text-white transition">
-                {{ $t('nav.invoices') }}
-              </span>
-            </router-link>
-          </div>
+          <router-link
+            v-if="hasPermission('view_invoices')"
+            to="/invoices"
+            class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700/50 transition group"
+            :class="{
+              'bg-gradient-to-r from-blue-600/20 to-blue-600/10 border-r-2 border-blue-500':
+                $route.path.includes('/invoices'),
+            }"
+          >
+            <i
+              class="fas fa-file-invoice w-5 text-center text-gray-300 group-hover:text-white transition"
+            ></i>
+            <span v-if="sidebarOpen" class="text-gray-300 group-hover:text-white transition">
+              {{ $t('nav.invoices') }}
+            </span>
+          </router-link>
 
           <!-- Reports -->
           <router-link
@@ -148,13 +153,11 @@
           </router-link>
 
           <!-- Admin Section -->
-          <div v-if="isAdmin && sidebarOpen" class="pt-4 mt-4 border-t border-gray-700">
-            <div class="px-3 mb-2">
-              <!-- <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">
-                {{ $t('admin.title') }}
-              </p>-->
-            </div>
+          <template v-if="isAdmin">
+            <!-- العنوان (يظهر فقط عند فتح الشريط الجانبي) -->
+            <div v-if="sidebarOpen" class="pt-4 mt-4 border-t border-gray-700"></div>
 
+            <!-- Users -->
             <router-link
               v-if="hasPermission('administration')"
               to="/admin/users"
@@ -172,6 +175,7 @@
               </span>
             </router-link>
 
+            <!-- Groups -->
             <router-link
               v-if="hasPermission('administration')"
               to="/admin/groups"
@@ -189,6 +193,7 @@
               </span>
             </router-link>
 
+            <!-- Permissions -->
             <router-link
               v-if="hasPermission('administration')"
               to="/admin/permissions"
@@ -206,7 +211,7 @@
               </span>
             </router-link>
 
-            <!-- ✅ تم إضافة قسم "تعيين الصلاحيات" هنا -->
+            <!-- Assign Permissions -->
             <router-link
               v-if="hasPermission('administration')"
               to="/admin/assign-permissions"
@@ -224,49 +229,31 @@
               </span>
             </router-link>
 
-            <div v-if="isAdmin && sidebarOpen" class="pt-4 mt-4 border-t border-gray-700">
-              <div class="px-3 mb-2">
-                <!-- <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">
-                {{ $t('admin.title') }}
-              </p>-->
-              </div>
-            </div>
+            <!-- العنوان (يظهر فقط عند فتح الشريط الجانبي) -->
+            <div v-if="sidebarOpen" class="pt-4 mt-4 border-t border-gray-700"></div>
 
-            <!-- Activity log -->
-            <div v-if="hasPermission('administration')">
-              <router-link
-                to="/activitylog"
-                class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700/50 transition group"
-                :class="{
-                  'bg-gradient-to-r from-orange-600/20 to-orange-600/10 border-r-2 border-orange-500':
-                    $route.path === '/activitylog',
-                }"
-              >
-                <i
-                  class="fas fa-user w-5 text-center text-gray-300 group-hover:text-orange-400 transition"
-                ></i>
-                <span
-                  v-if="sidebarOpen"
-                  class="text-gray-300 group-hover:text-orange-400 transition"
-                >
-                  {{ $t('nav.activitylog') }}
-                </span>
-              </router-link>
-            </div>
-
-            <!-- Admin Section -->
-            <div v-if="isAdmin && sidebarOpen" class="pt-4 mt-4 border-t border-gray-700">
-              <div class="px-3 mb-2">
-                <!-- <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">
-                {{ $t('admin.title') }}
-              </p>-->
-              </div>
-            </div>
-          </div>
+            <!-- Activity Log -->
+            <router-link
+              v-if="hasPermission('administration')"
+              to="/activitylog"
+              class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-600/10 transition group"
+              :class="{
+                'bg-gradient-to-r from-orange-600/20 to-orange-600/10 border-r-2 border-orange-500':
+                  $route.path === '/activitylog',
+              }"
+            >
+              <i
+                class="fas fa-history w-5 text-center text-gray-300 group-hover:text-orange-400 transition"
+              ></i>
+              <span class="text-gray-300 group-hover:text-orange-400 transition">
+                {{ $t('nav.activitylog') }}
+              </span>
+            </router-link>
+          </template>
         </nav>
 
         <!-- Bottom Section -->
-        <div class="pt-4 border-t border-gray-700">
+        <div class="pt-4 border-t border-gray-700 space-y-1">
           <!-- Language Toggle -->
           <button
             @click="toggleLanguage"
@@ -310,7 +297,7 @@
       <!-- Navbar -->
       <nav class="bg-white shadow-lg sticky top-0 z-30">
         <div class="px-4 py-3 flex items-center justify-between">
-          <!-- Left: Sidebar Toggle -->
+          <!-- Left: Sidebar Toggle and Breadcrumb -->
           <div class="flex items-center gap-4">
             <button
               @click="toggleSidebar"
@@ -319,7 +306,7 @@
               <i class="fas fa-bars text-lg"></i>
             </button>
 
-            <!-- Breadcrumb -->
+            <!-- Breadcrumb (desktop) -->
             <div class="hidden md:flex items-center text-sm text-gray-600">
               <router-link to="/dashboard" class="hover:text-blue-600 transition">
                 {{ $t('nav.dashboard') }}
@@ -340,7 +327,7 @@
 
           <!-- Right: User Menu and Language -->
           <div class="flex items-center gap-3">
-            <!-- Language Switcher -->
+            <!-- Language Switcher (desktop) -->
             <button
               @click="toggleLanguage"
               class="hidden md:flex items-center gap-2 px-3 py-1.5 text-sm text-gray-600 hover:text-blue-600 hover:bg-gray-100 rounded-lg transition"
@@ -355,10 +342,20 @@
                 @click="userDropdownOpen = !userDropdownOpen"
                 class="flex items-center gap-2 focus:outline-none"
               >
-                <div
-                  class="h-8 w-8 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center text-white shadow"
-                >
-                  {{ getInitials(user?.name || '') }}
+                <!-- صورة المستخدم -->
+                <div class="relative h-8 w-8 flex-shrink-0">
+                  <img
+                    v-if="user?.img_url"
+                    :src="user.img_url"
+                    class="w-full h-full rounded-full object-cover border-2 border-blue-500 shadow"
+                    :alt="user.name"
+                  />
+                  <div
+                    v-else
+                    class="w-full h-full rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center text-white text-xs font-bold shadow"
+                  >
+                    {{ getInitials(user?.name) }}
+                  </div>
                 </div>
                 <div class="hidden md:block text-right">
                   <p class="text-sm font-medium text-gray-700">{{ user?.name }}</p>
@@ -375,9 +372,25 @@
                 class="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-50"
                 v-click-outside="() => (userDropdownOpen = false)"
               >
-                <div class="p-3 border-b border-gray-100">
-                  <p class="font-medium text-gray-900">{{ user?.name }}</p>
-                  <p class="text-xs text-gray-500 truncate">{{ user?.email }}</p>
+                <div class="p-3 border-b border-gray-100 flex items-center gap-3">
+                  <div class="relative h-10 w-10 flex-shrink-0">
+                    <img
+                      v-if="user?.img_url"
+                      :src="user.img_url"
+                      class="w-full h-full rounded-full object-cover border-2 border-blue-500"
+                      :alt="user.name"
+                    />
+                    <div
+                      v-else
+                      class="w-full h-full rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm"
+                    >
+                      {{ getInitials(user?.name) }}
+                    </div>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <p class="font-medium text-gray-900 truncate">{{ user?.name }}</p>
+                    <p class="text-xs text-gray-500 truncate">{{ user?.email }}</p>
+                  </div>
                 </div>
                 <div class="py-1">
                   <router-link
@@ -385,14 +398,14 @@
                     class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition"
                     @click="userDropdownOpen = false"
                   >
-                    <i class="fas fa-user-circle text-gray-400"></i>
+                    <i class="fas fa-user-circle text-gray-400 w-4"></i>
                     <span>{{ $t('nav.profile') }}</span>
                   </router-link>
                   <button
                     @click="logout"
                     class="flex items-center gap-2 w-full text-right px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition"
                   >
-                    <i class="fas fa-sign-out-alt text-gray-400"></i>
+                    <i class="fas fa-sign-out-alt text-gray-400 w-4"></i>
                     <span>{{ $t('auth.logout') }}</span>
                   </button>
                 </div>
@@ -477,6 +490,7 @@ export default {
         '/admin/permissions': 'الصلاحيات',
         '/admin/assign-permissions': 'تعيين الصلاحيات',
         '/profile': 'الملف الشخصي',
+        '/activitylog': 'سجل النشاطات',
       }
       return titles[route.path] || 'نظام الفواتير'
     }
@@ -485,7 +499,6 @@ export default {
       sidebarOpen.value = !sidebarOpen.value
     }
 
-    // ✅ دالة تغيير اللغة مع إعادة تحميل الصفحة
     const toggleLanguage = () => {
       const newLang = locale.value === 'ar' ? 'en' : 'ar'
       locale.value = newLang
@@ -521,10 +534,10 @@ export default {
       if (isMobile.value) {
         sidebarOpen.value = false
       }
+    })
 
-      onUnmounted(() => {
-        window.removeEventListener('resize', checkMobile)
-      })
+    onUnmounted(() => {
+      window.removeEventListener('resize', checkMobile)
     })
 
     return {
@@ -617,5 +630,33 @@ aside::-webkit-scrollbar-thumb:hover {
 .fade-enter,
 .fade-leave-to {
   opacity: 0;
+}
+
+/* تحسينات إضافية للصور */
+img {
+  transition: all 0.3s ease;
+}
+
+img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* تحسين ظهور الشريط الجانبي المصغر */
+.w-20 .flex.items-center.gap-3 {
+  justify-content: center;
+}
+
+.w-20 .text-gray-300 {
+  display: none;
+}
+
+.w-20 .p-3 {
+  justify-content: center;
+}
+
+/* تحسين التباعد في القائمة الجانبية */
+nav .router-link-active {
+  font-weight: 500;
 }
 </style>

@@ -36,7 +36,7 @@
             <button
               v-if="hasPermission('create_invoice')"
               @click="$router.push('/invoices/create')"
-              class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2 group"
+              class="px-4 py-2.5 bg-blue-900 hover:bg-blue-800 text-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2 group"
             >
               <svg
                 class="w-4 h-4 group-hover:rotate-90 transition-transform duration-300"

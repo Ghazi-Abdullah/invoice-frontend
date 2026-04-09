@@ -80,7 +80,7 @@
           </div>
           <div>
             <p class="stats-label">{{ $t('permissions.total_permissions') }}</p>
-            <p class="stats-value">{{ permissions.length }}</p>
+            <p class="stats-value">{{ pagination.total || 0 }}</p>
           </div>
         </div>
         <div class="stats-card bg-gradient-to-br from-green-50 to-green-100">
@@ -280,14 +280,14 @@
               <div
                 class="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg shadow-sm"
               >
-                <span class="font-bold">{{ filteredPermissions.length }}</span>
+                <span class="font-bold">{{ pagination.total || 0 }}</span>
                 <span class="text-blue-100 mr-1">{{ $t('common.total') }}</span>
               </div>
             </div>
           </div>
 
           <!-- Empty State -->
-          <div v-if="filteredPermissions.length === 0" class="text-center py-16 px-4">
+          <div v-if="permissions.length === 0" class="text-center py-16 px-4">
             <div class="max-w-md mx-auto">
               <div class="relative mb-6">
                 <div
@@ -344,7 +344,7 @@
                 </thead>
                 <tbody class="divide-y divide-gray-200/30">
                   <tr
-                    v-for="permission in filteredPermissions"
+                    v-for="permission in permissions"
                     :key="'perm-' + permission.id"
                     class="hover:bg-blue-50/30 transition-colors"
                   >
@@ -382,17 +382,17 @@
 
                     <td class="table-cell">
                       <div class="flex flex-col">
-                        <span class="text-sm text-gray-900 font-medium">
-                          {{ permission.description_ar || $t('common.notAvailable') }}
-                        </span>
+                        <span class="text-sm text-gray-900 font-medium">{{
+                          permission.description_ar || $t('common.notAvailable')
+                        }}</span>
                       </div>
                     </td>
 
                     <td class="table-cell">
                       <div class="flex flex-col">
-                        <span class="text-sm text-gray-900 font-medium">
-                          {{ permission.description_en || $t('common.notAvailable') }}
-                        </span>
+                        <span class="text-sm text-gray-900 font-medium">{{
+                          permission.description_en || $t('common.notAvailable')
+                        }}</span>
                       </div>
                     </td>
 
@@ -465,6 +465,76 @@
             </div>
           </div>
         </div>
+
+        <!-- Pagination -->
+        <div
+          v-if="hasPagination"
+          class="mt-6 bg-white/80 backdrop-blur-sm rounded-2xl border border-white/50 shadow-lg p-4"
+        >
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="text-sm text-gray-700">
+              {{
+                $t('pagination.showing', {
+                  from: pagination.from || 1,
+                  to: pagination.to || pagination.total,
+                  total: pagination.total,
+                })
+              }}
+            </div>
+
+            <div class="flex items-center gap-2">
+              <button
+                @click="previousPage"
+                :disabled="pagination.current_page === 1"
+                class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 19l-7-7 7-7"
+                  />
+                </svg>
+                <span class="hidden sm:inline">{{ $t('pagination.previous') }}</span>
+              </button>
+
+              <div class="flex items-center gap-1">
+                <button
+                  v-for="page in paginationRange"
+                  :key="page"
+                  @click="goToPage(page)"
+                  :class="[
+                    'px-3 py-1.5 rounded-lg text-sm font-medium transition-colors duration-200',
+                    page === pagination.current_page
+                      ? 'bg-blue-600 text-white'
+                      : 'border border-gray-300 hover:bg-gray-50',
+                    page === '...' ? 'cursor-default hover:bg-transparent' : '',
+                  ]"
+                  :disabled="page === '...'"
+                >
+                  {{ page }}
+                </button>
+              </div>
+
+              <button
+                @click="nextPage"
+                :disabled="pagination.current_page === pagination.last_page"
+                class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+              >
+                <span class="hidden sm:inline">{{ $t('pagination.next') }}</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -492,38 +562,30 @@ export default {
       searchQuery: '',
       showModal: false,
       editingPermission: null,
+      searchTimeout: null,
     }
   },
 
   computed: {
     ...mapState('permissions', {
-      permissions: (state) => {
-        console.log('🟢 permissions from state:', state.permissions)
-        return state.permissions || []
-      },
-      menus: (state) => {
-        console.log('🟢 menus from state:', state.menus)
-        return state.menus || []
-      },
+      permissions: (state) => state.permissions || [],
+      menus: (state) => state.menus || [],
       parentPermissions: (state) => state.parentPermissions || [],
       loading: (state) => state.isLoading,
       error: (state) => state.error,
+      pagination: (state) => {
+        // تأكد من وجود كائن pagination بخصائص افتراضية
+        const defaultPagination = {
+          current_page: 1,
+          last_page: 1,
+          total: 0,
+          per_page: 15,
+          from: 1,
+          to: 15,
+        }
+        return state.pagination ? { ...defaultPagination, ...state.pagination } : defaultPagination
+      },
     }),
-
-    filteredPermissions() {
-      if (!this.searchQuery) {
-        return this.permissions
-      }
-
-      const search = this.searchQuery.toLowerCase()
-      return this.permissions.filter((permission) => {
-        return (
-          (permission.title && permission.title.toLowerCase().includes(search)) ||
-          (permission.description_ar && permission.description_ar.toLowerCase().includes(search)) ||
-          (permission.description_en && permission.description_en.toLowerCase().includes(search))
-        )
-      })
-    },
 
     parentPermissionsCount() {
       return this.permissions.filter((p) => p.is_parent).length
@@ -532,13 +594,39 @@ export default {
     childPermissionsCount() {
       return this.permissions.filter((p) => !p.is_parent).length
     },
-  },
 
-  async mounted() {
-    console.log('🟢 AdminPermissions mounted')
-    await this.loadPermissions()
-    await this.fetchMenus()
-    await this.fetchParentPermissions()
+    hasPagination() {
+      return this.pagination && this.pagination.total > this.pagination.per_page
+    },
+
+    paginationRange() {
+      const current = this.pagination.current_page
+      const last = this.pagination.last_page
+      const delta = 2
+      const range = []
+      const rangeWithDots = []
+      let l
+
+      for (let i = 1; i <= last; i++) {
+        if (i === 1 || i === last || (i >= current - delta && i <= current + delta)) {
+          range.push(i)
+        }
+      }
+
+      for (let i of range) {
+        if (l) {
+          if (i - l === 2) {
+            rangeWithDots.push(l + 1)
+          } else if (i - l !== 1) {
+            rangeWithDots.push('...')
+          }
+        }
+        rangeWithDots.push(i)
+        l = i
+      }
+
+      return rangeWithDots
+    },
   },
 
   methods: {
@@ -550,20 +638,37 @@ export default {
       'clearError',
     ]),
 
-    async loadPermissions() {
-      console.trace('🔍 loadPermissions called')
+    async loadPermissions(page = 1) {
       try {
-        console.log('🟢 Loading permissions...')
-        await this.fetchPermissions()
-        console.log('🟢 Permissions loaded successfully')
+        console.log(`🔍 Loading permissions - page: ${page}, search: "${this.searchQuery}"`)
+        await this.fetchPermissions({ page, search: this.searchQuery })
+        console.log('✅ Permissions loaded. Current page:', this.pagination.current_page)
       } catch (error) {
-        console.error('🔴 Failed to load permissions:', error)
+        console.error('❌ Failed to load permissions:', error)
         this.$toast?.error?.(this.$t('errors.failed_to_load_permissions'))
       }
     },
 
     async refreshPermissions() {
-      await this.fetchPermissions({ force: true })
+      await this.loadPermissions(1)
+    },
+
+    goToPage(page) {
+      if (page === '...' || page === this.pagination.current_page) return
+      console.log('➡️ Going to page:', page)
+      this.loadPermissions(page)
+    },
+
+    previousPage() {
+      if (this.pagination.current_page > 1) {
+        this.loadPermissions(this.pagination.current_page - 1)
+      }
+    },
+
+    nextPage() {
+      if (this.pagination.current_page < this.pagination.last_page) {
+        this.loadPermissions(this.pagination.current_page + 1)
+      }
     },
 
     openCreateModal() {
@@ -585,8 +690,9 @@ export default {
           showConfirmButton: false,
           timer: 1500,
         })
+        await this.loadPermissions(this.pagination.current_page)
       } catch (error) {
-        console.error('Error deleting permission:', error)
+        console.error('❌ Error deleting permission:', error)
         this.$swal?.fire({
           icon: 'error',
           title: this.$t('errors.failed_to_delete_permission'),
@@ -619,6 +725,23 @@ export default {
       this.showModal = false
       this.editingPermission = null
     },
+  },
+
+  watch: {
+    searchQuery: {
+      handler() {
+        if (this.searchTimeout) clearTimeout(this.searchTimeout)
+        this.searchTimeout = setTimeout(() => {
+          this.loadPermissions(1)
+        }, 500)
+      },
+    },
+  },
+
+  async mounted() {
+    await this.loadPermissions()
+    await this.fetchMenus()
+    await this.fetchParentPermissions()
   },
 }
 </script>

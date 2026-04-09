@@ -13,6 +13,12 @@ const routes = [
     meta: { guest: true, requiresGuest: true }
   },
   {
+    path: '/login-otp',
+    name: 'LoginOtp',
+    component: () => import('@/views/Auth/LoginOtp.vue'),
+    meta: { guest: true, requiresGuest: true }
+  },
+  {
     path: '/register',
     name: 'Register',
     component: () => import('@/views/Auth/Register.vue'),
@@ -124,7 +130,7 @@ const routes = [
       requiresAdmin: true
     }
   },
-    {
+  {
     path: '/activitylog',
     name: 'activitylog',
     component: () => import('@/views/ActivityLog.vue'),

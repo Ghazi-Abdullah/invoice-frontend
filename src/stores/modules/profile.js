@@ -47,7 +47,6 @@ export default {
       commit('SET_LOADING', true)
       commit('SET_ERROR', null)
       try {
-        // ✅ المسار الصحيح: /admin/users/profile/me
         const response = await axios.get('/admin/users/profile/me')
         if (response.data?.status === true) {
           const data = response.data.data
@@ -66,11 +65,30 @@ export default {
       }
     },
 
-    async updateProfile({ commit }, formData) {
+    /**
+     * تحديث الملف الشخصي
+     * @param {Object} payload - يحتوي على الحقول: name, email, phone, company_name, imgFile (اختياري)
+     */
+    async updateProfile({ commit }, payload) {
       commit('SET_LOADING', true)
       try {
-        // ✅ المسار الصحيح: /admin/users/profile/update
-        const response = await axios.put('/admin/users/profile/update', formData)
+        const formData = new FormData()
+        formData.append('name', payload.name)
+        formData.append('email', payload.email)
+        formData.append('phone', payload.phone || '')
+        formData.append('company_name', payload.company_name || '')
+
+        if (payload.imgFile) {
+          formData.append('img', payload.imgFile)
+        }
+
+        // إضافة _method لتقليد PUT
+        formData.append('_method', 'PUT')
+
+        const response = await axios.post('/admin/users/profile/update', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        })
+
         if (response.data?.status) {
           commit('UPDATE_USER', response.data.data)
           return true
@@ -88,7 +106,6 @@ export default {
     async changePassword({ commit }, passwords) {
       commit('SET_LOADING', true)
       try {
-        // ✅ المسار الصحيح: /admin/users/profile/change-password (PUT)
         const response = await axios.put('/admin/users/profile/change-password', passwords)
         if (response.data?.status) {
           return true
