@@ -15,6 +15,7 @@ import 'vue3-toastify/dist/index.css'
 // Font Awesome (Vue 3)
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { faRightToBracket } from '@fortawesome/free-solid-svg-icons'
 import {
   faUser,
   faFileInvoice,
@@ -65,6 +66,7 @@ import {
 // إضافة جميع الأيقونات
 library.add(
   faUser,
+  faRightToBracket,
   faFileInvoice,
   faUsers,
   faChartBar,

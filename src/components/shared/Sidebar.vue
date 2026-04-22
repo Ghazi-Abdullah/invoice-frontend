@@ -2,48 +2,40 @@
   <!-- Mobile Overlay -->
   <div
     v-if="isMobileOpen"
-    class="lg:hidden fixed inset-0 bg-black/50 z-30 transition-opacity duration-300"
+    class="lg:hidden fixed inset-0 z-30 transition-opacity duration-500"
+    style="background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(4px)"
     @click="$emit('close-mobile')"
   ></div>
 
   <!-- Sidebar -->
   <aside
-    class="fixed lg:static h-screen flex flex-col bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white shadow-2xl z-40 transition-all duration-300 ease-in-out"
+    ref="sidebarEl"
+    class="sidebar fixed lg:static h-screen flex flex-col z-40 transition-all duration-300 ease-in-out"
     :class="{
       '-translate-x-full lg:translate-x-0': !isMobileOpen,
-      'w-20': isCollapsed,
-      'w-64': !isCollapsed,
+      'w-[72px]': isCollapsed,
+      'w-[260px]': !isCollapsed,
     }"
-    ref="sidebarEl"
   >
-    <!-- Header with Logo & Collapse Toggle -->
-    <div class="flex items-center justify-between h-20 px-4 border-b border-gray-700/50">
+    <!-- Noise texture overlay -->
+    <div class="noise-overlay"></div>
+
+    <!-- ══════════ HEADER ══════════ -->
+    <div class="sidebar-header" :class="{ 'justify-center': isCollapsed }">
       <router-link
         to="/dashboard"
-        class="flex items-center space-x-3 transition-all duration-300 hover:opacity-90"
-        :class="{ 'justify-center w-full': isCollapsed }"
+        class="logo-link"
+        :class="{ 'justify-center': isCollapsed }"
         @click="closeMobileSidebar"
       >
-        <div class="relative">
-          <div
-            class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg transform hover:scale-105 transition-transform duration-200"
-          >
-            <i class="fas fa-file-invoice text-white text-xl"></i>
-          </div>
-          <div
-            class="absolute -top-1 -right-1 w-5 h-5 bg-green-400 rounded-full border-2 border-gray-900 flex items-center justify-center"
-          >
-            <i class="fas fa-check text-white text-[8px]"></i>
-          </div>
+        <div class="logo-icon">
+          <i class="fas fa-file-invoice"></i>
+          <span class="logo-badge"></span>
         </div>
-        <transition name="slide-fade" mode="out-in">
-          <div v-if="!isCollapsed" class="flex flex-col">
-            <span
-              class="font-bold text-xl bg-gradient-to-r from-blue-400 to-blue-300 bg-clip-text text-transparent"
-            >
-              {{ $t('app.name') }}
-            </span>
-            <span class="text-xs text-gray-400 mt-1">Enterprise v2.0</span>
+        <transition name="fade-slide">
+          <div v-if="!isCollapsed" class="logo-text">
+            <span class="logo-name">{{ $t('app.name') }}</span>
+            <span class="logo-version">v2.0 Enterprise</span>
           </div>
         </transition>
       </router-link>
@@ -51,99 +43,67 @@
       <button
         v-if="!isCollapsed"
         @click="toggleCollapse"
-        class="hidden lg:flex items-center justify-center w-10 h-10 rounded-full bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white transition-all duration-200"
+        class="collapse-btn hidden lg:flex"
         :title="$t('buttons.collapse')"
       >
-        <i class="fas fa-chevron-left text-sm"></i>
+        <i class="fas fa-chevron-left"></i>
       </button>
     </div>
 
-    <!-- User Profile Card -->
-    <transition name="slide-fade" mode="out-in">
-      <div v-if="!isCollapsed && user" class="px-5 py-4 border-b border-gray-700/50">
-        <div class="flex items-center space-x-3">
-          <div class="relative">
-            <div
-              class="w-14 h-14 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg overflow-hidden"
-            >
-              <div v-if="!user.avatar" class="text-white font-bold text-lg">
-                {{ getUserInitials }}
-              </div>
-              <img v-else :src="user.avatar" :alt="user.name" class="w-full h-full object-cover" />
-            </div>
-            <div
-              class="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-gray-900 flex items-center justify-center"
-            >
-              <i class="fas fa-check text-white text-[8px]"></i>
-            </div>
-          </div>
-          <div class="flex-1 min-w-0">
-            <p class="font-semibold text-base truncate">{{ user.name }}</p>
-            <p class="text-sm text-gray-300 truncate mt-0.5">{{ user.email }}</p>
-            <div class="flex items-center gap-2 mt-2">
-              <span
-                class="px-2 py-0.5 text-xs font-medium rounded-full"
-                :class="
-                  isAdmin ? 'bg-purple-500/20 text-purple-300' : 'bg-blue-500/20 text-blue-300'
-                "
-              >
-                {{ userRole }}
-              </span>
-              <span
-                v-if="user.is_online"
-                class="w-2 h-2 bg-green-500 rounded-full animate-pulse"
-              ></span>
-            </div>
-          </div>
+    <!-- ══════════ USER CARD ══════════ -->
+    <transition name="fade-slide">
+      <div v-if="!isCollapsed && user" class="user-card">
+        <div class="user-avatar">
+          <img v-if="user.avatar" :src="user.avatar" :alt="user.name" />
+          <span v-else>{{ getUserInitials }}</span>
+          <span class="online-dot"></span>
+        </div>
+        <div class="user-info">
+          <p class="user-name">{{ user.name }}</p>
+          <p class="user-email">{{ user.email }}</p>
+          <span class="user-role" :class="isAdmin ? 'role-admin' : 'role-user'">
+            <i class="fas" :class="isAdmin ? 'fa-crown' : 'fa-user'"></i>
+            {{ userRole }}
+          </span>
         </div>
       </div>
     </transition>
 
-    <!-- Navigation Menu -->
-    <div class="flex-1 overflow-y-auto py-4 scrollbar-thin">
-      <transition name="slide-fade" mode="out-in">
-        <div v-if="!isCollapsed" class="px-5 mb-4">
-          <h3 class="text-xs uppercase text-gray-500 font-semibold tracking-wider">
-            {{ $t('common.navigation') }}
-          </h3>
-        </div>
-      </transition>
+    <!-- Collapsed avatar -->
+    <div v-if="isCollapsed && user" class="collapsed-avatar">
+      <img v-if="user.avatar" :src="user.avatar" :alt="user.name" />
+      <span v-else>{{ getUserInitials }}</span>
+      <span class="online-dot"></span>
+    </div>
 
-      <ul class="space-y-1 px-3">
+    <!-- ══════════ NAV SECTION LABEL ══════════ -->
+    <transition name="fade-slide">
+      <div v-if="!isCollapsed" class="nav-label">
+        <span>{{ $t('common.navigation') }}</span>
+      </div>
+    </transition>
+
+    <!-- ══════════ NAVIGATION ══════════ -->
+    <nav class="nav-menu scrollbar-thin">
+      <ul>
         <!-- Dashboard -->
         <li v-if="hasPermission('view_dashboard')">
           <router-link
             to="/dashboard"
-            class="group flex items-center space-x-3 px-3 py-3 rounded-xl transition-all duration-200"
-            :class="
-              isActive('/dashboard')
-                ? 'bg-gradient-to-r from-blue-600/30 to-blue-500/20 text-white border-r-4 border-blue-500'
-                : 'text-gray-300 hover:bg-gray-800/50 hover:text-white'
-            "
-            :title="isCollapsed ? $t('nav.dashboard') : ''"
             @click="closeMobileSidebar"
+            :class="['nav-item', isActive('/dashboard') && 'nav-item--active nav-item--blue']"
+            :title="isCollapsed ? $t('nav.dashboard') : ''"
           >
-            <div
-              class="w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-200"
-              :class="
-                isActive('/dashboard')
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-gray-800 text-gray-400 group-hover:bg-blue-500/20 group-hover:text-blue-400'
-              "
-            >
-              <i class="fas fa-tachometer-alt text-base"></i>
-            </div>
-            <transition name="slide-fade" mode="out-in">
-              <div v-if="!isCollapsed" class="flex-1">
-                <span class="font-medium">{{ $t('nav.dashboard') }}</span>
-              </div>
+            <span class="nav-icon nav-icon--blue">
+              <i class="fas fa-tachometer-alt"></i>
+            </span>
+            <transition name="fade-slide">
+              <span v-if="!isCollapsed" class="nav-label-text">{{ $t('nav.dashboard') }}</span>
             </transition>
-            <transition name="slide-fade" mode="out-in">
-              <span
-                v-if="!isCollapsed && isActive('/dashboard')"
-                class="w-2 h-2 bg-blue-400 rounded-full animate-pulse"
-              ></span>
-            </transition>
+            <span
+              v-if="!isCollapsed && isActive('/dashboard')"
+              class="active-dot active-dot--blue"
+            ></span>
           </router-link>
         </li>
 
@@ -151,44 +111,21 @@
         <li v-if="hasPermission('view_invoices')">
           <router-link
             to="/invoices"
-            class="group flex items-center space-x-3 px-3 py-3 rounded-xl transition-all duration-200"
-            :class="
-              isActive('/invoices')
-                ? 'bg-gradient-to-r from-green-600/30 to-green-500/20 text-white border-r-4 border-green-500'
-                : 'text-gray-300 hover:bg-gray-800/50 hover:text-white'
-            "
-            :title="isCollapsed ? $t('nav.invoices') : ''"
             @click="closeMobileSidebar"
+            :class="['nav-item', isActive('/invoices') && 'nav-item--active nav-item--emerald']"
+            :title="isCollapsed ? $t('nav.invoices') : ''"
           >
-            <div
-              class="w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-200 relative"
-              :class="
-                isActive('/invoices')
-                  ? 'bg-green-500 text-white'
-                  : 'bg-gray-800 text-gray-400 group-hover:bg-green-500/20 group-hover:text-green-400'
-              "
-            >
-              <i class="fas fa-file-invoice-dollar text-base"></i>
-              <transition name="bounce">
-                <span
-                  v-if="pendingInvoices > 0"
-                  class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center border-2 border-gray-900"
-                >
-                  {{ pendingInvoices > 9 ? '9+' : pendingInvoices }}
-                </span>
-              </transition>
-            </div>
-            <transition name="slide-fade" mode="out-in">
-              <div v-if="!isCollapsed" class="flex-1">
-                <span class="font-medium">{{ $t('nav.invoices') }}</span>
-                <p class="text-xs text-gray-400 mt-0.5">{{ $t('nav.invoices_desc') }}</p>
+            <span class="nav-icon nav-icon--emerald" style="position: relative">
+              <i class="fas fa-file-invoice-dollar"></i>
+              <span v-if="pendingInvoices > 0" class="badge">
+                {{ pendingInvoices > 9 ? '9+' : pendingInvoices }}
+              </span>
+            </span>
+            <transition name="fade-slide">
+              <div v-if="!isCollapsed" class="nav-text-block">
+                <span class="nav-label-text">{{ $t('nav.invoices') }}</span>
+                <span class="nav-sub">{{ $t('nav.invoices_desc') }}</span>
               </div>
-            </transition>
-            <transition name="slide-fade" mode="out-in">
-              <i
-                v-if="!isCollapsed"
-                class="fas fa-chevron-left text-xs text-gray-500 group-hover:text-gray-300 transition-colors"
-              ></i>
             </transition>
           </router-link>
         </li>
@@ -197,36 +134,18 @@
         <li v-if="hasPermission('view_clients')">
           <router-link
             to="/clients"
-            class="group flex items-center space-x-3 px-3 py-3 rounded-xl transition-all duration-200"
-            :class="
-              isActive('/clients')
-                ? 'bg-gradient-to-r from-purple-600/30 to-purple-500/20 text-white border-r-4 border-purple-500'
-                : 'text-gray-300 hover:bg-gray-800/50 hover:text-white'
-            "
-            :title="isCollapsed ? $t('nav.clients') : ''"
             @click="closeMobileSidebar"
+            :class="['nav-item', isActive('/clients') && 'nav-item--active nav-item--violet']"
+            :title="isCollapsed ? $t('nav.clients') : ''"
           >
-            <div
-              class="w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-200"
-              :class="
-                isActive('/clients')
-                  ? 'bg-purple-500 text-white'
-                  : 'bg-gray-800 text-gray-400 group-hover:bg-purple-500/20 group-hover:text-purple-400'
-              "
-            >
-              <i class="fas fa-users text-base"></i>
-            </div>
-            <transition name="slide-fade" mode="out-in">
-              <div v-if="!isCollapsed" class="flex-1">
-                <span class="font-medium">{{ $t('nav.clients') }}</span>
-                <p class="text-xs text-gray-400 mt-0.5">{{ $t('nav.clients_desc') }}</p>
+            <span class="nav-icon nav-icon--violet">
+              <i class="fas fa-users"></i>
+            </span>
+            <transition name="fade-slide">
+              <div v-if="!isCollapsed" class="nav-text-block">
+                <span class="nav-label-text">{{ $t('nav.clients') }}</span>
+                <span class="nav-sub">{{ $t('nav.clients_desc') }}</span>
               </div>
-            </transition>
-            <transition name="slide-fade" mode="out-in">
-              <i
-                v-if="!isCollapsed"
-                class="fas fa-chevron-left text-xs text-gray-500 group-hover:text-gray-300 transition-colors"
-              ></i>
             </transition>
           </router-link>
         </li>
@@ -235,86 +154,49 @@
         <li v-if="hasPermission('view_reports')">
           <router-link
             to="/reports"
-            class="group flex items-center space-x-3 px-3 py-3 rounded-xl transition-all duration-200"
-            :class="
-              isActive('/reports')
-                ? 'bg-gradient-to-r from-orange-600/30 to-orange-500/20 text-white border-r-4 border-orange-500'
-                : 'text-gray-300 hover:bg-gray-800/50 hover:text-white'
-            "
-            :title="isCollapsed ? $t('nav.reports') : ''"
             @click="closeMobileSidebar"
+            :class="['nav-item', isActive('/reports') && 'nav-item--active nav-item--amber']"
+            :title="isCollapsed ? $t('nav.reports') : ''"
           >
-            <div
-              class="w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-200"
-              :class="
-                isActive('/reports')
-                  ? 'bg-orange-500 text-white'
-                  : 'bg-gray-800 text-gray-400 group-hover:bg-orange-500/20 group-hover:text-orange-400'
-              "
-            >
-              <i class="fas fa-chart-line text-base"></i>
-            </div>
-            <transition name="slide-fade" mode="out-in">
-              <div v-if="!isCollapsed" class="flex-1">
-                <span class="font-medium">{{ $t('nav.reports') }}</span>
-                <p class="text-xs text-gray-400 mt-0.5">{{ $t('nav.reports_desc') }}</p>
+            <span class="nav-icon nav-icon--amber">
+              <i class="fas fa-chart-line"></i>
+            </span>
+            <transition name="fade-slide">
+              <div v-if="!isCollapsed" class="nav-text-block">
+                <span class="nav-label-text">{{ $t('nav.reports') }}</span>
+                <span class="nav-sub">{{ $t('nav.reports_desc') }}</span>
               </div>
-            </transition>
-            <transition name="slide-fade" mode="out-in">
-              <i
-                v-if="!isCollapsed"
-                class="fas fa-chevron-left text-xs text-gray-500 group-hover:text-gray-300 transition-colors"
-              ></i>
             </transition>
           </router-link>
         </li>
 
-        <!-- Admin Section Header -->
-        <transition name="slide-fade" mode="out-in">
-          <div v-if="isAdmin && !isCollapsed" class="px-5 pt-8 pb-2">
-            <div class="flex items-center gap-2">
-              <div
-                class="w-full h-px bg-gradient-to-r from-transparent via-gray-700 to-transparent"
-              ></div>
-              <span
-                class="text-xs uppercase text-gray-500 font-semibold tracking-wider whitespace-nowrap"
-              >
-                {{ $t('admin.section_title') }}
-              </span>
-              <div
-                class="w-full h-px bg-gradient-to-r from-transparent via-gray-700 to-transparent"
-              ></div>
+        <!-- ── ADMIN DIVIDER ── -->
+        <li v-if="isAdmin">
+          <transition name="fade-slide">
+            <div v-if="!isCollapsed" class="section-divider">
+              <div class="divider-line"></div>
+              <span class="divider-label">{{ $t('admin.section_title') }}</span>
+              <div class="divider-line"></div>
             </div>
-          </div>
-        </transition>
+            <div v-else class="divider-dot-wrap">
+              <span class="divider-dot"></span>
+            </div>
+          </transition>
+        </li>
 
         <!-- Users -->
         <li v-if="isAdmin">
           <router-link
             to="/users"
-            class="group flex items-center space-x-3 px-3 py-3 rounded-xl transition-all duration-200"
-            :class="
-              isActive('/users')
-                ? 'bg-gradient-to-r from-indigo-600/30 to-indigo-500/20 text-white border-r-4 border-indigo-500'
-                : 'text-gray-300 hover:bg-gray-800/50 hover:text-white'
-            "
-            :title="isCollapsed ? $t('nav.users') : ''"
             @click="closeMobileSidebar"
+            :class="['nav-item', isActive('/users') && 'nav-item--active nav-item--indigo']"
+            :title="isCollapsed ? $t('nav.users') : ''"
           >
-            <div
-              class="w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-200"
-              :class="
-                isActive('/users')
-                  ? 'bg-indigo-500 text-white'
-                  : 'bg-gray-800 text-gray-400 group-hover:bg-indigo-500/20 group-hover:text-indigo-400'
-              "
-            >
-              <i class="fas fa-user-shield text-base"></i>
-            </div>
-            <transition name="slide-fade" mode="out-in">
-              <div v-if="!isCollapsed" class="flex-1">
-                <span class="font-medium">{{ $t('nav.users') }}</span>
-              </div>
+            <span class="nav-icon nav-icon--indigo">
+              <i class="fas fa-user-shield"></i>
+            </span>
+            <transition name="fade-slide">
+              <span v-if="!isCollapsed" class="nav-label-text">{{ $t('nav.users') }}</span>
             </transition>
           </router-link>
         </li>
@@ -323,29 +205,15 @@
         <li v-if="isAdmin">
           <router-link
             to="/admin/groups"
-            class="group flex items-center space-x-3 px-3 py-3 rounded-xl transition-all duration-200"
-            :class="
-              isActive('/admin/groups')
-                ? 'bg-gradient-to-r from-pink-600/30 to-pink-500/20 text-white border-r-4 border-pink-500'
-                : 'text-gray-300 hover:bg-gray-800/50 hover:text-white'
-            "
-            :title="isCollapsed ? $t('adminGroups.title') : ''"
             @click="closeMobileSidebar"
+            :class="['nav-item', isActive('/admin/groups') && 'nav-item--active nav-item--pink']"
+            :title="isCollapsed ? $t('adminGroups.title') : ''"
           >
-            <div
-              class="w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-200"
-              :class="
-                isActive('/admin/groups')
-                  ? 'bg-pink-500 text-white'
-                  : 'bg-gray-800 text-gray-400 group-hover:bg-pink-500/20 group-hover:text-pink-400'
-              "
-            >
-              <i class="fas fa-users-cog text-base"></i>
-            </div>
-            <transition name="slide-fade" mode="out-in">
-              <div v-if="!isCollapsed" class="flex-1">
-                <span class="font-medium">{{ $t('adminGroups.title') }}</span>
-              </div>
+            <span class="nav-icon nav-icon--pink">
+              <i class="fas fa-users-cog"></i>
+            </span>
+            <transition name="fade-slide">
+              <span v-if="!isCollapsed" class="nav-label-text">{{ $t('adminGroups.title') }}</span>
             </transition>
           </router-link>
         </li>
@@ -354,104 +222,103 @@
         <li v-if="isAdmin">
           <router-link
             to="/permissions"
-            class="group flex items-center space-x-3 px-3 py-3 rounded-xl transition-all duration-200"
-            :class="
-              isActive('/permissions')
-                ? 'bg-gradient-to-r from-teal-600/30 to-teal-500/20 text-white border-r-4 border-teal-500'
-                : 'text-gray-300 hover:bg-gray-800/50 hover:text-white'
-            "
-            :title="isCollapsed ? $t('nav.permissions') : ''"
             @click="closeMobileSidebar"
+            :class="['nav-item', isActive('/permissions') && 'nav-item--active nav-item--teal']"
+            :title="isCollapsed ? $t('nav.permissions') : ''"
           >
-            <div
-              class="w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-200"
-              :class="
-                isActive('/permissions')
-                  ? 'bg-teal-500 text-white'
-                  : 'bg-gray-800 text-gray-400 group-hover:bg-teal-500/20 group-hover:text-teal-400'
-              "
-            >
-              <i class="fas fa-shield-alt text-base"></i>
-            </div>
-            <transition name="slide-fade" mode="out-in">
-              <div v-if="!isCollapsed" class="flex-1">
-                <span class="font-medium">{{ $t('nav.permissions') }}</span>
+            <span class="nav-icon nav-icon--teal">
+              <i class="fas fa-shield-alt"></i>
+            </span>
+            <transition name="fade-slide">
+              <span v-if="!isCollapsed" class="nav-label-text">{{ $t('nav.permissions') }}</span>
+            </transition>
+          </router-link>
+        </li>
+
+        <!-- OTP -->
+        <li v-if="isAdmin">
+          <router-link
+            to="/admin/otp"
+            @click="closeMobileSidebar"
+            :class="['nav-item', isActive('/admin/otp') && 'nav-item--active nav-item--yellow']"
+            :title="isCollapsed ? 'رموز OTP' : ''"
+          >
+            <span class="nav-icon nav-icon--yellow">
+              <i class="fas fa-key"></i>
+            </span>
+            <transition name="fade-slide">
+              <div v-if="!isCollapsed" class="nav-text-block">
+                <span class="nav-label-text">رموز OTP</span>
+                <span class="nav-sub">إدارة رموز التحقق</span>
               </div>
             </transition>
           </router-link>
         </li>
       </ul>
-    </div>
+    </nav>
 
-    <!-- Bottom Actions -->
-    <div class="p-4 border-t border-gray-700/50 space-y-2">
-      <!-- Language Toggle -->
+    <!-- ══════════ FOOTER ACTIONS ══════════ -->
+    <div class="sidebar-footer">
+      <!-- Language -->
       <button
         @click="toggleLanguage"
-        class="group flex items-center space-x-3 w-full px-3 py-3 rounded-xl text-gray-300 hover:bg-gray-800/50 hover:text-white transition-all duration-200"
+        class="footer-btn"
         :title="isCollapsed ? $t('buttons.toggle_language') : ''"
       >
-        <div
-          class="w-10 h-10 rounded-lg flex items-center justify-center bg-gray-800 text-gray-400 group-hover:bg-blue-500/20 group-hover:text-blue-400 transition-all duration-200"
-        >
-          <i class="fas fa-language text-base"></i>
-        </div>
-        <transition name="slide-fade" mode="out-in">
-          <div v-if="!isCollapsed" class="flex-1 text-right">
-            <span class="font-medium block">
-              {{ isRTL ? 'English' : 'العربية' }}
-            </span>
-            <span class="text-xs text-gray-400">{{ $t('buttons.toggle_language') }}</span>
+        <span class="footer-btn-icon">
+          <i class="fas fa-language"></i>
+        </span>
+        <transition name="fade-slide">
+          <div v-if="!isCollapsed" class="footer-btn-text">
+            <span>{{ isRTL ? 'English' : 'العربية' }}</span>
+            <span class="footer-btn-sub">{{ $t('buttons.toggle_language') }}</span>
           </div>
         </transition>
       </button>
 
-      <!-- Expand/Collapse for Mobile -->
+      <!-- Collapse toggle (mobile) -->
       <button
         v-if="isCollapsed && !isMobileOpen"
         @click="toggleCollapse"
-        class="lg:hidden flex items-center justify-center w-full h-10 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white transition-all duration-200"
-        :title="$t('buttons.expand')"
+        class="footer-btn lg:hidden"
       >
-        <i class="fas fa-chevron-right text-sm"></i>
+        <span class="footer-btn-icon">
+          <i class="fas fa-chevron-right"></i>
+        </span>
       </button>
 
       <!-- Logout -->
       <button
         @click="handleLogout"
-        class="group flex items-center space-x-3 w-full px-3 py-3 rounded-xl text-gray-300 hover:bg-red-600/20 hover:text-red-300 transition-all duration-200"
+        class="footer-btn footer-btn--danger"
         :title="isCollapsed ? $t('auth.logout') : ''"
       >
-        <div
-          class="w-10 h-10 rounded-lg flex items-center justify-center bg-gray-800 text-gray-400 group-hover:bg-red-500/20 group-hover:text-red-400 transition-all duration-200"
-        >
-          <i class="fas fa-sign-out-alt text-base"></i>
-        </div>
-        <transition name="slide-fade" mode="out-in">
-          <div v-if="!isCollapsed" class="flex-1 text-right">
-            <span class="font-medium block">{{ $t('auth.logout') }}</span>
-            <span class="text-xs text-gray-400">{{ $t('auth.logout_desc') }}</span>
+        <span class="footer-btn-icon footer-btn-icon--danger">
+          <i class="fas fa-sign-out-alt"></i>
+        </span>
+        <transition name="fade-slide">
+          <div v-if="!isCollapsed" class="footer-btn-text">
+            <span>{{ $t('auth.logout') }}</span>
+            <span class="footer-btn-sub">{{ $t('auth.logout_desc') }}</span>
           </div>
         </transition>
       </button>
 
-      <!-- Version & Status -->
-      <transition name="slide-fade" mode="out-in">
-        <div v-if="!isCollapsed" class="pt-4 mt-4 border-t border-gray-700/50">
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-xs text-gray-500">{{ $t('app.version') }}</span>
-            <span class="text-xs font-medium text-green-400">v2.0.0</span>
+      <!-- Version -->
+      <transition name="fade-slide">
+        <div v-if="!isCollapsed" class="version-block">
+          <div class="version-row">
+            <span>{{ $t('app.version') }}</span>
+            <span class="version-val">v2.0.0</span>
           </div>
-          <div class="flex items-center justify-between">
-            <span class="text-xs text-gray-500">{{ $t('app.status') }}</span>
-            <div class="flex items-center gap-2">
-              <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-              <span class="text-xs text-green-400">{{ $t('app.online') }}</span>
+          <div class="version-row">
+            <span>{{ $t('app.status') }}</span>
+            <div class="status-online">
+              <span class="status-dot"></span>
+              <span>{{ $t('app.online') }}</span>
             </div>
           </div>
-          <p class="text-[10px] text-gray-600 text-center mt-4">
-            &copy; {{ new Date().getFullYear() }} {{ $t('app.name') }}. {{ $t('app.rights') }}
-          </p>
+          <p class="copyright">&copy; {{ new Date().getFullYear() }} {{ $t('app.name') }}</p>
         </div>
       </transition>
     </div>
@@ -463,39 +330,22 @@ import { mapState, mapGetters } from 'vuex'
 
 export default {
   name: 'Sidebar',
-
   props: {
-    isMobileOpen: {
-      type: Boolean,
-      default: false,
-    },
+    isMobileOpen: { type: Boolean, default: false },
   },
-
   data() {
-    return {
-      isCollapsed: false,
-    }
+    return { isCollapsed: false }
   },
-
   computed: {
     ...mapState('auth', ['user']),
     ...mapState('dashboard', ['stats']),
     ...mapGetters('auth', ['isAdmin', 'hasPermission']),
-
     isRTL() {
       return this.$i18n.locale === 'ar'
     },
-
     pendingInvoices() {
       return this.stats?.pendingInvoices || 0
     },
-  },
-
-  methods: {
-    isActive(path) {
-      return this.$route.path === path || this.$route.path.startsWith(path + '/')
-    },
-
     getUserInitials() {
       if (!this.user?.name) return 'U'
       return this.user.name
@@ -505,49 +355,33 @@ export default {
         .toUpperCase()
         .substring(0, 2)
     },
-
     userRole() {
       if (this.isAdmin) return this.$t('auth.admin')
       return this.user?.roles?.[0]?.name || this.$t('auth.user')
     },
-
+  },
+  methods: {
+    isActive(path) {
+      return this.$route.path === path || this.$route.path.startsWith(path + '/')
+    },
     toggleCollapse() {
       this.isCollapsed = !this.isCollapsed
       localStorage.setItem('sidebarCollapsed', this.isCollapsed)
       this.$emit('toggle-collapse', this.isCollapsed)
-
-      // إضافة تأثير صوتي خفيف
-      const audio = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-select-click-1109.mp3')
-      audio.volume = 0.1
-      audio.play().catch(() => {})
     },
-
     closeMobileSidebar() {
-      if (window.innerWidth < 1024) {
-        this.$emit('close-mobile')
-      }
+      if (window.innerWidth < 1024) this.$emit('close-mobile')
     },
-
     toggleLanguage() {
       const newLang = this.isRTL ? 'en' : 'ar'
       this.$i18n.locale = newLang
       localStorage.setItem('userLanguage', newLang)
       document.documentElement.dir = newLang === 'ar' ? 'rtl' : 'ltr'
       document.documentElement.lang = newLang
-
-      // إشعار بتغيير اللغة مع تأثير مرئي
-      this.$toast.info(
-        this.$t('language.changed', {
-          lang: newLang === 'ar' ? 'العربية' : 'English',
-        }),
-        {
-          position: 'bottom-left',
-          icon: 'fas fa-language',
-          duration: 3000,
-        },
+      this.$toast?.info(
+        this.$t('language.changed', { lang: newLang === 'ar' ? 'العربية' : 'English' }),
       )
     },
-
     async handleLogout() {
       try {
         const confirmed = await this.$swal({
@@ -555,246 +389,745 @@ export default {
           text: this.$t('auth.logout_confirm_text'),
           icon: 'question',
           showCancelButton: true,
-          confirmButtonColor: '#EF4444',
-          cancelButtonColor: '#6B7280',
+          confirmButtonColor: '#ef4444',
+          cancelButtonColor: '#6b7280',
           confirmButtonText: this.$t('auth.logout'),
           cancelButtonText: this.$t('common.cancel'),
           reverseButtons: true,
-          focusCancel: true,
-          customClass: {
-            popup: 'animated zoomIn',
-          },
         })
-
         if (confirmed.isConfirmed) {
           await this.$store.dispatch('auth/logout')
-          this.$toast.success(this.$t('auth.logout_success'), {
-            position: 'bottom-left',
-            icon: 'fas fa-check-circle',
-          })
           this.$router.push('/login')
         }
-      } catch (error) {
-        console.error('Logout error:', error)
-        this.$toast.error(this.$t('auth.logout_error'), {
-          position: 'bottom-left',
-          icon: 'fas fa-exclamation-circle',
-        })
+      } catch (e) {
+        console.error(e)
       }
     },
   },
-
   mounted() {
-    // Load sidebar state from localStorage
-    const savedState = localStorage.getItem('sidebarCollapsed')
-    if (savedState !== null) {
-      this.isCollapsed = savedState === 'true'
-    }
-
-    // Load stats if not loaded
-    if (!this.stats) {
-      this.$store.dispatch('dashboard/fetchDashboardData')
-    }
-
-    // إضافة تأثيرات صوتية خفيفة للتأكيد على التفاعل
-    this.$nextTick(() => {
-      const links = this.$el.querySelectorAll('a')
-      links.forEach((link) => {
-        link.addEventListener('click', () => {
-          const audio = new Audio(
-            'https://assets.mixkit.co/sfx/preview/mixkit-select-click-1109.mp3',
-          )
-          audio.volume = 0.05
-          audio.play().catch(() => {})
-        })
-      })
-    })
+    const saved = localStorage.getItem('sidebarCollapsed')
+    if (saved !== null) this.isCollapsed = saved === 'true'
+    if (!this.stats) this.$store.dispatch('dashboard/fetchDashboardData')
   },
 }
 </script>
 
 <style scoped>
-/* Custom Scrollbar */
-.scrollbar-thin::-webkit-scrollbar {
-  width: 4px;
+/* ═══════════════════════════════════════
+   CSS VARIABLES
+═══════════════════════════════════════ */
+:root {
+  --sidebar-bg: #0f1117;
+  --sidebar-border: rgba(255, 255, 255, 0.06);
+  --sidebar-text: #a1a8bc;
+  --sidebar-text-active: #ffffff;
 }
 
-.scrollbar-thin::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 10px;
-}
-
-.scrollbar-thin::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
-}
-
-.scrollbar-thin::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-/* Animations */
-.slide-fade-enter-active,
-.slide-fade-leave-active {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.slide-fade-enter-from,
-.slide-fade-leave-to {
-  opacity: 0;
-  transform: translateX(-10px);
-}
-
-.bounce-enter-active {
-  animation: bounce-in 0.5s;
-}
-
-.bounce-leave-active {
-  animation: bounce-in 0.5s reverse;
-}
-
-@keyframes bounce-in {
-  0% {
-    transform: scale(0);
-  }
-  50% {
-    transform: scale(1.2);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-/* Active Link Indicator */
-.router-link-active {
+/* ═══════════════════════════════════════
+   SIDEBAR BASE
+═══════════════════════════════════════ */
+.sidebar {
+  background: linear-gradient(160deg, #0f1117 0%, #141720 50%, #0f1117 100%);
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
   position: relative;
   overflow: hidden;
 }
 
-.router-link-active::after {
+/* Noise texture */
+.noise-overlay {
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.3;
+}
+
+/* Ambient glow */
+.sidebar::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 100%);
+  top: -120px;
+  right: -80px;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.12) 0%, transparent 70%);
   pointer-events: none;
+  z-index: 0;
 }
 
-/* Gradient Border Effect */
-.router-link-active {
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.3);
+.sidebar::after {
+  content: '';
+  position: absolute;
+  bottom: -100px;
+  left: -60px;
+  width: 250px;
+  height: 250px;
+  background: radial-gradient(circle, rgba(20, 184, 166, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
 }
 
-/* Hover Effects */
-.group:hover .group-hover\:scale-105 {
+.sidebar > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ═══════════════════════════════════════
+   HEADER
+═══════════════════════════════════════ */
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 72px;
+  padding: 0 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+}
+
+.logo-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  flex: 1;
+  min-width: 0;
+}
+
+.logo-icon {
+  position: relative;
+  width: 42px;
+  height: 42px;
+  background: linear-gradient(135deg, #6366f1 0%, #818cf8 100%);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+}
+
+.logo-link:hover .logo-icon {
   transform: scale(1.05);
+  box-shadow: 0 6px 28px rgba(99, 102, 241, 0.5);
 }
 
-/* Glass Effect */
-.bg-gradient-to-br {
-  background-attachment: fixed;
+.logo-icon i {
+  color: #fff;
+  font-size: 18px;
 }
 
-/* Responsive Adjustments */
-@media (max-width: 1024px) {
-  aside {
-    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.3);
-  }
+.logo-badge {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  width: 12px;
+  height: 12px;
+  background: #22c55e;
+  border-radius: 50%;
+  border: 2px solid #0f1117;
+  animation: pulse-dot 2s infinite;
 }
 
-/* RTL Support */
-[dir='rtl'] .router-link-active {
-  border-right: none;
-  border-left: 4px solid;
-}
-
-[dir='rtl'] .slide-fade-enter-from,
-[dir='rtl'] .slide-fade-leave-to {
-  transform: translateX(10px);
-}
-
-/* Loading Animation */
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
-}
-
-.animate-shimmer {
-  background: linear-gradient(
-    90deg,
-    transparent 25%,
-    rgba(255, 255, 255, 0.1) 50%,
-    transparent 75%
-  );
-  background-size: 200% 100%;
-  animation: shimmer 2s infinite;
-}
-
-/* Icon Pulse Animation */
-@keyframes icon-pulse {
+@keyframes pulse-dot {
   0%,
   100% {
-    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4);
   }
   50% {
-    transform: scale(1.1);
+    box-shadow: 0 0 0 5px rgba(34, 197, 94, 0);
   }
 }
 
-.fa-tachometer-alt,
-.fa-file-invoice-dollar,
-.fa-users,
-.fa-chart-line {
-  transition: transform 0.3s ease;
+.logo-text {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
-.group:hover .fa-tachometer-alt,
-.group:hover .fa-file-invoice-dollar,
-.group:hover .fa-users,
-.group:hover .fa-chart-line {
-  animation: icon-pulse 0.5s ease;
+.logo-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* Notification Badge Animation */
-@keyframes badge-pulse {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.1);
-    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.3);
-  }
+.logo-version {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.3);
+  letter-spacing: 0.5px;
+  margin-top: 1px;
 }
 
-.bg-red-500 {
+.collapse-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.collapse-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+/* ═══════════════════════════════════════
+   USER CARD
+═══════════════════════════════════════ */
+.user-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.02);
+  flex-shrink: 0;
+}
+
+.user-avatar {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #6366f1, #a78bfa);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 15px;
+  color: #fff;
+  flex-shrink: 0;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(99, 102, 241, 0.3);
+}
+
+.user-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.online-dot {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 11px;
+  height: 11px;
+  background: #22c55e;
+  border-radius: 50%;
+  border: 2px solid #0f1117;
+}
+
+.collapsed-avatar {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #6366f1, #a78bfa);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+  color: #fff;
+  margin: 12px auto;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.collapsed-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.user-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.user-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 1px;
+}
+
+.user-email {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.35);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 5px;
+}
+
+.user-role {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 20px;
+  letter-spacing: 0.3px;
+}
+
+.role-admin {
+  background: rgba(168, 85, 247, 0.15);
+  color: #c084fc;
+  border: 1px solid rgba(168, 85, 247, 0.2);
+}
+
+.role-user {
+  background: rgba(99, 102, 241, 0.15);
+  color: #818cf8;
+  border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+/* ═══════════════════════════════════════
+   NAV LABEL
+═══════════════════════════════════════ */
+.nav-label {
+  padding: 16px 20px 6px;
+  flex-shrink: 0;
+}
+
+.nav-label span {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: rgba(255, 255, 255, 0.2);
+}
+
+/* ═══════════════════════════════════════
+   NAV MENU
+═══════════════════════════════════════ */
+.nav-menu {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 10px;
+}
+
+.nav-menu ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* Nav Item Base */
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 10px;
+  border-radius: 10px;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.45);
+  transition: all 0.18s ease;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.nav-item::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0);
+  transition: background 0.2s;
+  border-radius: 10px;
+}
+
+.nav-item:hover {
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Active States */
+.nav-item--active {
+  color: #fff !important;
+}
+
+.nav-item--blue.nav-item--active {
+  background: rgba(59, 130, 246, 0.15);
+  border-right: 2px solid #3b82f6;
+}
+.nav-item--emerald.nav-item--active {
+  background: rgba(16, 185, 129, 0.15);
+  border-right: 2px solid #10b981;
+}
+.nav-item--violet.nav-item--active {
+  background: rgba(139, 92, 246, 0.15);
+  border-right: 2px solid #8b5cf6;
+}
+.nav-item--amber.nav-item--active {
+  background: rgba(245, 158, 11, 0.15);
+  border-right: 2px solid #f59e0b;
+}
+.nav-item--indigo.nav-item--active {
+  background: rgba(99, 102, 241, 0.15);
+  border-right: 2px solid #6366f1;
+}
+.nav-item--pink.nav-item--active {
+  background: rgba(236, 72, 153, 0.15);
+  border-right: 2px solid #ec4899;
+}
+.nav-item--teal.nav-item--active {
+  background: rgba(20, 184, 166, 0.15);
+  border-right: 2px solid #14b8a6;
+}
+.nav-item--yellow.nav-item--active {
+  background: rgba(234, 179, 8, 0.15);
+  border-right: 2px solid #eab308;
+}
+
+/* Nav Icon */
+.nav-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+  transition: all 0.2s;
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.nav-item:hover .nav-icon {
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.nav-item--blue.nav-item--active .nav-icon {
+  background: rgba(59, 130, 246, 0.2);
+  color: #60a5fa;
+}
+.nav-item--emerald.nav-item--active .nav-icon {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+}
+.nav-item--violet.nav-item--active .nav-icon {
+  background: rgba(139, 92, 246, 0.2);
+  color: #a78bfa;
+}
+.nav-item--amber.nav-item--active .nav-icon {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+}
+.nav-item--indigo.nav-item--active .nav-icon {
+  background: rgba(99, 102, 241, 0.2);
+  color: #818cf8;
+}
+.nav-item--pink.nav-item--active .nav-icon {
+  background: rgba(236, 72, 153, 0.2);
+  color: #f472b6;
+}
+.nav-item--teal.nav-item--active .nav-icon {
+  background: rgba(20, 184, 166, 0.2);
+  color: #2dd4bf;
+}
+.nav-item--yellow.nav-item--active .nav-icon {
+  background: rgba(234, 179, 8, 0.2);
+  color: #facc15;
+}
+
+/* Nav Text */
+.nav-label-text {
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.nav-text-block {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.nav-sub {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.25);
+}
+
+/* Active dot */
+.active-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-right: auto;
+  animation: pulse-dot 2s infinite;
+}
+
+.active-dot--blue {
+  background: #3b82f6;
+}
+
+/* Badge */
+.badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 18px;
+  height: 18px;
+  background: #ef4444;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #0f1117;
+  padding: 0 3px;
   animation: badge-pulse 2s infinite;
 }
 
-/* Smooth Transitions */
-* {
-  transition:
-    background-color 0.3s ease,
-    border-color 0.3s ease,
-    transform 0.3s ease,
-    opacity 0.3s ease;
+@keyframes badge-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0);
+  }
 }
 
-/* Focus States */
-button:focus,
-a:focus {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+/* ═══════════════════════════════════════
+   SECTION DIVIDER
+═══════════════════════════════════════ */
+.section-divider {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 4px 8px;
 }
 
-/* Active State Enhancement */
-.router-link-active {
-  backdrop-filter: blur(10px);
+.divider-line {
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.divider-label {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: rgba(255, 255, 255, 0.2);
+  white-space: nowrap;
+}
+
+.divider-dot-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 10px 0 4px;
+}
+
+.divider-dot {
+  width: 20px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.12);
+  display: block;
+}
+
+/* ═══════════════════════════════════════
+   SIDEBAR FOOTER
+═══════════════════════════════════════ */
+.sidebar-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 10px 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.footer-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 10px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  width: 100%;
+  text-align: right;
+  transition: all 0.18s;
+}
+
+.footer-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.footer-btn--danger:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #f87171;
+}
+
+.footer-btn-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.footer-btn-icon--danger {
+  background: rgba(239, 68, 68, 0.1);
+  color: #f87171;
+}
+
+.footer-btn-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1;
+  text-align: right;
+}
+
+.footer-btn-text span:first-child {
+  font-size: 12px;
+  font-weight: 500;
+}
+.footer-btn-sub {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.2);
+}
+
+/* ═══════════════════════════════════════
+   VERSION BLOCK
+═══════════════════════════════════════ */
+.version-block {
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  margin-top: 6px;
+  padding-top: 10px;
+}
+
+.version-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.2);
+}
+
+.version-val {
+  color: #22c55e;
+  font-weight: 600;
+}
+
+.status-online {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #22c55e;
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  background: #22c55e;
+  border-radius: 50%;
+  animation: pulse-dot 2s infinite;
+}
+
+.copyright {
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.1);
+  text-align: center;
+  margin-top: 8px;
+}
+
+/* ═══════════════════════════════════════
+   SCROLLBAR
+═══════════════════════════════════════ */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 3px;
+}
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* ═══════════════════════════════════════
+   TRANSITIONS
+═══════════════════════════════════════ */
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition: all 0.2s ease;
+}
+
+.fade-slide-enter-from,
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateX(-8px);
+}
+
+/* RTL */
+[dir='rtl'] .nav-item--blue.nav-item--active,
+[dir='rtl'] .nav-item--emerald.nav-item--active,
+[dir='rtl'] .nav-item--violet.nav-item--active,
+[dir='rtl'] .nav-item--amber.nav-item--active,
+[dir='rtl'] .nav-item--indigo.nav-item--active,
+[dir='rtl'] .nav-item--pink.nav-item--active,
+[dir='rtl'] .nav-item--teal.nav-item--active,
+[dir='rtl'] .nav-item--yellow.nav-item--active {
+  border-right: none;
+  border-left: 2px solid;
+}
+
+[dir='rtl'] .fade-slide-enter-from,
+[dir='rtl'] .fade-slide-leave-to {
+  transform: translateX(8px);
+}
+
+/* ═══════════════════════════════════════
+   MOBILE
+═══════════════════════════════════════ */
+@media (max-width: 1024px) {
+  .sidebar {
+    box-shadow: 8px 0 40px rgba(0, 0, 0, 0.5);
+  }
 }
 </style>

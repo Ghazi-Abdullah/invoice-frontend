@@ -148,6 +148,12 @@ const routes = [
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
     component: () => import('@/views/Auth/NotFound.vue')
+  },
+  {
+    path: '/admin/otp',
+    name: 'OTP',
+    component: () => import('@/views/Admin/OTP.vue'),
+    meta: { requiresAuth: true }
   }
 ]
 

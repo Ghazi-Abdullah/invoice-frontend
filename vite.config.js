@@ -9,7 +9,7 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
       //'@': path.resolve(__dirname, './src')
     },
-    extensions: ['.js', '.vue', '.json'] // أضف هذا السطر
+    extensions: ['.js', '.vue', '.json']
   },
   server: {
     port: 5173,
@@ -17,7 +17,9 @@ export default defineConfig({
     strictPort: true,
     allowedHosts: ['my-invoice.test'],
     hmr: {
-      host: 'my-invoice.test'
+      host: 'localhost',
+      port: 5173,
+
     },
     proxy: {
       '/api': {
