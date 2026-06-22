@@ -1,36 +1,30 @@
 <template>
   <div class="flex min-h-screen bg-gray-100" :dir="$i18n.locale === 'ar' ? 'rtl' : 'ltr'">
+    <!-- Overlay للموبايل عند فتح السايدبار -->
+    <div
+      v-if="sidebarOpen && isMobile"
+      class="fixed inset-0 bg-black bg-opacity-50 z-40"
+      @click="toggleSidebar"
+    ></div>
+
     <!-- Sidebar -->
     <aside
       :class="[
         'bg-gradient-to-b from-gray-900 to-gray-800 text-white shadow-xl overflow-y-auto transition-all duration-300 z-50',
-        sidebarOpen ? 'w-64' : 'w-0 md:w-20',
+        isMobile
+          ? sidebarOpen
+            ? 'fixed top-0 bottom-0 w-64'
+            : 'fixed top-0 bottom-0 w-0 overflow-hidden'
+          : sidebarOpen
+            ? 'relative w-64'
+            : 'relative w-20',
+        $i18n.locale === 'ar' ? 'right-0' : 'left-0',
       ]"
     >
-      <div class="p-4 h-full flex flex-col">
-        <!-- Logo and Toggle -->
-        <!--<div class="flex items-center justify-between mb-6">
-          <div v-if="sidebarOpen" class="flex items-center gap-3">
-            <div
-              class="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg"
-            >
-              <div class="logo">
-                <i class="fas fa-file-invoice" style="color: #3b82f6"></i>
-                <span style="font-weight: bold; color: #1f2937">فاتورة</span>
-              </div>
-              <i class="fas fa-file-invoice text-xl"></i>
-            </div>
-            <h1 class="text-lg font-bold text-white">{{ $t('app.name') }}</h1>
-          </div>
-          <button @click="toggleSidebar" class="text-white hover:text-blue-300 transition p-2">
-            <i :class="sidebarOpen ? 'fas fa-chevron-right' : 'fas fa-bars'"></i>
-          </button>
-        </div>-->
-
+      <div class="p-4 h-full flex flex-col min-h-screen">
         <!-- User Info -->
         <div v-if="sidebarOpen && user" class="mb-6 p-3 bg-gray-800/50 rounded-xl">
           <div class="flex items-center gap-3">
-            <!-- صورة المستخدم -->
             <div class="relative w-10 h-10 flex-shrink-0">
               <img
                 v-if="user.img_url"
@@ -63,6 +57,7 @@
           <div v-if="user">
             <router-link
               to="/profile"
+              @click="closeSidebarOnMobile"
               class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700/50 transition group"
               :class="{
                 'bg-gradient-to-r from-green-600/20 to-green-600/10 border-r-2 border-green-500':
@@ -84,6 +79,7 @@
           <router-link
             v-if="hasPermission('dashboard')"
             to="/dashboard"
+            @click="closeSidebarOnMobile"
             class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700/50 transition group"
             :class="{
               'bg-gradient-to-r from-blue-600/20 to-blue-600/10 border-r-2 border-blue-500':
@@ -102,6 +98,7 @@
           <router-link
             v-if="hasPermission('view_clients')"
             to="/clients"
+            @click="closeSidebarOnMobile"
             class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700/50 transition group"
             :class="{
               'bg-gradient-to-r from-blue-600/20 to-blue-600/10 border-r-2 border-blue-500':
@@ -120,6 +117,7 @@
           <router-link
             v-if="hasPermission('view_invoices')"
             to="/invoices"
+            @click="closeSidebarOnMobile"
             class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700/50 transition group"
             :class="{
               'bg-gradient-to-r from-blue-600/20 to-blue-600/10 border-r-2 border-blue-500':
@@ -138,6 +136,7 @@
           <router-link
             v-if="hasPermission('view_sales_report')"
             to="/reports"
+            @click="closeSidebarOnMobile"
             class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700/50 transition group"
             :class="{
               'bg-gradient-to-r from-blue-600/20 to-blue-600/10 border-r-2 border-blue-500':
@@ -154,13 +153,13 @@
 
           <!-- Admin Section -->
           <template v-if="isAdmin">
-            <!-- العنوان (يظهر فقط عند فتح الشريط الجانبي) -->
             <div v-if="sidebarOpen" class="pt-4 mt-4 border-t border-gray-700"></div>
 
             <!-- Users -->
             <router-link
               v-if="hasPermission('administration')"
               to="/admin/users"
+              @click="closeSidebarOnMobile"
               class="flex items-center gap-3 p-3 rounded-lg hover:bg-purple-600/10 transition group"
               :class="{
                 'bg-gradient-to-r from-purple-600/20 to-purple-600/10 border-r-2 border-purple-500':
@@ -170,7 +169,7 @@
               <i
                 class="fas fa-user-cog w-5 text-center text-gray-300 group-hover:text-purple-400 transition"
               ></i>
-              <span class="text-gray-300 group-hover:text-purple-400 transition">
+              <span v-if="sidebarOpen" class="text-gray-300 group-hover:text-purple-400 transition">
                 {{ $t('nav.users') }}
               </span>
             </router-link>
@@ -179,6 +178,7 @@
             <router-link
               v-if="hasPermission('administration')"
               to="/admin/groups"
+              @click="closeSidebarOnMobile"
               class="flex items-center gap-3 p-3 rounded-lg hover:bg-purple-600/10 transition group"
               :class="{
                 'bg-gradient-to-r from-purple-600/20 to-purple-600/10 border-r-2 border-purple-500':
@@ -188,7 +188,7 @@
               <i
                 class="fas fa-users-cog w-5 text-center text-gray-300 group-hover:text-purple-400 transition"
               ></i>
-              <span class="text-gray-300 group-hover:text-purple-400 transition">
+              <span v-if="sidebarOpen" class="text-gray-300 group-hover:text-purple-400 transition">
                 {{ $t('nav.groups') }}
               </span>
             </router-link>
@@ -197,6 +197,7 @@
             <router-link
               v-if="hasPermission('administration')"
               to="/admin/permissions"
+              @click="closeSidebarOnMobile"
               class="flex items-center gap-3 p-3 rounded-lg hover:bg-purple-600/10 transition group"
               :class="{
                 'bg-gradient-to-r from-purple-600/20 to-purple-600/10 border-r-2 border-purple-500':
@@ -206,7 +207,7 @@
               <i
                 class="fas fa-shield-alt w-5 text-center text-gray-300 group-hover:text-purple-400 transition"
               ></i>
-              <span class="text-gray-300 group-hover:text-purple-400 transition">
+              <span v-if="sidebarOpen" class="text-gray-300 group-hover:text-purple-400 transition">
                 {{ $t('nav.permissions') }}
               </span>
             </router-link>
@@ -215,6 +216,7 @@
             <router-link
               v-if="hasPermission('administration')"
               to="/admin/assign-permissions"
+              @click="closeSidebarOnMobile"
               class="flex items-center gap-3 p-3 rounded-lg hover:bg-purple-600/10 transition group"
               :class="{
                 'bg-gradient-to-r from-purple-600/20 to-purple-600/10 border-r-2 border-purple-500':
@@ -224,18 +226,18 @@
               <i
                 class="fas fa-key w-5 text-center text-gray-300 group-hover:text-purple-400 transition"
               ></i>
-              <span class="text-gray-300 group-hover:text-purple-400 transition">
+              <span v-if="sidebarOpen" class="text-gray-300 group-hover:text-purple-400 transition">
                 {{ $t('nav.assign_permissions') }}
               </span>
             </router-link>
 
-            <!-- العنوان (يظهر فقط عند فتح الشريط الجانبي) -->
             <div v-if="sidebarOpen" class="pt-4 mt-4 border-t border-gray-700"></div>
 
             <!-- Activity Log -->
             <router-link
               v-if="hasPermission('administration')"
               to="/activitylog"
+              @click="closeSidebarOnMobile"
               class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-600/10 transition group"
               :class="{
                 'bg-gradient-to-r from-orange-600/20 to-orange-600/10 border-r-2 border-orange-500':
@@ -245,7 +247,7 @@
               <i
                 class="fas fa-history w-5 text-center text-gray-300 group-hover:text-orange-400 transition"
               ></i>
-              <span class="text-gray-300 group-hover:text-orange-400 transition">
+              <span v-if="sidebarOpen" class="text-gray-300 group-hover:text-orange-400 transition">
                 {{ $t('nav.activitylog') }}
               </span>
             </router-link>
@@ -258,7 +260,6 @@
           <button
             @click="toggleLanguage"
             class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700/50 transition w-full group"
-            :title="sidebarOpen ? '' : $t('nav.toggle_language')"
           >
             <i
               class="fas fa-language w-5 text-center text-gray-300 group-hover:text-blue-400 transition"
@@ -272,7 +273,6 @@
           <button
             @click="logout"
             class="flex items-center gap-3 p-3 rounded-lg hover:bg-red-600/10 transition w-full group"
-            :title="sidebarOpen ? '' : $t('auth.logout')"
           >
             <i
               class="fas fa-sign-out-alt w-5 text-center text-gray-300 group-hover:text-red-400 transition"
@@ -285,19 +285,12 @@
       </div>
     </aside>
 
-    <!-- Overlay for mobile -->
-    <div
-      v-if="!sidebarOpen && isMobile"
-      class="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
-      @click="toggleSidebar"
-    ></div>
-
     <!-- Main Content -->
-    <div class="flex-1 flex flex-col min-h-screen">
+    <div class="flex-1 flex flex-col min-h-screen overflow-hidden">
       <!-- Navbar -->
       <nav class="bg-white shadow-lg sticky top-0 z-30">
         <div class="px-4 py-3 flex items-center justify-between">
-          <!-- Left: Sidebar Toggle and Breadcrumb -->
+          <!-- يسار: زر البرغر + Breadcrumb -->
           <div class="flex items-center gap-4">
             <button
               @click="toggleSidebar"
@@ -318,15 +311,16 @@
             </div>
           </div>
 
-          <!-- Center: Page Title (Mobile) -->
+          <!-- وسط: عنوان الصفحة (موبايل) -->
           <div class="md:hidden">
-            <h1 class="text-blue-600 font-bold text-sm">
-              {{ getPageTitle() }}
-            </h1>
+            <h1 class="text-blue-600 font-bold text-sm">{{ getPageTitle() }}</h1>
           </div>
 
-          <!-- Right: User Menu and Language -->
+          <!-- يمين: جرس الإشعارات + اللغة + المستخدم -->
           <div class="flex items-center gap-3">
+            <!-- جرس الإشعارات -->
+            <InvoiceNotificationBell />
+
             <!-- Language Switcher (desktop) -->
             <button
               @click="toggleLanguage"
@@ -342,7 +336,6 @@
                 @click="userDropdownOpen = !userDropdownOpen"
                 class="flex items-center gap-2 focus:outline-none"
               >
-                <!-- صورة المستخدم -->
                 <div class="relative h-8 w-8 flex-shrink-0">
                   <img
                     v-if="user?.img_url"
@@ -369,7 +362,8 @@
               <!-- Dropdown Menu -->
               <div
                 v-if="userDropdownOpen"
-                class="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-50"
+                class="absolute mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-50"
+                :class="$i18n.locale === 'ar' ? 'right-0' : 'left-0'"
                 v-click-outside="() => (userDropdownOpen = false)"
               >
                 <div class="p-3 border-b border-gray-100 flex items-center gap-3">
@@ -403,7 +397,7 @@
                   </router-link>
                   <button
                     @click="logout"
-                    class="flex items-center gap-2 w-full text-right px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition"
+                    class="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition"
                   >
                     <i class="fas fa-sign-out-alt text-gray-400 w-4"></i>
                     <span>{{ $t('auth.logout') }}</span>
@@ -415,7 +409,7 @@
         </div>
       </nav>
 
-      <!-- Main Content -->
+      <!-- Page Content -->
       <main class="flex-1 p-4 md:p-6 bg-gray-50">
         <router-view />
       </main>
@@ -428,9 +422,14 @@ import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
+import InvoiceNotificationBell from '@/components/shared/InvoiceNotificationBell.vue'
 
 export default {
   name: 'DefaultLayout',
+
+  components: {
+    InvoiceNotificationBell,
+  },
 
   directives: {
     'click-outside': {
@@ -457,12 +456,10 @@ export default {
     const userDropdownOpen = ref(false)
     const isMobile = ref(false)
 
-    // Computed properties
     const user = computed(() => store.state.auth.user)
     const permissions = computed(() => store.state.auth.permissions || [])
     const isAdmin = computed(() => store.state.auth.is_admin || false)
 
-    // Methods
     const getInitials = (name) => {
       if (!name) return 'U'
       return name
@@ -479,7 +476,7 @@ export default {
     }
 
     const getPageTitle = () => {
-      const route = router.currentRoute.value
+      const path = router.currentRoute.value.path
       const titles = {
         '/dashboard': 'لوحة التحكم',
         '/clients': 'العملاء',
@@ -492,18 +489,24 @@ export default {
         '/profile': 'الملف الشخصي',
         '/activitylog': 'سجل النشاطات',
       }
-      return titles[route.path] || 'نظام الفواتير'
+      return titles[path] || 'نظام الفواتير'
     }
 
     const toggleSidebar = () => {
       sidebarOpen.value = !sidebarOpen.value
     }
 
+    // ← يغلق السايدبار تلقائياً عند الضغط على رابط في الموبايل
+    const closeSidebarOnMobile = () => {
+      if (isMobile.value) {
+        sidebarOpen.value = false
+      }
+    }
+
     const toggleLanguage = () => {
       const newLang = locale.value === 'ar' ? 'en' : 'ar'
       locale.value = newLang
       localStorage.setItem('userLanguage', newLang)
-      // إعادة تحميل الصفحة لتطبيق اللغة
       window.location.reload()
     }
 
@@ -516,28 +519,26 @@ export default {
       }
     }
 
-    // Check auth on mount
+    // ← دالة مستقلة حتى نتمكن من إزالتها في onUnmounted
+    const checkMobile = () => {
+      isMobile.value = window.innerWidth < 768
+      if (isMobile.value) {
+        sidebarOpen.value = false
+      }
+    }
+
     onMounted(async () => {
       if (!user.value) {
         await store.dispatch('auth/checkAuth')
       }
-
-      // Check screen size
-      const checkMobile = () => {
-        isMobile.value = window.innerWidth < 768
-      }
-
+      store.dispatch('invoiceNotifications/startListening') // ← هل هذا موجود؟
       checkMobile()
       window.addEventListener('resize', checkMobile)
-
-      // Close sidebar on mobile by default
-      if (isMobile.value) {
-        sidebarOpen.value = false
-      }
     })
 
     onUnmounted(() => {
       window.removeEventListener('resize', checkMobile)
+      store.dispatch('invoiceNotifications/stopListening')
     })
 
     return {
@@ -551,6 +552,7 @@ export default {
       hasPermission,
       getPageTitle,
       toggleSidebar,
+      closeSidebarOnMobile,
       toggleLanguage,
       logout,
     }
@@ -559,12 +561,28 @@ export default {
 </script>
 
 <style scoped>
-/* تحسينات التصميم */
+/* تخصيص scrollbar السايدبار */
+aside::-webkit-scrollbar {
+  width: 6px;
+}
+aside::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+}
+aside::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+}
+aside::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* الخط الجانبي للرابط النشط */
 .router-link-active {
   position: relative;
 }
 
-.router-link-active::after {
+[dir='ltr'] .router-link-active::after {
   content: '';
   position: absolute;
   left: 0;
@@ -576,87 +594,13 @@ export default {
 }
 
 [dir='rtl'] .router-link-active::after {
-  left: auto;
+  content: '';
+  position: absolute;
   right: 0;
-}
-
-/* تخصيص scrollbar */
-aside::-webkit-scrollbar {
-  width: 6px;
-}
-
-aside::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 10px;
-}
-
-aside::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
-}
-
-aside::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.3);
-}
-
-/* تحسينات للأجهزة المحمولة */
-@media (max-width: 768px) {
-  aside {
-    position: fixed;
-    top: 0;
-    right: 0;
-    height: 100vh;
-    z-index: 50;
-    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.2);
-  }
-
-  .w-64 {
-    width: 16rem;
-  }
-
-  .w-0 {
-    width: 0;
-    overflow: hidden;
-    padding: 0;
-  }
-}
-
-/* تأثيرات انتقالية */
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s;
-}
-
-.fade-enter,
-.fade-leave-to {
-  opacity: 0;
-}
-
-/* تحسينات إضافية للصور */
-img {
-  transition: all 0.3s ease;
-}
-
-img:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-/* تحسين ظهور الشريط الجانبي المصغر */
-.w-20 .flex.items-center.gap-3 {
-  justify-content: center;
-}
-
-.w-20 .text-gray-300 {
-  display: none;
-}
-
-.w-20 .p-3 {
-  justify-content: center;
-}
-
-/* تحسين التباعد في القائمة الجانبية */
-nav .router-link-active {
-  font-weight: 500;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(to bottom, #3b82f6, #1d4ed8);
+  border-radius: 3px 0 0 3px;
 }
 </style>

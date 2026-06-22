@@ -32,15 +32,15 @@
                 </p>
               </div>
             </div>
-            <!-- Breadcrumbs -->
             <nav class="flex mt-3" aria-label="Breadcrumb">
               <ol class="flex items-center space-x-1 space-x-reverse">
                 <li>
                   <router-link
                     to="/invoices"
                     class="text-sm text-gray-500 hover:text-gray-700 transition-colors"
-                    >{{ $t('invoices.title') || 'الفواتير' }}</router-link
                   >
+                    {{ $t('invoices.title') || 'الفواتير' }}
+                  </router-link>
                 </li>
                 <li>
                   <svg class="w-4 h-4 text-gray-400 mx-1" fill="currentColor" viewBox="0 0 20 20">
@@ -106,10 +106,7 @@
           {{ $t('invoices.notFound') || 'الفاتورة غير موجودة' }}
         </h3>
         <p class="text-yellow-700 mb-6">
-          {{
-            $t('invoices.notFoundMessage', { id: $route.params.id }) ||
-            `لم يتم العثور على فاتورة بهذا الرقم`
-          }}
+          {{ $t('invoices.notFoundMessage') || 'لم يتم العثور على فاتورة بهذا الرقم' }}
         </p>
         <button
           @click="$router.push('/invoices')"
@@ -119,19 +116,22 @@
         </button>
       </div>
 
-      <!-- Error State (other errors) -->
+      <!-- Error State -->
       <div v-else-if="error" class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
         <div class="flex items-start">
-          <div class="flex-shrink-0 pt-0.5">
-            <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          </div>
+          <svg
+            class="w-5 h-5 text-red-400 mt-0.5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
           <div class="mr-3 flex-1">
             <h3 class="text-sm font-medium text-red-800">{{ $t('common.error') || 'خطأ' }}</h3>
             <p class="text-sm text-red-700 mt-1">{{ error }}</p>
@@ -159,6 +159,47 @@
 
       <!-- Invoice Details -->
       <div v-else-if="invoice" class="space-y-6" id="invoiceDetails">
+        <!--
+        |----------------------------------------------------------------------
+        | ✅ إضافة: شريط تنبيه "مدفوعة — التعديل غير متاح"
+        |----------------------------------------------------------------------
+        | يظهر فقط عندما تكون الفاتورة مدفوعة، يوضح للمستخدم سبب إخفاء
+        | زر التعديل ويذكره بأن الحذف والإلغاء لا زالا ممكنَين.
+        -->
+        <div
+          v-if="invoice.status === 'paid'"
+          class="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-3"
+        >
+          <div class="flex-shrink-0 p-2 bg-green-100 rounded-lg">
+            <svg
+              class="w-5 h-5 text-green-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </div>
+          <div class="flex-1">
+            <p class="text-green-800 font-semibold text-sm">
+              {{ $t('invoices.paidInvoiceNotice') || 'هذه الفاتورة مدفوعة — لا يمكن تعديلها' }}
+            </p>
+            <p class="text-green-700 text-xs mt-0.5">
+              {{
+                $t('invoices.paidInvoiceSubNotice') || 'يمكنك فقط حذفها أو إلغاؤها إذا لزم الأمر'
+              }}
+            </p>
+          </div>
+          <span class="text-xs text-green-600 font-medium">
+            {{ $t('invoices.paidAt') || 'دُفعت في' }}: {{ formatDate(invoice.paid_at) }}
+          </span>
+        </div>
+
         <!-- Invoice Summary Card -->
         <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
           <div
@@ -214,7 +255,7 @@
 
           <div class="p-6">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <!-- العمود الأول: رقم الفاتورة والتواريخ -->
+              <!-- العمود الأول -->
               <div class="space-y-3">
                 <div class="flex items-center gap-2">
                   <svg
@@ -246,10 +287,10 @@
                       d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                     />
                   </svg>
-                  <span class="text-gray-700"
-                    >{{ $t('invoices.issueDate') || 'تاريخ الإصدار' }}:
-                    <span class="font-medium">{{ formatDate(invoice.invoice_date) }}</span></span
-                  >
+                  <span class="text-gray-700">
+                    {{ $t('invoices.issueDate') || 'تاريخ الإصدار' }}:
+                    <span class="font-medium">{{ formatDate(invoice.invoice_date) }}</span>
+                  </span>
                 </div>
                 <div class="flex items-center gap-2">
                   <svg
@@ -265,10 +306,10 @@
                       d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                     />
                   </svg>
-                  <span class="text-gray-700"
-                    >{{ $t('invoices.dueDate') || 'تاريخ الاستحقاق' }}:
-                    <span class="font-medium">{{ formatDate(invoice.due_date) }}</span></span
-                  >
+                  <span class="text-gray-700">
+                    {{ $t('invoices.dueDate') || 'تاريخ الاستحقاق' }}:
+                    <span class="font-medium">{{ formatDate(invoice.due_date) }}</span>
+                  </span>
                 </div>
                 <div v-if="invoice.paid_at" class="flex items-center gap-2">
                   <svg
@@ -284,14 +325,16 @@
                       d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                     />
                   </svg>
-                  <span class="text-gray-700"
-                    >{{ $t('invoices.paymentDate') || 'تاريخ الدفع' }}:
-                    <span class="font-medium">{{ formatDate(invoice.paid_at) }}</span></span
-                  >
+                  <span class="text-gray-700">
+                    {{ $t('invoices.paymentDate') || 'تاريخ الدفع' }}:
+                    <span class="font-medium text-green-700">{{
+                      formatDate(invoice.paid_at)
+                    }}</span>
+                  </span>
                 </div>
               </div>
 
-              <!-- العمود الثاني: معلومات العميل -->
+              <!-- العمود الثاني -->
               <div class="space-y-3">
                 <h3 class="text-sm font-semibold text-gray-700 border-b border-gray-200 pb-1">
                   {{ $t('clients.client') || 'العميل' }}
@@ -342,31 +385,9 @@
                   </svg>
                   <span>{{ invoice.client.company_name }}</span>
                 </div>
-                <div
-                  v-if="invoice.client?.tax_number && invoice.client.tax_number !== '.'"
-                  class="text-sm text-gray-700 flex items-center gap-2"
-                >
-                  <svg
-                    class="w-4 h-4 text-gray-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v14a2 2 0 01-2 2z"
-                    />
-                  </svg>
-                  <span
-                    >{{ $t('clients.taxNumber') || 'الرقم الضريبي' }}:
-                    {{ invoice.client.tax_number }}</span
-                  >
-                </div>
               </div>
 
-              <!-- العمود الثالث: الإجماليات -->
+              <!-- العمود الثالث -->
               <div class="space-y-3">
                 <h3 class="text-sm font-semibold text-gray-700 border-b border-gray-200 pb-1">
                   {{ $t('invoices.summary') || 'ملخص' }}
@@ -468,7 +489,7 @@
           </div>
         </div>
 
-        <!-- Created/Printed Info - نسخة محسنة -->
+        <!-- Created/Printed Info -->
         <div
           class="bg-gradient-to-r from-gray-50 to-white rounded-xl border border-gray-200 shadow-sm p-5 text-sm"
         >
@@ -562,7 +583,7 @@
         v-if="invoice"
         class="bg-white rounded-xl border border-gray-200 shadow-sm p-4 mt-6 flex flex-wrap gap-3 justify-between items-center"
       >
-        <!-- Left side buttons: Print, PDF, Email -->
+        <!-- الأزرار اليسرى: طباعة، إيميل، Stripe -->
         <div class="flex flex-wrap gap-3">
           <button
             @click="printInvoice"
@@ -579,21 +600,6 @@
             {{ $t('invoices.print_invoice') || 'طباعة' }}
           </button>
 
-          <!--<button
-            @click="downloadPdf"
-            class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition flex items-center gap-2"
-          >
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-              />
-            </svg>
-            PDF
-          </button>-->
-
           <button
             v-if="invoice.client?.email"
             @click="sendEmail"
@@ -609,10 +615,52 @@
             </svg>
             {{ $t('invoices.sendEmail') || 'إرسال بالبريد' }}
           </button>
+
+          <!-- زر Stripe: يظهر فقط إذا Stripe مفعّل والفاتورة غير مدفوعة -->
+          <button
+            v-if="invoice.enable_stripe_checkout && invoice.status !== 'paid'"
+            @click="payWithStripe"
+            :disabled="stripeLoading"
+            class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <svg v-if="stripeLoading" class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              />
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+              />
+            </svg>
+            <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+              />
+            </svg>
+            {{
+              stripeLoading
+                ? $t('common.loading') || 'جاري التحميل...'
+                : $t('invoices.payWithStripe') || 'ادفع عبر Stripe'
+            }}
+          </button>
         </div>
 
-        <!-- Right side buttons: Edit, Delete -->
+        <!-- الأزرار اليمنى -->
         <div class="flex flex-wrap gap-3">
+          <!--
+          |--------------------------------------------------------------------
+          | ✅ زر التعديل: مخفي نهائياً إذا الفاتورة مدفوعة
+          |--------------------------------------------------------------------
+          -->
           <router-link
             v-if="hasEditPermission && invoice.status !== 'paid'"
             :to="`/invoices/${invoice.id}/edit`"
@@ -628,6 +676,52 @@
             </svg>
             {{ $t('common.edit') || 'تعديل' }}
           </router-link>
+
+          <!--
+          |--------------------------------------------------------------------
+          | ✅ إضافة: زر الإلغاء — يظهر فقط للفواتير المدفوعة
+          |--------------------------------------------------------------------
+          | الفاتورة المدفوعة يمكن إلغاؤها (وهو ما طلبه المستخدم).
+          | الإلغاء يغير الحالة إلى cancelled بدون حذف السجل.
+          -->
+          <button
+            v-if="hasEditPermission && invoice.status === 'paid'"
+            @click="confirmCancel"
+            :disabled="cancelLoading"
+            class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <svg v-if="cancelLoading" class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              />
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+              />
+            </svg>
+            <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"
+              />
+            </svg>
+            {{ $t('invoices.cancelInvoice') || 'إلغاء الفاتورة' }}
+          </button>
+
+          <!--
+          |--------------------------------------------------------------------
+          | ✅ زر الحذف: متاح دائماً بغض النظر عن الحالة (حسب الطلب)
+          |--------------------------------------------------------------------
+          | إذا كانت الفاتورة مدفوعة يُظهر تحذيراً إضافياً في الـ dialog.
+          -->
           <button
             v-if="hasDeletePermission"
             @click="confirmDelete"
@@ -655,6 +749,7 @@ import moment from 'moment'
 
 export default {
   name: 'InvoiceDetails',
+
   data() {
     return {
       loading: true,
@@ -665,17 +760,29 @@ export default {
       printedBy: JSON.parse(localStorage.getItem('userInfo') || '{}')?.user?.name || 'User',
       hasEditPermission: false,
       hasDeletePermission: false,
+      stripeLoading: false,
+      cancelLoading: false, // ✅ إضافة: حالة تحميل زر الإلغاء
     }
   },
+
   computed: {
     ...mapGetters('auth', ['user', 'permissions']),
+
+    // ✅ إضافة: computed لسهولة الاستخدام في template
+    isPaid() {
+      return this.invoice?.status === 'paid'
+    },
   },
+
   mounted() {
     this.checkPermissions()
     this.loadInvoice()
+    this.checkPaymentReturn()
   },
+
   methods: {
-    ...mapActions('invoices', ['fetchInvoice', 'deleteInvoice']),
+    ...mapActions('invoices', ['fetchInvoice', 'deleteInvoice', 'updateInvoiceStatus']),
+    ...mapActions('payments', ['createPaymentSession']),
 
     checkPermissions() {
       const perms = this.permissions || []
@@ -695,14 +802,12 @@ export default {
       }
       try {
         const response = await this.fetchInvoice(id)
-        // API returns { status, message, data }
         if (response && response.data) {
           this.invoice = response.data
         } else {
           this.notFound = true
         }
       } catch (err) {
-        console.error('Error loading invoice:', err)
         if (err.response?.status === 404) {
           this.notFound = true
         } else {
@@ -710,6 +815,76 @@ export default {
         }
       } finally {
         this.loading = false
+      }
+    },
+
+    checkPaymentReturn() {
+      const status = this.$route.query.payment
+      if (!status) return
+
+      if (status === 'success') {
+        this.$toast.success(this.$t('invoices.paymentSuccess') || 'تم الدفع بنجاح!')
+        this.loadInvoice()
+      } else if (status === 'cancelled') {
+        this.$toast.warning(this.$t('invoices.paymentCancelled') || 'تم إلغاء الدفع')
+      }
+
+      this.$router.replace({ query: {} })
+    },
+
+    async payWithStripe() {
+      this.stripeLoading = true
+      try {
+        const data = await this.createPaymentSession(this.invoice.id)
+        if (data?.url) {
+          window.location.href = data.url
+        }
+      } catch (err) {
+        this.$toast.error(err.message || this.$t('invoices.paymentError') || 'فشل في بدء الدفع')
+      } finally {
+        this.stripeLoading = false
+      }
+    },
+
+    /*
+    |--------------------------------------------------------------------------
+    | ✅ إضافة: تأكيد إلغاء الفاتورة المدفوعة
+    |--------------------------------------------------------------------------
+    */
+    confirmCancel() {
+      this.$swal
+        .fire({
+          title: this.$t('invoices.cancelConfirmTitle') || 'إلغاء الفاتورة المدفوعة؟',
+          html: `
+          <p>${this.$t('invoices.cancelConfirmText') || 'سيتم تغيير حالة الفاتورة إلى "ملغاة".'}</p>
+          <p class="text-sm text-orange-600 mt-2 font-medium">
+            ${this.$t('invoices.cancelWarning') || 'تأكد من معالجة استرجاع المبلغ (Refund) في Stripe إذا لزم.'}
+          </p>
+        `,
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#F97316',
+          cancelButtonColor: '#6B7280',
+          confirmButtonText: this.$t('invoices.confirmCancel') || 'نعم، إلغاء الفاتورة',
+          cancelButtonText: this.$t('common.back') || 'تراجع',
+        })
+        .then(async (result) => {
+          if (result.isConfirmed) {
+            await this.cancelInvoice()
+          }
+        })
+    },
+
+    async cancelInvoice() {
+      this.cancelLoading = true
+      try {
+        await this.updateInvoiceStatus({ id: this.invoice.id, status: 'cancelled' })
+        this.$toast.success(this.$t('invoices.cancelSuccess') || 'تم إلغاء الفاتورة')
+        await this.loadInvoice()
+      } catch (err) {
+        this.$toast.error(err.message || 'فشل إلغاء الفاتورة')
+      } finally {
+        this.cancelLoading = false
       }
     },
 
@@ -770,269 +945,107 @@ export default {
       }
       return map[status] || status
     },
+
     printInvoice() {
       const invoice = this.invoice
       if (!invoice) return
 
-      // تحديد اتجاه الصفحة بناءً على اللغة الحالية
-      const currentLocale = this.$i18n.locale // أو this.$i18n.language حسب مكتبة الترجمة
+      const currentLocale = this.$i18n.locale
       const dir = currentLocale === 'ar' ? 'rtl' : 'ltr'
-
       const printWindow = window.open('', '_blank')
 
       const styles = `
-    <style>
-      body {
-        font-family: 'Tajawal', sans-serif;
-        direction: ${dir}; /* اتجاه ديناميكي */
-        padding: 30px;
-        background: #fff;
-        color: #333;
-        margin: 0;
-      }
-      .invoice-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-bottom: 2px solid #e5e7eb;
-        padding-bottom: 20px;
-        margin-bottom: 20px;
-      }
-      .invoice-title h1 {
-        font-size: 24px;
-        font-weight: bold;
-        color: #1e3a8a;
-        margin: 0;
-      }
-      .status-badge {
-        display: inline-block;
-        padding: 6px 12px;
-        border-radius: 9999px;
-        font-size: 14px;
-        font-weight: 600;
-      }
-      .status-draft { background: #f3f4f6; color: #1f2937; }
-      .status-sent { background: #dbeafe; color: #1e40af; }
-      .status-paid { background: #d1fae5; color: #065f46; }
-      .status-overdue { background: #fee2e2; color: #991b1b; }
-      .status-cancelled { background: #e5e7eb; color: #4b5563; }
-
-      .grid-3 {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 20px;
-        margin-bottom: 30px;
-      }
-      .info-item {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-      .info-icon {
-        width: 20px;
-        height: 20px;
-        color: #6b7280;
-      }
-
-      .client-box {
-        background: #f9fafb;
-        padding: 15px;
-        border-radius: 8px;
-        border: 1px solid #e5e7eb;
-        margin-bottom: 30px;
-      }
-      .client-name {
-        font-size: 16px;
-        font-weight: 600;
-      }
-
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 20px 0;
-      }
-      th {
-        background: #f3f4f6;
-        padding: 12px;
-        text-align: center;
-        font-size: 14px;
-        font-weight: 600;
-        color: #374151;
-        border: 1px solid #d1d5db;
-      }
-      td {
-        padding: 10px;
-        text-align: center;
-        border: 1px solid #d1d5db;
-      }
-      /* استخدام محاذاة منطقية */
-      .text-start { text-align: start; }
-
-      .totals {
-        width: 300px;
-        /* استخدام margin-inline-start: auto لوضع العنصر في جهة النهاية (يمين في RTL، يسار في LTR) */
-        margin-inline-start: auto;
-        background: #f9fafb;
-        padding: 15px;
-        border-radius: 8px;
-        border: 1px solid #e5e7eb;
-      }
-      .totals-row {
-        display: flex;
-        justify-content: space-between;
-        padding: 5px 0;
-      }
-      .border-top {
-        border-top: 2px solid #d1d5db;
-        margin-top: 10px;
-        padding-top: 10px;
-        font-weight: bold;
-      }
-
-      .footer {
-        margin-top: 40px;
-        text-align: center;
-        font-size: 12px;
-        color: #6b7280;
-        border-top: 1px solid #e5e7eb;
-        padding-top: 20px;
-      }
-    </style>
-  `
-
-      const statusClass = `status-badge status-${invoice.status}`
+        <style>
+          body { font-family: 'Tajawal', sans-serif; direction: ${dir}; padding: 30px; background: #fff; color: #333; margin: 0; }
+          .invoice-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e5e7eb; padding-bottom: 20px; margin-bottom: 20px; }
+          .invoice-title h1 { font-size: 24px; font-weight: bold; color: #1e3a8a; margin: 0; }
+          .status-badge { display: inline-block; padding: 6px 12px; border-radius: 9999px; font-size: 14px; font-weight: 600; }
+          .status-draft { background: #f3f4f6; color: #1f2937; }
+          .status-sent { background: #dbeafe; color: #1e40af; }
+          .status-paid { background: #d1fae5; color: #065f46; }
+          .status-overdue { background: #fee2e2; color: #991b1b; }
+          .status-cancelled { background: #e5e7eb; color: #4b5563; }
+          .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
+          .client-box { background: #f9fafb; padding: 15px; border-radius: 8px; border: 1px solid #e5e7eb; margin-bottom: 30px; }
+          .client-name { font-size: 16px; font-weight: 600; }
+          table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+          th { background: #f3f4f6; padding: 12px; text-align: center; font-size: 14px; font-weight: 600; color: #374151; border: 1px solid #d1d5db; }
+          td { padding: 10px; text-align: center; border: 1px solid #d1d5db; }
+          .text-start { text-align: start; }
+          .totals { width: 300px; margin-inline-start: auto; background: #f9fafb; padding: 15px; border-radius: 8px; border: 1px solid #e5e7eb; }
+          .totals-row { display: flex; justify-content: space-between; padding: 5px 0; }
+          .border-top { border-top: 2px solid #d1d5db; margin-top: 10px; padding-top: 10px; font-weight: bold; }
+          .footer { margin-top: 40px; text-align: center; font-size: 12px; color: #6b7280; border-top: 1px solid #e5e7eb; padding-top: 20px; }
+        </style>
+      `
 
       const itemsHtml = invoice.items
         .map(
           (item) => `
-    <tr>
-      <td class="text-start">${item.description} ${item.notes ? `<br><small>${item.notes}</small>` : ''}</td>
-      <td>${item.quantity}</td>
-      <td>${this.formatCurrency(item.unit_price)}</td>
-      <td>${this.formatCurrency(item.total)}</td>
-    </tr>
-  `,
+        <tr>
+          <td class="text-start">${item.description} ${item.notes ? `<br><small>${item.notes}</small>` : ''}</td>
+          <td>${item.quantity}</td>
+          <td>${this.formatCurrency(item.unit_price)}</td>
+          <td>${this.formatCurrency(item.total)}</td>
+        </tr>
+      `,
         )
         .join('')
 
       const html = `
-    <html dir="${dir}">
-      <head>
-        <title>${this.$t('invoices.invoice') || 'فاتورة'} ${invoice.invoice_number}</title>
-        ${styles}
-      </head>
-      <body>
-        <div class="invoice-header">
-          <div class="invoice-title">
-            <h1>${this.$t('invoices.invoice') || 'فاتورة'} رقم ${invoice.invoice_number}</h1>
-          </div>
-          <div>
-            <span class="${statusClass}">${this.getStatusText(invoice.status)}</span>
-          </div>
-        </div>
-
-        <div class="grid-3">
-          <div class="info-item">
-            <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-            <span>${this.$t('invoices.issueDate') || 'تاريخ الإصدار'}: ${this.formatDate(invoice.invoice_date)}</span>
-          </div>
-          <div class="info-item">
-            <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-            <span>${this.$t('invoices.dueDate') || 'تاريخ الاستحقاق'}: ${this.formatDate(invoice.due_date)}</span>
-          </div>
-          ${
-            invoice.paid_at
-              ? `
-          <div class="info-item">
-            <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span>${this.$t('invoices.paymentDate') || 'تاريخ الدفع'}: ${this.formatDate(invoice.paid_at)}</span>
-          </div>
-          `
-              : ''
-          }
-        </div>
-
-        <div class="client-box">
-          <div class="client-name">${this.$t('clients.client') || 'العميل'}: ${invoice.client?.name || 'N/A'}</div>
-          <div>${this.$t('clients.email') || 'البريد'}: ${invoice.client?.email || 'N/A'}</div>
-          <div>${this.$t('clients.phone') || 'الهاتف'}: ${invoice.client?.phone || 'N/A'}</div>
-          ${invoice.client?.company_name && invoice.client.company_name !== '.' ? `<div>${this.$t('clients.company') || 'الشركة'}: ${invoice.client.company_name}</div>` : ''}
-          ${invoice.client?.tax_number && invoice.client.tax_number !== '.' ? `<div>${this.$t('clients.taxNumber') || 'الرقم الضريبي'}: ${invoice.client.tax_number}</div>` : ''}
-        </div>
-
-        <table>
-          <thead>
-            <tr>
-              <th>${this.$t('invoices.description') || 'الوصف'}</th>
-              <th>${this.$t('invoices.quantity') || 'الكمية'}</th>
-              <th>${this.$t('invoices.unitPrice') || 'سعر الوحدة'}</th>
-              <th>${this.$t('invoices.total') || 'الإجمالي'}</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${itemsHtml}
-          </tbody>
-        </table>
-
-        <div class="totals">
-          <div class="totals-row">
-            <span>${this.$t('invoices.subtotal') || 'المجموع الفرعي'}:</span>
-            <span>${this.formatCurrency(invoice.subtotal)}</span>
-          </div>
-          ${
-            parseFloat(invoice.discount_amount) > 0
-              ? `
-          <div class="totals-row">
-            <span>${this.$t('invoices.discount') || 'الخصم'}:</span>
-            <span>${this.formatCurrency(invoice.discount_amount)}</span>
-          </div>
-          `
-              : ''
-          }
-          <div class="totals-row">
-            <span>${this.$t('invoices.tax') || 'الضريبة'} (${invoice.tax_rate || 0}%):</span>
-            <span>${this.formatCurrency(invoice.tax_amount)}</span>
-          </div>
-          <div class="totals-row border-top">
-            <span>${this.$t('invoices.total') || 'الإجمالي'}:</span>
-            <span>${this.formatCurrency(invoice.total)}</span>
-          </div>
-        </div>
-
-        <div class="footer">
-          <div>${
-            this.$t('reports.created_by', {
-              name: invoice.created_by?.name || 'N/A',
-              date: this.formatDateTime(invoice.created_at),
-            }) ||
-            `تم الإنشاء بواسطة ${invoice.created_by?.name || 'N/A'} في ${this.formatDateTime(invoice.created_at)}`
-          }</div>
-          <div>${
-            this.$t('reports.printed_by', {
-              name: this.printedBy,
-              date: this.printedOn,
-            }) || `تمت الطباعة بواسطة ${this.printedBy} في ${this.printedOn}`
-          }</div>
-        </div>
-      </body>
-    </html>
-  `
+        <html dir="${dir}">
+          <head>
+            <title>${this.$t('invoices.invoice') || 'فاتورة'} ${invoice.invoice_number}</title>
+            ${styles}
+          </head>
+          <body>
+            <div class="invoice-header">
+              <div class="invoice-title">
+                <h1>${this.$t('invoices.invoice') || 'فاتورة'} رقم ${invoice.invoice_number}</h1>
+              </div>
+              <div><span class="status-badge status-${invoice.status}">${this.getStatusText(invoice.status)}</span></div>
+            </div>
+            <div class="grid-3">
+              <div>${this.$t('invoices.issueDate') || 'تاريخ الإصدار'}: ${this.formatDate(invoice.invoice_date)}</div>
+              <div>${this.$t('invoices.dueDate') || 'تاريخ الاستحقاق'}: ${this.formatDate(invoice.due_date)}</div>
+              ${invoice.paid_at ? `<div>${this.$t('invoices.paymentDate') || 'تاريخ الدفع'}: ${this.formatDate(invoice.paid_at)}</div>` : ''}
+            </div>
+            <div class="client-box">
+              <div class="client-name">${this.$t('clients.client') || 'العميل'}: ${invoice.client?.name || 'N/A'}</div>
+              <div>${this.$t('clients.email') || 'البريد'}: ${invoice.client?.email || 'N/A'}</div>
+              <div>${this.$t('clients.phone') || 'الهاتف'}: ${invoice.client?.phone || 'N/A'}</div>
+              ${invoice.client?.company_name && invoice.client.company_name !== '.' ? `<div>${invoice.client.company_name}</div>` : ''}
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>${this.$t('invoices.description') || 'الوصف'}</th>
+                  <th>${this.$t('invoices.quantity') || 'الكمية'}</th>
+                  <th>${this.$t('invoices.unitPrice') || 'سعر الوحدة'}</th>
+                  <th>${this.$t('invoices.total') || 'الإجمالي'}</th>
+                </tr>
+              </thead>
+              <tbody>${itemsHtml}</tbody>
+            </table>
+            <div class="totals">
+              <div class="totals-row"><span>${this.$t('invoices.subtotal') || 'المجموع الفرعي'}:</span><span>${this.formatCurrency(invoice.subtotal)}</span></div>
+              ${parseFloat(invoice.discount_amount) > 0 ? `<div class="totals-row"><span>${this.$t('invoices.discount') || 'الخصم'}:</span><span>${this.formatCurrency(invoice.discount_amount)}</span></div>` : ''}
+              <div class="totals-row"><span>${this.$t('invoices.tax') || 'الضريبة'} (${invoice.tax_rate || 0}%):</span><span>${this.formatCurrency(invoice.tax_amount)}</span></div>
+              <div class="totals-row border-top"><span>${this.$t('invoices.total') || 'الإجمالي'}:</span><span>${this.formatCurrency(invoice.total)}</span></div>
+            </div>
+            <div class="footer">
+              <div>تم الإنشاء بواسطة ${invoice.created_by?.name || 'N/A'} في ${this.formatDateTime(invoice.created_at)}</div>
+              <div>تمت الطباعة بواسطة ${this.printedBy} في ${this.printedOn}</div>
+            </div>
+          </body>
+        </html>
+      `
 
       printWindow.document.write(html)
       printWindow.document.close()
       printWindow.focus()
       printWindow.print()
       printWindow.close()
-    },
-
-    downloadPdf() {
-      this.$toast.info('PDF generation coming soon')
     },
 
     sendEmail() {
@@ -1046,12 +1059,23 @@ export default {
     },
 
     confirmDelete() {
+      /*
+      |------------------------------------------------------------------------
+      | ✅ إضافة: تحذير مضاعف عند حذف فاتورة مدفوعة
+      |------------------------------------------------------------------------
+      */
+      const isPaid = this.invoice?.status === 'paid'
+      const baseText =
+        this.$t('invoices.deleteConfirm', { number: this.invoice.invoice_number }) ||
+        `سيتم حذف الفاتورة رقم ${this.invoice.invoice_number}`
+      const paidWarn = isPaid
+        ? `<br><span style="color:#dc2626;font-weight:600;">⚠️ تنبيه: هذه الفاتورة مدفوعة — تأكد من الاحتفاظ بسجل خارجي قبل الحذف.</span>`
+        : ''
+
       this.$swal
         .fire({
           title: this.$t('common.are_you_sure') || 'هل أنت متأكد؟',
-          text:
-            this.$t('invoices.deleteConfirm', { number: this.invoice.invoice_number }) ||
-            `سيتم حذف الفاتورة رقم ${this.invoice.invoice_number}`,
+          html: baseText + paidWarn,
           icon: 'warning',
           showCancelButton: true,
           confirmButtonColor: '#EF4444',
@@ -1072,6 +1096,7 @@ export default {
         })
     },
   },
+
   watch: {
     '$route.params.id': {
       immediate: true,
