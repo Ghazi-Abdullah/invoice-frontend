@@ -1,0 +1,39 @@
+name: Deploy Invoice Frontend
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup SSH Connection
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            # 1. الانتقال للمجلد الصحيح الذي استخرجناه
+            cd /var/www/invoice-frontend
+            
+            # 2. تملك المجلد وإصلاح الصلاحيات فوراً قبل السحب والبناء
+            sudo chown -R ubuntu:www-data .
+            sudo chmod -R 775 .
+            
+            # 3. سحب كود الفرونتيند الجديد
+            git pull origin main
+            
+            # 4. بناء المشروع بالـ Node (اعتماداً على الـ Package Manager الخاص بك)
+            npm install
+            npm run build
+            
+            # 5. تأمين صلاحيات مجلد الـ Build النهائي (dist أو build) لكي يقرأه الـ Nginx
+            sudo chmod -R 775 dist
