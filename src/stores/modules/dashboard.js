@@ -1,4 +1,21 @@
+// src/stores/modules/dashboard.js
 import axios from '@/api/axios'
+import NProgress from 'nprogress'
+import i18n from '@/plugins/i18n'
+import {
+  formatCurrency,
+  formatDate,
+  formatShortDate,
+  formatDateTime,
+  formatTimeAgo,
+  formatNumber,
+  truncateText,
+  getInitials,
+  getStatusClass,
+  getStatusText,
+  formatPhone,
+  slugify
+} from '@/utils/formatters'
 
 const state = {
   stats: null,
@@ -12,113 +29,61 @@ const state = {
   performanceData: {},
   loading: false,
   error: null,
-  lastUpdated: null
+  lastUpdated: null,
+  // ✅ تخزين chartData مؤقتاً
+  _chartDataCache: null
 }
 
 const getters = {
-  stats: (state) => state.stats || {},
-  recentClients: (state) => state.recentClients,
-  recentInvoices: (state) => state.recentInvoices,
-  monthlyRevenue: (state) => state.monthlyRevenue,
-  overdueInvoices: (state) => state.overdueInvoices,
-  recentActivity: (state) => state.recentActivity,
-  topClients: (state) => state.topClients,
-  invoiceStatuses: (state) => state.invoiceStatuses,
-  performanceData: (state) => state.performanceData,
-  loading: (state) => state.loading,
-  error: (state) => state.error,
-  lastUpdated: (state) => state.lastUpdated,
+  // البيانات الأساسية
+  stats: state => state.stats || {},
+  recentClients: state => state.recentClients,
+  recentInvoices: state => state.recentInvoices,
+  monthlyRevenue: state => state.monthlyRevenue,
+  overdueInvoices: state => state.overdueInvoices,
+  recentActivity: state => state.recentActivity,
+  topClients: state => state.topClients,
+  invoiceStatuses: state => state.invoiceStatuses,
+  performanceData: state => state.performanceData,
+  loading: state => state.loading,
+  error: state => state.error,
+  lastUpdated: state => state.lastUpdated,
 
-  // Helper functions
-  formatCurrency: () => (amount) => {
-    if (amount === null || amount === undefined) return '0.00 ر.س'
-    const num = parseFloat(amount)
-    if (isNaN(num)) return '0.00 ر.س'
-    return num.toLocaleString('ar-SA', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    }) + ' ر.س'
-  },
-
-  formatDate: () => (dateString) => {
-    if (!dateString) return 'غير محدد'
-    try {
-      const date = new Date(dateString)
-      return date.toLocaleDateString('ar-SA', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      })
-    } catch (error) {
-      return 'تاريخ غير صالح'
-    }
-  },
-
-  formatShortDate: () => (dateString) => {
-    if (!dateString) return 'غير محدد'
-    try {
-      const date = new Date(dateString)
-      return date.toLocaleDateString('ar-SA', {
-        month: 'short',
-        day: 'numeric'
-      })
-    } catch (error) {
-      return 'تاريخ غير صالح'
-    }
-  },
-
-  getInitials: () => (name) => {
-    if (!name) return '؟'
-    return name
-      .split(' ')
-      .map((n) => n[0])
-      .join('')
-      .toUpperCase()
-      .substring(0, 2)
-  },
-
-  getStatusClass: () => (status) => {
-    const classes = {
-      paid: 'bg-green-100 text-green-800',
-      sent: 'bg-blue-100 text-blue-800',
-      draft: 'bg-gray-100 text-gray-800',
-      overdue: 'bg-red-100 text-red-800',
-      active: 'bg-green-100 text-green-800',
-      inactive: 'bg-gray-100 text-gray-800'
-    }
-    return classes[status] || 'bg-gray-100 text-gray-800'
-  },
-
-  getStatusText: () => (status) => {
-    const texts = {
-      paid: 'مدفوعة',
-      sent: 'مرسلة',
-      draft: 'مسودة',
-      overdue: 'متأخرة',
-      active: 'نشط',
-      inactive: 'غير نشط'
-    }
-    return texts[status] || status
-  },
+  // دوال مساعدة
+  formatCurrency: () => formatCurrency,
+  formatDate: () => formatDate,
+  formatShortDate: () => formatShortDate,
+  formatDateTime: () => formatDateTime,
+  formatTimeAgo: () => formatTimeAgo,
+  formatNumber: () => formatNumber,
+  truncateText: () => truncateText,
+  getInitials: () => getInitials,
+  getStatusClass: () => getStatusClass,
+  getStatusText: () => getStatusText,
+  formatPhone: () => formatPhone,
+  slugify: () => slugify,
 
   // حساب أداء اليوم
-  todayPerformance: (state) => {
+  todayPerformance: state => {
     const stats = state.stats || {}
     const todayPaid = stats.todayPaidInvoices || 0
     const todayTotal = stats.todayTotalInvoices || 0
     return todayTotal > 0 ? Math.round((todayPaid / todayTotal) * 100) : 0
   },
 
-  // بيانات الرسوم البيانية
-  chartData: (state) => {
-    return {
+  // ✅ chartData مع تخزين مؤقت
+  chartData: state => {
+    // إذا لم تتغير البيانات، أعد الكائن المخزن مؤقتاً
+    if (state._chartDataCache) {
+      return state._chartDataCache
+    }
+
+    const data = {
       revenueChartData: {
         labels: state.performanceData.months || [],
         datasets: [
           {
-            label: 'الإيرادات',
+            label: i18n.t('dashboard.revenue'),
             data: state.performanceData.revenues || [],
             borderColor: '#3b82f6',
             backgroundColor: 'rgba(59, 130, 246, 0.1)',
@@ -131,13 +96,13 @@ const getters = {
         labels: state.performanceData.months || [],
         datasets: [
           {
-            label: 'الفواتير',
+            label: i18n.t('dashboard.invoices'),
             data: state.performanceData.invoices || [],
             backgroundColor: 'rgba(59, 130, 246, 0.8)',
             borderRadius: 8
           },
           {
-            label: 'الإيرادات',
+            label: i18n.t('dashboard.revenue'),
             data: state.performanceData.revenues || [],
             backgroundColor: 'rgba(16, 185, 129, 0.8)',
             borderRadius: 8
@@ -155,12 +120,18 @@ const getters = {
         ]
       }
     }
+
+    // ✅ تخزين النتيجة في cache
+    state._chartDataCache = data
+    return data
   }
 }
 
 const mutations = {
   SET_STATS(state, stats) {
     state.stats = stats
+    // مسح الكاش لأن البيانات تغيرت
+    state._chartDataCache = null
   },
   SET_RECENT_CLIENTS(state, clients) {
     state.recentClients = clients
@@ -182,9 +153,13 @@ const mutations = {
   },
   SET_INVOICE_STATUSES(state, statuses) {
     state.invoiceStatuses = statuses
+    // مسح الكاش لأن البيانات تغيرت
+    state._chartDataCache = null
   },
   SET_PERFORMANCE_DATA(state, data) {
     state.performanceData = data
+    // مسح الكاش لأن البيانات تغيرت
+    state._chartDataCache = null
   },
   SET_LOADING(state, loading) {
     state.loading = loading
@@ -205,13 +180,18 @@ const mutations = {
     state.topClients = []
     state.invoiceStatuses = []
     state.performanceData = {}
+    state._chartDataCache = null
+  },
+  CLEAR_ERROR(state) {
+    state.error = null
   }
 }
 
 const actions = {
   async fetchDashboardData({ commit }) {
     commit('SET_LOADING', true)
-    commit('SET_ERROR', null)
+    commit('CLEAR_ERROR')
+    NProgress.start()
 
     try {
       const response = await axios.get('/admin/dashboard')
@@ -232,22 +212,24 @@ const actions = {
 
         return data
       } else {
-        throw new Error(response.data.message || 'فشل في جلب البيانات')
+        throw new Error(response.data.message || i18n.t('dashboard.fetch_failed'))
       }
     } catch (error) {
-      const errorMessage = error.response?.data?.message ||
-        error.message ||
-        'فشل في تحميل بيانات لوحة التحكم'
-
-      commit('SET_ERROR', errorMessage)
-      throw error
+      const message = error.response?.data?.message || error.message || i18n.t('dashboard.fetch_error')
+      commit('SET_ERROR', message)
+      throw new Error(message)
     } finally {
+      NProgress.done()
       commit('SET_LOADING', false)
     }
   },
 
   async refreshDashboardData({ dispatch }) {
     return await dispatch('fetchDashboardData')
+  },
+
+  clearError({ commit }) {
+    commit('CLEAR_ERROR')
   }
 }
 

@@ -1,231 +1,204 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import store from '@/stores'
+import DefaultLayout from '@/layouts/DefaultLayout.vue'
 
 const routes = [
-  {
-    path: '/',
-    redirect: '/dashboard'
-  },
+  // ── Redirect ──────────────────────────────────────────────
+  { path: '/', redirect: '/dashboard' },
+
+  // ── Guest Pages ───────────────────────────────────────────
   {
     path: '/login',
     name: 'Login',
     component: () => import('@/views/Auth/Login.vue'),
-    meta: { guest: true, requiresGuest: true }
+    meta: { requiresGuest: true },
   },
   {
     path: '/login-otp',
     name: 'LoginOtp',
     component: () => import('@/views/Auth/LoginOtp.vue'),
-    meta: { guest: true, requiresGuest: true }
+    meta: { requiresGuest: true },
   },
   {
     path: '/register',
     name: 'Register',
     component: () => import('@/views/Auth/Register.vue'),
-    meta: { guest: true, requiresGuest: true }
+    meta: { requiresGuest: true },
   },
+
+  // ── Protected Pages (داخل DefaultLayout) ──────────────────
   {
-    path: '/dashboard',
-    name: 'Dashboard',
-    component: () => import('@/views/Dashboard.vue'),
-    meta: { requiresAuth: true }
+    path: '/',
+    component: DefaultLayout,
+    meta: { requiresAuth: true },
+    children: [
+      {
+        path: 'dashboard',
+        name: 'Dashboard',
+        component: () => import('@/views/Dashboard.vue'),
+      },
+      // Invoices
+      {
+        path: 'invoices',
+        name: 'Invoices',
+        component: () => import('@/views/invoices/InvoicesIndex.vue'),
+        meta: { permission: 'view_invoices' },
+      },
+      {
+        path: 'invoices/create',
+        name: 'CreateInvoice',
+        component: () => import('@/views/invoices/CreateInvoice.vue'),
+        meta: { permission: 'create_invoice' },
+      },
+      {
+        path: 'invoices/:id',
+        name: 'InvoiceDetails',
+        component: () => import('@/views/invoices/InvoiceDetails.vue'),
+        meta: { permission: 'view_invoices' },
+      },
+      {
+        path: 'invoices/:id/edit',
+        name: 'EditInvoice',
+        component: () => import('@/views/invoices/EditInvoice.vue'),
+        meta: { permission: 'edit_invoice' },
+      },
+      // Clients
+      {
+        path: 'clients',
+        name: 'Clients',
+        component: () => import('@/views/Clients/ClientsIndex.vue'),
+        meta: { permission: 'view_clients' },
+      },
+      {
+        path: 'clients/create',
+        name: 'CreateClient',
+        component: () => import('@/views/Clients/CreateClient.vue'),
+        meta: { permission: 'create_client' },
+      },
+      {
+        path: 'clients/:id',
+        name: 'ClientDetails',
+        component: () => import('@/views/Clients/ClientDetails.vue'),
+        meta: { permission: 'view_clients' },
+      },
+      {
+        path: 'clients/:id/edit',
+        name: 'EditClient',
+        component: () => import('@/views/Clients/EditClient.vue'),
+        meta: { permission: 'edit_client' },
+      },
+      // Reports
+      {
+        path: 'reports',
+        name: 'Reports',
+        component: () => import('@/views/Reports/ReportsIndex.vue'),
+      },
+      // Profile
+      {
+        path: 'profile',
+        name: 'Profile',
+        component: () => import('@/views/Profile.vue'),
+      },
+      // Activity
+      {
+        path: 'activitylog',
+        name: 'ActivityLog',
+        component: () => import('@/views/ActivityLog.vue'),
+        meta: { requiresAdmin: true },
+      },
+      // Admin
+      { path: 'admin', redirect: '/admin/users' },
+      {
+        path: 'admin/users',
+        name: 'AdminUsers',
+        component: () => import('@/views/Admin/Users.vue'),
+        meta: { requiresAdmin: true, permission: 'administration' },
+      },
+      {
+        path: 'admin/groups',
+        name: 'AdminGroups',
+        component: () => import('@/views/Admin/Groups.vue'),
+        meta: { requiresAdmin: true, permission: 'administration' },
+      },
+      {
+        path: 'admin/permissions',
+        name: 'AdminPermissions',
+        component: () => import('@/views/Admin/Permissions.vue'),
+        meta: { requiresAdmin: true, permission: 'administration' },
+      },
+      {
+        path: 'admin/assign-permissions',
+        name: 'AssignPermissions',
+        component: () => import('@/views/Admin/AssignPermissions.vue'),
+        meta: { requiresAdmin: true },
+      },
+      {
+        path: 'admin/otp',
+        name: 'OTP',
+        component: () => import('@/views/Admin/OTP.vue'),
+        meta: { requiresAdmin: true },
+      },
+    ],
   },
-  {
-    path: '/invoices',
-    name: 'Invoices',
-    component: () => import('@/views/invoices/InvoicesIndex.vue'),
-    meta: { requiresAuth: true, permission: 'view_invoices' }
-  },
-  {
-    path: '/invoices/create',
-    name: 'CreateInvoice',
-    component: () => import('@/views/invoices/CreateInvoice.vue'),
-    meta: { requiresAuth: true, permission: 'create_invoice' }
-  },
-  {
-    path: '/invoices/:id',
-    name: 'InvoiceDetails',
-    component: () => import('@/views/invoices/InvoiceDetails.vue'),
-    meta: { requiresAuth: true, permission: 'view_invoices' }
-  },
-  {
-    path: '/invoices/:id/edit',
-    name: 'EditInvoice',
-    component: () => import('@/views/invoices/EditInvoice.vue'),
-    meta: { requiresAuth: true, permission: 'edit_invoice' }
-  },
-  {
-    path: '/clients',
-    name: 'Clients',
-    component: () => import('@/views/Clients/ClientsIndex.vue'),
-    meta: { requiresAuth: true, permission: 'view_clients' }
-  },
-  {
-    path: '/clients/create',
-    name: 'CreateClient',
-    component: () => import('@/views/Clients/CreateClient.vue'),
-    meta: { requiresAuth: true, permission: 'create_client' }
-  },
-  {
-    path: '/clients/:id',
-    name: 'ClientDetails',
-    component: () => import('@/views/Clients/ClientDetails.vue'),
-    meta: { requiresAuth: true, permission: 'view_clients' }
-  },
-  {
-    path: '/clients/:id/edit',
-    name: 'EditClient',
-    component: () => import('@/views/Clients/EditClient.vue'),
-    meta: { requiresAuth: true, permission: 'edit_client' }
-  },
-  {
-    path: '/reports',
-    name: 'Reports',
-    component: () => import('@/views/Reports/ReportsIndex.vue'),
-    meta: {
-      requiresAuth: true,
-      title: 'التقارير'
-    }
-  },
-  {
-    path: '/admin',
-    redirect: '/admin/users'
-  },
-  {
-    path: '/admin/permissions',
-    name: 'AdminPermissions',
-    component: () => import('@/views/Admin/Permissions.vue'),
-    meta: {
-      requiresAuth: true,
-      requiresAdmin: true,
-      permission: 'administration'
-    }
-  },
-  {
-    path: '/admin/groups',
-    name: 'AdminGroups',
-    component: () => import('@/views/Admin/Groups.vue'),
-    meta: {
-      requiresAuth: true,
-      requiresAdmin: true,
-      permission: 'administration'
-    }
-  },
-  {
-    path: '/admin/users',
-    name: 'AdminUsers',
-    component: () => import('@/views/Admin/Users.vue'),
-    meta: {
-      requiresAuth: true,
-      requiresAdmin: true,
-      permission: 'administration'
-    }
-  },
-  {
-    path: '/admin/assign-permissions',
-    name: 'AssignPermissions',
-    component: () => import('@/views/Admin/AssignPermissions.vue'),
-    meta: {
-      requiresAuth: true,
-      requiresAdmin: true
-    }
-  },
-  {
-    path: '/activitylog',
-    name: 'activitylog',
-    component: () => import('@/views/ActivityLog.vue'),
-    meta: {
-      requiresAuth: true,
-      requiresAdmin: true
-    }
-  },
-  {
-    path: '/profile',
-    name: 'profile',
-    component: () => import('@/views/Profile.vue'),
-  },
+
+  // ── 404 ───────────────────────────────────────────────────
   {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
-    component: () => import('@/views/Auth/NotFound.vue')
+    component: () => import('@/views/Auth/NotFound.vue'),
   },
-  {
-    path: '/admin/otp',
-    name: 'OTP',
-    component: () => import('@/views/Admin/OTP.vue'),
-    meta: { requiresAuth: true }
-  }
 ]
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes
+  routes,
+  scrollBehavior(to, from, savedPosition) {
+    return savedPosition ?? { top: 0, behavior: 'smooth' }
+  },
 })
 
-// Navigation Guard - محسن ومبسط
 router.beforeEach(async (to, from, next) => {
-  console.log(`🛡️ Navigation Guard: ${from.path} -> ${to.path}`)
-
-  // الحصول على التوكن
   const token = localStorage.getItem('token')
+  const requiresAuth = to.matched.some((r) => r.meta.requiresAuth)
+  const requiresGuest = to.matched.some((r) => r.meta.requiresGuest)
+  const requiresAdmin = to.meta.requiresAdmin
+  const permission = to.meta.permission
 
-  // إذا كانت الصفحة تتطلب مصادقة
-  if (to.meta.requiresAuth) {
+  if (requiresAuth) {
     if (!token) {
-      console.log('🚫 لا يوجد توكن، توجيه إلى /login')
-      return next('/login')
+      return next({ name: 'Login', query: { redirect: to.fullPath } })
     }
 
     try {
-      // التحقق من صحة التوكن وجلب بيانات المستخدم
-      const isAuthenticated = await store.dispatch('auth/checkAuth')
+      const ok = await store.dispatch('auth/checkAuth')
 
-      if (!isAuthenticated) {
-        console.log('❌ التوكن غير صالح، توجيه إلى /login')
+      if (!ok) {
         store.commit('auth/CLEAR_AUTH')
         localStorage.removeItem('token')
-        return next('/login')
+        return next({ name: 'Login' })
       }
 
-      // التحقق من الصلاحيات إذا كانت مطلوبة
-      if (to.meta.permission) {
-        const hasPermission = store.getters['auth/hasPermission'](to.meta.permission)
-        if (!hasPermission) {
-          console.log(`⛔ لا تملك صلاحية ${to.meta.permission}، توجيه إلى /dashboard`)
-          return next('/dashboard')
-        }
+      if (permission && !store.getters['auth/hasPermission'](permission)) {
+        return next({ name: 'Dashboard' })
       }
 
-      // التحقق من صلاحية المدير إذا كانت مطلوبة
-      if (to.meta.requiresAdmin && !store.getters['auth/is_admin']) {
-        console.log('⛔ ليس لديك صلاحية مدير، توجيه إلى /dashboard')
-        return next('/dashboard')
+      if (requiresAdmin && !store.getters['auth/isAdmin']) {
+        return next({ name: 'Dashboard' })
       }
 
-      console.log('✅ التحقق من المصادقة والصلاحيات ناجح')
-      next()
-
-    } catch (error) {
-      console.error('💥 خطأ في التحقق من المصادقة:', error)
+      return next()
+    } catch {
       store.commit('auth/CLEAR_AUTH')
       localStorage.removeItem('token')
-      return next('/login')
+      return next({ name: 'Login' })
     }
   }
-  // إذا كانت الصفحة للضيوف فقط
-  else if (to.meta.requiresGuest) {
-    if (token) {
-      console.log('🔄 المستخدم مصادق بالفعل، توجيه إلى /dashboard')
-      return next('/dashboard')
-    }
-    console.log('👋 صفحة ضيف، السماح بالدخول')
-    next()
+
+  if (requiresGuest && token) {
+    return next({ name: 'Dashboard' })
   }
-  // المسارات العامة
-  else {
-    console.log('🛣️ صفحة عامة، السماح بالدخول')
-    next()
-  }
+
+  next()
 })
 
 export default router
