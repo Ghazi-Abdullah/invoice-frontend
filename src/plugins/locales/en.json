@@ -70,6 +70,8 @@
     "title": "Dashboard",
     "welcome": "Welcome to the invoice management system",
     "welcome_back": "Welcome back",
+    "fallback_warning": "We couldn't load live dashboard data right now, so the figures shown are placeholder values only. Try refreshing the page, or contact support if this continues.",
+    "data_unavailable": "Data unavailable",
     "overview_subtitle": "Here's what's happening with your business today",
     "total_invoices": "Total Invoices",
     "total_clients": "Total Clients",
