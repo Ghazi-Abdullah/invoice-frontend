@@ -138,6 +138,16 @@ const routes = [
         component: () => import('@/views/Admin/OTP.vue'),
         meta: { requiresAdmin: true },
       },
+
+      {
+        path: '/admin/installment-tiers',
+        name: 'InstallmentTiersSettings',
+        component: () => import('@/views/Admin/InstallmentTiersSettings.vue'),
+        meta: {
+          requiresAuth: true,
+          permission: 'manage_settings', // أو أي صلاحية مناسبة
+        },
+      }
     ],
   },
 
