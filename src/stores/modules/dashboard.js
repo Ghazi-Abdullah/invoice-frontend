@@ -27,6 +27,7 @@ const state = {
   topClients: [],
   invoiceStatuses: [],
   performanceData: {},
+  isFallback: false,
   loading: false,
   error: null,
   lastUpdated: null,
@@ -37,6 +38,7 @@ const state = {
 const getters = {
   // البيانات الأساسية
   stats: state => state.stats || {},
+  isFallback: state => state.isFallback,
   recentClients: state => state.recentClients,
   recentInvoices: state => state.recentInvoices,
   monthlyRevenue: state => state.monthlyRevenue,
@@ -133,6 +135,9 @@ const mutations = {
     // مسح الكاش لأن البيانات تغيرت
     state._chartDataCache = null
   },
+  SET_IS_FALLBACK(state, value) {
+    state.isFallback = value
+  },
   SET_RECENT_CLIENTS(state, clients) {
     state.recentClients = clients
   },
@@ -200,6 +205,7 @@ const actions = {
         const data = response.data.data
 
         commit('SET_STATS', data.stats || {})
+        commit('SET_IS_FALLBACK', data.is_fallback || false)
         commit('SET_RECENT_CLIENTS', data.recentClients || [])
         commit('SET_RECENT_INVOICES', data.recentInvoices || [])
         commit('SET_MONTHLY_REVENUE', data.monthlyRevenue || [])
