@@ -218,6 +218,23 @@
           </router-link>
         </li>
 
+        <!-- Installment Tiers Settings -->
+        <li v-if="isAdmin">
+          <router-link
+            to="/admin/installment-tiers"
+            @click="closeMobileSidebar"
+            :class="['nav-item', isActive('/admin/installment-tiers') && 'nav-item--active nav-item--pink']"
+            :title="isCollapsed ? $t('installments.tiers_title') : ''"
+          >
+            <span class="nav-icon nav-icon--pink">
+              <i class="fas fa-percentage"></i>
+            </span>
+            <transition name="fade-slide">
+              <span v-if="!isCollapsed" class="nav-label-text">{{ $t('installments.tiers_title') }}</span>
+            </transition>
+          </router-link>
+        </li>
+
         <!-- Permissions -->
         <li v-if="isAdmin">
           <router-link

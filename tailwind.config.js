@@ -1,4 +1,22 @@
 /** @type {import('tailwindcss').Config} */
+
+// كل درجة تُبنى من متغير CSS واحد في src/style.css — غيّر القيمة هناك
+// فقط لتغيير الثيم بالكامل. <alpha-value> يسمح باستخدام bg-primary-600/50 إلخ.
+function themeColor(name) {
+  return {
+    50: `rgb(var(--color-${name}-50) / <alpha-value>)`,
+    100: `rgb(var(--color-${name}-100) / <alpha-value>)`,
+    200: `rgb(var(--color-${name}-200) / <alpha-value>)`,
+    300: `rgb(var(--color-${name}-300) / <alpha-value>)`,
+    400: `rgb(var(--color-${name}-400) / <alpha-value>)`,
+    500: `rgb(var(--color-${name}-500) / <alpha-value>)`,
+    600: `rgb(var(--color-${name}-600) / <alpha-value>)`,
+    700: `rgb(var(--color-${name}-700) / <alpha-value>)`,
+    800: `rgb(var(--color-${name}-800) / <alpha-value>)`,
+    900: `rgb(var(--color-${name}-900) / <alpha-value>)`,
+  }
+}
+
 export default {
   content: [
     "./index.html",
@@ -7,78 +25,21 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: {
-          50: '#f0f9ff',
-          100: '#e0f2fe',
-          200: '#bae6fd',
-          300: '#7dd3fc',
-          400: '#38bdf8',
-          500: '#0ea5e9',
-          600: '#0284c7',
-          700: '#0369a1',
-          800: '#075985',
-          900: '#0c4a6e',
-        },
-        secondary: {
-          50: '#f8fafc',
-          100: '#f1f5f9',
-          200: '#e2e8f0',
-          300: '#cbd5e1',
-          400: '#94a3b8',
-          500: '#64748b',
-          600: '#475569',
-          700: '#334155',
-          800: '#1e293b',
-          900: '#0f172a',
-        },
-        success: {
-          50: '#f0fdf4',
-          100: '#dcfce7',
-          200: '#bbf7d0',
-          300: '#86efac',
-          400: '#4ade80',
-          500: '#22c55e',
-          600: '#16a34a',
-          700: '#15803d',
-          800: '#166534',
-          900: '#14532d',
-        },
-        warning: {
-          50: '#fffbeb',
-          100: '#fef3c7',
-          200: '#fde68a',
-          300: '#fcd34d',
-          400: '#fbbf24',
-          500: '#f59e0b',
-          600: '#d97706',
-          700: '#b45309',
-          800: '#92400e',
-          900: '#78350f',
-        },
-        danger: {
-          50: '#fef2f2',
-          100: '#fee2e2',
-          200: '#fecaca',
-          300: '#fca5a5',
-          400: '#f87171',
-          500: '#ef4444',
-          600: '#dc2626',
-          700: '#b91c1c',
-          800: '#991b1b',
-          900: '#7f1d1d',
-        },
-        info: {
-          50: '#eff6ff',
-          100: '#dbeafe',
-          200: '#bfdbfe',
-          300: '#93c5fd',
-          400: '#60a5fa',
-          500: '#3b82f6',
-          600: '#2563eb',
-          700: '#1d4ed8',
-          800: '#1e40af',
-          900: '#1e3a8a',
-        },
+        // أسماء دلالية (يفضّل استخدامها بالكود الجديد)
+        primary: themeColor('primary'),
+        success: themeColor('success'),
+        warning: themeColor('warning'),
+        danger: themeColor('danger'),
+        accent: themeColor('accent'),
+
+        // نفس المتغيرات، بس تحت الأسماء الأصلية لـ Tailwind —
+        // هذا يخلي كل bg-blue-600 / text-green-600 / إلخ الموجودة
+        // فعلياً بالمشروع تتغيّر مع الثيم تلقائياً بدون تعديل أي ملف
+        blue: themeColor('primary'),
+        green: themeColor('success'),
+        red: themeColor('danger'),
+        yellow: themeColor('warning'),
+        purple: themeColor('accent'),
       },
       fontFamily: {
         'sans-ar': ['"Noto Sans Arabic"', 'system-ui', 'sans-serif'],

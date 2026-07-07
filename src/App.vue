@@ -5,9 +5,6 @@
 
     <!-- Render Layout Based on Authentication -->
     <template v-if="isAuthenticated">
-      <DefaultLayout />
-    </template>
-    <template v-else>
       <router-view />
     </template>
 
@@ -21,7 +18,6 @@
 
 <script>
 import ToastContainer from '@/components/ToastContainer.vue'
-import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import LoadingSpinner from '@/components/shared/LoadingSpinner.vue'
 
 export default {
@@ -29,7 +25,6 @@ export default {
 
   components: {
     ToastContainer,
-    DefaultLayout,
     LoadingSpinner,
   },
 

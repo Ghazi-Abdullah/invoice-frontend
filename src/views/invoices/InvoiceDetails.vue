@@ -159,13 +159,7 @@
 
       <!-- Invoice Details -->
       <div v-else-if="invoice" class="space-y-6" id="invoiceDetails">
-        <!--
-        |----------------------------------------------------------------------
-        | ✅ إضافة: شريط تنبيه "مدفوعة — التعديل غير متاح"
-        |----------------------------------------------------------------------
-        | يظهر فقط عندما تكون الفاتورة مدفوعة، يوضح للمستخدم سبب إخفاء
-        | زر التعديل ويذكره بأن الحذف والإلغاء لا زالا ممكنَين.
-        -->
+        <!-- شريط تنبيه "مدفوعة — التعديل غير متاح" -->
         <div
           v-if="invoice.status === 'paid'"
           class="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-3"
@@ -616,7 +610,6 @@
             {{ $t('invoices.sendEmail') || 'إرسال بالبريد' }}
           </button>
 
-          <!-- زر Stripe: يظهر فقط إذا Stripe مفعّل والفاتورة غير مدفوعة -->
           <button
             v-if="invoice.enable_stripe_checkout && invoice.status !== 'paid'"
             @click="payWithStripe"
@@ -656,11 +649,6 @@
 
         <!-- الأزرار اليمنى -->
         <div class="flex flex-wrap gap-3">
-          <!--
-          |--------------------------------------------------------------------
-          | ✅ زر التعديل: مخفي نهائياً إذا الفاتورة مدفوعة
-          |--------------------------------------------------------------------
-          -->
           <router-link
             v-if="hasEditPermission && invoice.status !== 'paid'"
             :to="`/invoices/${invoice.id}/edit`"
@@ -677,13 +665,6 @@
             {{ $t('common.edit') || 'تعديل' }}
           </router-link>
 
-          <!--
-          |--------------------------------------------------------------------
-          | ✅ إضافة: زر الإلغاء — يظهر فقط للفواتير المدفوعة
-          |--------------------------------------------------------------------
-          | الفاتورة المدفوعة يمكن إلغاؤها (وهو ما طلبه المستخدم).
-          | الإلغاء يغير الحالة إلى cancelled بدون حذف السجل.
-          -->
           <button
             v-if="hasEditPermission && invoice.status === 'paid'"
             @click="confirmCancel"
@@ -716,12 +697,6 @@
             {{ $t('invoices.cancelInvoice') || 'إلغاء الفاتورة' }}
           </button>
 
-          <!--
-          |--------------------------------------------------------------------
-          | ✅ زر الحذف: متاح دائماً بغض النظر عن الحالة (حسب الطلب)
-          |--------------------------------------------------------------------
-          | إذا كانت الفاتورة مدفوعة يُظهر تحذيراً إضافياً في الـ dialog.
-          -->
           <button
             v-if="hasDeletePermission"
             @click="confirmDelete"
@@ -741,13 +716,23 @@
       </div>
     </div>
   </div>
+
+   <InstallmentPlanSection
+    :invoice-id="invoice.id"
+    :invoice-total="invoice.total"
+    :can-manage="hasPermission('edit_invoice')"
+  />
 </template>
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
 import moment from 'moment'
+import InstallmentPlanSection from '@/components/invoices/InstallmentPlanSection.vue'
 
 export default {
+  components: {
+    InstallmentPlanSection,
+  },
   name: 'InvoiceDetails',
 
   data() {
@@ -761,14 +746,13 @@ export default {
       hasEditPermission: false,
       hasDeletePermission: false,
       stripeLoading: false,
-      cancelLoading: false, // ✅ إضافة: حالة تحميل زر الإلغاء
+      cancelLoading: false,
     }
   },
 
   computed: {
     ...mapGetters('auth', ['user', 'permissions']),
 
-    // ✅ إضافة: computed لسهولة الاستخدام في template
     isPaid() {
       return this.invoice?.status === 'paid'
     },
@@ -794,16 +778,19 @@ export default {
       this.loading = true
       this.error = null
       this.notFound = false
+
       const id = this.$route.params.id
       if (!id) {
         this.error = 'رقم الفاتورة غير صالح'
         this.loading = false
         return
       }
+
       try {
-        const response = await this.fetchInvoice(id)
-        if (response && response.data) {
-          this.invoice = response.data
+        // ✅ الإصلاح: fetchInvoice يرجع invoice مباشرة (مش response object)
+        const invoice = await this.fetchInvoice(id)
+        if (invoice && invoice.id) {
+          this.invoice = invoice
         } else {
           this.notFound = true
         }
@@ -846,21 +833,16 @@ export default {
       }
     },
 
-    /*
-    |--------------------------------------------------------------------------
-    | ✅ إضافة: تأكيد إلغاء الفاتورة المدفوعة
-    |--------------------------------------------------------------------------
-    */
     confirmCancel() {
       this.$swal
         .fire({
           title: this.$t('invoices.cancelConfirmTitle') || 'إلغاء الفاتورة المدفوعة؟',
           html: `
-          <p>${this.$t('invoices.cancelConfirmText') || 'سيتم تغيير حالة الفاتورة إلى "ملغاة".'}</p>
-          <p class="text-sm text-orange-600 mt-2 font-medium">
-            ${this.$t('invoices.cancelWarning') || 'تأكد من معالجة استرجاع المبلغ (Refund) في Stripe إذا لزم.'}
-          </p>
-        `,
+            <p>${this.$t('invoices.cancelConfirmText') || 'سيتم تغيير حالة الفاتورة إلى "ملغاة".'}</p>
+            <p class="text-sm text-orange-600 mt-2 font-medium">
+              ${this.$t('invoices.cancelWarning') || 'تأكد من معالجة استرجاع المبلغ (Refund) في Stripe إذا لزم.'}
+            </p>
+          `,
           icon: 'warning',
           showCancelButton: true,
           confirmButtonColor: '#F97316',
@@ -1059,11 +1041,6 @@ export default {
     },
 
     confirmDelete() {
-      /*
-      |------------------------------------------------------------------------
-      | ✅ إضافة: تحذير مضاعف عند حذف فاتورة مدفوعة
-      |------------------------------------------------------------------------
-      */
       const isPaid = this.invoice?.status === 'paid'
       const baseText =
         this.$t('invoices.deleteConfirm', { number: this.invoice.invoice_number }) ||
@@ -1099,15 +1076,13 @@ export default {
 
   watch: {
     '$route.params.id': {
-      immediate: true,
-      handler() {
-        if (this.$route.params.id) this.loadInvoice()
+      immediate: false,
+      handler(newId) {
+        if (newId) this.loadInvoice()
       },
     },
   },
 }
 </script>
 
-<style scoped>
-/* يمكن إضافة أنماط إضافية هنا إذا لزم الأمر */
-</style>
+<style scoped></style>

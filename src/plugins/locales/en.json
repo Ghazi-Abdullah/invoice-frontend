@@ -5,6 +5,11 @@
     "version": "Version"
   },
   "nav": {
+    "all_clients": "All Clients",
+    "add_client": "Add Client",
+    "all_invoices": "All Invoices",
+    "create_invoice": "Create Invoice",
+    "admin": "Admin",
     "dashboard": "Dashboard",
     "clients": "Clients",
     "invoices": "Invoices",
@@ -60,9 +65,13 @@
     "securityDescription": "We use the latest encryption technologies to protect your data. Password must be at least 8 characters and contain letters and numbers."
   },
   "dashboard": {
+    "fetch_failed": "Failed to fetch dashboard data",
+    "fetch_error": "An error occurred while loading dashboard data",
     "title": "Dashboard",
     "welcome": "Welcome to the invoice management system",
     "welcome_back": "Welcome back",
+    "fallback_warning": "We couldn't load live dashboard data right now, so the figures shown are placeholder values only. Try refreshing the page, or contact support if this continues.",
+    "data_unavailable": "Data unavailable",
     "overview_subtitle": "Here's what's happening with your business today",
     "total_invoices": "Total Invoices",
     "total_clients": "Total Clients",
@@ -103,6 +112,13 @@
     "revenue": "Revenue"
   },
   "clients": {
+    "empty_response": "No data received from server",
+    "fetch_failed": "Failed to fetch clients",
+    "fetch_one_failed": "Failed to fetch client details",
+    "create_failed": "Failed to create client",
+    "update_failed": "Failed to update client",
+    "delete_failed": "Failed to delete client",
+    "simple_list_failed": "Failed to fetch simple client list",
     "clientstats": "Stats",
     "quickActionsDescription": "Quick actions for this client",
     "clientInvoicesDescription": "View and manage invoices for this client",
@@ -223,6 +239,12 @@
     }
   },
   "invoices": {
+    "fetch_failed": "Failed to fetch invoices",
+    "fetch_one_failed": "Failed to fetch invoice data",
+    "create_failed": "Failed to create invoice",
+    "update_failed": "Failed to update invoice",
+    "delete_failed": "Failed to delete invoice",
+    "status_update_failed": "Failed to update invoice status",
     "editInvoice": "Edit Invoice",
     "client": "Client",
     "updateInfo": "Update the information",
@@ -700,6 +722,14 @@
     "passwordMatch": "Passwords do not match"
   },
   "permissions": {
+    "fetch_one_failed": "Failed to fetch permission",
+    "parent_fetch_failed": "Failed to fetch parent permissions",
+    "fetch_failed": "Failed to fetch permissions",
+    "fetch_all_failed": "Failed to fetch all permissions",
+    "menus_fetch_failed": "Failed to fetch menus",
+    "create_failed": "Failed to create permission",
+    "update_failed": "Failed to update permission",
+    "delete_failed": "Failed to delete permission",
     "delete_confirm_title": "Confirm Deletion",
     "delete_confirm": "Are you sure you want to delete? This action cannot be undone.",
     "total_permissions": "Total Permissions",
@@ -824,6 +854,15 @@
     "pageOf": "Page {current} of {total}"
   },
   "reports": {
+    "load_failed": "Failed to load report",
+    "invoices_failed": "Failed to load invoices report",
+    "clients_failed": "Failed to load clients report",
+    "revenue_failed": "Failed to load revenue report",
+    "overdue_failed": "Failed to load overdue report",
+    "export_failed": "Failed to export report",
+    "delete_file_failed": "Failed to delete exported file",
+    "send_reminder_failed": "Failed to send reminder",
+    "mark_paid_failed": "Failed to mark invoice as paid",
     "printed_on": "Printed On",
     "printed_by": "Printed By",
     "created_on": "Created On",
@@ -1006,6 +1045,13 @@
     "noFiles": "No files found"
   },
   "adminGroups": {
+    "fetch_failed": "Failed to load groups",
+    "fetch_group_failed": "Failed to load group",
+    "permissions_fetch_failed": "Failed to load permissions",
+    "create_failed": "Failed to create group",
+    "update_failed": "Failed to update group",
+    "permissions_update_failed": "Failed to update permissions",
+    "delete_failed": "Failed to delete group",
     "title": "Groups Management",
     "subtitle": "Manage user groups and permissions",
     "groups": "Groups",
@@ -1050,6 +1096,9 @@
     "this_year": "This Year"
   },
   "profile": {
+    "fetch_failed": "Failed to load profile",
+    "update_failed": "Failed to update profile",
+    "password_change_failed": "Failed to change password",
     "password": "Password",
     "personal_details": "Personal Details",
     "title": "Profile",
@@ -1081,7 +1130,9 @@
     "password_mismatch": "New password and confirmation do not match",
     "password_error": "Failed to change password, please check your inputs"
   },
- "activity": {
+  "activity": {
+    "fetch_failed": "Failed to fetch activity logs",
+    "fetch_error": "An error occurred while fetching activity logs",
     "title": "Activity Logs",
     "subtitle": "View all events and actions in the system",
     "search": "Search",
@@ -1118,5 +1169,14 @@
     "view": "View",
     "edit": "Edit",
     "delete": "Delete"
+  },
+  "sidebar": {
+    "load_error": "Failed to load menus"
+  },
+  "payments": {
+    "create_session_failed": "Failed to create payment session",
+    "invalid_session_url": "Session created but no payment URL provided",
+    "fetch_failed": "Failed to fetch payments",
+    "fetch_one_failed": "Failed to load payment details"
   }
 }

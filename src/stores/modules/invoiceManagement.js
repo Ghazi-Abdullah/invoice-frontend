@@ -1,5 +1,7 @@
-// store/modules/invoiceManagement.js
+// src/stores/modules/invoiceManagement.js
 import axios from '@/api/axios'
+import NProgress from 'nprogress'
+import i18n from '@/plugins/i18n'
 
 export default {
   namespaced: true,
@@ -48,31 +50,31 @@ export default {
   },
 
   getters: {
-    invoices: (state) => state.invoices,
-    currentInvoice: (state) => state.currentInvoice,
-    loading: (state) => state.loading,
-    error: (state) => state.error,
-    filters: (state) => state.filters,
-    pagination: (state) => state.pagination,
-    stats: (state) => state.stats,
-    invoiceForm: (state) => state.invoiceForm,
-    formErrors: (state) => state.formErrors,
+    invoices: state => state.invoices,
+    currentInvoice: state => state.currentInvoice,
+    loading: state => state.loading,
+    error: state => state.error,
+    filters: state => state.filters,
+    pagination: state => state.pagination,
+    stats: state => state.stats,
+    invoiceForm: state => state.invoiceForm,
+    formErrors: state => state.formErrors,
 
-    hasInvoices: (state) => state.invoices && state.invoices.length > 0,
+    hasInvoices: state => state.invoices && state.invoices.length > 0,
 
-    invoiceSummary: (state) => {
+    invoiceSummary: state => {
       const items = state.invoiceForm.items || []
       const subtotal = items.reduce((sum, item) => {
-        const quantity = parseFloat(item.quantity) || 0
-        const unitPrice = parseFloat(item.unit_price) || 0
-        return sum + (quantity * unitPrice)
+        const qty = parseFloat(item.quantity) || 0
+        const price = parseFloat(item.unit_price) || 0
+        return sum + (qty * price)
       }, 0)
 
       const tax = items.reduce((sum, item) => {
-        const quantity = parseFloat(item.quantity) || 0
-        const unitPrice = parseFloat(item.unit_price) || 0
-        const taxRate = parseFloat(item.tax_rate) || 0
-        return sum + (quantity * unitPrice * (taxRate / 100))
+        const qty = parseFloat(item.quantity) || 0
+        const price = parseFloat(item.unit_price) || 0
+        const rate = parseFloat(item.tax_rate) || 0
+        return sum + (qty * price * (rate / 100))
       }, 0)
 
       const total = subtotal + tax
@@ -88,9 +90,9 @@ export default {
       }
     },
 
-    hasIncompleteItems: (state) => {
+    hasIncompleteItems: state => {
       return state.invoiceForm.items.some(
-        (item) => !item.description || item.quantity <= 0 || item.unit_price < 0
+        item => !item.description || item.quantity <= 0 || item.unit_price < 0
       )
     }
   },
@@ -145,15 +147,7 @@ export default {
         invoice_number: '',
         issue_date: new Date().toISOString().split('T')[0],
         due_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        items: [
-          {
-            description: '',
-            quantity: 1,
-            unit_price: 0,
-            tax_rate: 15,
-            total: 0
-          }
-        ],
+        items: [{ description: '', quantity: 1, unit_price: 0, tax_rate: 15, total: 0 }],
         notes: '',
         terms: '',
         status: 'draft'
@@ -177,16 +171,14 @@ export default {
     },
 
     UPDATE_INVOICE_ITEM(state, { index, data }) {
-      if (state.invoiceForm.items[index]) {
-        state.invoiceForm.items[index] = { ...state.invoiceForm.items[index], ...data }
-        // إعادة حساب الإجمالي
-        const item = state.invoiceForm.items[index]
-        const quantity = parseFloat(item.quantity) || 0
-        const unitPrice = parseFloat(item.unit_price) || 0
-        const taxRate = parseFloat(item.tax_rate) || 0
-        const subtotal = quantity * unitPrice
-        const tax = subtotal * (taxRate / 100)
-        item.total = subtotal + tax
+      const item = state.invoiceForm.items[index]
+      if (item) {
+        Object.assign(item, data)
+        const qty = parseFloat(item.quantity) || 0
+        const price = parseFloat(item.unit_price) || 0
+        const rate = parseFloat(item.tax_rate) || 0
+        const subtotal = qty * price
+        item.total = subtotal + (subtotal * (rate / 100))
       }
     },
 
@@ -210,29 +202,31 @@ export default {
   },
 
   actions: {
+    // جلب الفواتير مع التصفية والترقيم
     async fetchInvoices({ commit, state }, params = {}) {
       commit('SET_LOADING', true)
       commit('CLEAR_ERROR')
+      NProgress.start()
 
       try {
-        const queryParams = {
+        const query = {
           page: params.page || state.pagination.current_page || 1,
           per_page: params.per_page || state.pagination.per_page || 10,
           ...state.filters,
           ...params
         }
 
-        const response = await axios.get('/admin/invoices', { params: queryParams })
+        const response = await axios.get('/admin/invoices', { params: query })
 
         if (response.data.status) {
           const data = response.data.data?.data || response.data.data || []
           const pagination = response.data.data
             ? {
-              current_page: response.data.data.current_page,
-              last_page: response.data.data.last_page,
-              per_page: response.data.data.per_page,
-              total: response.data.data.total
-            }
+                current_page: response.data.data.current_page,
+                last_page: response.data.data.last_page,
+                per_page: response.data.data.per_page,
+                total: response.data.data.total
+              }
             : null
 
           commit('SET_INVOICES', { data, pagination })
@@ -250,20 +244,23 @@ export default {
 
           return { data, pagination }
         } else {
-          throw new Error(response.data.message || 'فشل في جلب الفواتير')
+          throw new Error(response.data.message || i18n.t('invoices.fetch_failed'))
         }
       } catch (error) {
-        const errorMsg = error.response?.data?.message || error.message || 'فشل في جلب الفواتير'
-        commit('SET_ERROR', errorMsg)
-        throw error
+        const message = error.response?.data?.message || error.message || i18n.t('invoices.fetch_failed')
+        commit('SET_ERROR', message)
+        throw new Error(message)
       } finally {
+        NProgress.done()
         commit('SET_LOADING', false)
       }
     },
 
+    // جلب فاتورة واحدة
     async fetchInvoice({ commit }, id) {
       commit('SET_LOADING', true)
       commit('CLEAR_ERROR')
+      NProgress.start()
 
       try {
         const response = await axios.get(`/admin/invoices/${id}`)
@@ -273,24 +270,26 @@ export default {
           commit('SET_CURRENT_INVOICE', invoice)
           return invoice
         } else {
-          throw new Error(response.data.message || 'فشل في جلب الفاتورة')
+          throw new Error(response.data.message || i18n.t('invoices.fetch_one_failed'))
         }
       } catch (error) {
-        const errorMsg = error.response?.data?.message || error.message || 'فشل في جلب الفاتورة'
-        commit('SET_ERROR', errorMsg)
-        throw error
+        const message = error.response?.data?.message || error.message || i18n.t('invoices.fetch_one_failed')
+        commit('SET_ERROR', message)
+        throw new Error(message)
       } finally {
+        NProgress.done()
         commit('SET_LOADING', false)
       }
     },
 
+    // إنشاء فاتورة جديدة
     async createInvoice({ commit, dispatch }, invoiceData) {
       commit('SET_LOADING', true)
       commit('CLEAR_ERROR')
       commit('CLEAR_FORM_ERRORS')
+      NProgress.start()
 
       try {
-        // تنظيف بيانات العناصر
         const cleanedData = {
           ...invoiceData,
           items: invoiceData.items.map(item => ({
@@ -305,41 +304,36 @@ export default {
 
         if (response.data.status) {
           const invoice = response.data.data
-
-          // إضافة الفاتورة الجديدة
           commit('ADD_INVOICE', invoice)
-
-          // تنظيف النموذج
           commit('CLEAR_INVOICE_FORM')
-
           return invoice
         } else {
-          throw new Error(response.data.message || 'فشل في إنشاء الفاتورة')
+          throw new Error(response.data.message || i18n.t('invoices.create_failed'))
         }
       } catch (error) {
-        let errorMessage = 'فشل في إنشاء الفاتورة'
-
+        let message = i18n.t('invoices.create_failed')
         if (error.response) {
           if (error.response.status === 422 && error.response.data.errors) {
             commit('SET_FORM_ERRORS', error.response.data.errors)
           }
-          errorMessage = error.response.data?.message || error.message
+          message = error.response.data?.message || error.message
         }
-
-        commit('SET_ERROR', errorMessage)
-        throw error
+        commit('SET_ERROR', message)
+        throw new Error(message)
       } finally {
+        NProgress.done()
         commit('SET_LOADING', false)
       }
     },
 
+    // تحديث فاتورة
     async updateInvoice({ commit }, { id, data }) {
       commit('SET_LOADING', true)
       commit('CLEAR_ERROR')
       commit('CLEAR_FORM_ERRORS')
+      NProgress.start()
 
       try {
-        // تنظيف بيانات العناصر
         const cleanedData = {
           ...data,
           items: data.items.map(item => ({
@@ -354,34 +348,32 @@ export default {
 
         if (response.data.status) {
           const invoice = response.data.data
-
-          // تحديث الفاتورة
           commit('UPDATE_INVOICE', invoice)
-
           return invoice
         } else {
-          throw new Error(response.data.message || 'فشل في تحديث الفاتورة')
+          throw new Error(response.data.message || i18n.t('invoices.update_failed'))
         }
       } catch (error) {
-        let errorMessage = 'فشل في تحديث الفاتورة'
-
+        let message = i18n.t('invoices.update_failed')
         if (error.response) {
           if (error.response.status === 422 && error.response.data.errors) {
             commit('SET_FORM_ERRORS', error.response.data.errors)
           }
-          errorMessage = error.response.data?.message || error.message
+          message = error.response.data?.message || error.message
         }
-
-        commit('SET_ERROR', errorMessage)
-        throw error
+        commit('SET_ERROR', message)
+        throw new Error(message)
       } finally {
+        NProgress.done()
         commit('SET_LOADING', false)
       }
     },
 
+    // حذف فاتورة
     async deleteInvoice({ commit }, id) {
       commit('SET_LOADING', true)
       commit('CLEAR_ERROR')
+      NProgress.start()
 
       try {
         const response = await axios.delete(`/admin/invoices/${id}`)
@@ -390,23 +382,26 @@ export default {
           commit('DELETE_INVOICE', id)
           return true
         } else {
-          throw new Error(response.data.message || 'فشل في حذف الفاتورة')
+          throw new Error(response.data.message || i18n.t('invoices.delete_failed'))
         }
       } catch (error) {
-        const errorMsg = error.response?.data?.message || error.message || 'فشل في حذف الفاتورة'
-        commit('SET_ERROR', errorMsg)
-        throw error
+        const message = error.response?.data?.message || error.message || i18n.t('invoices.delete_failed')
+        commit('SET_ERROR', message)
+        throw new Error(message)
       } finally {
+        NProgress.done()
         commit('SET_LOADING', false)
       }
     },
 
+    // تحديث حالة الفاتورة (دفع، إرسال، تغيير حالة)
     async updateInvoiceStatus({ commit }, { id, status }) {
       commit('SET_LOADING', true)
       commit('CLEAR_ERROR')
+      NProgress.start()
 
       try {
-        let response;
+        let response
         if (status === 'paid') {
           response = await axios.put(`/admin/invoices/${id}/mark-paid`)
         } else if (status === 'sent') {
@@ -420,60 +415,62 @@ export default {
           commit('UPDATE_INVOICE', invoice)
           return invoice
         } else {
-          throw new Error(response.data.message || 'فشل في تحديث حالة الفاتورة')
+          throw new Error(response.data.message || i18n.t('invoices.status_update_failed'))
         }
       } catch (error) {
-        const errorMsg = error.response?.data?.message || error.message || 'فشل في تحديث حالة الفاتورة'
-        commit('SET_ERROR', errorMsg)
-        throw error
+        const message = error.response?.data?.message || error.message || i18n.t('invoices.status_update_failed')
+        commit('SET_ERROR', message)
+        throw new Error(message)
       } finally {
+        NProgress.done()
         commit('SET_LOADING', false)
       }
     },
 
+    // تحديث المرشحات (بدون NProgress)
     setFilters({ commit }, filters) {
       commit('SET_FILTERS', filters)
     },
 
+    // مسح المرشحات
     clearFilters({ commit }) {
-      commit('SET_FILTERS', {
-        status: '',
-        date: '',
-        search: ''
-      })
+      commit('SET_FILTERS', { status: '', date: '', search: '' })
     },
 
+    // تعيين بيانات نموذج الفاتورة
     setInvoiceFormData({ commit }, formData) {
       commit('SET_INVOICE_FORM', formData)
     },
 
+    // إضافة بند جديد في النموذج
     addInvoiceItem({ commit }) {
       commit('ADD_INVOICE_ITEM')
     },
 
+    // حذف بند من النموذج
     removeInvoiceItem({ commit }, index) {
       commit('REMOVE_INVOICE_ITEM', index)
     },
 
-    updateInvoiceItem({ commit }, { index, data }) {
-      commit('UPDATE_INVOICE_ITEM', { index, data })
+    // تحديث بيانات بند في النموذج
+    updateInvoiceItem({ commit }, payload) {
+      commit('UPDATE_INVOICE_ITEM', payload)
     },
 
+    // مسح النموذج بالكامل
     clearInvoiceForm({ commit }) {
       commit('CLEAR_INVOICE_FORM')
       commit('CLEAR_FORM_ERRORS')
     },
 
+    // توليد رقم فاتورة تلقائي (دون طلب API)
     generateInvoiceNumber({ commit }) {
       const now = new Date()
       const year = now.getFullYear()
       const month = String(now.getMonth() + 1).padStart(2, '0')
       const day = String(now.getDate()).padStart(2, '0')
-      const random = Math.floor(Math.random() * 10000)
-        .toString()
-        .padStart(4, '0')
+      const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0')
       const invoiceNumber = `INV-${year}${month}${day}-${random}`
-
       commit('SET_INVOICE_FORM', { invoice_number: invoiceNumber })
     }
   }

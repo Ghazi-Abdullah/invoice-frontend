@@ -16,6 +16,7 @@ import groups from './modules/adminGroups'
 import profile from './modules/profile'
 import activity from './modules/activity'
 import invoiceNotifications from './modules/invoiceNotifications'
+import installments from './modules/installments'
 
 
 export default createStore({
@@ -73,7 +74,8 @@ export default createStore({
     groups: groups,
     profile: profile,
     activity: activity,
-    invoiceNotifications: invoiceNotifications
+    invoiceNotifications: invoiceNotifications,
+    installments: installments
 
   }
 })

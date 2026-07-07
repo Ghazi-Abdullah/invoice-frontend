@@ -6,6 +6,11 @@
   },
   "nav": {
     "dashboard": "لوحة التحكم",
+    "all_clients": "جميع العملاء",
+    "add_client": "إضافة عميل",
+    "all_invoices": "جميع الفواتير",
+    "create_invoice": "إنشاء فاتورة",
+    "admin": "الإدارة",
     "clients": "العملاء",
     "invoices": "الفواتير",
     "reports": "التقارير",
@@ -60,9 +65,13 @@
     "securityDescription": "نستخدم أحدث تقنيات التشفير لحماية بياناتك. كلمة المرور يجب أن تكون 8 أحرف على الأقل وتحتوي على أحرف وأرقام."
   },
   "dashboard": {
+    "fetch_failed": "فشل في جلب بيانات لوحة التحكم",
+    "fetch_error": "حدث خطأ أثناء تحميل بيانات لوحة التحكم",
     "title": "لوحة التحكم",
     "welcome": "مرحباً بك في نظام إدارة الفواتير",
     "welcome_back": "مرحباً بعودتك",
+    "fallback_warning": "تعذّر جلب بيانات لوحة التحكم الحقيقية حالياً، والأرقام المعروضة احتياطية فقط. حاول تحديث الصفحة أو تواصل مع الدعم الفني إذا استمرت المشكلة.",
+    "data_unavailable": "البيانات غير متاحة",
     "overview_subtitle": "إليك ما يحدث في عملك اليوم",
     "total_invoices": "إجمالي الفواتير",
     "total_clients": "إجمالي العملاء",
@@ -103,6 +112,13 @@
     "revenue": "الإيرادات"
   },
   "clients": {
+    "empty_response": "لم يتم استلام بيانات من الخادم",
+    "fetch_failed": "فشل في جلب بيانات العملاء",
+    "fetch_one_failed": "فشل في تحميل بيانات العميل",
+    "create_failed": "فشل في إنشاء العميل",
+    "update_failed": "فشل في تحديث العميل",
+    "delete_failed": "فشل في حذف العميل",
+    "simple_list_failed": "فشل في جلب قائمة العملاء المبسطة",
     "name": "اسم العميل",
     "email": "البريد الإلكتروني",
     "title": "العملاء",
@@ -222,6 +238,12 @@
     }
   },
   "invoices": {
+    "fetch_failed": "فشل في جلب الفواتير",
+    "fetch_one_failed": "فشل في جلب بيانات الفاتورة",
+    "create_failed": "فشل في إنشاء الفاتورة",
+    "update_failed": "فشل في تحديث الفاتورة",
+    "delete_failed": "فشل في حذف الفاتورة",
+    "status_update_failed": "فشل في تحديث حالة الفاتورة",
     "invoiceNumber": "رقم الفاتورة",
     "status_legend": "وسيلة إيضاح الحالة",
     "financial_summary": "ملخص مالي",
@@ -665,6 +687,14 @@
     "passwordMatch": "كلمتا المرور غير متطابقتين"
   },
   "permissions": {
+    "fetch_one_failed": "فشل في جلب الصلاحية",
+    "parent_fetch_failed": "فشل في جلب الصلاحيات الرئيسية",
+    "fetch_failed": "فشل في جلب الصلاحيات",
+    "fetch_all_failed": "فشل في جلب جميع الصلاحيات",
+    "menus_fetch_failed": "فشل في جلب القوائم",
+    "create_failed": "فشل في إنشاء الصلاحية",
+    "update_failed": "فشل في تحديث الصلاحية",
+    "delete_failed": "فشل في حذف الصلاحية",
     "list_subtitle": "عرض وادارة مجموعات المستخدمين",
     "hasPermission": "لديه الصلاحية",
     "view_clients": "عرض العملاء",
@@ -840,6 +870,13 @@
     "delete_confirm": "هل أنت متأكد من حذف المجموعة \"{name}\"؟ لا يمكن التراجع عن هذا الإجراء."
   },
   "adminGroups": {
+    "fetch_failed": "فشل في تحميل المجموعات",
+    "fetch_group_failed": "فشل في تحميل المجموعة",
+    "permissions_fetch_failed": "فشل في تحميل الصلاحيات",
+    "create_failed": "فشل في إنشاء المجموعة",
+    "update_failed": "فشل في تحديث المجموعة",
+    "permissions_update_failed": "فشل في تحديث الصلاحيات",
+    "delete_failed": "فشل في حذف المجموعة",
     "title": "إدارة المجموعات",
     "subtitle": "إدارة مجموعات المستخدمين والصلاحيات",
     "groups": "المجموعات",
@@ -893,6 +930,15 @@
     "pageOf": "صفحة {current} من {total}"
   },
   "reports": {
+    "load_failed": "فشل في تحميل التقرير",
+    "invoices_failed": "فشل في تحميل تقرير الفواتير",
+    "clients_failed": "فشل في تحميل تقرير العملاء",
+    "revenue_failed": "فشل في تحميل تقرير الإيرادات",
+    "overdue_failed": "فشل في تحميل تقرير المتأخرات",
+    "export_failed": "فشل في تصدير التقرير",
+    "delete_file_failed": "فشل في حذف الملف المصدر",
+    "send_reminder_failed": "فشل في إرسال التذكير",
+    "mark_paid_failed": "فشل في تعليم الفاتورة كمدفوعة",
     "created_by": "تم بواسطة",
     "subtitle": "إحصائيات وبيانات شاملة لعملك",
     "delete_confirm_text": "هل تريد حذف التقرير؟",
@@ -1069,6 +1115,9 @@
     "sar": "ريال سعودي"
   },
   "profile": {
+    "fetch_failed": "فشل في تحميل الملف الشخصي",
+    "update_failed": "فشل في تحديث الملف الشخصي",
+    "password_change_failed": "فشل في تغيير كلمة المرور",
     "password": "كلمة المرور",
     "personal_details": "معلومات شخصية",
     "password_weak": "كلمة المرور ضعيفة، يرجى اختيار كلمة مرور أقوى",
@@ -1114,6 +1163,8 @@
     "this_year": "هذا العام"
   },
   "activity": {
+    "fetch_failed": "فشل جلب بيانات سجل النشاطات",
+    "fetch_error": "حدث خطأ أثناء جلب سجل النشاطات",
     "title": "سجل النشاطات",
     "subtitle": "عرض جميع الأحداث والإجراءات في النظام",
     "search": "بحث",
@@ -1150,5 +1201,14 @@
     "view": "عرض",
     "edit": "تعديل",
     "delete": "حذف"
+  },
+  "sidebar": {
+    "load_error": "فشل في تحميل القوائم"
+  },
+  "payments": {
+    "create_session_failed": "فشل في إنشاء جلسة الدفع",
+    "invalid_session_url": "تم إنشاء الجلسة ولكن لم يتم توفير رابط الدفع",
+    "fetch_failed": "فشل في جلب المدفوعات",
+    "fetch_one_failed": "فشل في تحميل بيانات الدفع"
   }
 }

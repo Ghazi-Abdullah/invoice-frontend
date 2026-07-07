@@ -1,7 +1,11 @@
-import axios from '../../api/axios'
+// src/stores/modules/auth.js
+import axios from '@/api/axios'
+import NProgress from 'nprogress'
+import i18n from '@/plugins/i18n'
 
 export default {
   namespaced: true,
+
   state: {
     user: null,
     token: localStorage.getItem('token') || null,
@@ -11,65 +15,43 @@ export default {
     isLoading: false,
     loginError: null
   },
+
   getters: {
     user: state => state.user,
     token: state => state.token,
     permissions: state => state.permissions || [],
     menus: state => state.menus,
     is_admin: state => state.is_admin,
-    isAdmin: state => {
-      console.log('🛡️ isAdmin getter:', {
-        state_is_admin: state.is_admin,
-        user_is_admin: state.user?.is_admin,
-        user: state.user
-      })
-      return state.is_admin || state.user?.is_admin === true || state.user?.is_admin === 1
-    },
+    isAdmin: state => state.is_admin || state.user?.is_admin === true || state.user?.is_admin === 1,
     isLoading: state => state.isLoading,
     loginError: state => state.loginError,
     isAuthenticated: state => !!state.token,
-    hasPermission: state => permission => {
-      console.log(`🔐 التحقق من الصلاحية "${permission}":`, {
-        isAdmin: state.is_admin,
-        permissions: state.permissions,
-        user: state.user
-      })
 
-      // Super Admin لديه جميع الصلاحيات
+    hasPermission: state => permission => {
       if (state.is_admin || state.user?.is_admin === true || state.user?.is_admin === 1) {
-        console.log(`✅ Super Admin - يملك صلاحية "${permission}" تلقائياً`)
         return true
       }
-
-      // المستخدم العادي يتحقق من قائمة الصلاحيات
-      const hasPerm = Array.isArray(state.permissions) && state.permissions.includes(permission)
-      console.log(`🔍 النتيجة:`, hasPerm)
-      return hasPerm
+      return Array.isArray(state.permissions) && state.permissions.includes(permission)
     }
   },
+
   mutations: {
     SET_USER(state, user) {
-      console.log('👤 تحديث بيانات المستخدم:', user)
       state.user = user
-
-      // تحديث is_admin من بيانات المستخدم
       if (user && (user.is_admin === true || user.is_admin === 1 || user.role === 'admin')) {
         state.is_admin = true
-        console.log('👑 تم تعيين is_admin = true من بيانات المستخدم')
       }
     },
     SET_TOKEN(state, token) {
       state.token = token
     },
     SET_PERMISSIONS(state, permissions) {
-      console.log('📋 تحديث الصلاحيات:', permissions)
       state.permissions = Array.isArray(permissions) ? permissions : []
     },
     SET_MENUS(state, menus) {
       state.menus = menus
     },
     SET_IS_ADMIN(state, isAdmin) {
-      console.log('👑 تحديث is_admin إلى:', isAdmin)
       state.is_admin = Boolean(isAdmin)
     },
     SET_LOADING(state, isLoading) {
@@ -87,119 +69,111 @@ export default {
       state.loginError = null
     }
   },
+
   actions: {
+    // تسجيل الدخول
     async login({ commit, dispatch }, credentials) {
       commit('SET_LOADING', true)
       commit('SET_LOGIN_ERROR', null)
-
-      console.log('🔐 محاولة تسجيل الدخول:', credentials)
+      NProgress.start()
 
       try {
         const response = await axios.post('/admin/login', credentials)
-        console.log('✅ استجابة تسجيل الدخول:', response.data)
 
         if (response.data.status && response.data.data) {
           const { user, token, permissions, is_admin } = response.data.data
 
-          // حفظ التوكن في localStorage
           localStorage.setItem('token', token)
           localStorage.setItem('user', JSON.stringify(user))
-
-          // تحديث axios headers
           axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
 
-          // تحديث حالة Vuex
           commit('SET_USER', user)
           commit('SET_TOKEN', token)
           commit('SET_PERMISSIONS', permissions || [])
           commit('SET_IS_ADMIN', is_admin || false)
           commit('SET_LOGIN_ERROR', null)
 
-          // تحميل القوائم بعد تسجيل الدخول
           await dispatch('loadMenus')
 
-          commit('SET_LOADING', false)
           return { success: true, data: response.data.data }
         } else {
-          const errorMsg = response.data.message || 'فشل تسجيل الدخول'
-          commit('SET_LOGIN_ERROR', errorMsg)
-          commit('SET_LOADING', false)
-          return { success: false, message: errorMsg }
+          const message = response.data.message || i18n.t('auth.login_failed')
+          commit('SET_LOGIN_ERROR', message)
+          return { success: false, message }
         }
       } catch (error) {
-        console.error('❌ خطأ في تسجيل الدخول:', error)
-
-        let errorMessage = 'حدث خطأ أثناء تسجيل الدخول'
+        let message = i18n.t('auth.login_error')
         if (error.response) {
           if (error.response.status === 401) {
-            errorMessage = 'البريد الإلكتروني أو كلمة المرور غير صحيحة'
-          } else if (error.response.data && error.response.data.message) {
-            errorMessage = error.response.data.message
+            message = i18n.t('auth.invalid_credentials')
+          } else if (error.response.data?.message) {
+            message = error.response.data.message
           }
-        } else if (error.message) {
-          errorMessage = error.message
         }
-
-        commit('SET_LOGIN_ERROR', errorMessage)
+        commit('SET_LOGIN_ERROR', message)
+        return { success: false, message }
+      } finally {
+        NProgress.done()
         commit('SET_LOADING', false)
-        return { success: false, message: errorMessage }
       }
     },
 
+    // تسجيل الخروج
     async logout({ commit }) {
       commit('SET_LOADING', true)
+      NProgress.start()
+      let result = { success: true, message: i18n.t('auth.logout_success') }
+
       try {
         await axios.post('/admin/logout')
+      } catch {
+        // تجاهل أخطاء الخروج
+      } finally {
         commit('CLEAR_AUTH')
         localStorage.removeItem('token')
         localStorage.removeItem('user')
         delete axios.defaults.headers.common['Authorization']
+        NProgress.done()
         commit('SET_LOADING', false)
-        return { success: true, message: 'تم تسجيل الخروج بنجاح' }
-      } catch (error) {
-        console.error('❌ خطأ في تسجيل الخروج:', error)
-        // حتى لو فشل الطلب، نقوم بتنظيف البيانات المحلية
-        commit('CLEAR_AUTH')
-        localStorage.removeItem('token')
-        localStorage.removeItem('user')
-        delete axios.defaults.headers.common['Authorization']
-        commit('SET_LOADING', false)
-        return { success: true, message: 'تم تسجيل الخروج محلياً' }
       }
+
+      return result
     },
 
-    // في قسم actions أضف بعد دالة login():
-
+    // إرسال رمز التحقق (OTP)
     async sendOtp({ commit }, email) {
       commit('SET_LOADING', true)
       commit('SET_LOGIN_ERROR', null)
+      NProgress.start()
 
       try {
         const response = await axios.post('/admin/send-otp', { email })
 
         if (response.data.status) {
-          commit('SET_LOADING', false)
           return {
             success: true,
             user_id: response.data.data.user_id
           }
         } else {
-          const errorMsg = response.data.message || 'فشل إرسال الرمز'
-          commit('SET_LOGIN_ERROR', errorMsg)
-          commit('SET_LOADING', false)
-          return { success: false, message: errorMsg }
+          const message = response.data.message || i18n.t('auth.otp_send_failed')
+          commit('SET_LOGIN_ERROR', message)
+          return { success: false, message }
         }
       } catch (error) {
-        const errorMsg = error.response?.data?.message || 'حدث خطأ أثناء إرسال الرمز'
-        commit('SET_LOGIN_ERROR', errorMsg)
+        const message = error.response?.data?.message || i18n.t('auth.otp_send_error')
+        commit('SET_LOGIN_ERROR', message)
+        return { success: false, message }
+      } finally {
+        NProgress.done()
         commit('SET_LOADING', false)
-        return { success: false, message: errorMsg }
       }
     },
 
+    // التحقق من رمز OTP
     async verifyOtp({ commit, dispatch }, { user_id, otp }) {
       commit('SET_LOADING', true)
       commit('SET_LOGIN_ERROR', null)
+      NProgress.start()
 
       try {
         const response = await axios.post('/admin/verify-otp', { user_id, otp })
@@ -218,160 +192,118 @@ export default {
           commit('SET_LOGIN_ERROR', null)
 
           await dispatch('loadMenus')
-
-          commit('SET_LOADING', false)
           return { success: true }
         } else {
-          const errorMsg = response.data.message || 'رمز التحقق غير صحيح'
-          commit('SET_LOGIN_ERROR', errorMsg)
-          commit('SET_LOADING', false)
-          return { success: false, message: errorMsg }
+          const message = response.data.message || i18n.t('auth.invalid_otp')
+          commit('SET_LOGIN_ERROR', message)
+          return { success: false, message }
         }
       } catch (error) {
-        const errorMsg = error.response?.data?.message || 'حدث خطأ أثناء التحقق'
-        commit('SET_LOGIN_ERROR', errorMsg)
+        const message = error.response?.data?.message || i18n.t('auth.otp_verify_error')
+        commit('SET_LOGIN_ERROR', message)
+        return { success: false, message }
+      } finally {
+        NProgress.done()
         commit('SET_LOADING', false)
-        return { success: false, message: errorMsg }
       }
     },
 
+    // التحقق من حالة المصادقة
     async checkAuth({ commit, state }) {
-      if (!state.token) {
-        return false
-      }
+      if (!state.token) return false
 
       commit('SET_LOADING', true)
+      NProgress.start()
+
       try {
         const response = await axios.get('/admin/me')
 
         if (response.data.status && response.data.data) {
           const { user, permissions, is_admin } = response.data.data
-
           commit('SET_USER', user)
           commit('SET_PERMISSIONS', permissions || [])
           commit('SET_IS_ADMIN', is_admin || false)
-
-          // تحديث التوكن في localStorage إذا لزم الأمر
           localStorage.setItem('user', JSON.stringify(user))
-
-          commit('SET_LOADING', false)
           return true
         } else {
           commit('CLEAR_AUTH')
           localStorage.removeItem('token')
           localStorage.removeItem('user')
           delete axios.defaults.headers.common['Authorization']
-          commit('SET_LOADING', false)
           return false
         }
-      } catch (error) {
-        console.error('❌ خطأ في التحقق من المصادقة:', error)
+      } catch {
         commit('CLEAR_AUTH')
         localStorage.removeItem('token')
         localStorage.removeItem('user')
         delete axios.defaults.headers.common['Authorization']
-        commit('SET_LOADING', false)
         return false
+      } finally {
+        NProgress.done()
+        commit('SET_LOADING', false)
       }
     },
 
+    // تحميل القوائم الجانبية
     async loadMenus({ commit, rootState }) {
-      try {
-        // تحميل القوائم بناءً على صلاحيات المستخدم
-        const menus = [
-          {
-            id: 1,
-            title: 'لوحة التحكم',
-            icon: 'home',
-            route: '/dashboard',
-            permission: 'view_dashboard'
-          },
-          {
-            id: 2,
-            title: 'العملاء',
-            icon: 'users',
-            route: '/clients',
-            permission: 'view_clients',
-            children: [
-              {
-                id: 21,
-                title: 'جميع العملاء',
-                route: '/clients',
-                permission: 'view_clients'
-              },
-              {
-                id: 22,
-                title: 'إضافة عميل',
-                route: '/clients/create',
-                permission: 'create_client'
-              }
-            ]
-          },
-          {
-            id: 3,
-            title: 'الفواتير',
-            icon: 'file-invoice',
-            route: '/invoices',
-            permission: 'view_invoices',
-            children: [
-              {
-                id: 31,
-                title: 'جميع الفواتير',
-                route: '/invoices',
-                permission: 'view_invoices'
-              },
-              {
-                id: 32,
-                title: 'إنشاء فاتورة',
-                route: '/invoices/create',
-                permission: 'create_invoice'
-              }
-            ]
-          },
-          {
-            id: 4,
-            title: 'التقارير',
-            icon: 'chart-bar',
-            route: '/reports',
-            permission: 'view_reports'
-          }
-        ]
-
-        // إضافة قوائم الإدارة للمسؤولين
-        if (rootState.auth.is_admin || (Array.isArray(rootState.auth.permissions) && rootState.auth.permissions.includes('view_admin_groups'))) {
-          menus.push({
-            id: 5,
-            title: 'الإدارة',
-            icon: 'cog',
-            route: '/admin',
-            permission: 'view_admin_groups',
-            children: [
-              {
-                id: 51,
-                title: 'المستخدمون',
-                route: '/admin/users',
-                permission: 'view_users'
-              },
-              {
-                id: 52,
-                title: 'المجموعات',
-                route: '/admin/groups',
-                permission: 'view_admin_groups'
-              },
-              {
-                id: 53,
-                title: 'الصلاحيات',
-                route: '/admin/permissions',
-                permission: 'manage_permissions'
-              }
-            ]
-          })
+      const baseMenus = [
+        {
+          id: 1,
+          title: i18n.t('nav.dashboard'),
+          icon: 'home',
+          route: '/dashboard',
+          permission: 'view_dashboard'
+        },
+        {
+          id: 2,
+          title: i18n.t('nav.clients'),
+          icon: 'users',
+          route: '/clients',
+          permission: 'view_clients',
+          children: [
+            { id: 21, title: i18n.t('nav.all_clients'), route: '/clients', permission: 'view_clients' },
+            { id: 22, title: i18n.t('nav.add_client'), route: '/clients/create', permission: 'create_client' }
+          ]
+        },
+        {
+          id: 3,
+          title: i18n.t('nav.invoices'),
+          icon: 'file-invoice',
+          route: '/invoices',
+          permission: 'view_invoices',
+          children: [
+            { id: 31, title: i18n.t('nav.all_invoices'), route: '/invoices', permission: 'view_invoices' },
+            { id: 32, title: i18n.t('nav.create_invoice'), route: '/invoices/create', permission: 'create_invoice' }
+          ]
+        },
+        {
+          id: 4,
+          title: i18n.t('nav.reports'),
+          icon: 'chart-bar',
+          route: '/reports',
+          permission: 'view_reports'
         }
+      ]
 
-        commit('SET_MENUS', menus)
-      } catch (error) {
-        console.error('❌ خطأ في تحميل القوائم:', error)
+      const isAdmin = rootState.auth.is_admin ||
+        (Array.isArray(rootState.auth.permissions) && rootState.auth.permissions.includes('view_admin_groups'))
+
+      if (isAdmin) {
+        baseMenus.push({
+          id: 5,
+          title: i18n.t('nav.admin'),
+          icon: 'cog',
+          route: '/admin',
+          permission: 'view_admin_groups',
+          children: [
+            { id: 51, title: i18n.t('nav.users'), route: '/admin/users', permission: 'view_users' },
+            { id: 52, title: i18n.t('nav.groups'), route: '/admin/groups', permission: 'view_admin_groups' },
+            { id: 53, title: i18n.t('nav.permissions'), route: '/admin/permissions', permission: 'manage_permissions' }
+          ]
+        })
       }
+
+      commit('SET_MENUS', baseMenus)
     },
 
     clearError({ commit }) {

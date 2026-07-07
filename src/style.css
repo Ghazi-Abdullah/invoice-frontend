@@ -3,13 +3,79 @@
 @tailwind utilities;
 
 /* تنسيقات مخصصة */
+/* ============================================================
+   نظام الألوان المركزي — Single Source of Truth
+   ============================================================
+   عدّل القيم هنا فقط لتغيير ثيم المشروع بالكامل من مكان واحد.
+   كل قيمة هي RGB مفصولة بمسافات (بدون فواصل) ليدعمها Tailwind
+   مع الشفافية opacity، مثل: bg-primary-600/50
+
+   الربط بـ Tailwind: هذه المتغيرات تغذي كلاً من الأسماء المخصصة
+   (primary/success/danger/warning/accent) وأسماء Tailwind الأصلية
+   (blue/green/red/yellow/purple) في نفس الوقت — فتغيير لون هنا
+   يغيّر كل مكان بالمشروع يستخدم bg-blue-600 أو bg-primary-600
+   على حد سواء، بدون الحاجة لتعديل أي ملف Vue.
+   ============================================================ */
 :root {
-  --primary-color: #3b82f6;
-  --secondary-color: #10b981;
-  --danger-color: #ef4444;
-  --warning-color: #f59e0b;
-  --dark-color: #1f2937;
-  --light-color: #f9fafb;
+  /* Primary (اللون الأساسي / العلامة التجارية) — يغذي blue-* */
+  --color-primary-50: 239 246 255;
+  --color-primary-100: 219 234 254;
+  --color-primary-200: 191 219 254;
+  --color-primary-300: 147 197 253;
+  --color-primary-400: 96 165 250;
+  --color-primary-500: 59 130 246;
+  --color-primary-600: 37 99 235;
+  --color-primary-700: 29 78 216;
+  --color-primary-800: 30 64 175;
+  --color-primary-900: 30 58 138;
+
+  /* Success (النجاح/المدفوع) — يغذي green-* */
+  --color-success-50: 240 253 244;
+  --color-success-100: 220 252 231;
+  --color-success-200: 187 247 208;
+  --color-success-300: 134 239 172;
+  --color-success-400: 74 222 128;
+  --color-success-500: 34 197 94;
+  --color-success-600: 22 163 74;
+  --color-success-700: 21 128 61;
+  --color-success-800: 22 101 52;
+  --color-success-900: 20 83 45;
+
+  /* Danger (الخطر/الحذف/المتأخر) — يغذي red-* */
+  --color-danger-50: 254 242 242;
+  --color-danger-100: 254 226 226;
+  --color-danger-200: 254 202 202;
+  --color-danger-300: 252 165 165;
+  --color-danger-400: 248 113 113;
+  --color-danger-500: 239 68 68;
+  --color-danger-600: 220 38 38;
+  --color-danger-700: 185 28 28;
+  --color-danger-800: 153 27 27;
+  --color-danger-900: 127 29 29;
+
+  /* Warning (تحذير/معلّق) — يغذي yellow-* */
+  --color-warning-50: 254 252 232;
+  --color-warning-100: 254 249 195;
+  --color-warning-200: 254 240 138;
+  --color-warning-300: 253 224 71;
+  --color-warning-400: 250 204 21;
+  --color-warning-500: 234 179 8;
+  --color-warning-600: 202 138 4;
+  --color-warning-700: 161 98 7;
+  --color-warning-800: 133 77 14;
+  --color-warning-900: 113 63 18;
+
+  /* Accent (لون ثانوي للتمييز — الصلاحيات/المجموعات) — يغذي purple-* */
+  --color-accent-50: 250 245 255;
+  --color-accent-100: 243 232 255;
+  --color-accent-200: 233 213 255;
+  --color-accent-300: 216 180 254;
+  --color-accent-400: 192 132 252;
+  --color-accent-500: 168 85 247;
+  --color-accent-600: 147 51 234;
+  --color-accent-700: 126 34 206;
+  --color-accent-800: 107 33 168;
+  --color-accent-900: 88 28 135;
 }
 
 /* تحسينات عامة */

@@ -57,6 +57,17 @@
 
     <!-- Main Content -->
     <div v-else class="dashboard-content">
+      <!-- Fallback Data Warning -->
+      <div v-if="isFallback" class="fallback-banner">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path
+            d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126z"
+          />
+          <path d="M12 15.75h.007v.008H12v-.008z" />
+        </svg>
+        <span>{{ $t('dashboard.fallback_warning') }}</span>
+      </div>
+
       <!-- Hero Header -->
       <header class="hero-header">
         <div class="hero-bg">
@@ -66,9 +77,9 @@
         </div>
         <div class="hero-inner">
           <div class="hero-greeting">
-            <div class="hero-badge">
+            <div class="hero-badge" :class="{ 'hero-badge--warning': isFallback }">
               <span class="badge-dot"></span>
-              <span>{{ $t('common.live') }}</span>
+              <span>{{ isFallback ? $t('dashboard.data_unavailable') : $t('common.live') }}</span>
             </div>
             <h1 class="hero-title">
               {{ $t('dashboard.welcome_back') }}،
@@ -708,6 +719,7 @@ export default {
     ...mapState('auth', ['user', 'permissions', 'is_admin']),
     ...mapState('dashboard', ['stats', 'loading', 'error']),
     ...mapGetters('dashboard', [
+      'isFallback',
       'recentClients',
       'recentInvoices',
       'formatCurrency',
@@ -1295,6 +1307,37 @@ export default {
   color: #34d399;
   font-size: 0.78rem;
   font-weight: 600;
+}
+
+.hero-badge--warning {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #f87171;
+}
+
+.hero-badge--warning .badge-dot {
+  background: #ef4444;
+}
+
+.fallback-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  margin: 0 0 1.25rem;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: 12px;
+  color: #b91c1c;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.fallback-banner svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: #ef4444;
 }
 
 .badge-dot {

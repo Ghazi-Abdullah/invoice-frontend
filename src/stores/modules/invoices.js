@@ -1,4 +1,6 @@
 import axios from '@/api/axios'
+import NProgress from 'nprogress'
+import i18n from '@/plugins/i18n'
 
 export default {
   namespaced: true,
@@ -32,12 +34,12 @@ export default {
     pagination: state => state.pagination,
     invoiceFilters: state => state.filters,
 
-    invoiceById: (state) => (id) => {
-      return state.invoices.find(invoice => Number(invoice.id) === Number(id))
+    invoiceById: state => id => {
+      return state.invoices.find(invoice => Number(invoice.id) === Number(id)) || null
     },
 
-    invoiceStats: (state) => {
-      const invoices = state.invoices
+    invoiceStats: state => {
+      const invoices = state.invoices || []
       return {
         total: invoices.length,
         paid: invoices.filter(inv => inv.status === 'paid').length,
@@ -53,11 +55,16 @@ export default {
     SET_LOADING(state, loading) {
       state.loading = loading
     },
+
     SET_ERROR(state, error) {
       state.error = error
     },
+
+    CLEAR_ERROR(state) {
+      state.error = null
+    },
+
     SET_INVOICES(state, data) {
-      console.log('📊 SET_INVOICES mutation called with:', data)
       if (data && data.data) {
         if (Array.isArray(data.data)) {
           state.invoices = data.data
@@ -71,204 +78,175 @@ export default {
           }
         } else {
           state.invoices = data.data
-          state.pagination = {
-            current_page: 1,
-            last_page: 1,
-            per_page: data.data.length,
-            total: data.data.length,
-            from: 1,
-            to: data.data.length
-          }
         }
       } else if (Array.isArray(data)) {
         state.invoices = data
-        state.pagination = {
-          current_page: 1,
-          last_page: 1,
-          per_page: data.length,
-          total: data.length,
-          from: 1,
-          to: data.length
-        }
       } else {
-        console.warn('⚠️ Unexpected data structure in SET_INVOICES:', data)
         state.invoices = []
-        state.pagination = {}
       }
-      console.log('✅ Invoices set to:', state.invoices)
-      console.log('✅ Pagination set to:', state.pagination)
     },
+
     SET_CURRENT_INVOICE(state, invoice) {
       state.currentInvoice = invoice
     },
+
     ADD_INVOICE(state, invoice) {
       if (!Array.isArray(state.invoices)) state.invoices = []
       state.invoices.unshift(invoice)
     },
+
     UPDATE_INVOICE(state, updatedInvoice) {
       if (Array.isArray(state.invoices)) {
         const index = state.invoices.findIndex(i => i.id === updatedInvoice.id)
         if (index !== -1) state.invoices.splice(index, 1, updatedInvoice)
       }
     },
+
     DELETE_INVOICE(state, id) {
       if (Array.isArray(state.invoices)) {
         state.invoices = state.invoices.filter(i => i.id !== id)
       }
     },
+
     SET_FILTERS(state, filters) {
       state.filters = { ...state.filters, ...filters }
     },
+
     CLEAR_FILTERS(state) {
       state.filters = { status: '', date_from: '', date_to: '', search: '' }
-    },
-    CLEAR_ERROR(state) {
-      state.error = null
     }
   },
 
   actions: {
-    async createInvoice({ commit, dispatch }, invoiceData) {
-      commit('SET_LOADING', true)
-      commit('CLEAR_ERROR')
-      try {
-        console.log('🚀 Creating invoice:', invoiceData)
-        const response = await axios.post('/admin/invoices', invoiceData)
-        console.log('✅ Invoice created:', response.data)
-
-        let invoice = null
-        if (response.data) {
-          invoice = response.data.data || response.data
-          commit('ADD_INVOICE', invoice)
-          commit('SET_CURRENT_INVOICE', invoice)
-        } else {
-          commit('SET_ERROR', 'فشل في إنشاء الفاتورة: لا توجد بيانات')
-          return null
-        }
-
-        if (invoiceData.enable_stripe_checkout && invoice && invoice.id) {
-          try {
-            console.log('🎯 Stripe Checkout enabled, creating payment session for invoice:', invoice.id)
-            const paymentResult = await dispatch('payments/createPaymentSession', invoice.id, { root: true })
-            if (paymentResult && paymentResult.url) {
-              return { invoice, redirectToStripe: true, stripeUrl: paymentResult.url }
-            } else {
-              console.warn('⚠️ Stripe session created but no URL returned')
-              return { invoice, redirectToStripe: false }
-            }
-          } catch (stripeError) {
-            console.error('❌ Failed to create Stripe session:', stripeError)
-            commit('SET_ERROR', 'تم إنشاء الفاتورة ولكن حدث خطأ في Stripe: ' + (stripeError.message || ''))
-            return { invoice, redirectToStripe: false, stripeError: stripeError.message }
-          }
-        }
-        return { invoice, redirectToStripe: false }
-      } catch (error) {
-        console.error('❌ Error creating invoice:', error)
-        commit('SET_ERROR', error.response?.data?.message || 'فشل في إنشاء الفاتورة')
-        throw error
-      } finally {
-        commit('SET_LOADING', false)
-      }
-    },
-
+    // جلب الفواتير مع التصفية والترقيم
     async fetchInvoices({ commit, state }, params = {}) {
       commit('SET_LOADING', true)
       commit('CLEAR_ERROR')
+      NProgress.start()
+
       try {
         const filters = { ...state.filters, ...params }
         const response = await axios.get('/admin/invoices', { params: filters })
-        if (response.data) {
-          if (response.data.status === true || response.data.success === true) {
-            const data = response.data.data || response.data
-            commit('SET_INVOICES', data.data ? data : data)
-          } else if (response.data.data) {
-            commit('SET_INVOICES', response.data)
-          } else if (Array.isArray(response.data)) {
-            commit('SET_INVOICES', response.data)
-          } else {
-            console.warn('⚠️ Unknown response structure:', response.data)
-            commit('SET_ERROR', 'هيكل البيانات غير متوقع')
-            commit('SET_INVOICES', [])
-          }
-        } else {
-          commit('SET_ERROR', 'لا توجد بيانات في الاستجابة')
-          commit('SET_INVOICES', [])
-        }
+        const data = response.data.data || response.data
+        commit('SET_INVOICES', data)
         return response.data
       } catch (error) {
-        const errorMessage = error.response?.data?.message || error.response?.data?.error || 'حدث خطأ في جلب بيانات الفواتير'
-        commit('SET_ERROR', errorMessage)
+        const message = error.response?.data?.message || i18n.t('invoices.fetch_failed')
+        commit('SET_ERROR', message)
         commit('SET_INVOICES', [])
-        throw error
+        throw new Error(message)
       } finally {
+        NProgress.done()
         commit('SET_LOADING', false)
       }
     },
 
+    // جلب فاتورة واحدة
     async fetchInvoice({ commit }, id) {
       commit('SET_LOADING', true)
       commit('CLEAR_ERROR')
+      NProgress.start()
+
       try {
         const response = await axios.get(`/admin/invoices/${id}`)
-        if (response.data) {
-          const invoice = response.data.data || response.data
-          commit('SET_CURRENT_INVOICE', invoice)
-        } else {
-          commit('SET_ERROR', 'فشل في تحميل الفاتورة: لا توجد بيانات')
-        }
-        return response.data
+        const invoice = response.data.data || response.data
+        commit('SET_CURRENT_INVOICE', invoice)
+        return invoice
       } catch (error) {
-        commit('SET_ERROR', error.response?.data?.message || 'فشل في تحميل الفاتورة')
-        throw error
+        const message = error.response?.data?.message || i18n.t('invoices.fetch_one_failed')
+        commit('SET_ERROR', message)
+        throw new Error(message)
       } finally {
+        NProgress.done()
         commit('SET_LOADING', false)
       }
     },
 
+    // إنشاء فاتورة جديدة
+    async createInvoice({ commit, dispatch }, invoiceData) {
+      commit('SET_LOADING', true)
+      commit('CLEAR_ERROR')
+      NProgress.start()
+
+      try {
+        const response = await axios.post('/admin/invoices', invoiceData)
+        const invoice = response.data.data || response.data
+
+        commit('ADD_INVOICE', invoice)
+        commit('SET_CURRENT_INVOICE', invoice)
+
+        // معالجة Stripe Checkout إذا كان مفعلاً
+        if (invoiceData.enable_stripe_checkout && invoice?.id) {
+          try {
+            const paymentResult = await dispatch('payments/createPaymentSession', invoice.id, { root: true })
+            if (paymentResult?.url) {
+              return { invoice, redirectToStripe: true, stripeUrl: paymentResult.url }
+            }
+          } catch (stripeError) {
+            console.warn('Stripe session creation failed:', stripeError)
+            return { invoice, redirectToStripe: false, stripeError: stripeError.message }
+          }
+        }
+
+        return { invoice, redirectToStripe: false }
+      } catch (error) {
+        const message = error.response?.data?.message || i18n.t('invoices.create_failed')
+        commit('SET_ERROR', message)
+        throw new Error(message)
+      } finally {
+        NProgress.done()
+        commit('SET_LOADING', false)
+      }
+    },
+
+    // تحديث فاتورة
     async updateInvoice({ commit }, { id, data }) {
       commit('SET_LOADING', true)
       commit('CLEAR_ERROR')
+      NProgress.start()
+
       try {
         const response = await axios.put(`/admin/invoices/${id}`, data)
-        if (response.data) {
-          const invoice = response.data.data || response.data
-          commit('UPDATE_INVOICE', invoice)
-          commit('SET_CURRENT_INVOICE', invoice)
-        } else {
-          commit('SET_ERROR', 'فشل في تحديث الفاتورة: لا توجد بيانات')
-        }
-        return response.data
+        const invoice = response.data.data || response.data
+        commit('UPDATE_INVOICE', invoice)
+        commit('SET_CURRENT_INVOICE', invoice)
+        return invoice
       } catch (error) {
-        commit('SET_ERROR', error.response?.data?.message || 'فشل في تحديث الفاتورة')
-        throw error
+        const message = error.response?.data?.message || i18n.t('invoices.update_failed')
+        commit('SET_ERROR', message)
+        throw new Error(message)
       } finally {
+        NProgress.done()
         commit('SET_LOADING', false)
       }
     },
 
+    // حذف فاتورة
     async deleteInvoice({ commit }, id) {
       commit('SET_LOADING', true)
       commit('CLEAR_ERROR')
+      NProgress.start()
+
       try {
-        const response = await axios.delete(`/admin/invoices/${id}`)
-        if (response.data) {
-          commit('DELETE_INVOICE', id)
-        } else {
-          commit('SET_ERROR', 'فشل في حذف الفاتورة: لا توجد بيانات')
-        }
-        return response.data
+        await axios.delete(`/admin/invoices/${id}`)
+        commit('DELETE_INVOICE', id)
+        return true
       } catch (error) {
-        commit('SET_ERROR', error.response?.data?.message || 'فشل في حذف الفاتورة')
-        throw error
+        const message = error.response?.data?.message || i18n.t('invoices.delete_failed')
+        commit('SET_ERROR', message)
+        throw new Error(message)
       } finally {
+        NProgress.done()
         commit('SET_LOADING', false)
       }
     },
 
+    // تحديث حالة الفاتورة
     async updateInvoiceStatus({ commit }, { id, status, payment_date = null }) {
       commit('SET_LOADING', true)
       commit('CLEAR_ERROR')
+      NProgress.start()
+
       try {
         let response
         if (status === 'paid') {
@@ -278,28 +256,32 @@ export default {
         } else {
           response = await axios.put(`/admin/invoices/${id}`, { status })
         }
-        if (response.data) {
-          const invoice = response.data.data || response.data
-          commit('UPDATE_INVOICE', invoice)
-          commit('SET_CURRENT_INVOICE', invoice)
-        } else {
-          commit('SET_ERROR', 'فشل في تحديث حالة الفاتورة: لا توجد بيانات')
-        }
-        return response.data
+
+        const invoice = response.data.data || response.data
+        commit('UPDATE_INVOICE', invoice)
+        commit('SET_CURRENT_INVOICE', invoice)
+        return invoice
       } catch (error) {
-        commit('SET_ERROR', error.response?.data?.message || 'فشل في تحديث حالة الفاتورة')
-        throw error
+        const message = error.response?.data?.message || i18n.t('invoices.status_update_failed')
+        commit('SET_ERROR', message)
+        throw new Error(message)
       } finally {
+        NProgress.done()
         commit('SET_LOADING', false)
       }
     },
 
+    // تحديث المرشحات
     updateFilters({ commit }, filters) {
       commit('SET_FILTERS', filters)
     },
+
+    // مسح المرشحات
     clearFilters({ commit }) {
       commit('CLEAR_FILTERS')
     },
+
+    // مسح الخطأ
     clearError({ commit }) {
       commit('CLEAR_ERROR')
     }

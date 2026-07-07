@@ -387,7 +387,7 @@
             </div>
           </transition>
 
-          <!-- Step 2: Invoice Items (مختصر للاختصار، لكن يمكنك تركه كاملاً من الكود السابق) -->
+          <!-- Step 2: Invoice Items -->
           <transition name="fade">
             <div
               v-if="currentStep === 1"
@@ -432,7 +432,6 @@
                 </div>
               </div>
               <div class="p-6">
-                <!-- جدول الأصناف (يُفضل إبقاؤه كما هو من الكود السابق – مساحة) -->
                 <div class="overflow-x-auto">
                   <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
@@ -469,13 +468,15 @@
                               @click="item.quantity > 1 ? item.quantity-- : null"
                               class="px-3 py-1 border rounded-l"
                             >
-                              -</button
-                            ><input
+                              -
+                            </button>
+                            <input
                               v-model.number="item.quantity"
                               type="number"
                               min="1"
                               class="w-16 text-center border-y"
-                            /><button @click="item.quantity++" class="px-3 py-1 border rounded-r">
+                            />
+                            <button @click="item.quantity++" class="px-3 py-1 border rounded-r">
                               +
                             </button>
                           </div>
@@ -495,9 +496,9 @@
                           <button
                             @click="removeItem(index)"
                             :disabled="invoiceData.items.length === 1"
-                            class="text-red-600"
+                            class="text-red-600 disabled:opacity-30"
                           >
-                            حذف
+                            {{ $t('common.delete') || 'حذف' }}
                           </button>
                         </td>
                       </tr>
@@ -514,7 +515,7 @@
                   <button
                     @click="nextStep"
                     :disabled="!canProceedToStep2"
-                    class="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    class="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {{ $t('common.next') }}: {{ $t('invoices.create.payment_settings') }}
                   </button>
@@ -523,7 +524,7 @@
             </div>
           </transition>
 
-          <!-- Step 3: Payment & Status (مختصر – يمكنك استخدام الكود السابق كاملاً) -->
+          <!-- Step 3: Payment & Status -->
           <transition name="fade">
             <div
               v-if="currentStep === 2"
@@ -633,7 +634,7 @@
             </div>
           </transition>
 
-          <!-- Step 4: Summary (مختصر) -->
+          <!-- Step 4: Summary -->
           <transition name="fade">
             <div
               v-if="currentStep === 3"
@@ -645,8 +646,8 @@
               <div class="p-6">
                 <div class="bg-gray-50 p-6 rounded-xl">
                   <div class="flex justify-between">
-                    <span>{{ $t('invoices.create.total') }}:</span
-                    ><span class="text-2xl font-bold text-blue-600">{{
+                    <span>{{ $t('invoices.create.total') }}:</span>
+                    <span class="text-2xl font-bold text-blue-600">{{
                       formatCurrency(invoiceData.total)
                     }}</span>
                   </div>
@@ -661,17 +662,17 @@
                   <div class="flex gap-3">
                     <button
                       @click="saveAsDraft"
-                      class="px-6 py-2.5 bg-gray-600 text-white rounded-lg"
+                      class="px-6 py-2.5 bg-gray-600 text-white rounded-lg disabled:opacity-50"
                       :disabled="loading"
                     >
                       {{ $t('common.save_draft') }}
                     </button>
                     <button
                       @click="submitInvoice"
-                      class="px-6 py-2.5 bg-blue-600 text-white rounded-lg"
+                      class="px-6 py-2.5 bg-blue-600 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
                       :disabled="loading || !isFormValid"
                     >
-                      {{ getSubmitButtonText() }}
+                      {{ loading ? ($t('common.loading') || 'جاري...') : getSubmitButtonText() }}
                     </button>
                   </div>
                 </div>
@@ -680,22 +681,22 @@
           </transition>
         </div>
 
-        <!-- Right Column: Invoice Summary (مختصر) -->
+        <!-- Right Column: Invoice Summary -->
         <div class="lg:col-span-1 space-y-6">
           <div class="bg-white rounded-xl border p-6 sticky top-6">
             <h3 class="font-bold mb-4">{{ $t('invoice.create.summary') }}</h3>
             <div class="space-y-3">
               <div class="flex justify-between">
-                <span>{{ $t('invoices.create.subtotal') }}:</span
-                ><span>{{ formatCurrency(invoiceData.subtotal) }}</span>
+                <span>{{ $t('invoices.create.subtotal') }}:</span>
+                <span>{{ formatCurrency(invoiceData.subtotal) }}</span>
               </div>
               <div class="flex justify-between">
-                <span>{{ $t('invoices.create.tax') }}:</span
-                ><span>{{ formatCurrency(invoiceData.tax_amount) }}</span>
+                <span>{{ $t('invoices.create.tax') }}:</span>
+                <span>{{ formatCurrency(invoiceData.tax_amount) }}</span>
               </div>
-              <div class="flex justify-between font-bold text-blue-600">
-                <span>{{ $t('invoices.create.total') }}:</span
-                ><span>{{ formatCurrency(invoiceData.total) }}</span>
+              <div class="flex justify-between font-bold text-blue-600 border-t pt-3 mt-3">
+                <span>{{ $t('invoices.create.total') }}:</span>
+                <span>{{ formatCurrency(invoiceData.total) }}</span>
               </div>
             </div>
           </div>
@@ -739,7 +740,6 @@ export default {
         enable_stripe_checkout: false,
       },
       errors: {},
-      quickItems: [],
       statusOptions: [
         {
           value: 'draft',
@@ -762,7 +762,6 @@ export default {
           iconBg: 'bg-red-100',
         },
       ],
-      paymentMethods: [],
     }
   },
   computed: {
@@ -770,18 +769,6 @@ export default {
     ...mapGetters('clients', ['clients']),
     selectedClient() {
       return this.clients.find((c) => c.id == this.invoiceData.client_id)
-    },
-    daysUntilDue() {
-      if (!this.invoiceData.due_date) return 0
-      const diff = new Date(this.invoiceData.due_date) - new Date()
-      return Math.ceil(diff / (1000 * 60 * 60 * 24))
-    },
-    averagePrice() {
-      if (!this.invoiceData.items.length) return 0
-      return (
-        this.invoiceData.items.reduce((s, i) => s + (i.unit_price || 0), 0) /
-        this.invoiceData.items.length
-      )
     },
     isFormValid() {
       return (
@@ -808,9 +795,11 @@ export default {
   methods: {
     ...mapActions('invoices', ['createInvoice', 'clearError']),
     ...mapActions('clients', ['fetchClients']),
+
     getStepProgress() {
       return ((this.currentStep + 1) / this.steps.length) * 100
     },
+
     async loadClients() {
       try {
         await this.fetchClients({ per_page: 100 })
@@ -818,20 +807,20 @@ export default {
         console.error(e)
       }
     },
+
     generateInvoiceNumber() {
       const d = new Date()
-      this.invoiceData.invoice_number = `INV-${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}-${Math.floor(
-        Math.random() * 1000,
-      )
-        .toString()
-        .padStart(3, '0')}`
+      this.invoiceData.invoice_number = `INV-${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`
     },
+
     nextStep() {
       if (this.currentStep < this.steps.length - 1) this.currentStep++
     },
+
     prevStep() {
       if (this.currentStep > 0) this.currentStep--
     },
+
     selectStatus(status) {
       this.invoiceData.status = status
       if (status === 'paid') {
@@ -839,42 +828,36 @@ export default {
         this.invoiceData.enable_stripe_checkout = false
       }
     },
-    selectPaymentMethod(method) {
-      this.invoiceData.payment_method = method
-    },
+
     addItem() {
       this.invoiceData.items.push({ description: '', quantity: 1, unit_price: 0, total: 0 })
     },
-    addQuickItem(item) {
-      this.invoiceData.items.push({
-        description: item.description,
-        quantity: 1,
-        unit_price: item.unit_price,
-        total: item.unit_price,
-      })
-      this.calculateTotals()
-    },
+
     removeItem(index) {
       if (this.invoiceData.items.length > 1) {
         this.invoiceData.items.splice(index, 1)
         this.calculateTotals()
       }
     },
+
     calculateItemTotal(index) {
       const item = this.invoiceData.items[index]
       item.total = (item.quantity || 0) * (item.unit_price || 0)
       this.calculateTotals()
     },
+
     calculateTotals() {
       this.invoiceData.subtotal = this.invoiceData.items.reduce((s, i) => s + (i.total || 0), 0)
       this.invoiceData.tax_amount = this.invoiceData.subtotal * (this.invoiceData.tax_rate / 100)
       this.invoiceData.total =
         this.invoiceData.subtotal + this.invoiceData.tax_amount - this.invoiceData.discount_amount
     },
+
     saveAsDraft() {
       this.invoiceData.status = 'draft'
       this.submitInvoice()
     },
+
     getInitials(name) {
       return name
         ? name
@@ -885,34 +868,18 @@ export default {
             .substring(0, 2)
         : '؟؟'
     },
+
     formatCurrency(amount) {
       return parseFloat(amount || 0).toFixed(2) + ' ' + this.$t('currency.sar')
     },
-    formatDate(dateString) {
-      return dateString
-        ? new Date(dateString).toLocaleDateString(this.$i18n.locale)
-        : this.$t('common.not_specified')
-    },
-    getStatusBadgeClass(status) {
-      return (
-        { draft: 'bg-gray-100', sent: 'bg-blue-100', paid: 'bg-green-100', overdue: 'bg-red-100' }[
-          status
-        ] || 'bg-gray-100'
-      )
-    },
-    getStatusDotClass(status) {
-      return (
-        { draft: 'bg-gray-500', sent: 'bg-blue-500', paid: 'bg-green-500', overdue: 'bg-red-500' }[
-          status
-        ] || 'bg-gray-500'
-      )
-    },
+
     getSubmitButtonText() {
       if (this.invoiceData.status === 'paid') return this.$t('common.create_and_mark_paid')
       if (this.invoiceData.status === 'sent') return this.$t('common.create_and_send')
       if (this.invoiceData.enable_stripe_checkout) return this.$t('common.create_and_enable_stripe')
       return this.$t('common.create_invoice')
     },
+
     validateStripeAmount() {
       if (
         this.invoiceData.enable_stripe_checkout &&
@@ -924,23 +891,25 @@ export default {
       delete this.errors.stripe_amount
       return true
     },
+
     async submitInvoice() {
       this.errors = {}
+
       if (!this.invoiceData.client_id) this.errors.client_id = this.$t('validation.client_required')
-      if (!this.invoiceData.invoice_date)
-        this.errors.invoice_date = this.$t('validation.date_required')
+      if (!this.invoiceData.invoice_date) this.errors.invoice_date = this.$t('validation.date_required')
       if (!this.invoiceData.due_date) this.errors.due_date = this.$t('validation.date_required')
       if (!this.invoiceData.status) this.errors.status = this.$t('validation.status_required')
-      if (this.invoiceData.status === 'paid' && !this.invoiceData.payment_method)
-        this.errors.payment_method = this.$t('validation.payment_method_required')
+
       if (!this.validateStripeAmount()) {
         this.currentStep = 2
         return
       }
+
       if (Object.keys(this.errors).length) {
         this.currentStep = 0
         return
       }
+
       try {
         const data = {
           ...this.invoiceData,
@@ -950,13 +919,23 @@ export default {
             unit_price: parseFloat(i.unit_price),
           })),
         }
+
         const result = await this.createInvoice(data)
+
+        // ✅ الإصلاح: توجيه لـ Stripe إذا مفعّل
         if (result && result.redirectToStripe && result.stripeUrl) {
           window.location.href = result.stripeUrl
           return
         }
+
         this.$toast.success(this.$t('invoice.messages.created'))
-        this.$router.push('/invoices')
+
+        // ✅ الإصلاح الرئيسي: التوجيه لصفحة تفاصيل الفاتورة المنشأة
+        if (result && result.invoice && result.invoice.id) {
+          this.$router.push(`/invoices/${result.invoice.id}`)
+        } else {
+          this.$router.push('/invoices')
+        }
       } catch (error) {
         console.error(error)
         this.$toast.error(error.response?.data?.message || this.$t('invoice.messages.error'))
@@ -970,17 +949,14 @@ export default {
       },
       deep: true,
     },
-    'invoiceData.tax_rate': {
-      handler() {
-        this.calculateTotals()
-      },
+    'invoiceData.tax_rate'() {
+      this.calculateTotals()
     },
-    'invoiceData.discount_amount': {
-      handler() {
-        this.calculateTotals()
-      },
+    'invoiceData.discount_amount'() {
+      this.calculateTotals()
     },
   },
 }
 </script>
+
 <style scoped></style>

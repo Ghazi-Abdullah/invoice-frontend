@@ -1,10 +1,12 @@
 // src/store/modules/activity.js
 import axios from '@/api/axios'
+import NProgress from 'nprogress'
+import i18n from '@/plugins/i18n'
 
 export default {
   namespaced: true,
 
-  state: () => ({
+  state: {
     logs: [],
     loading: false,
     error: null,
@@ -24,7 +26,7 @@ export default {
       date_to: '',
       page: 1
     }
-  }),
+  },
 
   getters: {
     logs: state => state.logs,
@@ -35,6 +37,17 @@ export default {
   },
 
   mutations: {
+    SET_LOGS(state, payload) {
+      state.logs = payload.data || []
+      state.pagination = {
+        current_page: payload.current_page || 1,
+        last_page: payload.last_page || 1,
+        per_page: payload.per_page || 15,
+        total: payload.total || 0,
+        from: payload.from || 0,
+        to: payload.to || 0
+      }
+    },
     SET_LOADING(state, loading) {
       state.loading = loading
     },
@@ -43,23 +56,6 @@ export default {
     },
     CLEAR_ERROR(state) {
       state.error = null
-    },
-    SET_LOGS(state, data) {
-      console.log('📦 SET_LOGS received:', data) // للتشخيص
-
-      if (data && data.data) {
-        state.logs = data.data
-        state.pagination = {
-          current_page: data.current_page,
-          last_page: data.last_page,
-          per_page: data.per_page,
-          total: data.total,
-          from: data.from,
-          to: data.to
-        }
-      } else {
-        state.logs = []
-      }
     },
     SET_FILTERS(state, filters) {
       state.filters = { ...state.filters, ...filters }
@@ -80,26 +76,25 @@ export default {
     async fetchLogs({ commit, state }, params = {}) {
       commit('SET_LOADING', true)
       commit('CLEAR_ERROR')
+      NProgress.start()
 
       try {
         const filters = { ...state.filters, ...params }
-        console.log('🔍 Fetching logs with filters:', filters)
-
         const response = await axios.get('/admin/activity-logs', { params: filters })
-        console.log('✅ API response:', response.data)
 
-        if (response.data && response.data.status) {
+        if (response.data?.status) {
           commit('SET_LOGS', response.data.data)
         } else {
-          commit('SET_ERROR', response.data?.message || 'فشل جلب البيانات')
+          const errorMsg = response.data?.message || i18n.t('activity.fetch_failed')
+          commit('SET_ERROR', errorMsg)
         }
         return response.data
       } catch (error) {
-        console.error('❌ Error fetching logs:', error)
-        const errorMessage = error.response?.data?.message || 'حدث خطأ أثناء جلب سجل النشاطات'
-        commit('SET_ERROR', errorMessage)
+        const message = error.response?.data?.message || i18n.t('activity.fetch_error')
+        commit('SET_ERROR', message)
         throw error
       } finally {
+        NProgress.done()
         commit('SET_LOADING', false)
       }
     },
