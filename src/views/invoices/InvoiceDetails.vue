@@ -716,13 +716,23 @@
       </div>
     </div>
   </div>
+
+   <InstallmentPlanSection
+    :invoice-id="invoice.id"
+    :invoice-total="invoice.total"
+    :can-manage="hasPermission('edit_invoice')"
+  />
 </template>
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
 import moment from 'moment'
+import InstallmentPlanSection from '@/components/invoices/InstallmentPlanSection.vue'
 
 export default {
+  components: {
+    InstallmentPlanSection,
+  },
   name: 'InvoiceDetails',
 
   data() {
