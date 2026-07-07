@@ -76,6 +76,5 @@ export default createStore({
     activity: activity,
     invoiceNotifications: invoiceNotifications,
     installments: installments
-
   }
 })
