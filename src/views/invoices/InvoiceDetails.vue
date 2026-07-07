@@ -717,10 +717,11 @@
     </div>
   </div>
 
-   <InstallmentPlanSection
+  <InstallmentPlanSection
+    v-if="invoice"
     :invoice-id="invoice.id"
     :invoice-total="invoice.total"
-    :can-manage="hasPermission('edit_invoice')"
+    :can-manage="hasEditPermission"
   />
 </template>
 
