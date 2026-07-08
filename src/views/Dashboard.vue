@@ -1236,6 +1236,13 @@ export default {
   gap: 1.5rem;
 }
 
+@media (max-width: 480px) {
+  .dashboard-content {
+    padding: 1rem;
+    gap: 1rem;
+  }
+}
+
 /* ─── Hero ──────────────────────────────────────────────────────────────── */
 .hero-header {
   position: relative;
@@ -1243,6 +1250,13 @@ export default {
   overflow: hidden;
   background: #0f172a;
   padding: 2.5rem;
+}
+
+@media (max-width: 640px) {
+  .hero-header {
+    padding: 1.5rem;
+    border-radius: 18px;
+  }
 }
 
 .hero-bg {
@@ -1263,7 +1277,8 @@ export default {
   height: 500px;
   top: -200px;
   right: -100px;
-  background: #6366f1;
+  background: rgb(var(--color-primary-500));
+  transition: background-color 700ms ease;
 }
 .mesh-2 {
   width: 350px;

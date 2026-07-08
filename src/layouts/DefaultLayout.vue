@@ -1,27 +1,57 @@
 <template>
   <div class="flex min-h-screen bg-gray-100" :dir="$i18n.locale === 'ar' ? 'rtl' : 'ltr'">
     <!-- Overlay للموبايل عند فتح السايدبار -->
-    <div
-      v-if="sidebarOpen && isMobile"
-      class="fixed inset-0 bg-black bg-opacity-50 z-40"
-      @click="toggleSidebar"
-    ></div>
+    <transition name="fade-slide">
+      <div
+        v-if="sidebarOpen && isMobile"
+        class="fixed inset-0 bg-black bg-opacity-50 z-40"
+        @click="toggleSidebar"
+      ></div>
+    </transition>
 
     <!-- Sidebar -->
     <aside
       :class="[
-        'bg-gradient-to-b from-gray-900 to-gray-800 text-white shadow-xl overflow-y-auto transition-all duration-300 z-50',
+        'bg-gradient-to-b from-gray-900 to-gray-800 text-white shadow-xl overflow-y-auto transition-all duration-300 ease-in-out z-50 w-64',
         isMobile
-          ? sidebarOpen
-            ? 'fixed top-0 bottom-0 w-64'
-            : 'fixed top-0 bottom-0 w-0 overflow-hidden'
+          ? [
+              'fixed top-0 bottom-0',
+              sidebarOpen
+                ? 'translate-x-0'
+                : $i18n.locale === 'ar'
+                  ? 'translate-x-full'
+                  : '-translate-x-full',
+            ]
           : sidebarOpen
-            ? 'relative w-64'
-            : 'relative w-20',
+            ? 'relative'
+            : 'relative !w-20',
         $i18n.locale === 'ar' ? 'right-0' : 'left-0',
       ]"
     >
       <div class="p-4 h-full flex flex-col min-h-screen">
+        <!-- Brand / Logo -->
+        <router-link
+          to="/dashboard"
+          class="flex items-center gap-3 mb-4 group"
+          :class="sidebarOpen ? '' : 'justify-center'"
+        >
+          <div
+            class="brand-logo-mark relative w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-transform duration-500 group-hover:scale-105"
+          >
+            <i class="fas fa-file-invoice text-white text-lg"></i>
+            <span
+              class="absolute -top-1 -end-1 w-3 h-3 rounded-full bg-emerald-400 border-2 border-gray-900"
+            ></span>
+          </div>
+          <transition name="fade-slide">
+            <div v-if="sidebarOpen" class="flex flex-col overflow-hidden whitespace-nowrap">
+              <span class="text-white font-bold text-sm tracking-tight">{{ $t('app.name') }}</span>
+              <span class="text-[10px] text-gray-400 tracking-wide">{{ $t('app.edition') }}</span>
+            </div>
+          </transition>
+        </router-link>
+        <div class="border-b border-gray-700/60 mb-4"></div>
+
         <!-- User Info -->
         <div v-if="sidebarOpen && user" class="mb-6 p-3 bg-gray-800/50 rounded-xl">
           <div class="flex items-center gap-3">
@@ -29,12 +59,12 @@
               <img
                 v-if="user.img_url"
                 :src="user.img_url"
-                class="w-full h-full rounded-full object-cover border-2 border-blue-500 shadow-lg"
+                class="w-full h-full rounded-full object-cover border-2 border-primary-500 shadow-lg"
                 :alt="user.name"
               />
               <div
                 v-else
-                class="w-full h-full rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-lg"
+                class="w-full h-full rounded-full bg-gradient-to-r from-primary-500 to-primary-600 flex items-center justify-center text-white font-bold text-sm shadow-lg"
               >
                 {{ getInitials(user.name) }}
               </div>
@@ -43,7 +73,7 @@
               <p class="text-sm font-medium text-white truncate">{{ user.name }}</p>
               <p class="text-xs text-gray-300 truncate">{{ user.email }}</p>
               <div class="mt-1">
-                <span class="inline-block px-2 py-0.5 text-xs bg-blue-600/80 rounded-lg">
+                <span class="inline-block px-2 py-0.5 text-xs bg-primary-600/80 rounded-lg">
                   {{ user.group?.title_ar || $t('auth.user') }}
                 </span>
               </div>
@@ -411,7 +441,11 @@
 
       <!-- Page Content -->
       <main class="flex-1 p-4 md:p-6 bg-gray-50">
-        <router-view />
+        <router-view v-slot="{ Component }">
+          <transition name="page-fade" mode="out-in">
+            <component :is="Component" :key="$route.fullPath" />
+          </transition>
+        </router-view>
       </main>
     </div>
   </div>
@@ -602,5 +636,57 @@ aside::-webkit-scrollbar-thumb:hover {
   width: 3px;
   background: linear-gradient(to bottom, #3b82f6, #1d4ed8);
   border-radius: 3px 0 0 3px;
+}
+
+/* ظهور/اختفاء اسم العلامة التجارية عند طي/فتح السايدبار */
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease;
+}
+
+.fade-slide-enter-from,
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateX(-6px);
+}
+
+[dir='rtl'] .fade-slide-enter-from,
+[dir='rtl'] .fade-slide-leave-to {
+  transform: translateX(6px);
+}
+</style>
+
+<!-- غير scoped عمداً: يجب أن يطال هذا الأسلوب محتوى الصفحات المعروضة
+     داخل router-view (مكوّنات أخرى)، وهو ما لا تسمح به scoped styles -->
+<style>
+/* انتقال ناعم بين الصفحات عند التنقل */
+.page-fade-enter-active,
+.page-fade-leave-active {
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.page-fade-enter-from {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.page-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
+}
+
+/* شبكة أمان للموبايل: أي جدول عادي غير ملفوف بـ .table-container
+   يصبح قابلاً للتمرير أفقياً بدل أن يكسر التخطيط على الشاشات الصغيرة */
+@media (max-width: 767px) {
+  main table:not(.table-container table) {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
 }
 </style>

@@ -7,6 +7,7 @@ import App from './App.vue'
 import router from './router'
 import store from './stores'
 import i18n from './plugins/i18n'
+import { startDynamicTheme } from './utils/dynamicTheme'
 
 // Toastify
 import Vue3Toastify, { toast } from 'vue3-toastify'
@@ -221,5 +222,8 @@ app.config.globalProperties.$toast = toast
 
 // تشغيل التطبيق
 app.mount('#app')
+
+// تشغيل تدوير ألوان العلامة التجارية التلقائي (كل 15 ثانية)
+startDynamicTheme()
 
 console.log('✅ تم تهيئة التطبيق بنجاح')

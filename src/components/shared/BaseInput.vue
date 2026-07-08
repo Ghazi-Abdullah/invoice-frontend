@@ -22,7 +22,7 @@
 
       <div
         v-if="$slots.prefix || prefixIcon"
-        class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+        class="absolute inset-y-0 start-0 ps-3 flex items-center pointer-events-none"
       >
         <slot name="prefix">
           <font-awesome-icon v-if="prefixIcon" :icon="prefixIcon" class="text-gray-400" />
@@ -31,7 +31,7 @@
 
       <div
         v-if="$slots.suffix || suffixIcon"
-        class="absolute inset-y-0 right-0 pr-3 flex items-center"
+        class="absolute inset-y-0 end-0 pe-3 flex items-center"
       >
         <slot name="suffix">
           <font-awesome-icon v-if="suffixIcon" :icon="suffixIcon" class="text-gray-400" />
@@ -111,15 +111,15 @@ export default {
   computed: {
     inputClasses() {
       const baseClasses =
-        'form-input block w-full rounded-lg border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors'
+        'form-input block w-full rounded-lg border-gray-300 shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200'
       const sizeClasses = {
         sm: 'px-3 py-2 text-sm',
         md: 'px-4 py-2.5',
         lg: 'px-4 py-3 text-lg',
       }
       const errorClass = this.error ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : ''
-      const prefixClass = this.prefixIcon || this.$slots.prefix ? 'pl-10' : ''
-      const suffixClass = this.suffixIcon || this.$slots.suffix ? 'pr-10' : ''
+      const prefixClass = this.prefixIcon || this.$slots.prefix ? 'ps-10' : ''
+      const suffixClass = this.suffixIcon || this.$slots.suffix ? 'pe-10' : ''
 
       return `${baseClasses} ${sizeClasses[this.size]} ${errorClass} ${prefixClass} ${suffixClass}`
     },

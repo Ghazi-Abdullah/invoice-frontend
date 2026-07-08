@@ -132,7 +132,7 @@ export default {
 }
 
 .modal-footer {
-  @apply px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end space-x-3 space-x-reverse;
+  @apply px-6 py-4 border-t border-gray-200 bg-gray-50 flex flex-wrap justify-end gap-3;
 }
 
 @keyframes slideDown {

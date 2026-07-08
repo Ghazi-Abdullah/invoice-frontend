@@ -2,7 +2,8 @@
   "app": {
     "name": "Invoice System",
     "description": "Complete invoice management system",
-    "version": "Version"
+    "version": "Version",
+    "edition": "Enterprise Edition"
   },
   "nav": {
     "all_clients": "All Clients",
