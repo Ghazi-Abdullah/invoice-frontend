@@ -1065,4 +1065,56 @@ export default {
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }
+
+/* ظهور/اختفاء اسم العلامة التجارية عند طي/فتح السايدبار */
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease;
+}
+
+.fade-slide-enter-from,
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateX(-6px);
+}
+
+[dir='rtl'] .fade-slide-enter-from,
+[dir='rtl'] .fade-slide-leave-to {
+  transform: translateX(6px);
+}
+</style>
+
+<!-- غير scoped عمداً: يجب أن يطال هذا الأسلوب محتوى الصفحات المعروضة
+     داخل router-view (مكوّنات أخرى)، وهو ما لا تسمح به scoped styles -->
+<style>
+/* انتقال ناعم بين الصفحات عند التنقل */
+.page-fade-enter-active,
+.page-fade-leave-active {
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.page-fade-enter-from {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.page-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
+}
+
+/* شبكة أمان للموبايل: أي جدول عادي غير ملفوف بـ .table-container
+   يصبح قابلاً للتمرير أفقياً بدل أن يكسر التخطيط على الشاشات الصغيرة */
+@media (max-width: 767px) {
+  main table:not(.table-container table) {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+}
 </style>

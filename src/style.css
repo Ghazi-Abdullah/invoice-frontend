@@ -84,6 +84,27 @@ body {
   direction: rtl;
 }
 
+/* ============================================================
+   انتقال سلس لتبديل ألوان العلامة التجارية (dynamicTheme.js)
+   ============================================================
+   نطبّق انتقالاً خفيفاً على خصائص اللون فقط (بدون تأثير على
+   التخطيط) حتى يبدو تغيّر اللون التلقائي أنيقاً وغير مفاجئ،
+   حتى على العناصر التي لا تملك class خاص بالـ transition.
+   ============================================================ */
+*,
+*::before,
+*::after {
+  transition-property: background-color, border-color, color, box-shadow, fill, stroke;
+  transition-duration: 700ms;
+  transition-timing-function: ease;
+}
+
+/* شعار الموقع الموحّد — يُستخدم في السايدبار وأي مكان آخر */
+.brand-logo-mark {
+  background: linear-gradient(135deg, rgb(var(--color-primary-500)), rgb(var(--color-primary-700)));
+  box-shadow: 0 6px 20px -4px rgba(var(--color-primary-600), 0.5);
+}
+
 /* تخصيص scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
