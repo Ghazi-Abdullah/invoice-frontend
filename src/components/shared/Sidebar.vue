@@ -9,362 +9,374 @@
 
   <!-- Sidebar -->
   <aside
-    ref="sidebarEl"
-    class="sidebar fixed lg:static h-screen flex flex-col z-40 transition-all duration-300 ease-in-out"
-    :class="{
-      '-translate-x-full lg:translate-x-0': !isMobileOpen,
-      'w-[72px]': isCollapsed,
-      'w-[260px]': !isCollapsed,
-    }"
+    :class="[
+      'bg-gradient-to-b from-gray-900 to-gray-800 text-white shadow-xl overflow-y-auto transition-all duration-300 z-50',
+      isMobile
+        ? sidebarOpen
+          ? 'fixed top-0 bottom-0 w-64'
+          : 'fixed top-0 bottom-0 w-0 overflow-hidden'
+        : sidebarOpen
+          ? 'relative w-64'
+          : 'relative w-20',
+      $i18n.locale === 'ar' ? 'right-0' : 'left-0',
+    ]"
+    :style="isMobile && !sidebarOpen ? 'min-width: 0 !important;' : ''"
   >
-    <!-- Noise texture overlay -->
-    <div class="noise-overlay"></div>
+    <div
+      class="h-full flex flex-col min-h-screen"
+      :class="{ 'p-4': sidebarOpen || !isMobile, 'p-0': isMobile && !sidebarOpen }"
+    >
+      <!-- Noise texture overlay -->
+      <div class="noise-overlay"></div>
 
-    <!-- ══════════ HEADER ══════════ -->
-    <div class="sidebar-header" :class="{ 'justify-center': isCollapsed }">
-      <router-link
-        to="/dashboard"
-        class="logo-link"
-        :class="{ 'justify-center': isCollapsed }"
-        @click="closeMobileSidebar"
-      >
-        <div class="logo-icon">
-          <i class="fas fa-file-invoice"></i>
-          <span class="logo-badge"></span>
-        </div>
-        <transition name="fade-slide">
-          <div v-if="!isCollapsed" class="logo-text">
-            <span class="logo-name">{{ $t('app.name') }}</span>
-            <span class="logo-version">v2.0 Enterprise</span>
+      <!-- ══════════ HEADER ══════════ -->
+      <div class="sidebar-header" :class="{ 'justify-center': isCollapsed }">
+        <router-link
+          to="/dashboard"
+          class="logo-link"
+          :class="{ 'justify-center': isCollapsed }"
+          @click="closeMobileSidebar"
+        >
+          <div class="logo-icon">
+            <i class="fas fa-file-invoice"></i>
+            <span class="logo-badge"></span>
           </div>
-        </transition>
-      </router-link>
-
-      <button
-        v-if="!isCollapsed"
-        @click="toggleCollapse"
-        class="collapse-btn hidden lg:flex"
-        :title="$t('buttons.collapse')"
-      >
-        <i class="fas fa-chevron-left"></i>
-      </button>
-    </div>
-
-    <!-- ══════════ USER CARD ══════════ -->
-    <transition name="fade-slide">
-      <div v-if="!isCollapsed && user" class="user-card">
-        <div class="user-avatar">
-          <img v-if="user.avatar" :src="user.avatar" :alt="user.name" />
-          <span v-else>{{ getUserInitials }}</span>
-          <span class="online-dot"></span>
-        </div>
-        <div class="user-info">
-          <p class="user-name">{{ user.name }}</p>
-          <p class="user-email">{{ user.email }}</p>
-          <span class="user-role" :class="isAdmin ? 'role-admin' : 'role-user'">
-            <i class="fas" :class="isAdmin ? 'fa-crown' : 'fa-user'"></i>
-            {{ userRole }}
-          </span>
-        </div>
-      </div>
-    </transition>
-
-    <!-- Collapsed avatar -->
-    <div v-if="isCollapsed && user" class="collapsed-avatar">
-      <img v-if="user.avatar" :src="user.avatar" :alt="user.name" />
-      <span v-else>{{ getUserInitials }}</span>
-      <span class="online-dot"></span>
-    </div>
-
-    <!-- ══════════ NAV SECTION LABEL ══════════ -->
-    <transition name="fade-slide">
-      <div v-if="!isCollapsed" class="nav-label">
-        <span>{{ $t('common.navigation') }}</span>
-      </div>
-    </transition>
-
-    <!-- ══════════ NAVIGATION ══════════ -->
-    <nav class="nav-menu scrollbar-thin">
-      <ul>
-        <!-- Dashboard -->
-        <li v-if="hasPermission('view_dashboard')">
-          <router-link
-            to="/dashboard"
-            @click="closeMobileSidebar"
-            :class="['nav-item', isActive('/dashboard') && 'nav-item--active nav-item--blue']"
-            :title="isCollapsed ? $t('nav.dashboard') : ''"
-          >
-            <span class="nav-icon nav-icon--blue">
-              <i class="fas fa-tachometer-alt"></i>
-            </span>
-            <transition name="fade-slide">
-              <span v-if="!isCollapsed" class="nav-label-text">{{ $t('nav.dashboard') }}</span>
-            </transition>
-            <span
-              v-if="!isCollapsed && isActive('/dashboard')"
-              class="active-dot active-dot--blue"
-            ></span>
-          </router-link>
-        </li>
-
-        <!-- Invoices -->
-        <li v-if="hasPermission('view_invoices')">
-          <router-link
-            to="/invoices"
-            @click="closeMobileSidebar"
-            :class="['nav-item', isActive('/invoices') && 'nav-item--active nav-item--emerald']"
-            :title="isCollapsed ? $t('nav.invoices') : ''"
-          >
-            <span class="nav-icon nav-icon--emerald" style="position: relative">
-              <i class="fas fa-file-invoice-dollar"></i>
-              <span v-if="pendingInvoices > 0" class="badge">
-                {{ pendingInvoices > 9 ? '9+' : pendingInvoices }}
-              </span>
-            </span>
-            <transition name="fade-slide">
-              <div v-if="!isCollapsed" class="nav-text-block">
-                <span class="nav-label-text">{{ $t('nav.invoices') }}</span>
-                <span class="nav-sub">{{ $t('nav.invoices_desc') }}</span>
-              </div>
-            </transition>
-          </router-link>
-        </li>
-
-        <!-- Clients -->
-        <li v-if="hasPermission('view_clients')">
-          <router-link
-            to="/clients"
-            @click="closeMobileSidebar"
-            :class="['nav-item', isActive('/clients') && 'nav-item--active nav-item--violet']"
-            :title="isCollapsed ? $t('nav.clients') : ''"
-          >
-            <span class="nav-icon nav-icon--violet">
-              <i class="fas fa-users"></i>
-            </span>
-            <transition name="fade-slide">
-              <div v-if="!isCollapsed" class="nav-text-block">
-                <span class="nav-label-text">{{ $t('nav.clients') }}</span>
-                <span class="nav-sub">{{ $t('nav.clients_desc') }}</span>
-              </div>
-            </transition>
-          </router-link>
-        </li>
-
-        <!-- Reports -->
-        <li v-if="hasPermission('view_reports')">
-          <router-link
-            to="/reports"
-            @click="closeMobileSidebar"
-            :class="['nav-item', isActive('/reports') && 'nav-item--active nav-item--amber']"
-            :title="isCollapsed ? $t('nav.reports') : ''"
-          >
-            <span class="nav-icon nav-icon--amber">
-              <i class="fas fa-chart-line"></i>
-            </span>
-            <transition name="fade-slide">
-              <div v-if="!isCollapsed" class="nav-text-block">
-                <span class="nav-label-text">{{ $t('nav.reports') }}</span>
-                <span class="nav-sub">{{ $t('nav.reports_desc') }}</span>
-              </div>
-            </transition>
-          </router-link>
-        </li>
-
-        <!-- ── ADMIN DIVIDER ── -->
-        <li v-if="isAdmin">
           <transition name="fade-slide">
-            <div v-if="!isCollapsed" class="section-divider">
-              <div class="divider-line"></div>
-              <span class="divider-label">{{ $t('admin.section_title') }}</span>
-              <div class="divider-line"></div>
-            </div>
-            <div v-else class="divider-dot-wrap">
-              <span class="divider-dot"></span>
+            <div v-if="!isCollapsed" class="logo-text">
+              <span class="logo-name">{{ $t('app.name') }}</span>
+              <span class="logo-version">v2.0 Enterprise</span>
             </div>
           </transition>
-        </li>
+        </router-link>
 
-        <!-- Installment Tiers Settings -->
-        <li v-if="isAdmin">
-          <router-link
-            to="/admin/installment-tiers"
-            @click="closeMobileSidebar"
-            :class="[
-              'nav-item',
-              isActive('/admin/installment-tiers') && 'nav-item--active nav-item--pink',
-            ]"
-            :title="isCollapsed ? $t('installments.tiers_title') : ''"
-          >
-            <span class="nav-icon nav-icon--pink">
-              <i class="fas fa-percentage"></i>
-            </span>
-            <transition name="fade-slide">
-              <span v-if="!isCollapsed" class="nav-label-text">{{
-                $t('installments.tiers_title')
-              }}</span>
-            </transition>
-          </router-link>
-        </li>
+        <button
+          v-if="!isCollapsed"
+          @click="toggleCollapse"
+          class="collapse-btn hidden lg:flex"
+          :title="$t('buttons.collapse')"
+        >
+          <i class="fas fa-chevron-left"></i>
+        </button>
+      </div>
 
-        <!-- Users -->
-        <li v-if="isAdmin">
-          <router-link
-            to="/users"
-            @click="closeMobileSidebar"
-            :class="['nav-item', isActive('/users') && 'nav-item--active nav-item--indigo']"
-            :title="isCollapsed ? $t('nav.users') : ''"
-          >
-            <span class="nav-icon nav-icon--indigo">
-              <i class="fas fa-user-shield"></i>
-            </span>
-            <transition name="fade-slide">
-              <span v-if="!isCollapsed" class="nav-label-text">{{ $t('nav.users') }}</span>
-            </transition>
-          </router-link>
-        </li>
-
-        <!-- Groups -->
-        <li v-if="isAdmin">
-          <router-link
-            to="/admin/groups"
-            @click="closeMobileSidebar"
-            :class="['nav-item', isActive('/admin/groups') && 'nav-item--active nav-item--pink']"
-            :title="isCollapsed ? $t('adminGroups.title') : ''"
-          >
-            <span class="nav-icon nav-icon--pink">
-              <i class="fas fa-users-cog"></i>
-            </span>
-            <transition name="fade-slide">
-              <span v-if="!isCollapsed" class="nav-label-text">{{ $t('adminGroups.title') }}</span>
-            </transition>
-          </router-link>
-        </li>
-
-        <!-- Installment Tiers Settings -->
-        <li v-if="isAdmin">
-          <router-link
-            to="/admin/installment-tiers"
-            @click="closeMobileSidebar"
-            :class="[
-              'nav-item',
-              isActive('/admin/installment-tiers') && 'nav-item--active nav-item--pink',
-            ]"
-            :title="isCollapsed ? $t('installments.tiers_title') : ''"
-          >
-            <span class="nav-icon nav-icon--pink">
-              <i class="fas fa-percentage"></i>
-            </span>
-            <transition name="fade-slide">
-              <span v-if="!isCollapsed" class="nav-label-text">{{
-                $t('installments.tiers_title')
-              }}</span>
-            </transition>
-          </router-link>
-        </li>
-
-        <!-- Permissions -->
-        <li v-if="isAdmin">
-          <router-link
-            to="/permissions"
-            @click="closeMobileSidebar"
-            :class="['nav-item', isActive('/permissions') && 'nav-item--active nav-item--teal']"
-            :title="isCollapsed ? $t('nav.permissions') : ''"
-          >
-            <span class="nav-icon nav-icon--teal">
-              <i class="fas fa-shield-alt"></i>
-            </span>
-            <transition name="fade-slide">
-              <span v-if="!isCollapsed" class="nav-label-text">{{ $t('nav.permissions') }}</span>
-            </transition>
-          </router-link>
-        </li>
-
-        <!-- OTP -->
-        <li v-if="isAdmin">
-          <router-link
-            to="/admin/otp"
-            @click="closeMobileSidebar"
-            :class="['nav-item', isActive('/admin/otp') && 'nav-item--active nav-item--yellow']"
-            :title="isCollapsed ? 'رموز OTP' : ''"
-          >
-            <span class="nav-icon nav-icon--yellow">
-              <i class="fas fa-key"></i>
-            </span>
-            <transition name="fade-slide">
-              <div v-if="!isCollapsed" class="nav-text-block">
-                <span class="nav-label-text">رموز OTP</span>
-                <span class="nav-sub">إدارة رموز التحقق</span>
-              </div>
-            </transition>
-          </router-link>
-        </li>
-      </ul>
-    </nav>
-
-    <!-- ══════════ FOOTER ACTIONS ══════════ -->
-    <div class="sidebar-footer">
-      <!-- Language -->
-      <button
-        @click="toggleLanguage"
-        class="footer-btn"
-        :title="isCollapsed ? $t('buttons.toggle_language') : ''"
-      >
-        <span class="footer-btn-icon">
-          <i class="fas fa-language"></i>
-        </span>
-        <transition name="fade-slide">
-          <div v-if="!isCollapsed" class="footer-btn-text">
-            <span>{{ isRTL ? 'English' : 'العربية' }}</span>
-            <span class="footer-btn-sub">{{ $t('buttons.toggle_language') }}</span>
-          </div>
-        </transition>
-      </button>
-
-      <!-- Collapse toggle (mobile) -->
-      <button
-        v-if="isCollapsed && !isMobileOpen"
-        @click="toggleCollapse"
-        class="footer-btn lg:hidden"
-      >
-        <span class="footer-btn-icon">
-          <i class="fas fa-chevron-right"></i>
-        </span>
-      </button>
-
-      <!-- Logout -->
-      <button
-        @click="handleLogout"
-        class="footer-btn footer-btn--danger"
-        :title="isCollapsed ? $t('auth.logout') : ''"
-      >
-        <span class="footer-btn-icon footer-btn-icon--danger">
-          <i class="fas fa-sign-out-alt"></i>
-        </span>
-        <transition name="fade-slide">
-          <div v-if="!isCollapsed" class="footer-btn-text">
-            <span>{{ $t('auth.logout') }}</span>
-            <span class="footer-btn-sub">{{ $t('auth.logout_desc') }}</span>
-          </div>
-        </transition>
-      </button>
-
-      <!-- Version -->
+      <!-- ══════════ USER CARD ══════════ -->
       <transition name="fade-slide">
-        <div v-if="!isCollapsed" class="version-block">
-          <div class="version-row">
-            <span>{{ $t('app.version') }}</span>
-            <span class="version-val">v2.0.0</span>
+        <div v-if="!isCollapsed && user" class="user-card">
+          <div class="user-avatar">
+            <img v-if="user.avatar" :src="user.avatar" :alt="user.name" />
+            <span v-else>{{ getUserInitials }}</span>
+            <span class="online-dot"></span>
           </div>
-          <div class="version-row">
-            <span>{{ $t('app.status') }}</span>
-            <div class="status-online">
-              <span class="status-dot"></span>
-              <span>{{ $t('app.online') }}</span>
-            </div>
+          <div class="user-info">
+            <p class="user-name">{{ user.name }}</p>
+            <p class="user-email">{{ user.email }}</p>
+            <span class="user-role" :class="isAdmin ? 'role-admin' : 'role-user'">
+              <i class="fas" :class="isAdmin ? 'fa-crown' : 'fa-user'"></i>
+              {{ userRole }}
+            </span>
           </div>
-          <p class="copyright">&copy; {{ new Date().getFullYear() }} {{ $t('app.name') }}</p>
         </div>
       </transition>
+
+      <!-- Collapsed avatar -->
+      <div v-if="isCollapsed && user" class="collapsed-avatar">
+        <img v-if="user.avatar" :src="user.avatar" :alt="user.name" />
+        <span v-else>{{ getUserInitials }}</span>
+        <span class="online-dot"></span>
+      </div>
+
+      <!-- ══════════ NAV SECTION LABEL ══════════ -->
+      <transition name="fade-slide">
+        <div v-if="!isCollapsed" class="nav-label">
+          <span>{{ $t('common.navigation') }}</span>
+        </div>
+      </transition>
+
+      <!-- ══════════ NAVIGATION ══════════ -->
+      <nav class="nav-menu scrollbar-thin">
+        <ul>
+          <!-- Dashboard -->
+          <li v-if="hasPermission('view_dashboard')">
+            <router-link
+              to="/dashboard"
+              @click="closeMobileSidebar"
+              :class="['nav-item', isActive('/dashboard') && 'nav-item--active nav-item--blue']"
+              :title="isCollapsed ? $t('nav.dashboard') : ''"
+            >
+              <span class="nav-icon nav-icon--blue">
+                <i class="fas fa-tachometer-alt"></i>
+              </span>
+              <transition name="fade-slide">
+                <span v-if="!isCollapsed" class="nav-label-text">{{ $t('nav.dashboard') }}</span>
+              </transition>
+              <span
+                v-if="!isCollapsed && isActive('/dashboard')"
+                class="active-dot active-dot--blue"
+              ></span>
+            </router-link>
+          </li>
+
+          <!-- Invoices -->
+          <li v-if="hasPermission('view_invoices')">
+            <router-link
+              to="/invoices"
+              @click="closeMobileSidebar"
+              :class="['nav-item', isActive('/invoices') && 'nav-item--active nav-item--emerald']"
+              :title="isCollapsed ? $t('nav.invoices') : ''"
+            >
+              <span class="nav-icon nav-icon--emerald" style="position: relative">
+                <i class="fas fa-file-invoice-dollar"></i>
+                <span v-if="pendingInvoices > 0" class="badge">
+                  {{ pendingInvoices > 9 ? '9+' : pendingInvoices }}
+                </span>
+              </span>
+              <transition name="fade-slide">
+                <div v-if="!isCollapsed" class="nav-text-block">
+                  <span class="nav-label-text">{{ $t('nav.invoices') }}</span>
+                  <span class="nav-sub">{{ $t('nav.invoices_desc') }}</span>
+                </div>
+              </transition>
+            </router-link>
+          </li>
+
+          <!-- Clients -->
+          <li v-if="hasPermission('view_clients')">
+            <router-link
+              to="/clients"
+              @click="closeMobileSidebar"
+              :class="['nav-item', isActive('/clients') && 'nav-item--active nav-item--violet']"
+              :title="isCollapsed ? $t('nav.clients') : ''"
+            >
+              <span class="nav-icon nav-icon--violet">
+                <i class="fas fa-users"></i>
+              </span>
+              <transition name="fade-slide">
+                <div v-if="!isCollapsed" class="nav-text-block">
+                  <span class="nav-label-text">{{ $t('nav.clients') }}</span>
+                  <span class="nav-sub">{{ $t('nav.clients_desc') }}</span>
+                </div>
+              </transition>
+            </router-link>
+          </li>
+
+          <!-- Reports -->
+          <li v-if="hasPermission('view_reports')">
+            <router-link
+              to="/reports"
+              @click="closeMobileSidebar"
+              :class="['nav-item', isActive('/reports') && 'nav-item--active nav-item--amber']"
+              :title="isCollapsed ? $t('nav.reports') : ''"
+            >
+              <span class="nav-icon nav-icon--amber">
+                <i class="fas fa-chart-line"></i>
+              </span>
+              <transition name="fade-slide">
+                <div v-if="!isCollapsed" class="nav-text-block">
+                  <span class="nav-label-text">{{ $t('nav.reports') }}</span>
+                  <span class="nav-sub">{{ $t('nav.reports_desc') }}</span>
+                </div>
+              </transition>
+            </router-link>
+          </li>
+
+          <!-- ── ADMIN DIVIDER ── -->
+          <li v-if="isAdmin">
+            <transition name="fade-slide">
+              <div v-if="!isCollapsed" class="section-divider">
+                <div class="divider-line"></div>
+                <span class="divider-label">{{ $t('admin.section_title') }}</span>
+                <div class="divider-line"></div>
+              </div>
+              <div v-else class="divider-dot-wrap">
+                <span class="divider-dot"></span>
+              </div>
+            </transition>
+          </li>
+
+          <!-- Installment Tiers Settings -->
+          <li v-if="isAdmin">
+            <router-link
+              to="/admin/installment-tiers"
+              @click="closeMobileSidebar"
+              :class="[
+                'nav-item',
+                isActive('/admin/installment-tiers') && 'nav-item--active nav-item--pink',
+              ]"
+              :title="isCollapsed ? $t('installments.tiers_title') : ''"
+            >
+              <span class="nav-icon nav-icon--pink">
+                <i class="fas fa-percentage"></i>
+              </span>
+              <transition name="fade-slide">
+                <span v-if="!isCollapsed" class="nav-label-text">{{
+                  $t('installments.tiers_title')
+                }}</span>
+              </transition>
+            </router-link>
+          </li>
+
+          <!-- Users -->
+          <li v-if="isAdmin">
+            <router-link
+              to="/users"
+              @click="closeMobileSidebar"
+              :class="['nav-item', isActive('/users') && 'nav-item--active nav-item--indigo']"
+              :title="isCollapsed ? $t('nav.users') : ''"
+            >
+              <span class="nav-icon nav-icon--indigo">
+                <i class="fas fa-user-shield"></i>
+              </span>
+              <transition name="fade-slide">
+                <span v-if="!isCollapsed" class="nav-label-text">{{ $t('nav.users') }}</span>
+              </transition>
+            </router-link>
+          </li>
+
+          <!-- Groups -->
+          <li v-if="isAdmin">
+            <router-link
+              to="/admin/groups"
+              @click="closeMobileSidebar"
+              :class="['nav-item', isActive('/admin/groups') && 'nav-item--active nav-item--pink']"
+              :title="isCollapsed ? $t('adminGroups.title') : ''"
+            >
+              <span class="nav-icon nav-icon--pink">
+                <i class="fas fa-users-cog"></i>
+              </span>
+              <transition name="fade-slide">
+                <span v-if="!isCollapsed" class="nav-label-text">{{
+                  $t('adminGroups.title')
+                }}</span>
+              </transition>
+            </router-link>
+          </li>
+
+          <!-- Installment Tiers Settings -->
+          <li v-if="isAdmin">
+            <router-link
+              to="/admin/installment-tiers"
+              @click="closeMobileSidebar"
+              :class="[
+                'nav-item',
+                isActive('/admin/installment-tiers') && 'nav-item--active nav-item--pink',
+              ]"
+              :title="isCollapsed ? $t('installments.tiers_title') : ''"
+            >
+              <span class="nav-icon nav-icon--pink">
+                <i class="fas fa-percentage"></i>
+              </span>
+              <transition name="fade-slide">
+                <span v-if="!isCollapsed" class="nav-label-text">{{
+                  $t('installments.tiers_title')
+                }}</span>
+              </transition>
+            </router-link>
+          </li>
+
+          <!-- Permissions -->
+          <li v-if="isAdmin">
+            <router-link
+              to="/permissions"
+              @click="closeMobileSidebar"
+              :class="['nav-item', isActive('/permissions') && 'nav-item--active nav-item--teal']"
+              :title="isCollapsed ? $t('nav.permissions') : ''"
+            >
+              <span class="nav-icon nav-icon--teal">
+                <i class="fas fa-shield-alt"></i>
+              </span>
+              <transition name="fade-slide">
+                <span v-if="!isCollapsed" class="nav-label-text">{{ $t('nav.permissions') }}</span>
+              </transition>
+            </router-link>
+          </li>
+
+          <!-- OTP -->
+          <li v-if="isAdmin">
+            <router-link
+              to="/admin/otp"
+              @click="closeMobileSidebar"
+              :class="['nav-item', isActive('/admin/otp') && 'nav-item--active nav-item--yellow']"
+              :title="isCollapsed ? 'رموز OTP' : ''"
+            >
+              <span class="nav-icon nav-icon--yellow">
+                <i class="fas fa-key"></i>
+              </span>
+              <transition name="fade-slide">
+                <div v-if="!isCollapsed" class="nav-text-block">
+                  <span class="nav-label-text">رموز OTP</span>
+                  <span class="nav-sub">إدارة رموز التحقق</span>
+                </div>
+              </transition>
+            </router-link>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- ══════════ FOOTER ACTIONS ══════════ -->
+      <div class="sidebar-footer">
+        <!-- Language -->
+        <button
+          @click="toggleLanguage"
+          class="footer-btn"
+          :title="isCollapsed ? $t('buttons.toggle_language') : ''"
+        >
+          <span class="footer-btn-icon">
+            <i class="fas fa-language"></i>
+          </span>
+          <transition name="fade-slide">
+            <div v-if="!isCollapsed" class="footer-btn-text">
+              <span>{{ isRTL ? 'English' : 'العربية' }}</span>
+              <span class="footer-btn-sub">{{ $t('buttons.toggle_language') }}</span>
+            </div>
+          </transition>
+        </button>
+
+        <!-- Collapse toggle (mobile) -->
+        <button
+          v-if="isCollapsed && !isMobileOpen"
+          @click="toggleCollapse"
+          class="footer-btn lg:hidden"
+        >
+          <span class="footer-btn-icon">
+            <i class="fas fa-chevron-right"></i>
+          </span>
+        </button>
+
+        <!-- Logout -->
+        <button
+          @click="handleLogout"
+          class="footer-btn footer-btn--danger"
+          :title="isCollapsed ? $t('auth.logout') : ''"
+        >
+          <span class="footer-btn-icon footer-btn-icon--danger">
+            <i class="fas fa-sign-out-alt"></i>
+          </span>
+          <transition name="fade-slide">
+            <div v-if="!isCollapsed" class="footer-btn-text">
+              <span>{{ $t('auth.logout') }}</span>
+              <span class="footer-btn-sub">{{ $t('auth.logout_desc') }}</span>
+            </div>
+          </transition>
+        </button>
+
+        <!-- Version -->
+        <transition name="fade-slide">
+          <div v-if="!isCollapsed" class="version-block">
+            <div class="version-row">
+              <span>{{ $t('app.version') }}</span>
+              <span class="version-val">v2.0.0</span>
+            </div>
+            <div class="version-row">
+              <span>{{ $t('app.status') }}</span>
+              <div class="status-online">
+                <span class="status-dot"></span>
+                <span>{{ $t('app.online') }}</span>
+              </div>
+            </div>
+            <p class="copyright">&copy; {{ new Date().getFullYear() }} {{ $t('app.name') }}</p>
+          </div>
+        </transition>
+      </div>
     </div>
   </aside>
 </template>

@@ -2,7 +2,9 @@
   "app": {
     "name": "Invoice System",
     "description": "Complete invoice management system",
-    "version": "Version"
+    "version": "Version",
+    "title": "Invoice System",
+    "subtitle": "Invoice System"
   },
   "nav": {
     "all_clients": "All Clients",
@@ -20,7 +22,8 @@
     "assign_permissions": "Assign Permissions",
     "profile": "Profile",
     "activitylog": "Activity Log",
-    "toggle_language": "Toggle Language"
+    "toggle_language": "Toggle Language",
+    "collapse_menu": "Collapse Menu"
   },
   "auth": {
     "login": "Login",

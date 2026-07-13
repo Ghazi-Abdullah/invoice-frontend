@@ -714,15 +714,16 @@
           </button>
         </div>
       </div>
+
+      <!-- Installment Plan Section -->
+      <InstallmentPlanSection
+        v-if="invoice"
+        :invoice-id="invoice.id"
+        :invoice-total="invoice.total"
+        :can-manage="canManageInstallments"
+      />
     </div>
   </div>
-
-  <InstallmentPlanSection
-    v-if="invoice"
-    :invoice-id="invoice.id"
-    :invoice-total="invoice.total"
-    :can-manage="hasEditPermission"
-  />
 </template>
 
 <script>
@@ -757,6 +758,11 @@ export default {
     isPaid() {
       return this.invoice?.status === 'paid'
     },
+
+    // دمج صلاحيات التعديل وإنشاء الأقساط في متحساب واحد
+    canManageInstallments() {
+      return this.hasEditPermission // أو يمكن إضافة صلاحية منفصلة مستقبلاً
+    },
   },
 
   mounted() {
@@ -788,7 +794,6 @@ export default {
       }
 
       try {
-        // ✅ الإصلاح: fetchInvoice يرجع invoice مباشرة (مش response object)
         const invoice = await this.fetchInvoice(id)
         if (invoice && invoice.id) {
           this.invoice = invoice
