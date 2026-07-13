@@ -21,7 +21,8 @@
     "assign_permissions": "تعيين الصلاحيات",
     "profile": "الملف الشخصي",
     "activitylog": "سجل النشاط",
-    "toggle_language": "تغيير اللغة"
+    "toggle_language": "تغيير اللغة",
+    "collapse_menu": "طي القائمة"
   },
   "auth": {
     "login": "تسجيل الدخول",
@@ -110,7 +111,14 @@
     "today_performance": "أداء اليوم",
     "loading_data": "جاري تحميل بيانات لوحة التحكم...",
     "invoices": "الفواتير",
-    "revenue": "الإيرادات"
+    "revenue": "الإيرادات",
+    "collected": "محصّل",
+    "period_1m": "1ش",
+    "period_3m": "3ش",
+    "period_6m": "6ش",
+    "period_1y": "1س",
+    "avg_monthly": "متوسط شهري",
+    "growth_rate": "معدل النمو"
   },
   "clients": {
     "empty_response": "لم يتم استلام بيانات من الخادم",
@@ -588,6 +596,7 @@
     "created_at": "تاريخ الإنشاء",
     "date_from": "من تاريخ",
     "per_page": "لكل صفحة",
+    "details": "التفاصيل",
     "created": "تم الإنشاء",
     "months": {
       "january": "يناير",
@@ -930,6 +939,12 @@
     "showing": "عرض {from} إلى {to} من {total}",
     "pageOf": "صفحة {current} من {total}"
   },
+    "time": {
+    "days_ago": "قبل {count} يوم",
+    "hours_ago": "قبل {count} ساعة",
+    "minutes_ago": "قبل {count} دقيقة",
+    "just_now": "الآن"
+  },
   "reports": {
     "load_failed": "فشل في تحميل التقرير",
     "invoices_failed": "فشل في تحميل تقرير الفواتير",
@@ -1196,7 +1211,14 @@
     "ip_address": "عنوان IP",
     "date_time": "التاريخ والوقت",
     "description": "الوصف",
-    "unknown_user": "غير معروف"
+    "unknown_user": "غير معروف",
+    "invoice_paid": "فاتورة مدفوعة",
+    "invoice_paid_desc": "فاتورة #{id} تم دفعها بنجاح",
+    "client_added": "عميل جديد",
+    "client_added_desc": "{name} تمت إضافتها إلى النظام",
+    "invoice_created": "فاتورة جديدة",
+    "invoice_created_desc": "فاتورة #{id} تم إنشاؤها",
+    "demo_company": "شركة التقنية المتطورة"
   },
   "actions": {
     "view": "عرض",

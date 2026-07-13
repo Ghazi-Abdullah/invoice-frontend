@@ -22,7 +22,7 @@ import installments from './modules/installments'
 export default createStore({
   state: {
     appLoading: false,
-    appError: null,
+    appError: null, 
     appSuccess: null
   },
   mutations: {

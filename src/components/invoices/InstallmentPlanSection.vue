@@ -37,7 +37,9 @@
           <p class="font-bold">{{ formatCurrency(plan.original_amount) }}</p>
         </div>
         <div class="bg-orange-50 rounded-lg p-3">
-          <p class="text-sm text-gray-500">{{ $t('installments.interest_amount') }} ({{ plan.interest_rate }}%)</p>
+          <p class="text-sm text-gray-500">
+            {{ $t('installments.interest_amount') }} ({{ plan.interest_rate }}%)
+          </p>
           <p class="font-bold text-orange-600">{{ formatCurrency(plan.interest_amount) }}</p>
         </div>
         <div class="bg-blue-50 rounded-lg p-3">
@@ -113,9 +115,9 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex';
-import { formatCurrency, formatDate } from '@/utils/formatters';
-import CreateInstallmentPlanModal from './CreateInstallmentPlanModal.vue';
+import { mapActions, mapGetters } from 'vuex'
+import { formatCurrency, formatDate } from '@/utils/formatters'
+import CreateInstallmentPlanModal from './CreateInstallmentPlanModal.vue'
 
 export default {
   components: { CreateInstallmentPlanModal },
@@ -123,57 +125,71 @@ export default {
     invoiceId: { type: [Number, String], required: true },
     invoiceTotal: { type: [Number, String], required: true },
     canManage: { type: Boolean, default: false },
+    // canCreate لم تعد مستخدمة، يمكن حذفها، لكن نبقيها للتوافق
+    canCreate: { type: Boolean, default: false },
   },
   data() {
     return {
       showCreateModal: false,
-    };
+    }
   },
   computed: {
     ...mapGetters('installments', ['currentPlan', 'loading', 'submitting']),
     plan() {
-      return this.currentPlan;
+      return this.currentPlan
     },
   },
   created() {
-    this.fetchPlan(this.invoiceId);
+    this.fetchPlan(this.invoiceId)
   },
   methods: {
     ...mapActions('installments', ['fetchPlan', 'payInstallment', 'cancelPlan']),
     formatCurrency,
     formatDate,
     statusClass(status) {
-      return {
-        pending: 'bg-yellow-100 text-yellow-800',
-        paid: 'bg-green-100 text-green-800',
-        overdue: 'bg-red-100 text-red-800',
-        cancelled: 'bg-gray-100 text-gray-600',
-      }[status] || 'bg-gray-100';
+      return (
+        {
+          pending: 'bg-yellow-100 text-yellow-800',
+          paid: 'bg-green-100 text-green-800',
+          overdue: 'bg-red-100 text-red-800',
+          cancelled: 'bg-gray-100 text-gray-600',
+        }[status] || 'bg-gray-100'
+      )
     },
     onCreated() {
-      this.showCreateModal = false;
-      this.fetchPlan(this.invoiceId);
+      this.showCreateModal = false
+      this.fetchPlan(this.invoiceId)
     },
     async pay(inst) {
-      if (!confirm(this.$t('installments.confirm_pay_message', { number: inst.installment_number, amount: formatCurrency(inst.amount) }))) return;
+      if (
+        !confirm(
+          this.$t('installments.confirm_pay_message', {
+            number: inst.installment_number,
+            amount: formatCurrency(inst.amount),
+          }),
+        )
+      )
+        return
       try {
-        await this.payInstallment({ installmentId: inst.id, paymentMethod: 'cash' });
-        this.$toast?.success(this.$t('installments.pay_success'));
-        this.fetchPlan(this.invoiceId);
+        await this.payInstallment({ installmentId: inst.id, paymentMethod: 'cash' })
+        this.$toast?.success(this.$t('installments.pay_success'))
+        this.fetchPlan(this.invoiceId)
       } catch (e) {
-        this.$toast?.error(e.response?.data?.message || this.$t('installments.pay_failed'));
+        this.$toast?.error(e.response?.data?.message || this.$t('installments.pay_failed'))
       }
     },
     async confirmCancel() {
-      if (!confirm(this.$t('installments.confirm_cancel_message'))) return;
+      if (!confirm(this.$t('installments.confirm_cancel_message'))) return
       try {
-        await this.cancelPlan(this.plan.id);
-        this.$toast?.success(this.$t('installments.cancel_success'));
-        this.fetchPlan(this.invoiceId);
+        await this.cancelPlan(this.plan.id)
+        this.$toast?.success(this.$t('installments.cancel_success'))
+        this.fetchPlan(this.invoiceId)
       } catch (e) {
-        this.$toast?.error(e.response?.data?.message || this.$t('installments.cancel_failed'));
+        this.$toast?.error(e.response?.data?.message || this.$t('installments.cancel_failed'))
       }
     },
   },
-};
+}
 </script>
+
+<style scoped></style>
