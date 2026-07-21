@@ -17,6 +17,11 @@
    على حد سواء، بدون الحاجة لتعديل أي ملف Vue.
    ============================================================ */
 :root {
+  /* ✅ يخبر المتصفح بأن الوضع الافتراضي فاتح، حتى يرسم عناصر
+     النماذج الأصلية (input/select/scrollbar...) بالألوان الصحيحة
+     بدل تخمين وضع داكن تلقائياً حسب إعدادات نظام التشغيل */
+  color-scheme: light;
+
   /* Primary (اللون الأساسي / العلامة التجارية) — يغذي blue-* */
   --color-primary-50: 239 246 255;
   --color-primary-100: 219 234 254;
@@ -76,6 +81,11 @@
   --color-accent-700: 126 34 206;
   --color-accent-800: 107 33 168;
   --color-accent-900: 88 28 135;
+}
+
+/* ✅ نفس فكرة color-scheme أعلاه، بس للوضع الداكن بالذات */
+.dark {
+  color-scheme: dark;
 }
 
 /* تحسينات عامة */
@@ -180,8 +190,13 @@ body {
   @apply block text-sm font-medium text-gray-700 mb-1;
 }
 
+/* ✅ تم تحديدها صراحةً (bg-white + text-gray-900) بدل الاعتماد على
+   الوراثة الافتراضية من body — وهذا بالضبط سبب اختفاء نص الحقول:
+   كانت تعتمد فقط على color: inherit (من Tailwind Preflight)، فأي
+   قيمة color مطبّقة على body أو عنصر أعلى (مثل .dark body) كانت
+   تنعكس مباشرة على الحقل، حتى في الوضع الفاتح. */
 .form-control {
-  @apply w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
+  @apply w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
 }
 
 .form-control-error {
@@ -242,8 +257,9 @@ body {
   @apply text-sm text-gray-600 mt-2;
 }
 
+/* ✅ نفس إصلاح .form-control أعلاه (bg-white + text-gray-900 صراحةً) */
 .form-input {
-  @apply w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
+  @apply w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
 }
 
 .badge {
@@ -403,13 +419,13 @@ body {
 }
 
 /* مدخلات النماذج والأزرار بالوضع الداكن */
-.dark .form-control, 
+.dark .form-control,
 .dark .form-input {
   background-color: #1e293b !important;
   border-color: #475569 !important;
   color: #f8fafc !important;
 }
-.dark .form-control:disabled, 
+.dark .form-control:disabled,
 .dark .form-input:disabled {
   background-color: #0f172a !important;
   color: #64748b !important;
@@ -440,4 +456,3 @@ body {
   background-color: #1e293b !important;
   border-color: #334155 !important;
 }
-

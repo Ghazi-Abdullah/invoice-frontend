@@ -74,45 +74,6 @@
           </div>
         </div>
 
-        <!-- User Info -->
-        <!-- <Transition name="fade">
-          <div
-            v-if="sidebarOpen && user"
-            class="mb-6 p-4 bg-slate-800/50 rounded-2xl border border-slate-700/50 backdrop-blur-sm"
-          >
-            <div class="flex items-center gap-3">
-              <div class="relative w-12 h-12 flex-shrink-0">
-                <img
-                  v-if="user.img_url"
-                  :src="user.img_url"
-                  class="w-full h-full rounded-full object-cover border-2 border-blue-400 shadow-lg shadow-blue-500/20"
-                  :alt="user.name"
-                />
-                <div
-                  v-else
-                  class="w-full h-full rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center text-white font-bold text-sm shadow-lg"
-                >
-                  {{ getInitials(user.name) }}
-                </div>
-                <div
-                  class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-500 border-2 border-slate-900 rounded-full"
-                ></div>
-              </div>
-              <div class="flex-1 min-w-0">
-                <p class="text-sm font-semibold text-white truncate">{{ user.name }}</p>
-                <p class="text-xs text-slate-400 truncate mt-0.5">{{ user.email }}</p>
-                <div class="mt-2">
-                  <span
-                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-500/20 text-blue-300 border border-blue-500/20"
-                  >
-                    {{ user.group?.title_ar || t('auth.user') }}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </Transition> -->
-
         <!-- Navigation -->
         <nav class="space-y-1 flex-1 overflow-y-auto custom-scrollbar">
           <div class="mb-2">
@@ -544,90 +505,6 @@
             </router-link>
           </template>
         </nav>
-
-        <!-- Footer Actions -->
-        <!-- <div class="pt-4 border-t border-slate-700/50 space-y-1">
-
-
-          <router-link
-            to="/settings"
-            class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-800/60 transition-all duration-200 w-full group text-slate-400 hover:text-white"
-            :class="!sidebarOpen && !isMobile ? 'justify-center' : ''"
-            :title="!sidebarOpen && !isMobile ? t('nav.settings') : ''"
-          >
-            <svg
-              class="w-5 h-5 flex-shrink-0"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.5"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path
-                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543-.826-3.31z"
-              />
-              <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-            <span v-if="sidebarOpen" class="text-sm font-medium">
-              {{ t('nav.settings') }}
-            </span>
-            <div
-              v-if="$route.path === '/settings'"
-              class="absolute top-1/2 -translate-y-1/2 w-1 h-6 rounded-full bg-blue-500"
-              :class="$i18n.locale === 'ar' ? 'right-0' : 'left-0'"
-            ></div>
-          </router-link>
-
-          <button
-            @click="toggleLanguage"
-            class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-800/60 transition-all duration-200 w-full group text-slate-400 hover:text-white"
-            :class="!sidebarOpen && !isMobile ? 'justify-center' : ''"
-            :title="!sidebarOpen && !isMobile ? t('nav.toggle_language') : ''"
-          >
-            <svg
-              class="w-5 h-5 flex-shrink-0"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.5"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path
-                d="M10.5 21l5.25-11.25L21 21m-9-3h7.5M3 5.621l4.5-1.5v11.326m-4.5-9.75L9 9.75M15 3.75l-4.5 1.5v11.326m4.5-9.75L9 9.75"
-              />
-            </svg>
-            <span v-if="sidebarOpen" class="text-sm font-medium">
-              {{ t('nav.toggle_language') }}
-            </span>
-          </button>
-
-          <button
-            @click="logout"
-            class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-red-500/10 transition-all duration-200 w-full group text-slate-400 hover:text-red-400"
-            :class="!sidebarOpen && !isMobile ? 'justify-center' : ''"
-            :title="!sidebarOpen && !isMobile ? t('auth.logout') : ''"
-          >
-            <svg
-              class="w-5 h-5 flex-shrink-0"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.5"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path
-                d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75"
-              />
-            </svg>
-            <span v-if="sidebarOpen" class="text-sm font-medium">
-              {{ t('auth.logout') }}
-            </span>
-          </button>
-        </div> -->
-
       </div>
     </aside>
 
@@ -703,12 +580,52 @@
           <div class="flex items-center gap-2">
             <InvoiceNotificationBell v-if="!isMobile" />
 
+            <!-- ✅ زر تبديل الوضع الداكن/الفاتح -->
             <button
-              @click="toggleLanguage"
-              class="hidden md:flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-200"
+              @click="handleToggleDarkMode"
+              class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-800 rounded-xl transition-all duration-200"
+              :title="
+                darkModeEnabled
+                  ? t('nav.light_mode', 'Light Mode')
+                  : t('nav.dark_mode', 'Dark Mode')
+              "
             >
               <svg
-                class="w-4 h-4"
+                v-if="darkModeEnabled"
+                class="w-6 h-6"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M12 3v1.5m0 15V21m9-9h-1.5M4.5 12H3m15.364 6.364l-1.06-1.06M6.697 6.697l-1.06-1.06m12.727 0l-1.06 1.06M6.697 17.303l-1.06 1.06M16.5 12a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z"
+                />
+              </svg>
+              <svg
+                v-else
+                class="w-6 h-6"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M21.752 15.002A9.72 9.72 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z"
+                />
+              </svg>
+            </button>
+
+            <button
+              @click="toggleLanguage"
+              class="hidden md:flex items-center gap-2 px-3 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-800 rounded-xl transition-all duration-200"
+            >
+              <svg
+                class="w-6 h-6"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -727,7 +644,7 @@
             <div class="relative" ref="userDropdownRef">
               <button
                 @click="userDropdownOpen = !userDropdownOpen"
-                class="flex items-center gap-2.5 p-1.5 pr-3 rounded-xl hover:bg-gray-100 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                class="flex items-center gap-2.5 p-1.5 pr-3 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-800 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
               >
                 <div class="relative h-9 w-9 flex-shrink-0">
                   <img
@@ -744,8 +661,10 @@
                   </div>
                 </div>
                 <div class="hidden md:block text-right">
-                  <p class="text-sm font-semibold text-gray-800 leading-tight">{{ user?.name }}</p>
-                  <p class="text-xs text-gray-500 leading-tight">
+                  <p class="text-sm font-semibold text-gray-800 dark:text-gray-100 leading-tight">
+                    {{ user?.name }}
+                  </p>
+                  <p class="text-xs text-gray-500 dark:text-gray-400 leading-tight">
                     {{ user?.group?.title_ar || $t('auth.user', 'User') }}
                   </p>
                 </div>
@@ -773,10 +692,12 @@
               >
                 <div
                   v-if="userDropdownOpen"
-                  class="absolute mt-2 w-56 bg-white rounded-2xl shadow-xl shadow-gray-200/50 border border-gray-100 z-50 overflow-hidden"
+                  class="absolute mt-2 w-56 bg-white dark:bg-slate-800 rounded-2xl shadow-xl shadow-gray-200/50 dark:shadow-black/30 border border-gray-100 dark:border-slate-700 z-50 overflow-hidden"
                   :class="$i18n.locale === 'ar' ? 'left-0' : 'right-0'"
                 >
-                  <div class="p-4 border-b border-gray-100 bg-gray-50/50">
+                  <div
+                    class="p-4 border-b border-gray-100 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-900/50"
+                  >
                     <div class="flex items-center gap-3">
                       <div class="relative h-12 w-12 flex-shrink-0">
                         <img
@@ -793,18 +714,24 @@
                         </div>
                       </div>
                       <div class="flex-1 min-w-0">
-                        <p class="font-semibold text-gray-900 truncate">{{ user?.name }}</p>
-                        <p class="text-xs text-gray-500 truncate">{{ user?.email }}</p>
+                        <p class="font-semibold text-gray-900 dark:text-gray-100 truncate">
+                          {{ user?.name }}
+                        </p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
+                          {{ user?.email }}
+                        </p>
                       </div>
                     </div>
                   </div>
                   <div class="py-1.5">
                     <router-link
                       to="/profile"
-                      class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                      class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-slate-700 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                       @click="userDropdownOpen = false"
                     >
-                      <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+                      <div
+                        class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-slate-700 flex items-center justify-center"
+                      >
                         <svg
                           class="w-5 h-5 text-blue-500"
                           viewBox="0 0 24 24"
@@ -823,9 +750,11 @@
                     </router-link>
                     <button
                       @click="logout"
-                      class="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                      class="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
                     >
-                      <div class="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center">
+                      <div
+                        class="w-8 h-8 rounded-lg bg-red-50 dark:bg-red-500/10 flex items-center justify-center"
+                      >
                         <svg
                           class="w-5 h-5 text-red-500"
                           viewBox="0 0 24 24"
@@ -864,6 +793,7 @@
 
 <script>
 import InvoiceNotificationBell from '@/components/shared/InvoiceNotificationBell.vue'
+import { toggleDarkMode, isDarkMode } from '@/utils/darkMode'
 
 export default {
   name: 'DefaultLayout',
@@ -876,6 +806,7 @@ export default {
       sidebarOpen: true,
       userDropdownOpen: false,
       isMobile: false,
+      darkModeEnabled: false, // ✅ حالة الوضع الداكن الحالية — تُهيّأ فعلياً بـ mounted()
     }
   },
   computed: {
@@ -927,6 +858,8 @@ export default {
           'nav.activitylog': 'Activity Log',
           'nav.toggle_language': 'Toggle Language',
           'nav.administration': 'Administration',
+          'nav.dark_mode': 'Dark Mode',
+          'nav.light_mode': 'Light Mode',
         }
         return staticTexts[key] || fallback || key
       }
@@ -960,6 +893,10 @@ export default {
       localStorage.setItem('userLanguage', newLang)
       window.location.reload()
     },
+    // ✅ يبدّل الوضع الداكن/الفاتح ويحفظ الاختيار في localStorage عبر utils/darkMode.js
+    handleToggleDarkMode() {
+      this.darkModeEnabled = toggleDarkMode()
+    },
     async logout() {
       try {
         await this.$store.dispatch('auth/logout')
@@ -987,6 +924,9 @@ export default {
     this.checkMobile()
     window.addEventListener('resize', this.checkMobile)
     document.addEventListener('click', this.handleClickOutside)
+
+    // ✅ مزامنة حالة الزر مع الوضع الفعلي المطبّق أصلاً بـ utils/darkMode.js عند تحميل الصفحة
+    this.darkModeEnabled = isDarkMode()
 
     if (!this.user) this.$store.dispatch('auth/checkAuth')
     this.$store.dispatch('invoiceNotifications/startListening')
