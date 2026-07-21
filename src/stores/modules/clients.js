@@ -182,10 +182,10 @@ export default {
           return response.data
         } else {
           commit('SET_CLIENTS', { data: [] })
-          throw new Error(i18n.t('clients.empty_response'))
+          throw new Error(i18n.global.t('clients.empty_response'))
         }
       } catch (error) {
-        const message = error.response?.data?.message || i18n.t('clients.fetch_failed')
+        const message = error.response?.data?.message || i18n.global.t('clients.fetch_failed')
         commit('SET_ERROR', message)
         commit('SET_CLIENTS', { data: [] })
         commit('SET_CLIENT_STATS', { total_clients: 0, active_clients: 0, total_invoices: 0, total_revenue: 0 })
@@ -207,7 +207,7 @@ export default {
         commit('SET_CURRENT_CLIENT', client)
         return client
       } catch (error) {
-        const message = error.response?.data?.message || i18n.t('clients.fetch_one_failed')
+        const message = error.response?.data?.message || i18n.global.t('clients.fetch_one_failed')
         commit('SET_ERROR', message)
         throw new Error(message)
       } finally {
@@ -227,7 +227,7 @@ export default {
         commit('ADD_CLIENT', client)
         return client
       } catch (error) {
-        const message = error.response?.data?.message || i18n.t('clients.create_failed')
+        const message = error.response?.data?.message || i18n.global.t('clients.create_failed')
         commit('SET_ERROR', message)
         throw new Error(message)
       } finally {
@@ -247,7 +247,7 @@ export default {
         commit('UPDATE_CLIENT', updatedClient)
         return updatedClient
       } catch (error) {
-        const message = error.response?.data?.message || i18n.t('clients.update_failed')
+        const message = error.response?.data?.message || i18n.global.t('clients.update_failed')
         commit('SET_ERROR', message)
         throw new Error(message)
       } finally {
@@ -266,7 +266,7 @@ export default {
         commit('DELETE_CLIENT', id)
         return true
       } catch (error) {
-        const message = error.response?.data?.message || i18n.t('clients.delete_failed')
+        const message = error.response?.data?.message || i18n.global.t('clients.delete_failed')
         commit('SET_ERROR', message)
         throw new Error(message)
       } finally {
@@ -282,7 +282,7 @@ export default {
         return response.data.data || response.data || []
       } catch (error) {
         // لا نعرض رسائل للمستخدم في هذه الحالة، فقط نرمي الخطأ
-        throw new Error(error.response?.data?.message || i18n.t('clients.simple_list_failed'))
+        throw new Error(error.response?.data?.message || i18n.global.t('clients.simple_list_failed'))
       }
     },
 

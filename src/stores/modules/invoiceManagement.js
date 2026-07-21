@@ -244,10 +244,10 @@ export default {
 
           return { data, pagination }
         } else {
-          throw new Error(response.data.message || i18n.t('invoices.fetch_failed'))
+          throw new Error(response.data.message || i18n.global.t('invoices.fetch_failed'))
         }
       } catch (error) {
-        const message = error.response?.data?.message || error.message || i18n.t('invoices.fetch_failed')
+        const message = error.response?.data?.message || error.message || i18n.global.t('invoices.fetch_failed')
         commit('SET_ERROR', message)
         throw new Error(message)
       } finally {
@@ -270,10 +270,10 @@ export default {
           commit('SET_CURRENT_INVOICE', invoice)
           return invoice
         } else {
-          throw new Error(response.data.message || i18n.t('invoices.fetch_one_failed'))
+          throw new Error(response.data.message || i18n.global.t('invoices.fetch_one_failed'))
         }
       } catch (error) {
-        const message = error.response?.data?.message || error.message || i18n.t('invoices.fetch_one_failed')
+        const message = error.response?.data?.message || error.message || i18n.global.t('invoices.fetch_one_failed')
         commit('SET_ERROR', message)
         throw new Error(message)
       } finally {
@@ -308,10 +308,10 @@ export default {
           commit('CLEAR_INVOICE_FORM')
           return invoice
         } else {
-          throw new Error(response.data.message || i18n.t('invoices.create_failed'))
+          throw new Error(response.data.message || i18n.global.t('invoices.create_failed'))
         }
       } catch (error) {
-        let message = i18n.t('invoices.create_failed')
+        let message = i18n.global.t('invoices.create_failed')
         if (error.response) {
           if (error.response.status === 422 && error.response.data.errors) {
             commit('SET_FORM_ERRORS', error.response.data.errors)
@@ -351,10 +351,10 @@ export default {
           commit('UPDATE_INVOICE', invoice)
           return invoice
         } else {
-          throw new Error(response.data.message || i18n.t('invoices.update_failed'))
+          throw new Error(response.data.message || i18n.global.t('invoices.update_failed'))
         }
       } catch (error) {
-        let message = i18n.t('invoices.update_failed')
+        let message = i18n.global.t('invoices.update_failed')
         if (error.response) {
           if (error.response.status === 422 && error.response.data.errors) {
             commit('SET_FORM_ERRORS', error.response.data.errors)
@@ -382,10 +382,10 @@ export default {
           commit('DELETE_INVOICE', id)
           return true
         } else {
-          throw new Error(response.data.message || i18n.t('invoices.delete_failed'))
+          throw new Error(response.data.message || i18n.global.t('invoices.delete_failed'))
         }
       } catch (error) {
-        const message = error.response?.data?.message || error.message || i18n.t('invoices.delete_failed')
+        const message = error.response?.data?.message || error.message || i18n.global.t('invoices.delete_failed')
         commit('SET_ERROR', message)
         throw new Error(message)
       } finally {
@@ -415,10 +415,10 @@ export default {
           commit('UPDATE_INVOICE', invoice)
           return invoice
         } else {
-          throw new Error(response.data.message || i18n.t('invoices.status_update_failed'))
+          throw new Error(response.data.message || i18n.global.t('invoices.status_update_failed'))
         }
       } catch (error) {
-        const message = error.response?.data?.message || error.message || i18n.t('invoices.status_update_failed')
+        const message = error.response?.data?.message || error.message || i18n.global.t('invoices.status_update_failed')
         commit('SET_ERROR', message)
         throw new Error(message)
       } finally {

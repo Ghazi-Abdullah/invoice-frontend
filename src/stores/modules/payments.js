@@ -87,13 +87,13 @@ const actions = {
         if (response.data.data?.url) {
           return response.data.data
         } else {
-          throw new Error(i18n.t('payments.invalid_session_url'))
+          throw new Error(i18n.global.t('payments.invalid_session_url'))
         }
       } else {
-        throw new Error(response.data.message || i18n.t('payments.create_session_failed'))
+        throw new Error(response.data.message || i18n.global.t('payments.create_session_failed'))
       }
     } catch (error) {
-      const message = error.response?.data?.message || error.message || i18n.t('payments.create_session_failed')
+      const message = error.response?.data?.message || error.message || i18n.global.t('payments.create_session_failed')
       commit('SET_ERROR', message)
       throw new Error(message)
     } finally {
@@ -136,10 +136,10 @@ const actions = {
 
         return response.data
       } else {
-        throw new Error(response.data.message || i18n.t('payments.fetch_failed'))
+        throw new Error(response.data.message || i18n.global.t('payments.fetch_failed'))
       }
     } catch (error) {
-      const message = error.response?.data?.message || error.message || i18n.t('payments.fetch_failed')
+      const message = error.response?.data?.message || error.message || i18n.global.t('payments.fetch_failed')
       commit('SET_ERROR', message)
       throw new Error(message)
     } finally {
@@ -161,10 +161,10 @@ const actions = {
         commit('SET_CURRENT_PAYMENT', response.data.data)
         return response.data.data
       } else {
-        throw new Error(response.data.message || i18n.t('payments.fetch_one_failed'))
+        throw new Error(response.data.message || i18n.global.t('payments.fetch_one_failed'))
       }
     } catch (error) {
-      const message = error.response?.data?.message || error.message || i18n.t('payments.fetch_one_failed')
+      const message = error.response?.data?.message || error.message || i18n.global.t('payments.fetch_one_failed')
       commit('SET_ERROR', message)
       throw new Error(message)
     } finally {

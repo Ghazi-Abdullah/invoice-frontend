@@ -289,11 +289,11 @@ export default {
 
 <style scoped>
 .table-container {
-  @apply bg-white rounded-lg shadow border border-gray-200;
+  @apply bg-white dark:bg-slate-800 rounded-lg shadow border border-gray-200 dark:border-slate-700;
 }
 
 .table-header {
-  @apply px-6 py-4 border-b border-gray-200 flex items-center justify-between;
+  @apply px-6 py-4 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between;
 }
 
 .table-title {
@@ -309,11 +309,11 @@ export default {
 }
 
 .base-table {
-  @apply min-w-full divide-y divide-gray-200;
+  @apply min-w-full divide-y divide-gray-200 dark:divide-slate-700;
 }
 
 .table-header-cell {
-  @apply px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50;
+  @apply px-6 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider bg-gray-50 dark:bg-slate-700/50;
 }
 
 .header-content {
@@ -321,11 +321,11 @@ export default {
 }
 
 .sort-button {
-  @apply text-gray-400 hover:text-gray-600 focus:outline-none;
+  @apply text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 focus:outline-none;
 }
 
 .table-cell {
-  @apply px-6 py-4 whitespace-nowrap text-sm text-gray-900;
+  @apply px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100;
 }
 
 .table-row {
@@ -333,15 +333,15 @@ export default {
 }
 
 .hover-row:hover {
-  @apply bg-gray-50;
+  @apply bg-gray-50 dark:bg-slate-700/30;
 }
 
 .table-striped tbody tr:nth-child(odd) {
-  @apply bg-gray-50;
+  @apply bg-gray-50/50 dark:bg-slate-700/10;
 }
 
 .table-bordered {
-  @apply border border-gray-200;
+  @apply border border-gray-200 dark:border-slate-700;
 }
 
 .empty-state {
@@ -353,11 +353,11 @@ export default {
 }
 
 .table-footer {
-  @apply px-6 py-4 border-t border-gray-200 flex items-center justify-between;
+  @apply px-6 py-4 border-t border-gray-200 dark:border-slate-700 flex items-center justify-between;
 }
 
 .pagination-info {
-  @apply text-sm text-gray-700;
+  @apply text-sm text-gray-700 dark:text-gray-400;
 }
 
 .pagination-controls {
@@ -369,7 +369,7 @@ export default {
 }
 
 .page-button {
-  @apply w-8 h-8 flex items-center justify-center text-sm rounded-md hover:bg-gray-100 transition-colors;
+  @apply w-8 h-8 flex items-center justify-center text-sm rounded-md hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-700 dark:text-gray-300 transition-colors;
 }
 
 .page-button.active {

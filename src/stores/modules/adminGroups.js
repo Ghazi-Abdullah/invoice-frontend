@@ -55,7 +55,7 @@ export default {
         commit('SET_ADMIN_GROUPS', groups)
         return groups
       } catch (error) {
-        const message = error.response?.data?.message || i18n.t('adminGroups.fetch_failed')
+        const message = error.response?.data?.message || i18n.global.t('adminGroups.fetch_failed')
         commit('SET_ERROR', message)
         throw new Error(message)
       } finally {
@@ -74,7 +74,7 @@ export default {
         commit('SET_ADMIN_GROUP', response.data.data)
         return response.data.data
       } catch (error) {
-        const message = error.response?.data?.message || i18n.t('adminGroups.fetch_group_failed')
+        const message = error.response?.data?.message || i18n.global.t('adminGroups.fetch_group_failed')
         commit('SET_ERROR', message)
         throw new Error(message)
       } finally {
@@ -96,7 +96,7 @@ export default {
         commit('SET_AVAILABLE_PERMISSIONS', permissions)
         return { permissions, selectedPermissions }
       } catch (error) {
-        const message = error.response?.data?.message || i18n.t('adminGroups.permissions_fetch_failed')
+        const message = error.response?.data?.message || i18n.global.t('adminGroups.permissions_fetch_failed')
         commit('SET_ERROR', message)
         throw new Error(message)
       } finally {
@@ -120,7 +120,7 @@ export default {
         await dispatch('getAdminGroups')
         return response.data.data
       } catch (error) {
-        let message = i18n.t('adminGroups.create_failed')
+        let message = i18n.global.t('adminGroups.create_failed')
         if (error.response?.status === 422 && error.response.data.errors) {
           message = Object.values(error.response.data.errors).flat().join(', ')
         } else if (error.response?.data?.message) {
@@ -147,7 +147,7 @@ export default {
         await dispatch('getAdminGroups')
         return response.data.data
       } catch (error) {
-        let message = i18n.t('adminGroups.update_failed')
+        let message = i18n.global.t('adminGroups.update_failed')
         if (error.response?.status === 422 && error.response.data.errors) {
           message = Object.values(error.response.data.errors).flat().join(', ')
         } else if (error.response?.data?.message) {
@@ -171,7 +171,7 @@ export default {
         await dispatch('getAdminGroups')
         return response.data.data
       } catch (error) {
-        const message = error.response?.data?.message || i18n.t('adminGroups.permissions_update_failed')
+        const message = error.response?.data?.message || i18n.global.t('adminGroups.permissions_update_failed')
         throw new Error(message)
       } finally {
         NProgress.done()
@@ -186,7 +186,7 @@ export default {
         await dispatch('getAdminGroups')
         return true
       } catch (error) {
-        const message = error.response?.data?.message || i18n.t('adminGroups.delete_failed')
+        const message = error.response?.data?.message || i18n.global.t('adminGroups.delete_failed')
         throw new Error(message)
       } finally {
         NProgress.done()

@@ -74,7 +74,7 @@ export default {
 
 <style scoped>
 .base-card {
-  @apply bg-white transition-all duration-200;
+  @apply bg-white dark:bg-slate-800 transition-all duration-200;
 }
 
 .card-shadow-none {
@@ -107,7 +107,7 @@ export default {
 }
 
 .card-bordered {
-  @apply border border-gray-200;
+  @apply border border-gray-200 dark:border-slate-700;
 }
 
 .card-hoverable:hover {
@@ -115,11 +115,11 @@ export default {
 }
 
 .card-header {
-  @apply border-b border-gray-200 px-6 py-4 flex items-center justify-between;
+  @apply border-b border-gray-200 dark:border-slate-700 px-6 py-4 flex items-center justify-between;
 }
 
 .card-title {
-  @apply text-lg font-semibold text-gray-900;
+  @apply text-lg font-semibold text-gray-900 dark:text-gray-100;
 }
 
 .card-actions {
@@ -131,7 +131,7 @@ export default {
 }
 
 .card-footer {
-  @apply border-t border-gray-200 px-6 py-4;
+  @apply border-t border-gray-200 dark:border-slate-700 px-6 py-4;
 }
 
 .rtl .card-header {

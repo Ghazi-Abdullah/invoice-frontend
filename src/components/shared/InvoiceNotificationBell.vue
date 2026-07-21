@@ -15,10 +15,7 @@
         <path
           stroke-linecap="round"
           stroke-linejoin="round"
-          d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002
-             6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6
-             8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4
-             17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+          d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
         />
       </svg>
 
@@ -50,7 +47,9 @@
       >
         <!-- Header -->
         <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100">
-          <span class="text-sm font-semibold text-gray-800">الإشعارات</span>
+          <span class="text-sm font-semibold text-gray-800">
+            {{ $t('notifications.title', 'Notifications') }}
+          </span>
           <span
             v-if="totalCount > 0"
             class="text-xs font-bold text-white bg-red-500 px-2 py-0.5 rounded-full"
@@ -75,8 +74,12 @@
             </svg>
           </span>
           <span class="flex-1 min-w-0">
-            <span class="block text-sm font-medium text-gray-600">كل شيء على ما يرام</span>
-            <span class="block text-xs text-gray-400 mt-0.5">لا توجد فواتير تحتاج انتباهك</span>
+            <span class="block text-sm font-medium text-gray-600">
+              {{ $t('notifications.all_good', 'All is well') }}
+            </span>
+            <span class="block text-xs text-gray-400 mt-0.5">
+              {{ $t('notifications.no_invoices', 'No invoices need your attention') }}
+            </span>
           </span>
         </div>
 
@@ -106,7 +109,9 @@
                   />
                 </svg>
               </span>
-              <span class="text-sm font-medium text-gray-800 truncate">فواتير غير مدفوعة</span>
+              <span class="text-sm font-medium text-gray-800 truncate">
+                {{ $t('notifications.unpaid_invoices', 'Unpaid Invoices') }}
+              </span>
             </span>
             <span
               class="shrink-0 flex items-center justify-center min-w-[24px] h-6 px-1 text-xs font-bold text-amber-700 bg-amber-100 rounded-full"
@@ -139,7 +144,9 @@
                   />
                 </svg>
               </span>
-              <span class="text-sm font-medium text-gray-800 truncate">فواتير متأخرة</span>
+              <span class="text-sm font-medium text-gray-800 truncate">
+                {{ $t('notifications.overdue_invoices', 'Overdue Invoices') }}
+              </span>
             </span>
             <span
               class="shrink-0 flex items-center justify-center min-w-[24px] h-6 px-1 text-xs font-bold text-red-700 bg-red-100 rounded-full"
@@ -158,13 +165,9 @@ import { mapGetters } from 'vuex'
 
 export default {
   name: 'InvoiceNotificationBell',
-
   data() {
-    return {
-      open: false,
-    }
+    return { open: false }
   },
-
   computed: {
     ...mapGetters({
       unpaidCount: 'invoiceNotifications/unpaidCount',
@@ -176,33 +179,26 @@ export default {
       return this.$i18n.locale === 'ar'
     },
   },
-
   methods: {
     toggle() {
       this.open = !this.open
-      if (!this.open) {
-        this.$store.commit('invoiceNotifications/CLEAR_NEW')
-      }
+      if (!this.open) this.$store.commit('invoiceNotifications/CLEAR_NEW')
     },
     goTo(routeName, query = {}) {
       this.open = false
       this.$router.push({ name: routeName, query })
     },
     handleClickOutside(e) {
-      if (this.$refs.bellRef && !this.$refs.bellRef.contains(e.target)) {
-        this.open = false
-      }
+      if (this.$refs.bellRef && !this.$refs.bellRef.contains(e.target)) this.open = false
     },
     handleEscape(e) {
       if (e.key === 'Escape') this.open = false
     },
   },
-
   mounted() {
     document.addEventListener('click', this.handleClickOutside)
     document.addEventListener('keydown', this.handleEscape)
   },
-
   beforeUnmount() {
     document.removeEventListener('click', this.handleClickOutside)
     document.removeEventListener('keydown', this.handleEscape)

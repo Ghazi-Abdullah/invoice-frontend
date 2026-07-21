@@ -130,13 +130,13 @@ const actions = {
       const translate = (items) =>
         items.map(item => ({
           ...item,
-          title: i18n.t(item.title),
+          title: i18n.global.t(item.title),
           children: item.children ? translate(item.children) : undefined
         }))
       const translated = translate(menus)
       commit('SET_MENUS', translated)
     } catch (error) {
-      commit('SET_ERROR', error.message || i18n.t('sidebar.load_error'))
+      commit('SET_ERROR', error.message || i18n.global.t('sidebar.load_error'))
     } finally {
       commit('SET_LOADING', false)
     }

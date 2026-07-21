@@ -66,10 +66,10 @@ export default {
             permissions: data.permissions || []
           })
         } else {
-          throw new Error(response.data?.message || i18n.t('profile.fetch_failed'))
+          throw new Error(response.data?.message || i18n.global.t('profile.fetch_failed'))
         }
       } catch (error) {
-        const message = error.response?.data?.message || error.message || i18n.t('profile.fetch_failed')
+        const message = error.response?.data?.message || error.message || i18n.global.t('profile.fetch_failed')
         commit('SET_ERROR', message)
       } finally {
         NProgress.done()
@@ -103,10 +103,10 @@ export default {
           commit('UPDATE_USER', response.data.data)
           return true
         } else {
-          throw new Error(response.data?.message || i18n.t('profile.update_failed'))
+          throw new Error(response.data?.message || i18n.global.t('profile.update_failed'))
         }
       } catch (error) {
-        const message = error.response?.data?.message || error.message || i18n.t('profile.update_failed')
+        const message = error.response?.data?.message || error.message || i18n.global.t('profile.update_failed')
         commit('SET_ERROR', message)
         return false
       } finally {
@@ -127,10 +127,10 @@ export default {
         if (response.data?.status) {
           return true
         } else {
-          throw new Error(response.data?.message || i18n.t('profile.password_change_failed'))
+          throw new Error(response.data?.message || i18n.global.t('profile.password_change_failed'))
         }
       } catch (error) {
-        const message = error.response?.data?.message || error.message || i18n.t('profile.password_change_failed')
+        const message = error.response?.data?.message || error.message || i18n.global.t('profile.password_change_failed')
         commit('SET_ERROR', message)
         return false
       } finally {

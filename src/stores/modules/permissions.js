@@ -175,7 +175,7 @@ export default {
         commit('SET_PERMISSIONS', response.data)
         return response.data
       } catch (error) {
-        const message = error.response?.data?.message || i18n.t('permissions.fetch_failed')
+        const message = error.response?.data?.message || i18n.global.t('permissions.fetch_failed')
         commit('SET_ERROR', message)
         throw new Error(message)
       } finally {
@@ -195,7 +195,7 @@ export default {
         commit('SET_CURRENT_PERMISSION', permission)
         return permission
       } catch (error) {
-        const message = error.response?.data?.message || i18n.t('permissions.fetch_one_failed')
+        const message = error.response?.data?.message || i18n.global.t('permissions.fetch_one_failed')
         commit('SET_ERROR', message)
         throw new Error(message)
       } finally {
@@ -215,7 +215,7 @@ export default {
         commit('ADD_PERMISSION', permission)
         return permission
       } catch (error) {
-        const message = error.response?.data?.message || i18n.t('permissions.create_failed')
+        const message = error.response?.data?.message || i18n.global.t('permissions.create_failed')
         commit('SET_ERROR', message)
         throw new Error(message)
       } finally {
@@ -235,7 +235,7 @@ export default {
         commit('UPDATE_PERMISSION', permission)
         return permission
       } catch (error) {
-        const message = error.response?.data?.message || i18n.t('permissions.update_failed')
+        const message = error.response?.data?.message || i18n.global.t('permissions.update_failed')
         commit('SET_ERROR', message)
         throw new Error(message)
       } finally {
@@ -254,7 +254,7 @@ export default {
         commit('DELETE_PERMISSION', id)
         return true
       } catch (error) {
-        const message = error.response?.data?.message || i18n.t('permissions.delete_failed')
+        const message = error.response?.data?.message || i18n.global.t('permissions.delete_failed')
         commit('SET_ERROR', message)
         throw new Error(message)
       } finally {
@@ -273,7 +273,7 @@ export default {
         commit('SET_MENUS', response.data)
         return response.data
       } catch (error) {
-        const message = error.response?.data?.message || i18n.t('permissions.menus_fetch_failed')
+        const message = error.response?.data?.message || i18n.global.t('permissions.menus_fetch_failed')
         commit('SET_ERROR', message)
         throw new Error(message)
       } finally {
@@ -292,7 +292,7 @@ export default {
         commit('SET_PARENT_PERMISSIONS', response.data)
         return response.data
       } catch (error) {
-        const message = error.response?.data?.message || i18n.t('permissions.parent_fetch_failed')
+        const message = error.response?.data?.message || i18n.global.t('permissions.parent_fetch_failed')
         commit('SET_ERROR', message)
         throw new Error(message)
       } finally {

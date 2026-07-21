@@ -77,7 +77,8 @@ export default {
     this.$i18n.locale = savedLang
     document.documentElement.dir = savedLang === 'ar' ? 'rtl' : 'ltr'
     document.documentElement.lang = savedLang
-    document.documentElement.setAttribute('class', `lang-${savedLang}`)
+    document.documentElement.classList.remove('lang-ar', 'lang-en')
+    document.documentElement.classList.add(`lang-${savedLang}`)
 
     const token = localStorage.getItem('token')
     if (token) {

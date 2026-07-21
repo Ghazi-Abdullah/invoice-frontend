@@ -42,7 +42,7 @@ export default {
 }
 
 .status-draft {
-  @apply bg-yellow-100 text-yellow-800;
+  @apply bg-yellow-100 text-yellow-800 dark:bg-yellow-500/10 dark:text-yellow-400;
 }
 
 .status-draft .badge-dot {
@@ -50,7 +50,7 @@ export default {
 }
 
 .status-sent {
-  @apply bg-blue-100 text-blue-800;
+  @apply bg-blue-100 text-blue-800 dark:bg-blue-500/10 dark:text-blue-400;
 }
 
 .status-sent .badge-dot {
@@ -58,7 +58,7 @@ export default {
 }
 
 .status-paid {
-  @apply bg-green-100 text-green-800;
+  @apply bg-green-100 text-green-800 dark:bg-green-500/10 dark:text-green-400;
 }
 
 .status-paid .badge-dot {
@@ -66,7 +66,7 @@ export default {
 }
 
 .status-overdue {
-  @apply bg-red-100 text-red-800;
+  @apply bg-red-100 text-red-800 dark:bg-red-500/10 dark:text-red-400;
 }
 
 .status-overdue .badge-dot {

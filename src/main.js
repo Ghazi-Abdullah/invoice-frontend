@@ -1,5 +1,3 @@
-import './assets/main.css'
-import './assets/theme.css'
 import './style.css'
 
 import { createApp } from 'vue'
@@ -125,6 +123,7 @@ import LoadingSpinner from './components/shared/LoadingSpinner.vue'
 import PageHeader from './components/shared/PageHeader.vue'
 import StatusBadge from './components/shared/StatusBadge.vue'
 
+
 // إنشاء التطبيق
 const app = createApp(App)
 
@@ -219,6 +218,9 @@ app.config.globalProperties.$formatDate = function (dateString) {
 
 // ربط toast عالميًا
 app.config.globalProperties.$toast = toast
+
+// تهيئة السمة (الوضع الداكن)
+store.dispatch('initTheme')
 
 // تشغيل التطبيق
 app.mount('#app')

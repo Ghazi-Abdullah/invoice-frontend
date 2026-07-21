@@ -95,7 +95,7 @@ export default {
 }
 
 .modal-container {
-  @apply bg-white rounded-xl shadow-2xl max-h-[90vh] overflow-hidden flex flex-col transform transition-all duration-300;
+  @apply bg-white dark:bg-slate-800 rounded-xl shadow-2xl max-h-[90vh] overflow-hidden flex flex-col transform transition-all duration-300;
   animation: slideDown 0.3s ease-out;
 }
 
@@ -116,15 +116,15 @@ export default {
 }
 
 .modal-header {
-  @apply px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-gray-50;
+  @apply px-6 py-4 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between bg-gray-50 dark:bg-slate-900;
 }
 
 .modal-title {
-  @apply text-lg font-semibold text-gray-900;
+  @apply text-lg font-semibold text-gray-900 dark:text-gray-100;
 }
 
 .modal-close {
-  @apply w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors;
+  @apply w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors;
 }
 
 .modal-body {
@@ -132,7 +132,7 @@ export default {
 }
 
 .modal-footer {
-  @apply px-6 py-4 border-t border-gray-200 bg-gray-50 flex flex-wrap justify-end gap-3;
+  @apply px-6 py-4 border-t border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-900 flex flex-wrap justify-end gap-3;
 }
 
 @keyframes slideDown {

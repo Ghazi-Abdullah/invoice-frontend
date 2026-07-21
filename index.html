@@ -8,6 +8,15 @@
   <!-- Font Awesome 6 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <title>Invoice System</title>
+
+  <!-- ✅ تطبيق تفضيل الوضع الداكن قبل رسم الصفحة، لتفادي الوميض -->
+  <script>
+    (function () {
+      var pref = localStorage.getItem('colorTheme') || 'system';
+      var isDark = pref === 'dark' || (pref === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      if (isDark) document.documentElement.classList.add('dark');
+    })();
+  </script>
 </head>
 
 <body>

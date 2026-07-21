@@ -85,7 +85,7 @@ const getters = {
         labels: state.performanceData.months || [],
         datasets: [
           {
-            label: i18n.t('dashboard.revenue'),
+            label: i18n.global.t('dashboard.revenue'),
             data: state.performanceData.revenues || [],
             borderColor: '#3b82f6',
             backgroundColor: 'rgba(59, 130, 246, 0.1)',
@@ -98,13 +98,13 @@ const getters = {
         labels: state.performanceData.months || [],
         datasets: [
           {
-            label: i18n.t('dashboard.invoices'),
+            label: i18n.global.t('dashboard.invoices'),
             data: state.performanceData.invoices || [],
             backgroundColor: 'rgba(59, 130, 246, 0.8)',
             borderRadius: 8
           },
           {
-            label: i18n.t('dashboard.revenue'),
+            label: i18n.global.t('dashboard.revenue'),
             data: state.performanceData.revenues || [],
             backgroundColor: 'rgba(16, 185, 129, 0.8)',
             borderRadius: 8
@@ -218,10 +218,10 @@ const actions = {
 
         return data
       } else {
-        throw new Error(response.data.message || i18n.t('dashboard.fetch_failed'))
+        throw new Error(response.data.message || i18n.global.t('dashboard.fetch_failed'))
       }
     } catch (error) {
-      const message = error.response?.data?.message || error.message || i18n.t('dashboard.fetch_error')
+      const message = error.response?.data?.message || error.message || i18n.global.t('dashboard.fetch_error')
       commit('SET_ERROR', message)
       throw new Error(message)
     } finally {

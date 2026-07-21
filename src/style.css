@@ -230,3 +230,214 @@ body {
     display: block !important;
   }
 }
+
+/* ============================================================
+   تنسيقات مضافة وموحدة من الملفات السابقة
+   ============================================================ */
+.page-title {
+  @apply text-2xl md:text-3xl font-bold text-gray-900;
+}
+
+.page-subtitle {
+  @apply text-sm text-gray-600 mt-2;
+}
+
+.form-input {
+  @apply w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
+}
+
+.badge {
+  @apply inline-flex px-3 py-1 text-xs font-semibold rounded-full;
+}
+
+.badge-success {
+  @apply bg-green-100 text-green-800;
+}
+
+.badge-warning {
+  @apply bg-yellow-100 text-yellow-800;
+}
+
+.badge-danger {
+  @apply bg-red-100 text-red-800;
+}
+
+.rtl-scroll {
+  direction: rtl;
+}
+
+.rtl-scroll > * {
+  direction: ltr;
+}
+
+.chart-container {
+  direction: ltr;
+}
+
+.table-container {
+  @apply overflow-x-auto border border-gray-200 rounded-lg;
+}
+
+.table-header {
+  @apply bg-gray-50;
+}
+
+.table-header th {
+  @apply px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider;
+}
+
+.table-body tr {
+  @apply hover:bg-gray-50;
+}
+
+.table-body td {
+  @apply px-6 py-4 whitespace-nowrap text-sm text-gray-900;
+}
+
+.rtl .mr-4 {
+  margin-right: 0;
+  margin-left: 1rem;
+}
+
+.rtl .ml-3 {
+  margin-left: 0;
+  margin-right: 0.75rem;
+}
+
+.rtl .space-x-3 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 1;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+}
+
+/* ============================================================
+   نظام تعميم الوضع الداكن التلقائي (Automatic Dark Mode overrides)
+   ============================================================ */
+.dark body {
+  background-color: #0b0f19 !important;
+  color: #f1f5f9 !important;
+}
+
+/* تعديل الخلفيات البيضاء والرمادية */
+.dark .bg-white {
+  background-color: #1e293b !important; /* slate-800 */
+}
+.dark .bg-white\/80 {
+  background-color: rgba(30, 41, 59, 0.8) !important;
+}
+.dark .bg-gray-50 {
+  background-color: #0b0f19 !important; /* slate-950 */
+}
+.dark .bg-gray-50\/50 {
+  background-color: rgba(11, 15, 25, 0.5) !important;
+}
+.dark .bg-gray-50\/80 {
+  background-color: rgba(11, 15, 25, 0.8) !important;
+}
+.dark .bg-gray-100 {
+  background-color: #1e293b !important;
+}
+
+/* تعديل ألوان الحدود */
+.dark .border-gray-100 {
+  border-color: #334155 !important; /* slate-700 */
+}
+.dark .border-gray-200 {
+  border-color: #334155 !important;
+}
+.dark .border-gray-200\/50 {
+  border-color: rgba(51, 65, 85, 0.5) !important;
+}
+.dark .border-gray-300 {
+  border-color: #475569 !important; /* slate-600 */
+}
+.dark .border-white\/50 {
+  border-color: rgba(51, 65, 85, 0.3) !important;
+}
+
+/* تعديل ألوان النصوص الرمادية والداكنة */
+.dark .text-gray-900 {
+  color: #f8fafc !important; /* slate-50 */
+}
+.dark .text-gray-800 {
+  color: #e2e8f0 !important; /* slate-200 */
+}
+.dark .text-gray-700 {
+  color: #cbd5e1 !important; /* slate-300 */
+}
+.dark .text-gray-600 {
+  color: #94a3b8 !important; /* slate-400 */
+}
+.dark .text-gray-500 {
+  color: #94a3b8 !important;
+}
+.dark .text-gray-400 {
+  color: #64748b !important; /* slate-500 */
+}
+
+/* تأثيرات التمرير hover */
+.dark .hover\:bg-gray-50:hover {
+  background-color: rgba(51, 65, 85, 0.4) !important;
+}
+.dark .hover\:bg-gray-100:hover {
+  background-color: #334155 !important;
+}
+.dark .hover\:text-gray-900:hover {
+  color: #ffffff !important;
+}
+
+/* الجداول والأقسام والتقسيمات */
+.dark .divide-gray-200 > :not([hidden]) ~ :not([hidden]) {
+  border-color: #334155 !important;
+}
+.dark .divide-gray-100 > :not([hidden]) ~ :not([hidden]) {
+  border-color: #334155 !important;
+}
+
+/* مدخلات النماذج والأزرار بالوضع الداكن */
+.dark .form-control, 
+.dark .form-input {
+  background-color: #1e293b !important;
+  border-color: #475569 !important;
+  color: #f8fafc !important;
+}
+.dark .form-control:disabled, 
+.dark .form-input:disabled {
+  background-color: #0f172a !important;
+  color: #64748b !important;
+}
+.dark .form-label {
+  color: #cbd5e1 !important;
+}
+
+/* كروت الإحصائيات (StatCard/KPI) */
+.dark .stat-card {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+}
+
+/* المودال */
+.dark .modal-container {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+}
+.dark .modal-header,
+.dark .modal-footer {
+  background-color: #0f172a !important;
+  border-color: #334155 !important;
+}
+
+/* القوائم المنسدلة */
+.dark .dropdown-menu {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+}
+

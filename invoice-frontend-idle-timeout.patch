@@ -1,0 +1,237 @@
+diff --git a/src/App.vue b/src/App.vue
+index 35f380b..7c62e54 100644
+--- a/src/App.vue
++++ b/src/App.vue
+@@ -28,6 +28,7 @@
+ <script>
+ import ToastContainer from '@/components/ToastContainer.vue'
+ import LoadingSpinner from '@/components/shared/LoadingSpinner.vue'
++import { startIdleTimeout, stopIdleTimeout } from '@/utils/idleTimeout'
+ 
+ export default {
+   name: 'App',
+@@ -72,6 +73,21 @@ export default {
+     },
+   },
+ 
++  watch: {
++    // ✅ نشغّل مراقبة عدم النشاط فقط أثناء وجود جلسة فعلية،
++    // ونوقفها فوراً عند تسجيل الخروج (يدوياً أو تلقائياً)
++    isAuthenticated: {
++      immediate: true,
++      handler(isAuthenticated) {
++        if (isAuthenticated) {
++          startIdleTimeout(this.handleIdleTimeout, 60 * 60 * 1000) // ساعة واحدة
++        } else {
++          stopIdleTimeout()
++        }
++      },
++    },
++  },
++
+   async created() {
+     const savedLang = localStorage.getItem('userLanguage') || 'ar'
+     this.$i18n.locale = savedLang
+@@ -96,5 +112,18 @@ export default {
+       document.body.classList.remove('rtl')
+     }
+   },
++
++  beforeUnmount() {
++    stopIdleTimeout()
++  },
++
++  methods: {
++    // ✅ يُستدعى مرة واحدة بعد ساعة كاملة بدون أي نشاط من المستخدم
++    async handleIdleTimeout() {
++      this.$toast.warning(this.$t('auth.sessionExpiredIdle'))
++      await this.$store.dispatch('auth/logout')
++      this.$router.push({ name: 'Login' })
++    },
++  },
+ }
+ </script>
+diff --git a/src/api/axios.js b/src/api/axios.js
+index 791db98..f22dad7 100644
+--- a/src/api/axios.js
++++ b/src/api/axios.js
+@@ -1,5 +1,6 @@
+ // src/api/axios.js
+ import axios from 'axios'
++import { toast } from 'vue3-toastify'
+ 
+ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'
+ 
+@@ -37,8 +38,17 @@ const handleError = (error) => {
+     console.error(`❌ ${status} Error: ${config.url}`, data)
+ 
+     if (status === 401) {
++      // ✅ هل كانت هناك جلسة فعلية؟ (وليس مجرد فشل تسجيل دخول عادي
++      // على /admin/login، والذي يُعالَج برسالته الخاصة في الفورم)
++      const hadActiveSession = !!localStorage.getItem('token')
++
+       localStorage.removeItem('token')
+       delete instance.defaults.headers.common['Authorization']
++
++      if (hadActiveSession) {
++        toast.warning(data?.message || 'انتهت الجلسة، الرجاء تسجيل الدخول مرة أخرى')
++      }
++
+       if (typeof window !== 'undefined') {
+         window.location.href = '/login'
+       }
+diff --git a/src/plugins/locales/ar.json b/src/plugins/locales/ar.json
+index 86c50ff..d69647b 100644
+--- a/src/plugins/locales/ar.json
++++ b/src/plugins/locales/ar.json
+@@ -35,6 +35,7 @@
+     "forgot_password": "نسيت كلمة المرور؟",
+     "logout_success": "تم تسجيل الخروج بنجاح",
+     "logout_error": "خطأ في تسجيل الخروج",
++    "sessionExpiredIdle": "انتهت جلستك بسبب عدم النشاط. الرجاء تسجيل الدخول مرة أخرى.",
+     "admin_indicator": "(مدير)",
+     "user": "مستخدم",
+     "registerSubtitle": "انضم إلى نظام إدارة الفواتير",
+diff --git a/src/plugins/locales/en.json b/src/plugins/locales/en.json
+index 046f5d4..59cf46c 100644
+--- a/src/plugins/locales/en.json
++++ b/src/plugins/locales/en.json
+@@ -36,6 +36,7 @@
+     "forgot_password": "Forgot Password?",
+     "logout_success": "Logged out successfully",
+     "logout_error": "Error logging out",
++    "sessionExpiredIdle": "Your session has expired due to inactivity. Please log in again.",
+     "admin_indicator": "(Admin)",
+     "user": "User",
+     "registerSubtitle": "Join the invoice management system",
+diff --git a/src/utils/idleTimeout.js b/src/utils/idleTimeout.js
+new file mode 100644
+index 0000000..cf92ebd
+--- /dev/null
++++ b/src/utils/idleTimeout.js
+@@ -0,0 +1,125 @@
++// ============================================================
++// نظام تسجيل الخروج التلقائي بسبب عدم النشاط (Idle Timeout)
++// ============================================================
++// يراقب هذا الملف نشاط المستخدم (حركة الماوس، الكتابة، النقر،
++// التمرير...) وإذا مرّت ساعة كاملة بدون أي نشاط، يتم استدعاء
++// دالة onTimeout (تسجيل خروج + توجيه لصفحة الدخول).
++//
++// وقت آخر نشاط يُخزَّن في localStorage لسببين:
++// 1) يبقى صحيحاً حتى بعد تحديث الصفحة (F5) بدل أن يبدأ من الصفر
++// 2) يعمل بشكل موحّد بين كل تبويبات نفس المتصفح — أي نشاط في
++//    تبويب آخر يُعيد ضبط المؤقّت في هذا التبويب أيضاً (عبر حدث
++//    "storage" الذي يُطلقه المتصفح تلقائياً عند تعديل localStorage
++//    من تبويب مختلف).
++//
++// هذا مكمّل لفحص انتهاء الجلسة في الباك-إند (CheckIdleTimeout
++// middleware)، وليس بديلاً عنه — الباك-إند هو مصدر الحقيقة
++// الفعلي، وهذا الملف يوفّر فقط تجربة استخدام أفضل بإخراج
++// المستخدم فوراً بدل انتظار أول طلب API فاشل.
++// ============================================================
++
++const STORAGE_KEY = 'lastActivityAt'
++const DEFAULT_TIMEOUT_MS = 60 * 60 * 1000 // ساعة واحدة
++const ACTIVITY_THROTTLE_MS = 5000 // لا نحدّث التخزين أكثر من مرة كل 5 ثوانٍ
++const ACTIVITY_EVENTS = ['mousedown', 'mousemove', 'keydown', 'wheel', 'scroll', 'touchstart']
++
++let checkTimerId = null
++let onTimeoutCallback = null
++let timeoutMs = DEFAULT_TIMEOUT_MS
++let boundHandleActivity = null
++let boundHandleVisibility = null
++let boundHandleStorage = null
++
++function now() {
++  return Date.now()
++}
++
++function getLastActivity() {
++  const stored = parseInt(localStorage.getItem(STORAGE_KEY), 10)
++  return Number.isFinite(stored) ? stored : now()
++}
++
++function scheduleCheck() {
++  if (checkTimerId) clearTimeout(checkTimerId)
++  const elapsed = now() - getLastActivity()
++  const remaining = Math.max(timeoutMs - elapsed, 0)
++  checkTimerId = setTimeout(checkIdle, remaining)
++}
++
++function checkIdle() {
++  const elapsed = now() - getLastActivity()
++
++  if (elapsed >= timeoutMs) {
++    const callback = onTimeoutCallback
++    stopIdleTimeout()
++    if (typeof callback === 'function') callback()
++    return
++  }
++
++  scheduleCheck()
++}
++
++function recordActivity() {
++  const last = getLastActivity()
++  if (now() - last < ACTIVITY_THROTTLE_MS) return
++
++  localStorage.setItem(STORAGE_KEY, String(now()))
++  scheduleCheck()
++}
++
++/**
++ * يبدأ مراقبة نشاط المستخدم. يجب استدعاؤها فقط أثناء وجود جلسة
++ * مسجّل دخول فيها (بعد نجاح تسجيل الدخول)، وإيقافها عند الخروج.
++ *
++ * @param {Function} onTimeout - يُستدعى مرة واحدة عند انتهاء الجلسة
++ * @param {number} ms - مدة عدم النشاط المسموحة بالميلي ثانية (افتراضياً: ساعة)
++ */
++export function startIdleTimeout(onTimeout, ms = DEFAULT_TIMEOUT_MS) {
++  stopIdleTimeout()
++
++  onTimeoutCallback = onTimeout
++  timeoutMs = ms
++
++  boundHandleActivity = () => recordActivity()
++  boundHandleVisibility = () => {
++    if (document.visibilityState === 'visible') checkIdle()
++  }
++  boundHandleStorage = (event) => {
++    if (event.key === STORAGE_KEY) scheduleCheck()
++  }
++
++  ACTIVITY_EVENTS.forEach((evt) => window.addEventListener(evt, boundHandleActivity, { passive: true }))
++  document.addEventListener('visibilitychange', boundHandleVisibility)
++  window.addEventListener('storage', boundHandleStorage)
++
++  // نشاط "تسجيل الدخول" نفسه يُعتبر بداية جديدة للعدّ
++  localStorage.setItem(STORAGE_KEY, String(now()))
++  scheduleCheck()
++}
++
++/**
++ * يوقف مراقبة النشاط ويزيل كل الـ listeners. يجب استدعاؤها عند
++ * تسجيل الخروج (بغض النظر عن السبب: يدوي، انتهاء جلسة، فشل توكن...).
++ */
++export function stopIdleTimeout() {
++  if (checkTimerId) {
++    clearTimeout(checkTimerId)
++    checkTimerId = null
++  }
++
++  if (boundHandleActivity) {
++    ACTIVITY_EVENTS.forEach((evt) => window.removeEventListener(evt, boundHandleActivity))
++    boundHandleActivity = null
++  }
++  if (boundHandleVisibility) {
++    document.removeEventListener('visibilitychange', boundHandleVisibility)
++    boundHandleVisibility = null
++  }
++  if (boundHandleStorage) {
++    window.removeEventListener('storage', boundHandleStorage)
++    boundHandleStorage = null
++  }
++
++  onTimeoutCallback = null
++  localStorage.removeItem(STORAGE_KEY)
++}

@@ -148,19 +148,19 @@ export default {
 }
 
 .form-label {
-  @apply block text-sm font-medium text-gray-700 mb-2;
+  @apply block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2;
 }
 
 .form-input {
-  @apply w-full border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors;
+  @apply w-full border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors;
 }
 
 .form-input:disabled {
-  @apply bg-gray-100 cursor-not-allowed;
+  @apply bg-gray-100 dark:bg-slate-900 cursor-not-allowed text-gray-400;
 }
 
 .form-input:read-only {
-  @apply bg-gray-50 cursor-not-allowed;
+  @apply bg-gray-50 dark:bg-slate-900/50 cursor-not-allowed;
 }
 
 .rtl .pl-10 {

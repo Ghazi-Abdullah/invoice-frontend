@@ -23,7 +23,8 @@ export default createStore({
   state: {
     appLoading: false,
     appError: null, 
-    appSuccess: null
+    appSuccess: null,
+    theme: localStorage.getItem('theme') || 'light'
   },
   mutations: {
     SET_APP_LOADING(state, loading) {
@@ -38,6 +39,15 @@ export default createStore({
     CLEAR_APP_MESSAGES(state) {
       state.appError = null
       state.appSuccess = null
+    },
+    SET_THEME(state, theme) {
+      state.theme = theme
+      localStorage.setItem('theme', theme)
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark')
+      } else {
+        document.documentElement.classList.remove('dark')
+      }
     }
   },
   actions: {
@@ -52,12 +62,22 @@ export default createStore({
     },
     clearAppMessages({ commit }) {
       commit('CLEAR_APP_MESSAGES')
+    },
+    toggleTheme({ commit, state }) {
+      const newTheme = state.theme === 'light' ? 'dark' : 'light'
+      commit('SET_THEME', newTheme)
+    },
+    initTheme({ commit, state }) {
+      const savedTheme = localStorage.getItem('theme')
+      const theme = savedTheme || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+      commit('SET_THEME', theme)
     }
   },
   getters: {
     appLoading: state => state.appLoading,
     appError: state => state.appError,
-    appSuccess: state => state.appSuccess
+    appSuccess: state => state.appSuccess,
+    theme: state => state.theme
   },
   modules: {
     auth: auth,

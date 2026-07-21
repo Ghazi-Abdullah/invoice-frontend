@@ -627,6 +627,7 @@
             </span>
           </button>
         </div> -->
+
       </div>
     </aside>
 
@@ -745,7 +746,7 @@
                 <div class="hidden md:block text-right">
                   <p class="text-sm font-semibold text-gray-800 leading-tight">{{ user?.name }}</p>
                   <p class="text-xs text-gray-500 leading-tight">
-                    {{ user?.group?.title_ar || t('auth.user') }}
+                    {{ user?.group?.title_ar || $t('auth.user', 'User') }}
                   </p>
                 </div>
                 <svg
@@ -773,7 +774,7 @@
                 <div
                   v-if="userDropdownOpen"
                   class="absolute mt-2 w-56 bg-white rounded-2xl shadow-xl shadow-gray-200/50 border border-gray-100 z-50 overflow-hidden"
-                  :class="$i18n.locale === 'ar' ? 'right-0' : 'left-0'"
+                  :class="$i18n.locale === 'ar' ? 'left-0' : 'right-0'"
                 >
                   <div class="p-4 border-b border-gray-100 bg-gray-50/50">
                     <div class="flex items-center gap-3">
@@ -818,7 +819,7 @@
                           />
                         </svg>
                       </div>
-                      <span class="font-medium">{{ t('nav.profile') }}</span>
+                      <span class="font-medium">{{ $t('nav.profile', 'Profile') }}</span>
                     </router-link>
                     <button
                       @click="logout"
@@ -839,7 +840,7 @@
                           />
                         </svg>
                       </div>
-                      <span class="font-medium">{{ t('auth.logout') }}</span>
+                      <span class="font-medium">{{ $t('auth.logout', 'Logout') }}</span>
                     </button>
                   </div>
                 </div>

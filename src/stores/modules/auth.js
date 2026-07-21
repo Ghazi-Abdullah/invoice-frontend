@@ -97,15 +97,15 @@ export default {
 
           return { success: true, data: response.data.data }
         } else {
-          const message = response.data.message || i18n.t('auth.login_failed')
+          const message = response.data.message || i18n.global.t('auth.login_failed')
           commit('SET_LOGIN_ERROR', message)
           return { success: false, message }
         }
       } catch (error) {
-        let message = i18n.t('auth.login_error')
+        let message = i18n.global.t('auth.login_error')
         if (error.response) {
           if (error.response.status === 401) {
-            message = i18n.t('auth.invalid_credentials')
+            message = i18n.global.t('auth.invalid_credentials')
           } else if (error.response.data?.message) {
             message = error.response.data.message
           }
@@ -122,7 +122,6 @@ export default {
     async logout({ commit }) {
       commit('SET_LOADING', true)
       NProgress.start()
-      let result = { success: true, message: i18n.t('auth.logout_success') }
 
       try {
         await axios.post('/admin/logout')
@@ -135,9 +134,11 @@ export default {
         delete axios.defaults.headers.common['Authorization']
         NProgress.done()
         commit('SET_LOADING', false)
+        // التعديل هنا:
+        window.location.href = '/login'
       }
 
-      return result
+      return { success: true, message: i18n.global.t('auth.logout_success') }
     },
 
     // إرسال رمز التحقق (OTP)
@@ -155,12 +156,12 @@ export default {
             user_id: response.data.data.user_id
           }
         } else {
-          const message = response.data.message || i18n.t('auth.otp_send_failed')
+          const message = response.data.message || i18n.global.t('auth.otp_send_failed')
           commit('SET_LOGIN_ERROR', message)
           return { success: false, message }
         }
       } catch (error) {
-        const message = error.response?.data?.message || i18n.t('auth.otp_send_error')
+        const message = error.response?.data?.message || i18n.global.t('auth.otp_send_error')
         commit('SET_LOGIN_ERROR', message)
         return { success: false, message }
       } finally {
@@ -194,12 +195,12 @@ export default {
           await dispatch('loadMenus')
           return { success: true }
         } else {
-          const message = response.data.message || i18n.t('auth.invalid_otp')
+          const message = response.data.message || i18n.global.t('auth.invalid_otp')
           commit('SET_LOGIN_ERROR', message)
           return { success: false, message }
         }
       } catch (error) {
-        const message = error.response?.data?.message || i18n.t('auth.otp_verify_error')
+        const message = error.response?.data?.message || i18n.global.t('auth.otp_verify_error')
         commit('SET_LOGIN_ERROR', message)
         return { success: false, message }
       } finally {
@@ -249,36 +250,36 @@ export default {
       const baseMenus = [
         {
           id: 1,
-          title: i18n.t('nav.dashboard'),
+          title: i18n.global.t('nav.dashboard'),
           icon: 'home',
           route: '/dashboard',
           permission: 'view_dashboard'
         },
         {
           id: 2,
-          title: i18n.t('nav.clients'),
+          title: i18n.global.t('nav.clients'),
           icon: 'users',
           route: '/clients',
           permission: 'view_clients',
           children: [
-            { id: 21, title: i18n.t('nav.all_clients'), route: '/clients', permission: 'view_clients' },
-            { id: 22, title: i18n.t('nav.add_client'), route: '/clients/create', permission: 'create_client' }
+            { id: 21, title: i18n.global.t('nav.all_clients'), route: '/clients', permission: 'view_clients' },
+            { id: 22, title: i18n.global.t('nav.add_client'), route: '/clients/create', permission: 'create_client' }
           ]
         },
         {
           id: 3,
-          title: i18n.t('nav.invoices'),
+          title: i18n.global.t('nav.invoices'),
           icon: 'file-invoice',
           route: '/invoices',
           permission: 'view_invoices',
           children: [
-            { id: 31, title: i18n.t('nav.all_invoices'), route: '/invoices', permission: 'view_invoices' },
-            { id: 32, title: i18n.t('nav.create_invoice'), route: '/invoices/create', permission: 'create_invoice' }
+            { id: 31, title: i18n.global.t('nav.all_invoices'), route: '/invoices', permission: 'view_invoices' },
+            { id: 32, title: i18n.global.t('nav.create_invoice'), route: '/invoices/create', permission: 'create_invoice' }
           ]
         },
         {
           id: 4,
-          title: i18n.t('nav.reports'),
+          title: i18n.global.t('nav.reports'),
           icon: 'chart-bar',
           route: '/reports',
           permission: 'view_reports'
@@ -291,14 +292,14 @@ export default {
       if (isAdmin) {
         baseMenus.push({
           id: 5,
-          title: i18n.t('nav.admin'),
+          title: i18n.global.t('nav.admin'),
           icon: 'cog',
           route: '/admin',
           permission: 'view_admin_groups',
           children: [
-            { id: 51, title: i18n.t('nav.users'), route: '/admin/users', permission: 'view_users' },
-            { id: 52, title: i18n.t('nav.groups'), route: '/admin/groups', permission: 'view_admin_groups' },
-            { id: 53, title: i18n.t('nav.permissions'), route: '/admin/permissions', permission: 'manage_permissions' }
+            { id: 51, title: i18n.global.t('nav.users'), route: '/admin/users', permission: 'view_users' },
+            { id: 52, title: i18n.global.t('nav.groups'), route: '/admin/groups', permission: 'view_admin_groups' },
+            { id: 53, title: i18n.global.t('nav.permissions'), route: '/admin/permissions', permission: 'manage_permissions' }
           ]
         })
       }

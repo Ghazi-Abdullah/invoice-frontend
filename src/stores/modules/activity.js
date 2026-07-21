@@ -85,12 +85,12 @@ export default {
         if (response.data?.status) {
           commit('SET_LOGS', response.data.data)
         } else {
-          const errorMsg = response.data?.message || i18n.t('activity.fetch_failed')
+          const errorMsg = response.data?.message || i18n.global.t('activity.fetch_failed')
           commit('SET_ERROR', errorMsg)
         }
         return response.data
       } catch (error) {
-        const message = error.response?.data?.message || i18n.t('activity.fetch_error')
+        const message = error.response?.data?.message || i18n.global.t('activity.fetch_error')
         commit('SET_ERROR', message)
         throw error
       } finally {

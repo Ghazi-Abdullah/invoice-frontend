@@ -131,7 +131,7 @@ export default {
         commit('SET_INVOICES', data)
         return response.data
       } catch (error) {
-        const message = error.response?.data?.message || i18n.t('invoices.fetch_failed')
+        const message = error.response?.data?.message || i18n.global.t('invoices.fetch_failed')
         commit('SET_ERROR', message)
         commit('SET_INVOICES', [])
         throw new Error(message)
@@ -153,7 +153,7 @@ export default {
         commit('SET_CURRENT_INVOICE', invoice)
         return invoice
       } catch (error) {
-        const message = error.response?.data?.message || i18n.t('invoices.fetch_one_failed')
+        const message = error.response?.data?.message || i18n.global.t('invoices.fetch_one_failed')
         commit('SET_ERROR', message)
         throw new Error(message)
       } finally {
@@ -190,7 +190,7 @@ export default {
 
         return { invoice, redirectToStripe: false }
       } catch (error) {
-        const message = error.response?.data?.message || i18n.t('invoices.create_failed')
+        const message = error.response?.data?.message || i18n.global.t('invoices.create_failed')
         commit('SET_ERROR', message)
         throw new Error(message)
       } finally {
@@ -212,7 +212,7 @@ export default {
         commit('SET_CURRENT_INVOICE', invoice)
         return invoice
       } catch (error) {
-        const message = error.response?.data?.message || i18n.t('invoices.update_failed')
+        const message = error.response?.data?.message || i18n.global.t('invoices.update_failed')
         commit('SET_ERROR', message)
         throw new Error(message)
       } finally {
@@ -232,7 +232,7 @@ export default {
         commit('DELETE_INVOICE', id)
         return true
       } catch (error) {
-        const message = error.response?.data?.message || i18n.t('invoices.delete_failed')
+        const message = error.response?.data?.message || i18n.global.t('invoices.delete_failed')
         commit('SET_ERROR', message)
         throw new Error(message)
       } finally {
@@ -262,7 +262,7 @@ export default {
         commit('SET_CURRENT_INVOICE', invoice)
         return invoice
       } catch (error) {
-        const message = error.response?.data?.message || i18n.t('invoices.status_update_failed')
+        const message = error.response?.data?.message || i18n.global.t('invoices.status_update_failed')
         commit('SET_ERROR', message)
         throw new Error(message)
       } finally {
