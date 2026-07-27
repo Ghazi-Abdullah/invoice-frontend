@@ -282,7 +282,7 @@ body {
   direction: rtl;
 }
 
-.rtl-scroll > * {
+.rtl-scroll>* {
   direction: ltr;
 }
 
@@ -320,7 +320,7 @@ body {
   margin-right: 0.75rem;
 }
 
-.rtl .space-x-3 > :not([hidden]) ~ :not([hidden]) {
+.rtl .space-x-3> :not([hidden])~ :not([hidden]) {
   --tw-space-x-reverse: 1;
 }
 
@@ -344,77 +344,103 @@ body {
 
 /* تعديل الخلفيات البيضاء والرمادية */
 .dark .bg-white {
-  background-color: #1e293b !important; /* slate-800 */
+  background-color: #1e293b !important;
+  /* slate-800 */
 }
+
 .dark .bg-white\/80 {
   background-color: rgba(30, 41, 59, 0.8) !important;
 }
+
 .dark .bg-gray-50 {
-  background-color: #0b0f19 !important; /* slate-950 */
+  background-color: #0b0f19 !important;
+  /* slate-950 */
 }
+
 .dark .bg-gray-50\/50 {
   background-color: rgba(11, 15, 25, 0.5) !important;
 }
+
 .dark .bg-gray-50\/80 {
   background-color: rgba(11, 15, 25, 0.8) !important;
 }
+
 .dark .bg-gray-100 {
   background-color: #1e293b !important;
 }
 
 /* تعديل ألوان الحدود */
 .dark .border-gray-100 {
-  border-color: #334155 !important; /* slate-700 */
+  border-color: #334155 !important;
+  /* slate-700 */
 }
+
 .dark .border-gray-200 {
   border-color: #334155 !important;
 }
+
 .dark .border-gray-200\/50 {
   border-color: rgba(51, 65, 85, 0.5) !important;
 }
+
 .dark .border-gray-300 {
-  border-color: #475569 !important; /* slate-600 */
+  border-color: #475569 !important;
+  /* slate-600 */
 }
+
 .dark .border-white\/50 {
   border-color: rgba(51, 65, 85, 0.3) !important;
 }
 
 /* تعديل ألوان النصوص الرمادية والداكنة */
 .dark .text-gray-900 {
-  color: #f8fafc !important; /* slate-50 */
+  color: #f8fafc !important;
+  /* slate-50 */
 }
+
 .dark .text-gray-800 {
-  color: #e2e8f0 !important; /* slate-200 */
+  color: #e2e8f0 !important;
+  /* slate-200 */
 }
+
 .dark .text-gray-700 {
-  color: #cbd5e1 !important; /* slate-300 */
+  color: #cbd5e1 !important;
+  /* slate-300 */
 }
+
 .dark .text-gray-600 {
-  color: #94a3b8 !important; /* slate-400 */
+  color: #94a3b8 !important;
+  /* slate-400 */
 }
+
 .dark .text-gray-500 {
   color: #94a3b8 !important;
 }
+
 .dark .text-gray-400 {
-  color: #64748b !important; /* slate-500 */
+  color: #64748b !important;
+  /* slate-500 */
 }
 
 /* تأثيرات التمرير hover */
 .dark .hover\:bg-gray-50:hover {
   background-color: rgba(51, 65, 85, 0.4) !important;
 }
+
 .dark .hover\:bg-gray-100:hover {
   background-color: #334155 !important;
 }
+
 .dark .hover\:text-gray-900:hover {
   color: #ffffff !important;
 }
 
 /* الجداول والأقسام والتقسيمات */
-.dark .divide-gray-200 > :not([hidden]) ~ :not([hidden]) {
+.dark .divide-gray-200> :not([hidden])~ :not([hidden]) {
   border-color: #334155 !important;
 }
-.dark .divide-gray-100 > :not([hidden]) ~ :not([hidden]) {
+
+.dark .divide-gray-100> :not([hidden])~ :not([hidden]) {
   border-color: #334155 !important;
 }
 
@@ -425,11 +451,13 @@ body {
   border-color: #475569 !important;
   color: #f8fafc !important;
 }
+
 .dark .form-control:disabled,
 .dark .form-input:disabled {
   background-color: #0f172a !important;
   color: #64748b !important;
 }
+
 .dark .form-label {
   color: #cbd5e1 !important;
 }
@@ -445,6 +473,7 @@ body {
   background-color: #1e293b !important;
   border-color: #334155 !important;
 }
+
 .dark .modal-header,
 .dark .modal-footer {
   background-color: #0f172a !important;
@@ -455,4 +484,18 @@ body {
 .dark .dropdown-menu {
   background-color: #1e293b !important;
   border-color: #334155 !important;
+}
+
+/* ============================================================
+   خلفية التدرّج الرمادي لصفحات المحتوى الرئيسية
+   ============================================================
+   نمط "bg-gradient-to-br from-gray-50 to-gray-100" مستخدم كخلفية
+   لصفحة كاملة في أكثر من 14 ملف (Clients, Invoices, Reports,
+   Admin...). كلاسات التدرّج from- و to- في Tailwind لا تُغطّى
+   بتعديل bg-gray-50 العادي (لأنها تولّد background-image عبر
+   متغيرات CSS خاصة، وليس background-color)، فاحتاجت قاعدة خاصة
+   بها هنا. إصلاح واحد هنا يغطي كل الصفحات الـ 14 دفعة واحدة،
+   بدل تعديل كل ملف Vue على حدة. */
+.dark .bg-gradient-to-br.from-gray-50.to-gray-100 {
+  background-image: linear-gradient(to bottom right, #0b0f19, #0f172a) !important;
 }

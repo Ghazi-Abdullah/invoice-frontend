@@ -1,4 +1,4 @@
-// src/stores/modules/invoiceManagement.js
+// src/stores/modules/report.js
 import axios from '@/api/axios'
 import NProgress from 'nprogress'
 import i18n from '@/plugins/i18n'
@@ -7,470 +7,328 @@ export default {
   namespaced: true,
 
   state: {
-    invoices: [],
-    currentInvoice: null,
     loading: false,
+    exportLoading: false,
     error: null,
+    activeTab: 'invoices',
+    showExportModal: false,
+    showExportedFiles: false,
+    clients: [],
+    exportedFiles: [],
     filters: {
+      start_date: '',
+      end_date: '',
       status: '',
-      date: '',
-      search: ''
-    },
-    pagination: {
-      current_page: 1,
-      last_page: 1,
-      per_page: 10,
-      total: 0
-    },
-    stats: {
-      total: 0,
-      paid: 0,
-      sent: 0,
-      overdue: 0
-    },
-    invoiceForm: {
       client_id: '',
-      invoice_number: '',
-      issue_date: new Date().toISOString().split('T')[0],
-      due_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      items: [
-        {
-          description: '',
-          quantity: 1,
-          unit_price: 0,
-          tax_rate: 15,
-          total: 0
-        }
-      ],
-      notes: '',
-      terms: '',
-      status: 'draft'
+      user_id: '',
+      search: '',
+      per_page: 20,
+      page: 1,
     },
-    formErrors: {}
+    reports: {
+      invoices: { items: [], stats: {}, pagination: { current_page: 1, last_page: 1, per_page: 20, total: 0, from: 0, to: 0 } },
+      clients: { items: [], stats: {}, pagination: { current_page: 1, last_page: 1, per_page: 20, total: 0, from: 0, to: 0 } },
+      revenue: { items: [], stats: {}, pagination: { current_page: 1, last_page: 1, per_page: 20, total: 0, from: 0, to: 0 } },
+      overdue: { items: [], stats: {}, pagination: { current_page: 1, last_page: 1, per_page: 20, total: 0, from: 0, to: 0 } },
+    },
   },
 
   getters: {
-    invoices: state => state.invoices,
-    currentInvoice: state => state.currentInvoice,
-    loading: state => state.loading,
-    error: state => state.error,
-    filters: state => state.filters,
-    pagination: state => state.pagination,
-    stats: state => state.stats,
-    invoiceForm: state => state.invoiceForm,
-    formErrors: state => state.formErrors,
-
-    hasInvoices: state => state.invoices && state.invoices.length > 0,
-
-    invoiceSummary: state => {
-      const items = state.invoiceForm.items || []
-      const subtotal = items.reduce((sum, item) => {
-        const qty = parseFloat(item.quantity) || 0
-        const price = parseFloat(item.unit_price) || 0
-        return sum + (qty * price)
-      }, 0)
-
-      const tax = items.reduce((sum, item) => {
-        const qty = parseFloat(item.quantity) || 0
-        const price = parseFloat(item.unit_price) || 0
-        const rate = parseFloat(item.tax_rate) || 0
-        return sum + (qty * price * (rate / 100))
-      }, 0)
-
-      const total = subtotal + tax
-
-      return {
-        subtotal: subtotal.toFixed(2),
-        tax: tax.toFixed(2),
-        total: total.toFixed(2),
-        itemsCount: items.length,
-        averageTax: items.length > 0
-          ? (items.reduce((sum, item) => sum + (parseFloat(item.tax_rate) || 0), 0) / items.length).toFixed(2)
-          : '0.00'
-      }
+    overdueCount: state => {
+      return state.reports.overdue.items?.length || 0
     },
-
-    hasIncompleteItems: state => {
-      return state.invoiceForm.items.some(
-        item => !item.description || item.quantity <= 0 || item.unit_price < 0
-      )
-    }
   },
 
   mutations: {
-    SET_INVOICES(state, { data, pagination }) {
-      state.invoices = data
-      if (pagination) {
-        state.pagination = { ...state.pagination, ...pagination }
-      }
-    },
-
-    SET_CURRENT_INVOICE(state, invoice) {
-      state.currentInvoice = invoice
-    },
-
     SET_LOADING(state, loading) {
       state.loading = loading
     },
-
+    SET_EXPORT_LOADING(state, loading) {
+      state.exportLoading = loading
+    },
     SET_ERROR(state, error) {
       state.error = error
     },
-
     CLEAR_ERROR(state) {
       state.error = null
     },
-
+    SET_ACTIVE_TAB(state, tab) {
+      state.activeTab = tab
+    },
     SET_FILTERS(state, filters) {
       state.filters = { ...state.filters, ...filters }
     },
-
-    SET_STATS(state, stats) {
-      state.stats = { ...state.stats, ...stats }
-    },
-
-    SET_INVOICE_FORM(state, formData) {
-      state.invoiceForm = { ...state.invoiceForm, ...formData }
-    },
-
-    SET_FORM_ERRORS(state, errors) {
-      state.formErrors = errors
-    },
-
-    CLEAR_FORM_ERRORS(state) {
-      state.formErrors = {}
-    },
-
-    CLEAR_INVOICE_FORM(state) {
-      state.invoiceForm = {
+    RESET_FILTERS(state) {
+      const endDate = new Date()
+      const startDate = new Date()
+      startDate.setDate(startDate.getDate() - 30)
+      state.filters = {
+        start_date: startDate.toISOString().split('T')[0],
+        end_date: endDate.toISOString().split('T')[0],
+        status: '',
         client_id: '',
-        invoice_number: '',
-        issue_date: new Date().toISOString().split('T')[0],
-        due_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        items: [{ description: '', quantity: 1, unit_price: 0, tax_rate: 15, total: 0 }],
-        notes: '',
-        terms: '',
-        status: 'draft'
+        user_id: '',
+        search: '',
+        per_page: 20,
+        page: 1,
       }
     },
-
-    ADD_INVOICE_ITEM(state) {
-      state.invoiceForm.items.push({
-        description: '',
-        quantity: 1,
-        unit_price: 0,
-        tax_rate: 15,
-        total: 0
-      })
-    },
-
-    REMOVE_INVOICE_ITEM(state, index) {
-      if (state.invoiceForm.items.length > 1) {
-        state.invoiceForm.items.splice(index, 1)
+    SET_REPORT_DATA(state, { type, data }) {
+      if (state.reports[type]) {
+        state.reports[type] = {
+          items: data.items || [],
+          stats: data.stats || {},
+          pagination: data.pagination || { current_page: 1, last_page: 1, per_page: 20, total: 0, from: 0, to: 0 },
+        }
       }
     },
-
-    UPDATE_INVOICE_ITEM(state, { index, data }) {
-      const item = state.invoiceForm.items[index]
-      if (item) {
-        Object.assign(item, data)
-        const qty = parseFloat(item.quantity) || 0
-        const price = parseFloat(item.unit_price) || 0
-        const rate = parseFloat(item.tax_rate) || 0
-        const subtotal = qty * price
-        item.total = subtotal + (subtotal * (rate / 100))
-      }
+    SET_EXPORTED_FILES(state, files) {
+      state.exportedFiles = files || []
     },
-
-    ADD_INVOICE(state, invoice) {
-      state.invoices.unshift(invoice)
+    SET_SHOW_EXPORT_MODAL(state, show) {
+      state.showExportModal = show
     },
-
-    UPDATE_INVOICE(state, invoice) {
-      const index = state.invoices.findIndex(i => i.id === invoice.id)
-      if (index !== -1) {
-        state.invoices.splice(index, 1, invoice)
-      }
-      if (state.currentInvoice && state.currentInvoice.id === invoice.id) {
-        state.currentInvoice = invoice
-      }
+    SET_SHOW_EXPORTED_FILES(state, show) {
+      state.showExportedFiles = show
     },
-
-    DELETE_INVOICE(state, id) {
-      state.invoices = state.invoices.filter(i => i.id !== id)
-    }
+    SET_CLIENTS(state, clients) {
+      state.clients = clients || []
+    },
   },
 
   actions: {
-    // جلب الفواتير مع التصفية والترقيم
-    async fetchInvoices({ commit, state }, params = {}) {
+    // ── Initialization ─────────────────────────────────────
+    async init({ dispatch, commit }) {
+      commit('RESET_FILTERS')
+      await dispatch('fetchClients')
+      await dispatch('loadReport')
+    },
+
+    // ── Fetch clients for filter dropdown ──────────────────
+    async fetchClients({ commit }) {
+      try {
+        const response = await axios.get('/admin/clients')
+        const clients = response.data?.data || response.data || []
+        commit('SET_CLIENTS', clients)
+      } catch (error) {
+        console.error('Failed to fetch clients:', error)
+      }
+    },
+
+    // ── Load report based on active tab ─────────────────────
+    async loadReport({ state, commit }) {
       commit('SET_LOADING', true)
       commit('CLEAR_ERROR')
       NProgress.start()
 
       try {
-        const query = {
-          page: params.page || state.pagination.current_page || 1,
-          per_page: params.per_page || state.pagination.per_page || 10,
+        const endpoint = `/admin/reports/${state.activeTab}`
+        const params = { ...state.filters }
+
+        // Remove empty filters
+        Object.keys(params).forEach(key => {
+          if (params[key] === '' || params[key] === null || params[key] === undefined) {
+            delete params[key]
+          }
+        })
+
+        const response = await axios.get(endpoint, { params })
+
+        // Backend returns { success: true, data: {...} }
+        if (response.data.success) {
+          commit('SET_REPORT_DATA', {
+            type: state.activeTab,
+            data: response.data.data || {},
+          })
+        } else {
+          throw new Error(response.data.message || i18n.global.t('reports.load_failed'))
+        }
+      } catch (error) {
+        const message = error.response?.data?.message || error.message || i18n.global.t('reports.load_failed')
+        commit('SET_ERROR', message)
+      } finally {
+        NProgress.done()
+        commit('SET_LOADING', false)
+      }
+    },
+
+    // ── Switch tab ──────────────────────────────────────────
+    async switchTab({ commit, dispatch }, tab) {
+      commit('SET_ACTIVE_TAB', tab)
+      commit('SET_FILTERS', { page: 1 })
+      await dispatch('loadReport')
+    },
+
+    // ── Handle page change ─────────────────────────────────
+    async handlePageChange({ commit, dispatch }, page) {
+      commit('SET_FILTERS', { page })
+      await dispatch('loadReport')
+    },
+
+    // ── Reset filters ────────────────────────────────────────
+    async resetFilters({ commit, dispatch }) {
+      commit('RESET_FILTERS')
+      await dispatch('loadReport')
+    },
+
+    // ── Search with debounce helper ─────────────────────────────────
+    onSearch({ commit, dispatch }, search) {
+      commit('SET_FILTERS', { search, page: 1 })
+      dispatch('loadReport')
+    },
+
+    clearSearch({ commit, dispatch }) {
+      commit('SET_FILTERS', { search: '', page: 1 })
+      dispatch('loadReport')
+    },
+
+    // ── Export modal ────────────────────────────────────────
+    openExportModal({ commit }) {
+      commit('SET_SHOW_EXPORT_MODAL', true)
+    },
+    closeExportModal({ commit }) {
+      commit('SET_SHOW_EXPORT_MODAL', false)
+    },
+
+    // ── Direct export (download) ────────────────────────────
+    async handleDirectExport({ state, commit }) {
+      commit('SET_EXPORT_LOADING', true)
+      try {
+        const params = {
           ...state.filters,
-          ...params
+          download: 1,
+          lang: i18n.global.locale?.value || 'ar',
         }
-
-        const response = await axios.get('/admin/invoices', { params: query })
-
-        if (response.data.status) {
-          const data = response.data.data?.data || response.data.data || []
-          const pagination = response.data.data
-            ? {
-              current_page: response.data.data.current_page,
-              last_page: response.data.data.last_page,
-              per_page: response.data.data.per_page,
-              total: response.data.data.total
-            }
-            : null
-
-          commit('SET_INVOICES', { data, pagination })
-
-          if (data.length > 0) {
-            const stats = {
-              total: pagination?.total || data.length,
-              paid: data.filter(i => i.status === 'paid').length,
-              sent: data.filter(i => i.status === 'sent').length,
-              overdue: data.filter(i => i.status === 'overdue').length
-            }
-            commit('SET_STATS', stats)
+        Object.keys(params).forEach(key => {
+          if (params[key] === '' || params[key] === null || params[key] === undefined) {
+            delete params[key]
           }
+        })
 
-          return { data, pagination }
-        } else {
-          throw new Error(response.data.message || i18n.global.t('invoices.fetch_failed'))
+        const response = await axios.get(
+          `/admin/reports/export/${state.activeTab}`,
+          { params, responseType: 'blob' }
+        )
+
+        // Create download link
+        const blob = new Blob([response.data])
+        const url = window.URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = url
+        const reportNames = {
+          invoices: 'تقرير_الفواتير',
+          clients: 'تقرير_العملاء',
+          revenue: 'تقرير_الإيرادات',
+          overdue: 'تقرير_المتأخرات',
         }
+        link.setAttribute('download', `${reportNames[state.activeTab] || 'report'}_${new Date().toISOString().split('T')[0]}.xlsx`)
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        window.URL.revokeObjectURL(url)
       } catch (error) {
-        const message = error.response?.data?.message || error.message || i18n.global.t('invoices.fetch_failed')
-        commit('SET_ERROR', message)
-        throw new Error(message)
+        commit('SET_ERROR', i18n.global.t('reports.export_failed'))
+        throw error
       } finally {
-        NProgress.done()
-        commit('SET_LOADING', false)
+        commit('SET_EXPORT_LOADING', false)
       }
     },
 
-    // جلب فاتورة واحدة
-    async fetchInvoice({ commit }, id) {
-      commit('SET_LOADING', true)
-      commit('CLEAR_ERROR')
-      NProgress.start()
-
+    // ── Server export (save to server) ──────────────────────
+    async handleServerExport({ state, commit, dispatch }) {
+      commit('SET_EXPORT_LOADING', true)
       try {
-        const response = await axios.get(`/admin/invoices/${id}`)
-
-        if (response.data.status) {
-          const invoice = response.data.data
-          commit('SET_CURRENT_INVOICE', invoice)
-          return invoice
-        } else {
-          throw new Error(response.data.message || i18n.global.t('invoices.fetch_one_failed'))
+        const params = {
+          ...state.filters,
+          lang: i18n.global.locale?.value || 'ar',
         }
-      } catch (error) {
-        const message = error.response?.data?.message || error.message || i18n.global.t('invoices.fetch_one_failed')
-        commit('SET_ERROR', message)
-        throw new Error(message)
-      } finally {
-        NProgress.done()
-        commit('SET_LOADING', false)
-      }
-    },
-
-    // ✅ إنشاء فاتورة جديدة (تم إزالة dispatch غير المستخدم)
-    async createInvoice({ commit }, invoiceData) {
-      commit('SET_LOADING', true)
-      commit('CLEAR_ERROR')
-      commit('CLEAR_FORM_ERRORS')
-      NProgress.start()
-
-      try {
-        const cleanedData = {
-          ...invoiceData,
-          items: invoiceData.items.map(item => ({
-            description: item.description,
-            quantity: parseFloat(item.quantity) || 0,
-            unit_price: parseFloat(item.unit_price) || 0,
-            tax_rate: parseFloat(item.tax_rate) || 0
-          }))
-        }
-
-        const response = await axios.post('/admin/invoices', cleanedData)
-
-        if (response.data.status) {
-          const invoice = response.data.data
-          commit('ADD_INVOICE', invoice)
-          commit('CLEAR_INVOICE_FORM')
-          return invoice
-        } else {
-          throw new Error(response.data.message || i18n.global.t('invoices.create_failed'))
-        }
-      } catch (error) {
-        let message = i18n.global.t('invoices.create_failed')
-        if (error.response) {
-          if (error.response.status === 422 && error.response.data.errors) {
-            commit('SET_FORM_ERRORS', error.response.data.errors)
+        Object.keys(params).forEach(key => {
+          if (params[key] === '' || params[key] === null || params[key] === undefined) {
+            delete params[key]
           }
-          message = error.response.data?.message || error.message
-        }
-        commit('SET_ERROR', message)
-        throw new Error(message)
-      } finally {
-        NProgress.done()
-        commit('SET_LOADING', false)
-      }
-    },
+        })
 
-    // ✅ تحديث فاتورة (تم إزالة dispatch غير المستخدم)
-    async updateInvoice({ commit }, { id, data }) {
-      commit('SET_LOADING', true)
-      commit('CLEAR_ERROR')
-      commit('CLEAR_FORM_ERRORS')
-      NProgress.start()
+        const response = await axios.get(
+          `/admin/reports/export/${state.activeTab}`,
+          { params }
+        )
 
-      try {
-        const cleanedData = {
-          ...data,
-          items: data.items.map(item => ({
-            description: item.description,
-            quantity: parseFloat(item.quantity) || 0,
-            unit_price: parseFloat(item.unit_price) || 0,
-            tax_rate: parseFloat(item.tax_rate) || 0
-          }))
-        }
-
-        const response = await axios.put(`/admin/invoices/${id}`, cleanedData)
-
-        if (response.data.status) {
-          const invoice = response.data.data
-          commit('UPDATE_INVOICE', invoice)
-          return invoice
+        if (response.data.success) {
+          await dispatch('refreshExportedFiles')
         } else {
-          throw new Error(response.data.message || i18n.global.t('invoices.update_failed'))
+          throw new Error(response.data.message)
         }
       } catch (error) {
-        let message = i18n.global.t('invoices.update_failed')
-        if (error.response) {
-          if (error.response.status === 422 && error.response.data.errors) {
-            commit('SET_FORM_ERRORS', error.response.data.errors)
-          }
-          message = error.response.data?.message || error.message
-        }
-        commit('SET_ERROR', message)
-        throw new Error(message)
+        commit('SET_ERROR', error.response?.data?.message || i18n.global.t('reports.export_failed'))
+        throw error
       } finally {
-        NProgress.done()
-        commit('SET_LOADING', false)
+        commit('SET_EXPORT_LOADING', false)
       }
     },
 
-    // حذف فاتورة
-    async deleteInvoice({ commit }, id) {
-      commit('SET_LOADING', true)
-      commit('CLEAR_ERROR')
-      NProgress.start()
+    // ── Exported files ──────────────────────────────────────
+    async toggleExportedFiles({ state, commit, dispatch }) {
+      const newValue = !state.showExportedFiles
+      commit('SET_SHOW_EXPORTED_FILES', newValue)
+      if (newValue) {
+        await dispatch('refreshExportedFiles')
+      }
+    },
 
+    async refreshExportedFiles({ commit }) {
       try {
-        const response = await axios.delete(`/admin/invoices/${id}`)
-
-        if (response.data.status) {
-          commit('DELETE_INVOICE', id)
-          return true
-        } else {
-          throw new Error(response.data.message || i18n.global.t('invoices.delete_failed'))
+        const response = await axios.get('/admin/reports/exported-files')
+        if (response.data.success) {
+          commit('SET_EXPORTED_FILES', response.data.data || [])
         }
       } catch (error) {
-        const message = error.response?.data?.message || error.message || i18n.global.t('invoices.delete_failed')
-        commit('SET_ERROR', message)
-        throw new Error(message)
-      } finally {
-        NProgress.done()
-        commit('SET_LOADING', false)
+        console.error('Failed to fetch exported files:', error)
       }
     },
 
-    // تحديث حالة الفاتورة
-    async updateInvoiceStatus({ commit }, { id, status }) {
-      commit('SET_LOADING', true)
-      commit('CLEAR_ERROR')
-      NProgress.start()
-
+    async deleteExportedFile({ commit, dispatch }, fileName) {
       try {
-        let response
-        if (status === 'paid') {
-          response = await axios.put(`/admin/invoices/${id}/mark-paid`)
-        } else if (status === 'sent') {
-          response = await axios.post(`/admin/invoices/${id}/send`)
-        } else {
-          response = await axios.put(`/admin/invoices/${id}`, { status })
-        }
-
-        if (response.data.status) {
-          const invoice = response.data.data
-          commit('UPDATE_INVOICE', invoice)
-          return invoice
-        } else {
-          throw new Error(response.data.message || i18n.global.t('invoices.status_update_failed'))
-        }
+        await axios.delete('/admin/reports/exported-files/delete', {
+          data: { file_name: fileName }
+        })
+        await dispatch('refreshExportedFiles')
       } catch (error) {
-        const message = error.response?.data?.message || error.message || i18n.global.t('invoices.status_update_failed')
-        commit('SET_ERROR', message)
-        throw new Error(message)
-      } finally {
-        NProgress.done()
-        commit('SET_LOADING', false)
+        throw new Error(error.response?.data?.message || i18n.global.t('errors.deleteFailed'))
       }
     },
 
-    // تحديث المرشحات
-    setFilters({ commit }, filters) {
-      commit('SET_FILTERS', filters)
+    // ── Send reminder ─────────────────────────────────────
+    async sendReminder({ commit, dispatch }, invoiceId) {
+      try {
+        const response = await axios.post(`/admin/reports/send-reminder/${invoiceId}`)
+        if (response.data.success) {
+          await dispatch('loadReport')
+          return response.data
+        }
+        throw new Error(response.data.message)
+      } catch (error) {
+        commit('SET_ERROR', error.response?.data?.message || i18n.global.t('reports.reminder_failed'))
+        throw error
+      }
     },
 
-    // مسح المرشحات
-    clearFilters({ commit }) {
-      commit('SET_FILTERS', { status: '', date: '', search: '' })
+    // ── Mark as paid ────────────────────────────────────────
+    async markAsPaid({ commit, dispatch }, invoiceId) {
+      try {
+        const response = await axios.post(`/admin/reports/mark-paid/${invoiceId}`)
+        if (response.data.success) {
+          await dispatch('loadReport')
+          return response.data
+        }
+        throw new Error(response.data.message)
+      } catch (error) {
+        commit('SET_ERROR', error.response?.data?.message || i18n.global.t('reports.mark_paid_failed'))
+        throw error
+      }
     },
 
-    // تعيين بيانات نموذج الفاتورة
-    setInvoiceFormData({ commit }, formData) {
-      commit('SET_INVOICE_FORM', formData)
+    clearError({ commit }) {
+      commit('CLEAR_ERROR')
     },
-
-    // إضافة بند جديد في النموذج
-    addInvoiceItem({ commit }) {
-      commit('ADD_INVOICE_ITEM')
-    },
-
-    // حذف بند من النموذج
-    removeInvoiceItem({ commit }, index) {
-      commit('REMOVE_INVOICE_ITEM', index)
-    },
-
-    // تحديث بيانات بند في النموذج
-    updateInvoiceItem({ commit }, payload) {
-      commit('UPDATE_INVOICE_ITEM', payload)
-    },
-
-    // مسح النموذج بالكامل
-    clearInvoiceForm({ commit }) {
-      commit('CLEAR_INVOICE_FORM')
-      commit('CLEAR_FORM_ERRORS')
-    },
-
-    // توليد رقم فاتورة تلقائي
-    generateInvoiceNumber({ commit }) {
-      const now = new Date()
-      const year = now.getFullYear()
-      const month = String(now.getMonth() + 1).padStart(2, '0')
-      const day = String(now.getDate()).padStart(2, '0')
-      const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0')
-      const invoiceNumber = `INV-${year}${month}${day}-${random}`
-      commit('SET_INVOICE_FORM', { invoice_number: invoiceNumber })
-    }
-  }
+  },
 }

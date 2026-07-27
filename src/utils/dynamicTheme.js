@@ -55,7 +55,7 @@ const PALETTES = [
 
 const KEY_ENABLED = 'dynamicThemeEnabled'
 const KEY_INDEX = 'dynamicThemeIndex'
-const DEFAULT_INTERVAL_MS = 15000
+const DEFAULT_INTERVAL_MS = 60000 // 1 دقيقة
 
 let currentIndex = 0
 let timerId = null

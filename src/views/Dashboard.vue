@@ -2412,4 +2412,187 @@ export default {
 .empty-state.small p {
   font-size: 0.8rem;
 }
+
+/* ============================================================
+   الوضع الداكن (Dark Mode)
+   ============================================================
+   هذا المكوّن لا يستخدم كلاسات Tailwind (bg-white, text-gray-900...)
+   زي باقي صفحات المشروع — عنده نظام تصميم خاص فيه بألوان HEX
+   مباشرة داخل <style scoped>. لذلك تعديلات style.css المركزية
+   (اللي تستهدف أسماء كلاسات Tailwind) ما تصل له إطلاقاً، واحتاج
+   مجموعة قواعد ".dark" خاصة فيه هنا، بنفس درجات اللون المستخدمة
+   بباقي المشروع (slate-800/900/950) للتناسق البصري.
+   ============================================================ */
+.dark .dashboard-root {
+  background: #0b0f19;
+}
+
+.dark .loading-text {
+  color: #e2e8f0;
+}
+
+.dark .error-card {
+  background: #1e293b;
+  border-color: rgba(239, 68, 68, 0.25);
+}
+.dark .error-icon-wrap {
+  background: rgba(239, 68, 68, 0.12);
+}
+.dark .error-card h3 {
+  color: #f8fafc;
+}
+.dark .error-card p {
+  color: #94a3b8;
+}
+.dark .btn-ghost {
+  color: #94a3b8;
+  border-color: #334155;
+}
+.dark .btn-ghost:hover {
+  background: #0f172a;
+  color: #e2e8f0;
+}
+
+/* البطاقات الأساسية (KPI + Charts) */
+.dark .kpi-card,
+.dark .chart-card {
+  background: #1e293b;
+  border-color: #334155;
+}
+.dark .kpi-value,
+.dark .chart-title,
+.dark .chart-stat-val,
+.dark .status-count,
+.dark .act-title,
+.dark .act-amount,
+.dark .client-name,
+.dark .client-spent,
+.dark .qa-title {
+  color: #f8fafc;
+}
+.dark .status-name {
+  color: #cbd5e1;
+}
+.dark .chart-header {
+  border-bottom-color: #334155;
+}
+.dark .chart-footer-stats {
+  background: #0f172a;
+  border-top-color: #334155;
+}
+.dark .chart-stat-divider,
+.dark .radial-bg,
+.dark .kpi-progress-track {
+  background: #334155;
+  stroke: #334155;
+}
+
+/* أشرطة التقدّم والفواصل الرفيعة أسفل بطاقات KPI */
+.dark .kpi-bar-track {
+  background: #0f172a;
+}
+
+/* تبويبات الفترة الزمنية (1M/3M/6M/1Y) */
+.dark .period-tabs {
+  background: #0f172a;
+  border-color: #334155;
+}
+.dark .period-btn.active {
+  background: #1e293b;
+  color: #a5b4fc;
+}
+.dark .period-btn:not(.active):hover {
+  color: #cbd5e1;
+}
+
+/* حالات التمرير (hover) على العناصر القابلة للنقر */
+.dark .status-item:hover {
+  background: #0f172a;
+  border-color: #334155;
+}
+.dark .icon-btn {
+  background: #0f172a;
+  border-color: #334155;
+  color: #94a3b8;
+}
+.dark .icon-btn:hover {
+  background: #334155;
+  color: #f1f5f9;
+}
+.dark .activity-item:hover,
+.dark .client-item:hover {
+  background: #0f172a;
+}
+
+/* روابط وأزرار بألوان تمييز فاتحة — نحوّلها لنسخة شفافة تناسب الخلفية الداكنة */
+.dark .view-link,
+.dark .text-btn:hover {
+  background: rgba(99, 102, 241, 0.15);
+  color: #a5b4fc;
+}
+.dark .qa-blue {
+  background: rgba(99, 102, 241, 0.1);
+  border-color: rgba(99, 102, 241, 0.25);
+}
+.dark .qa-green {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.25);
+}
+.dark .qa-purple {
+  background: rgba(124, 58, 237, 0.1);
+  border-color: rgba(124, 58, 237, 0.25);
+}
+.dark .qa-blue .qa-icon {
+  background: rgba(99, 102, 241, 0.2);
+}
+.dark .qa-green .qa-icon {
+  background: rgba(16, 185, 129, 0.2);
+}
+.dark .qa-purple .qa-icon {
+  background: rgba(124, 58, 237, 0.2);
+}
+
+/* أيقونات بطاقات KPI ونشاطات القائمة — نفس فكرة الشفافية أعلاه */
+.dark .kpi-green .kpi-icon-wrap {
+  background: rgba(5, 150, 105, 0.15);
+}
+.dark .kpi-blue .kpi-icon-wrap {
+  background: rgba(99, 102, 241, 0.15);
+}
+.dark .kpi-purple .kpi-icon-wrap {
+  background: rgba(124, 58, 237, 0.15);
+}
+.dark .kpi-amber .kpi-icon-wrap {
+  background: rgba(217, 119, 6, 0.15);
+}
+.dark .act-green {
+  background: rgba(5, 150, 105, 0.15);
+}
+.dark .act-blue {
+  background: rgba(99, 102, 241, 0.15);
+}
+.dark .act-purple {
+  background: rgba(124, 58, 237, 0.15);
+}
+.dark .act-teal {
+  background: rgba(13, 148, 136, 0.15);
+}
+.dark .act-gray {
+  background: #0f172a;
+  color: #94a3b8;
+}
+.dark .trend-up {
+  background: rgba(22, 163, 74, 0.15);
+}
+.dark .trend-down {
+  background: rgba(220, 38, 38, 0.15);
+}
+
+/* أوصاف ثانوية باهتة — تفتيح بسيط ليبقى التباين مريحاً على خلفية داكنة */
+.dark .act-desc,
+.dark .client-company,
+.dark .qa-desc,
+.dark .status-amount {
+  color: #64748b;
+}
 </style>
