@@ -44,7 +44,12 @@
         <!-- Total Groups -->
         <div class="stats-card bg-gradient-to-br from-blue-50 to-blue-100">
           <div class="stats-icon bg-blue-100">
-            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              class="w-6 h-6 text-blue-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -62,7 +67,12 @@
         <!-- Total Permissions -->
         <div class="stats-card bg-gradient-to-br from-purple-50 to-purple-100">
           <div class="stats-icon bg-purple-100">
-            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              class="w-6 h-6 text-purple-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -80,7 +90,12 @@
         <!-- Selected Permissions (if group selected) -->
         <div class="stats-card bg-gradient-to-br from-green-50 to-green-100">
           <div class="stats-icon bg-green-100">
-            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              class="w-6 h-6 text-green-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -423,7 +438,7 @@
                 <div v-else>
                   <div class="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div
-                      class="bg-gradient-to-br from-blue-50 to-blue-100/30 rounded-xl border border-blue-200/50 p-5 "
+                      class="bg-gradient-to-br from-blue-50 to-blue-100/30 rounded-xl border border-blue-200/50 p-5"
                     >
                       <div class="text-2xl font-bold text-blue-600 mb-1">
                         {{ selectedPermissionIds.length }}
@@ -556,7 +571,7 @@
                 <div class="mt-8 pt-6 border-t border-gray-200/50">
                   <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div class="text-sm text-gray-600">
-                       <!--{{
+                      <!--{{
                         $t('permissions.selected_count', {
                           selected: selectedPermissionIds.length,
                           total: permissions.length,
@@ -870,3 +885,4 @@ button:hover:not(:disabled) {
   background: #94a3b8;
 }
 </style>
+ 

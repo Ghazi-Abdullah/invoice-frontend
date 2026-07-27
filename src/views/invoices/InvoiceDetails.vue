@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-6 md:py-8">
     <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
-      <!-- Header -->
+      <!-- ============ Header ============ -->
       <div class="mb-8">
         <div
           class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6"
@@ -76,7 +76,7 @@
         </div>
       </div>
 
-      <!-- Loading State -->
+      <!-- ============ Loading State ============ -->
       <div v-if="loading" class="flex flex-col items-center justify-center py-12">
         <div
           class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-200 border-t-blue-600 mb-4"
@@ -84,7 +84,7 @@
         <p class="text-gray-600 text-lg mt-4">{{ $t('common.loading') || 'جاري التحميل...' }}</p>
       </div>
 
-      <!-- Not Found State -->
+      <!-- ============ Not Found State ============ -->
       <div
         v-else-if="notFound"
         class="bg-yellow-50 border border-yellow-200 rounded-xl p-8 text-center"
@@ -116,7 +116,7 @@
         </button>
       </div>
 
-      <!-- Error State -->
+      <!-- ============ Error State ============ -->
       <div v-else-if="error" class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
         <div class="flex items-start">
           <svg
@@ -157,8 +157,8 @@
         </div>
       </div>
 
-      <!-- Invoice Details -->
-      <div v-else-if="invoice" class="space-y-6" id="invoiceDetails">
+      <!-- ============ Invoice Details ============ -->
+      <div v-else-if="invoice" class="space-y-6">
         <!-- شريط تنبيه "مدفوعة — التعديل غير متاح" -->
         <div
           v-if="invoice.status === 'paid'"
@@ -249,7 +249,7 @@
 
           <div class="p-6">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <!-- العمود الأول -->
+              <!-- العمود الأول: التواريخ -->
               <div class="space-y-3">
                 <div class="flex items-center gap-2">
                   <svg
@@ -328,7 +328,7 @@
                 </div>
               </div>
 
-              <!-- العمود الثاني -->
+              <!-- العمود الثاني: العميل -->
               <div class="space-y-3">
                 <h3 class="text-sm font-semibold text-gray-700 border-b border-gray-200 pb-1">
                   {{ $t('clients.client') || 'العميل' }}
@@ -381,7 +381,7 @@
                 </div>
               </div>
 
-              <!-- العمود الثالث -->
+              <!-- العمود الثالث: الملخص المالي -->
               <div class="space-y-3">
                 <h3 class="text-sm font-semibold text-gray-700 border-b border-gray-200 pb-1">
                   {{ $t('invoices.summary') || 'ملخص' }}
@@ -572,13 +572,23 @@
         </div>
       </div>
 
-      <!-- Action Buttons -->
+      <!-- ============ Installment Plan Section ============ -->
+      <InstallmentPlanSection
+        v-if="invoice"
+        :invoice-id="invoice.id"
+        :invoice-total="invoice.total"
+        :can-manage="canManageInstallments"
+        @generate-link="openPaymentLinkForInstallment"
+      />
+
+      <!-- ============ Action Buttons ============ -->
       <div
         v-if="invoice"
         class="bg-white rounded-xl border border-gray-200 shadow-sm p-4 mt-6 flex flex-wrap gap-3 justify-between items-center"
       >
-        <!-- الأزرار اليسرى: طباعة، إيميل، Stripe -->
+        <!-- الأزرار اليسرى: طباعة، إيميل، رابط دفع، Stripe -->
         <div class="flex flex-wrap gap-3">
+          <!-- ✅ تم إصلاح زر الطباعة: أعدنا الدالة الأصلية printInvoice -->
           <button
             @click="printInvoice"
             class="px-4 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition flex items-center gap-2"
@@ -608,6 +618,22 @@
               />
             </svg>
             {{ $t('invoices.sendEmail') || 'إرسال بالبريد' }}
+          </button>
+
+          <button
+            v-if="invoice.status !== 'paid'"
+            @click="openPaymentLinkGenerator"
+            class="px-4 py-2 border border-indigo-300 text-indigo-600 rounded-lg hover:bg-indigo-50 transition flex items-center gap-2"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M13.828 10.172a4 4 0 010 5.656l-3 3a4 4 0 01-5.656-5.656l1.5-1.5M10.172 13.828a4 4 0 010-5.656l3-3a4 4 0 015.656 5.656l-1.5 1.5"
+              />
+            </svg>
+            {{ $t('payment_links.title') || 'رابط دفع' }}
           </button>
 
           <button
@@ -647,8 +673,45 @@
           </button>
         </div>
 
-        <!-- الأزرار اليمنى -->
+        <!-- الأزرار اليمنى: تغيير حالة الفاتورة -->
         <div class="flex flex-wrap gap-3">
+          <button
+            v-if="invoice.status !== 'paid' && hasEditPermission"
+            @click="markAsPaid"
+            :disabled="markPaidLoading"
+            class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <svg
+              v-if="markPaidLoading"
+              class="animate-spin w-4 h-4"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              />
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+              />
+            </svg>
+            <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            {{ $t('invoices.markAsPaid') || 'تعليم كمدفوعة' }}
+          </button>
+
           <router-link
             v-if="hasEditPermission && invoice.status !== 'paid'"
             :to="`/invoices/${invoice.id}/edit`"
@@ -715,12 +778,13 @@
         </div>
       </div>
 
-      <!-- Installment Plan Section -->
-      <InstallmentPlanSection
+      <!-- ============ مولد روابط الدفع ============ -->
+      <PaymentLinkGenerator
         v-if="invoice"
-        :invoice-id="invoice.id"
-        :invoice-total="invoice.total"
-        :can-manage="canManageInstallments"
+        :show="showPaymentLinkGenerator"
+        :invoice="invoice"
+        :initial-installment-number="installmentToPreselect"
+        @close="showPaymentLinkGenerator = false"
       />
     </div>
   </div>
@@ -728,12 +792,15 @@
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
+import { nextTick } from 'vue'
 import moment from 'moment'
 import InstallmentPlanSection from '@/components/invoices/InstallmentPlanSection.vue'
+import PaymentLinkGenerator from '@/components/invoices/PaymentLinkGenerator.vue'
 
 export default {
   components: {
     InstallmentPlanSection,
+    PaymentLinkGenerator,
   },
   name: 'InvoiceDetails',
 
@@ -749,6 +816,9 @@ export default {
       hasDeletePermission: false,
       stripeLoading: false,
       cancelLoading: false,
+      markPaidLoading: false,
+      showPaymentLinkGenerator: false,
+      installmentToPreselect: null,
     }
   },
 
@@ -759,9 +829,8 @@ export default {
       return this.invoice?.status === 'paid'
     },
 
-    // دمج صلاحيات التعديل وإنشاء الأقساط في متحساب واحد
     canManageInstallments() {
-      return this.hasEditPermission // أو يمكن إضافة صلاحية منفصلة مستقبلاً
+      return this.hasEditPermission
     },
   },
 
@@ -825,6 +894,120 @@ export default {
       this.$router.replace({ query: {} })
     },
 
+    /* =========================================================
+       ✅ دالة الطباعة الأصلية المُعاد إدراجها (من النسخة القديمة)
+       ========================================================= */
+    printInvoice() {
+      const invoice = this.invoice
+      if (!invoice) return
+
+      // تحديث وقت الطباعة في كل مرة
+      this.printedOn = moment().format('DD-MM-YYYY hh:mm a')
+
+      const currentLocale = this.$i18n.locale
+      const dir = currentLocale === 'ar' ? 'rtl' : 'ltr'
+      const printWindow = window.open('', '_blank')
+
+      const styles = `
+        <style>
+          @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap');
+          body { font-family: 'Tajawal', sans-serif; direction: ${dir}; padding: 30px; background: #fff; color: #333; margin: 0; }
+          .invoice-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e5e7eb; padding-bottom: 20px; margin-bottom: 20px; }
+          .invoice-title h1 { font-size: 24px; font-weight: bold; color: #1e3a8a; margin: 0; }
+          .status-badge { display: inline-block; padding: 6px 12px; border-radius: 9999px; font-size: 14px; font-weight: 600; }
+          .status-draft { background: #f3f4f6; color: #1f2937; }
+          .status-sent { background: #dbeafe; color: #1e40af; }
+          .status-paid { background: #d1fae5; color: #065f46; }
+          .status-overdue { background: #fee2e2; color: #991b1b; }
+          .status-cancelled { background: #e5e7eb; color: #4b5563; }
+          .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
+          .client-box { background: #f9fafb; padding: 15px; border-radius: 8px; border: 1px solid #e5e7eb; margin-bottom: 30px; }
+          .client-name { font-size: 16px; font-weight: 600; }
+          table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+          th { background: #f3f4f6; padding: 12px; text-align: center; font-size: 14px; font-weight: 600; color: #374151; border: 1px solid #d1d5db; }
+          td { padding: 10px; text-align: center; border: 1px solid #d1d5db; }
+          .text-start { text-align: start; }
+          .totals { width: 300px; margin-inline-start: auto; background: #f9fafb; padding: 15px; border-radius: 8px; border: 1px solid #e5e7eb; }
+          .totals-row { display: flex; justify-content: space-between; padding: 5px 0; }
+          .border-top { border-top: 2px solid #d1d5db; margin-top: 10px; padding-top: 10px; font-weight: bold; }
+          .footer { margin-top: 40px; text-align: center; font-size: 12px; color: #6b7280; border-top: 1px solid #e5e7eb; padding-top: 20px; }
+        </style>
+      `
+
+      const itemsHtml = invoice.items
+        .map(
+          (item) => `
+        <tr>
+          <td class="text-start">${item.description} ${item.notes ? `<br><small>${item.notes}</small>` : ''}</td>
+          <td>${item.quantity}</td>
+          <td>${this.formatCurrency(item.unit_price)}</td>
+          <td>${this.formatCurrency(item.total)}</td>
+        </tr>
+      `,
+        )
+        .join('')
+
+      const html = `
+        <html dir="${dir}">
+          <head>
+            <title>${this.$t('invoices.invoice') || 'فاتورة'} ${invoice.invoice_number}</title>
+            ${styles}
+          </head>
+          <body>
+            <div class="invoice-header">
+              <div class="invoice-title">
+                <h1>${this.$t('invoices.invoice') || 'فاتورة'} رقم ${invoice.invoice_number}</h1>
+              </div>
+              <div><span class="status-badge status-${invoice.status}">${this.getStatusText(invoice.status)}</span></div>
+            </div>
+            <div class="grid-3">
+              <div>${this.$t('invoices.issueDate') || 'تاريخ الإصدار'}: ${this.formatDate(invoice.invoice_date)}</div>
+              <div>${this.$t('invoices.dueDate') || 'تاريخ الاستحقاق'}: ${this.formatDate(invoice.due_date)}</div>
+              ${invoice.paid_at ? `<div>${this.$t('invoices.paymentDate') || 'تاريخ الدفع'}: ${this.formatDate(invoice.paid_at)}</div>` : ''}
+            </div>
+            <div class="client-box">
+              <div class="client-name">${this.$t('clients.client') || 'العميل'}: ${invoice.client?.name || 'N/A'}</div>
+              <div>${this.$t('clients.email') || 'البريد'}: ${invoice.client?.email || 'N/A'}</div>
+              <div>${this.$t('clients.phone') || 'الهاتف'}: ${invoice.client?.phone || 'N/A'}</div>
+              ${invoice.client?.company_name && invoice.client.company_name !== '.' ? `<div>${invoice.client.company_name}</div>` : ''}
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>${this.$t('invoices.description') || 'الوصف'}</th>
+                  <th>${this.$t('invoices.quantity') || 'الكمية'}</th>
+                  <th>${this.$t('invoices.unitPrice') || 'سعر الوحدة'}</th>
+                  <th>${this.$t('invoices.total') || 'الإجمالي'}</th>
+                </tr>
+              </thead>
+              <tbody>${itemsHtml}</tbody>
+            </table>
+            <div class="totals">
+              <div class="totals-row"><span>${this.$t('invoices.subtotal') || 'المجموع الفرعي'}:</span><span>${this.formatCurrency(invoice.subtotal)}</span></div>
+              ${parseFloat(invoice.discount_amount) > 0 ? `<div class="totals-row"><span>${this.$t('invoices.discount') || 'الخصم'}:</span><span>${this.formatCurrency(invoice.discount_amount)}</span></div>` : ''}
+              <div class="totals-row"><span>${this.$t('invoices.tax') || 'الضريبة'} (${invoice.tax_rate || 0}%):</span><span>${this.formatCurrency(invoice.tax_amount)}</span></div>
+              <div class="totals-row border-top"><span>${this.$t('invoices.total') || 'الإجمالي'}:</span><span>${this.formatCurrency(invoice.total)}</span></div>
+            </div>
+            <div class="footer">
+              <div>تم الإنشاء بواسطة ${invoice.created_by?.name || 'N/A'} في ${this.formatDateTime(invoice.created_at)}</div>
+              <div>تمت الطباعة بواسطة ${this.printedBy} في ${this.printedOn}</div>
+            </div>
+          </body>
+        </html>
+      `
+
+      printWindow.document.write(html)
+      printWindow.document.close()
+      printWindow.focus()
+      printWindow.print()
+      printWindow.close()
+    },
+
+    openPaymentLinkGenerator() {
+      this.installmentToPreselect = null
+      this.showPaymentLinkGenerator = true
+    },
+
     async payWithStripe() {
       this.stripeLoading = true
       try {
@@ -837,6 +1020,38 @@ export default {
       } finally {
         this.stripeLoading = false
       }
+    },
+
+    async markAsPaid() {
+      const result = await this.$swal.fire({
+        title: this.$t('invoices.markPaidConfirmTitle') || 'تعليم الفاتورة كمدفوعة؟',
+        text:
+          this.$t('invoices.markPaidConfirmText') ||
+          'سيتم تحديث حالة الفاتورة إلى "مدفوعة" مباشرة (دفعة يدوية/نقدية).',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#16A34A',
+        cancelButtonColor: '#6B7280',
+        confirmButtonText: this.$t('invoices.confirmMarkPaid') || 'نعم، تعليم كمدفوعة',
+        cancelButtonText: this.$t('common.back') || 'تراجع',
+      })
+      if (!result.isConfirmed) return
+
+      this.markPaidLoading = true
+      try {
+        await this.updateInvoiceStatus({ id: this.invoice.id, status: 'paid' })
+        this.$toast.success(this.$t('invoices.markPaidSuccess') || 'تم تعليم الفاتورة كمدفوعة')
+        await this.loadInvoice()
+      } catch (err) {
+        this.$toast.error(err.message || 'فشل تحديث حالة الفاتورة')
+      } finally {
+        this.markPaidLoading = false
+      }
+    },
+
+    openPaymentLinkForInstallment(inst) {
+      this.installmentToPreselect = inst.installment_number
+      this.showPaymentLinkGenerator = true
     },
 
     confirmCancel() {
@@ -932,108 +1147,6 @@ export default {
         cancelled: this.$t('invoices.status.cancelled') || 'ملغاة',
       }
       return map[status] || status
-    },
-
-    printInvoice() {
-      const invoice = this.invoice
-      if (!invoice) return
-
-      const currentLocale = this.$i18n.locale
-      const dir = currentLocale === 'ar' ? 'rtl' : 'ltr'
-      const printWindow = window.open('', '_blank')
-
-      const styles = `
-        <style>
-          body { font-family: 'Tajawal', sans-serif; direction: ${dir}; padding: 30px; background: #fff; color: #333; margin: 0; }
-          .invoice-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e5e7eb; padding-bottom: 20px; margin-bottom: 20px; }
-          .invoice-title h1 { font-size: 24px; font-weight: bold; color: #1e3a8a; margin: 0; }
-          .status-badge { display: inline-block; padding: 6px 12px; border-radius: 9999px; font-size: 14px; font-weight: 600; }
-          .status-draft { background: #f3f4f6; color: #1f2937; }
-          .status-sent { background: #dbeafe; color: #1e40af; }
-          .status-paid { background: #d1fae5; color: #065f46; }
-          .status-overdue { background: #fee2e2; color: #991b1b; }
-          .status-cancelled { background: #e5e7eb; color: #4b5563; }
-          .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
-          .client-box { background: #f9fafb; padding: 15px; border-radius: 8px; border: 1px solid #e5e7eb; margin-bottom: 30px; }
-          .client-name { font-size: 16px; font-weight: 600; }
-          table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-          th { background: #f3f4f6; padding: 12px; text-align: center; font-size: 14px; font-weight: 600; color: #374151; border: 1px solid #d1d5db; }
-          td { padding: 10px; text-align: center; border: 1px solid #d1d5db; }
-          .text-start { text-align: start; }
-          .totals { width: 300px; margin-inline-start: auto; background: #f9fafb; padding: 15px; border-radius: 8px; border: 1px solid #e5e7eb; }
-          .totals-row { display: flex; justify-content: space-between; padding: 5px 0; }
-          .border-top { border-top: 2px solid #d1d5db; margin-top: 10px; padding-top: 10px; font-weight: bold; }
-          .footer { margin-top: 40px; text-align: center; font-size: 12px; color: #6b7280; border-top: 1px solid #e5e7eb; padding-top: 20px; }
-        </style>
-      `
-
-      const itemsHtml = invoice.items
-        .map(
-          (item) => `
-        <tr>
-          <td class="text-start">${item.description} ${item.notes ? `<br><small>${item.notes}</small>` : ''}</td>
-          <td>${item.quantity}</td>
-          <td>${this.formatCurrency(item.unit_price)}</td>
-          <td>${this.formatCurrency(item.total)}</td>
-        </tr>
-      `,
-        )
-        .join('')
-
-      const html = `
-        <html dir="${dir}">
-          <head>
-            <title>${this.$t('invoices.invoice') || 'فاتورة'} ${invoice.invoice_number}</title>
-            ${styles}
-          </head>
-          <body>
-            <div class="invoice-header">
-              <div class="invoice-title">
-                <h1>${this.$t('invoices.invoice') || 'فاتورة'} رقم ${invoice.invoice_number}</h1>
-              </div>
-              <div><span class="status-badge status-${invoice.status}">${this.getStatusText(invoice.status)}</span></div>
-            </div>
-            <div class="grid-3">
-              <div>${this.$t('invoices.issueDate') || 'تاريخ الإصدار'}: ${this.formatDate(invoice.invoice_date)}</div>
-              <div>${this.$t('invoices.dueDate') || 'تاريخ الاستحقاق'}: ${this.formatDate(invoice.due_date)}</div>
-              ${invoice.paid_at ? `<div>${this.$t('invoices.paymentDate') || 'تاريخ الدفع'}: ${this.formatDate(invoice.paid_at)}</div>` : ''}
-            </div>
-            <div class="client-box">
-              <div class="client-name">${this.$t('clients.client') || 'العميل'}: ${invoice.client?.name || 'N/A'}</div>
-              <div>${this.$t('clients.email') || 'البريد'}: ${invoice.client?.email || 'N/A'}</div>
-              <div>${this.$t('clients.phone') || 'الهاتف'}: ${invoice.client?.phone || 'N/A'}</div>
-              ${invoice.client?.company_name && invoice.client.company_name !== '.' ? `<div>${invoice.client.company_name}</div>` : ''}
-            </div>
-            <table>
-              <thead>
-                <tr>
-                  <th>${this.$t('invoices.description') || 'الوصف'}</th>
-                  <th>${this.$t('invoices.quantity') || 'الكمية'}</th>
-                  <th>${this.$t('invoices.unitPrice') || 'سعر الوحدة'}</th>
-                  <th>${this.$t('invoices.total') || 'الإجمالي'}</th>
-                </tr>
-              </thead>
-              <tbody>${itemsHtml}</tbody>
-            </table>
-            <div class="totals">
-              <div class="totals-row"><span>${this.$t('invoices.subtotal') || 'المجموع الفرعي'}:</span><span>${this.formatCurrency(invoice.subtotal)}</span></div>
-              ${parseFloat(invoice.discount_amount) > 0 ? `<div class="totals-row"><span>${this.$t('invoices.discount') || 'الخصم'}:</span><span>${this.formatCurrency(invoice.discount_amount)}</span></div>` : ''}
-              <div class="totals-row"><span>${this.$t('invoices.tax') || 'الضريبة'} (${invoice.tax_rate || 0}%):</span><span>${this.formatCurrency(invoice.tax_amount)}</span></div>
-              <div class="totals-row border-top"><span>${this.$t('invoices.total') || 'الإجمالي'}:</span><span>${this.formatCurrency(invoice.total)}</span></div>
-            </div>
-            <div class="footer">
-              <div>تم الإنشاء بواسطة ${invoice.created_by?.name || 'N/A'} في ${this.formatDateTime(invoice.created_at)}</div>
-              <div>تمت الطباعة بواسطة ${this.printedBy} في ${this.printedOn}</div>
-            </div>
-          </body>
-        </html>
-      `
-
-      printWindow.document.write(html)
-      printWindow.document.close()
-      printWindow.focus()
-      printWindow.print()
-      printWindow.close()
     },
 
     sendEmail() {

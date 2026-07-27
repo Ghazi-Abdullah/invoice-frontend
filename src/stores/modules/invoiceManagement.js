@@ -283,7 +283,7 @@ export default {
     },
 
     // إنشاء فاتورة جديدة
-    async createInvoice({ commit, dispatch }, invoiceData) {
+    async createInvoice({ commit /*, dispatch*/ }, invoiceData) {
       commit('SET_LOADING', true)
       commit('CLEAR_ERROR')
       commit('CLEAR_FORM_ERRORS')

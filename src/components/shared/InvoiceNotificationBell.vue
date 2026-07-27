@@ -88,7 +88,7 @@
           <!-- فواتير غير مدفوعة -->
           <button
             v-if="unpaidCount > 0"
-            @click="goTo('invoices', { status: 'unpaid' })"
+            @click="goTo('Invoices', { status: 'unpaid' })"
             class="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors group"
           >
             <span class="flex items-center gap-3 min-w-0">
@@ -123,7 +123,7 @@
           <!-- فواتير متأخرة -->
           <button
             v-if="overdueCount > 0"
-            @click="goTo('invoices', { status: 'overdue' })"
+            @click="goTo('Invoices', { status: 'overdue' })"
             class="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors group"
           >
             <span class="flex items-center gap-3 min-w-0">
@@ -154,6 +154,41 @@
               {{ overdueCount }}
             </span>
           </button>
+
+          <!-- فواتير تستحق قريباً -->
+          <button
+            v-if="dueSoonCount > 0"
+            @click="goTo('Invoices', { status: 'sent' })"
+            class="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors group"
+          >
+            <span class="flex items-center gap-3 min-w-0">
+              <span
+                class="flex items-center justify-center w-9 h-9 rounded-lg bg-blue-50 text-blue-600 group-hover:bg-blue-100 transition-colors shrink-0"
+              >
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </span>
+              <span class="text-sm font-medium text-gray-800 truncate">
+                {{ $t('notifications.due_soon_invoices', 'Due Soon') }}
+              </span>
+            </span>
+            <span
+              class="shrink-0 flex items-center justify-center min-w-[24px] h-6 px-1 text-xs font-bold text-blue-700 bg-blue-100 rounded-full"
+            >
+              {{ dueSoonCount }}
+            </span>
+          </button>
         </div>
       </div>
     </transition>
@@ -161,7 +196,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 
 export default {
   name: 'InvoiceNotificationBell',
@@ -169,37 +204,50 @@ export default {
     return { open: false }
   },
   computed: {
-    ...mapGetters({
-      unpaidCount: 'invoiceNotifications/unpaidCount',
-      overdueCount: 'invoiceNotifications/overdueCount',
-      totalCount: 'invoiceNotifications/totalCount',
-      hasNew: 'invoiceNotifications/hasNew',
-    }),
+    ...mapGetters('invoiceNotifications', [
+      'unpaidCount',
+      'overdueCount',
+      'dueSoonCount',
+      'totalCount',
+      'hasNew',
+    ]),
     isRtl() {
-      return this.$i18n.locale === 'ar'
+      return this.$i18n?.locale === 'ar'
     },
   },
   methods: {
+    ...mapActions('invoiceNotifications', ['fetchInitialCounts', 'refreshCounts']),
+
     toggle() {
       this.open = !this.open
-      if (!this.open) this.$store.commit('invoiceNotifications/CLEAR_NEW')
+      if (this.open) {
+        this.refreshCounts()
+      }
     },
+
     goTo(routeName, query = {}) {
       this.open = false
+      this.$store.commit('invoiceNotifications/CLEAR_NEW')
       this.$router.push({ name: routeName, query })
     },
+
     handleClickOutside(e) {
-      if (this.$refs.bellRef && !this.$refs.bellRef.contains(e.target)) this.open = false
+      if (this.$refs.bellRef && !this.$refs.bellRef.contains(e.target)) {
+        this.open = false
+      }
     },
+
     handleEscape(e) {
       if (e.key === 'Escape') this.open = false
     },
   },
   mounted() {
+    this.$store.dispatch('invoiceNotifications/startListening')
     document.addEventListener('click', this.handleClickOutside)
     document.addEventListener('keydown', this.handleEscape)
   },
   beforeUnmount() {
+    this.$store.dispatch('invoiceNotifications/stopListening')
     document.removeEventListener('click', this.handleClickOutside)
     document.removeEventListener('keydown', this.handleEscape)
   },

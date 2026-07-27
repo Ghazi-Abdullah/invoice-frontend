@@ -593,6 +593,47 @@
                       </div>
                     </div>
                   </div>
+
+                  <!-- خطة الأقساط -->
+                  <div class="border-t pt-6">
+                    <div class="flex items-center justify-between">
+                      <div>
+                        <h4 class="text-lg font-bold">{{ $t('installments.title') }}</h4>
+                        <p class="text-gray-600">
+                          {{
+                            $t('installments.create_offer_description') ||
+                            'يمكنك تقسيط مبلغ هذه الفاتورة على العميل بعد إنشائها مباشرة.'
+                          }}
+                        </p>
+                      </div>
+                      <label class="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          v-model="wantsInstallmentPlan"
+                          class="sr-only peer"
+                          :disabled="
+                            invoiceData.status === 'paid' || invoiceData.status === 'draft'
+                          "
+                        />
+                        <div
+                          class="w-14 h-7 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:right-[4px] after:bg-white after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-blue-600"
+                        ></div>
+                      </label>
+                    </div>
+                    <p v-if="invoiceData.status === 'draft'" class="text-xs text-gray-400 mt-2">
+                      {{
+                        $t('installments.not_available_for_draft') ||
+                        'خطط الأقساط متاحة فقط للفواتير غير المسودة.'
+                      }}
+                    </p>
+                    <p v-else-if="wantsInstallmentPlan" class="text-xs text-blue-600 mt-2">
+                      {{
+                        $t('installments.offer_hint') ||
+                        'سنعرض عليك إعداد خطة الأقساط مباشرة بعد حفظ الفاتورة.'
+                      }}
+                    </p>
+                  </div>
+
                   <div class="border-t pt-6">
                     <div class="flex items-center justify-between">
                       <div>
@@ -604,7 +645,7 @@
                           type="checkbox"
                           v-model="invoiceData.enable_stripe_checkout"
                           class="sr-only peer"
-                          :disabled="invoiceData.status === 'paid'"
+                          :disabled="invoiceData.status === 'paid' || wantsInstallmentPlan"
                         />
                         <div
                           class="w-14 h-7 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:right-[4px] after:bg-white after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-blue-600"
@@ -651,6 +692,23 @@
                       formatCurrency(invoiceData.total)
                     }}</span>
                   </div>
+                  <div
+                    v-if="wantsInstallmentPlan"
+                    class="flex items-center gap-2 mt-3 text-sm text-blue-700"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    {{
+                      $t('installments.will_offer_after_save') ||
+                      'سيتم فتح إعداد خطة الأقساط بعد حفظ الفاتورة'
+                    }}
+                  </div>
                 </div>
                 <div class="flex justify-between pt-6 mt-6 border-t">
                   <button
@@ -672,7 +730,7 @@
                       class="px-6 py-2.5 bg-blue-600 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
                       :disabled="loading || !isFormValid"
                     >
-                      {{ loading ? ($t('common.loading') || 'جاري...') : getSubmitButtonText() }}
+                      {{ loading ? $t('common.loading') || 'جاري...' : getSubmitButtonText() }}
                     </button>
                   </div>
                 </div>
@@ -703,14 +761,29 @@
         </div>
       </div>
     </div>
+
+    <!-- خطة الأقساط — تُعرض بعد إنشاء الفاتورة مباشرة إذا اختار المستخدم ذلك في الخطوة 3 -->
+    <CreateInstallmentPlanModal
+      v-if="newInvoiceId"
+      :show="showInstallmentModal"
+      :invoice-id="newInvoiceId"
+      :invoice-total="newInvoiceTotal"
+      :submitting="false"
+      @close="finishAndRedirect"
+      @created="finishAndRedirect"
+    />
   </div>
 </template>
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
+import CreateInstallmentPlanModal from '@/components/invoices/CreateInstallmentPlanModal.vue'
 
 export default {
   name: 'CreateInvoice',
+  components: {
+    CreateInstallmentPlanModal,
+  },
   data() {
     return {
       minStripeAmount: 5,
@@ -762,6 +835,11 @@ export default {
           iconBg: 'bg-red-100',
         },
       ],
+      // خطة الأقساط
+      wantsInstallmentPlan: false,
+      newInvoiceId: null,
+      newInvoiceTotal: 0,
+      showInstallmentModal: false,
     }
   },
   computed: {
@@ -810,7 +888,11 @@ export default {
 
     generateInvoiceNumber() {
       const d = new Date()
-      this.invoiceData.invoice_number = `INV-${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`
+      this.invoiceData.invoice_number = `INV-${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}-${Math.floor(
+        Math.random() * 1000,
+      )
+        .toString()
+        .padStart(3, '0')}`
     },
 
     nextStep() {
@@ -826,6 +908,10 @@ export default {
       if (status === 'paid') {
         this.invoiceData.payment_date = new Date().toISOString().split('T')[0]
         this.invoiceData.enable_stripe_checkout = false
+        this.wantsInstallmentPlan = false
+      }
+      if (status === 'draft') {
+        this.wantsInstallmentPlan = false
       }
     },
 
@@ -855,6 +941,7 @@ export default {
 
     saveAsDraft() {
       this.invoiceData.status = 'draft'
+      this.wantsInstallmentPlan = false
       this.submitInvoice()
     },
 
@@ -875,6 +962,8 @@ export default {
 
     getSubmitButtonText() {
       if (this.invoiceData.status === 'paid') return this.$t('common.create_and_mark_paid')
+      if (this.wantsInstallmentPlan)
+        return this.$t('installments.create_and_setup_plan') || this.$t('common.create_invoice')
       if (this.invoiceData.status === 'sent') return this.$t('common.create_and_send')
       if (this.invoiceData.enable_stripe_checkout) return this.$t('common.create_and_enable_stripe')
       return this.$t('common.create_invoice')
@@ -892,11 +981,21 @@ export default {
       return true
     },
 
+    finishAndRedirect() {
+      this.showInstallmentModal = false
+      if (this.newInvoiceId) {
+        this.$router.push(`/invoices/${this.newInvoiceId}`)
+      } else {
+        this.$router.push('/invoices')
+      }
+    },
+
     async submitInvoice() {
       this.errors = {}
 
       if (!this.invoiceData.client_id) this.errors.client_id = this.$t('validation.client_required')
-      if (!this.invoiceData.invoice_date) this.errors.invoice_date = this.$t('validation.date_required')
+      if (!this.invoiceData.invoice_date)
+        this.errors.invoice_date = this.$t('validation.date_required')
       if (!this.invoiceData.due_date) this.errors.due_date = this.$t('validation.date_required')
       if (!this.invoiceData.status) this.errors.status = this.$t('validation.status_required')
 
@@ -932,6 +1031,17 @@ export default {
 
         // ✅ الإصلاح الرئيسي: التوجيه لصفحة تفاصيل الفاتورة المنشأة
         if (result && result.invoice && result.invoice.id) {
+          this.newInvoiceId = result.invoice.id
+          this.newInvoiceTotal = result.invoice.total
+
+          // إذا اختار المستخدم إعداد خطة أقساط في الخطوة 3، افتح النافذة
+          // المخصصة لذلك (نفس المكوّن المستخدم في صفحة تفاصيل الفاتورة)
+          // بدل التوجيه المباشر.
+          if (this.wantsInstallmentPlan) {
+            this.showInstallmentModal = true
+            return
+          }
+
           this.$router.push(`/invoices/${result.invoice.id}`)
         } else {
           this.$router.push('/invoices')

@@ -86,16 +86,52 @@
                 </span>
               </td>
               <td class="px-4 py-2 text-center">
-                <button
-                  v-if="['pending', 'overdue'].includes(inst.status) && canManage"
-                  @click="pay(inst)"
-                  class="px-3 py-1 bg-green-500 text-white rounded-lg hover:bg-green-600 text-sm"
-                >
-                  {{ $t('installments.mark_paid') }}
-                </button>
-                <span v-else-if="inst.status === 'paid'" class="text-gray-500 text-xs">
-                  {{ formatDate(inst.paid_at) }}
-                </span>
+                <div class="flex items-center justify-center gap-1.5">
+                  <button
+                    v-if="['pending', 'overdue'].includes(inst.status) && canManage"
+                    @click="pay(inst)"
+                    class="px-3 py-1 bg-green-500 text-white rounded-lg hover:bg-green-600 text-sm"
+                  >
+                    {{ $t('installments.mark_paid') }}
+                  </button>
+                  <span v-else-if="inst.status === 'paid'" class="text-gray-500 text-xs">
+                    {{ formatDate(inst.paid_at) }}
+                  </span>
+
+                  <!-- رابط دفع لهذا القسط تحديدًا -->
+                  <button
+                    v-if="inst.status === 'pending' && canManage"
+                    @click="$emit('generate-link', inst)"
+                    class="p-1.5 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                    :title="$t('payment_links.title')"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M13.828 10.172a4 4 0 010 5.656l-3 3a4 4 0 01-5.656-5.656l1.5-1.5M10.172 13.828a4 4 0 010-5.656l3-3a4 4 0 015.656 5.656l-1.5 1.5"
+                      />
+                    </svg>
+                  </button>
+
+                  <!-- حذف القسط + إعادة توزيع المتبقي -->
+                  <button
+                    v-if="inst.status === 'pending' && canManage"
+                    @click="removeInstallment(inst)"
+                    class="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    :title="$t('installments.delete_and_redistribute')"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                      />
+                    </svg>
+                  </button>
+                </div>
               </td>
             </tr>
           </tbody>
@@ -128,6 +164,7 @@ export default {
     // canCreate لم تعد مستخدمة، يمكن حذفها، لكن نبقيها للتوافق
     canCreate: { type: Boolean, default: false },
   },
+  emits: ['generate-link'],
   data() {
     return {
       showCreateModal: false,
@@ -143,7 +180,12 @@ export default {
     this.fetchPlan(this.invoiceId)
   },
   methods: {
-    ...mapActions('installments', ['fetchPlan', 'payInstallment', 'cancelPlan']),
+    ...mapActions('installments', [
+      'fetchPlan',
+      'payInstallment',
+      'cancelPlan',
+      'deleteInstallment',
+    ]),
     formatCurrency,
     formatDate,
     statusClass(status) {
@@ -176,6 +218,21 @@ export default {
         this.fetchPlan(this.invoiceId)
       } catch (e) {
         this.$toast?.error(e.response?.data?.message || this.$t('installments.pay_failed'))
+      }
+    },
+    async removeInstallment(inst) {
+      if (
+        !confirm(
+          this.$t('installments.confirm_delete_redistribute', { number: inst.installment_number }),
+        )
+      )
+        return
+      try {
+        await this.deleteInstallment(inst.id)
+        this.$toast?.success(this.$t('installments.delete_success'))
+        this.fetchPlan(this.invoiceId)
+      } catch (e) {
+        this.$toast?.error(e.response?.data?.message || this.$t('installments.delete_failed'))
       }
     },
     async confirmCancel() {

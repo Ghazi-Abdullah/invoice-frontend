@@ -57,6 +57,36 @@ const routes = [
         meta: { permission: 'view_invoices' },
       },
       {
+        path: 'privacy',
+        name: 'PrivacyPolicy',
+        component: () => import('@/views/legal/PrivacyPolicy.vue'),
+        meta: { title: 'privacy.title' },
+      },
+      {
+        path: 'terms',
+        name: 'TermsOfService',
+        component: () => import('@/views/legal/TermsOfService.vue'),
+        meta: { title: 'terms.title' },
+      },
+      {
+        path: 'support',
+        name: 'ContactSupport',
+        component: () => import('@/views/support/ContactSupport.vue'),
+        meta: { title: 'support.title' },
+      },
+      {
+        path: '/support/tickets',
+        name: 'SupportTicketList',
+        component: () => import('@/views/support/SupportTicketList.vue'),
+        meta: { requiresAuth: true }
+      },
+      {
+        path: '/support/tickets/:id',
+        name: 'SupportTicketDetails',
+        component: () => import('@/views/support/SupportTicketDetails.vue'),
+        // meta: { requiresAuth: true } // إذا كنت في لوحة الأدمن
+      },
+      {
         path: 'invoices/:id/edit',
         name: 'EditInvoice',
         component: () => import('@/views/invoices/EditInvoice.vue'),

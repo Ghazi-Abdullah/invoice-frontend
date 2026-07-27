@@ -286,7 +286,7 @@ export default {
       }
     },
 
-    async deleteExportedFile({ commit, dispatch }, fileName) {
+    async deleteExportedFile({ /*commit,*/ dispatch }, fileName) {
       try {
         await axios.delete('/admin/reports/exported-files/delete', {
           data: { file_name: fileName }

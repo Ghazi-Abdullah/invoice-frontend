@@ -17,12 +17,17 @@ import profile from './modules/profile'
 import activity from './modules/activity'
 import invoiceNotifications from './modules/invoiceNotifications'
 import installments from './modules/installments'
+import paymentLinks from './modules/paymentLinks'
+import support from './modules/support'
+import content from './modules/content'
+
+
 
 
 export default createStore({
   state: {
     appLoading: false,
-    appError: null, 
+    appError: null,
     appSuccess: null,
     theme: localStorage.getItem('theme') || 'light'
   },
@@ -95,6 +100,9 @@ export default createStore({
     profile: profile,
     activity: activity,
     invoiceNotifications: invoiceNotifications,
-    installments: installments
+    installments: installments,
+    paymentLinks: paymentLinks,
+    support: support,
+    content: content
   }
 })

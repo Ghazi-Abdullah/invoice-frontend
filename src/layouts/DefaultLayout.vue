@@ -161,6 +161,7 @@
                 :class="$i18n.locale === 'ar' ? 'right-0' : 'left-0'"
               ></div>
             </router-link>
+            
           </div>
 
           <div v-if="sidebarOpen" class="pt-4 mt-2 border-t border-slate-700/50"></div>
@@ -236,6 +237,43 @@
             <div
               v-if="$route.path === '/clients'"
               class="absolute top-1/2 -translate-y-1/2 w-1 h-6 rounded-full bg-blue-500"
+              :class="$i18n.locale === 'ar' ? 'right-0' : 'left-0'"
+            ></div>
+          </router-link>
+
+           <!-- ✅ Support Tickets -->
+          <router-link
+            v-if="hasPermission('administration')"
+            to="/support/tickets"
+            @click="closeSidebarOnMobile"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative"
+            :class="[
+              !sidebarOpen && !isMobile ? 'justify-center' : '',
+              $route.path.includes('/support/tickets')
+                ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-sm shadow-emerald-500/10'
+                : 'text-slate-400 hover:bg-slate-800/60 hover:text-white',
+            ]"
+            :title="!sidebarOpen && !isMobile ? t('nav.support_tickets') : ''"
+          >
+            <svg
+              class="w-5 h-5 flex-shrink-0"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155"
+              />
+            </svg>
+            <span v-if="sidebarOpen" class="text-sm font-medium transition-colors">
+              {{ t('nav.support_tickets') }}
+            </span>
+            <div
+              v-if="$route.path.includes('/support/tickets')"
+              class="absolute top-1/2 -translate-y-1/2 w-1 h-6 rounded-full bg-emerald-500"
               :class="$i18n.locale === 'ar' ? 'right-0' : 'left-0'"
             ></div>
           </router-link>
@@ -787,17 +825,21 @@
           </Transition>
         </router-view>
       </main>
+
+      <!-- Footer -->
+      <Footer />
     </div>
   </div>
 </template>
 
 <script>
 import InvoiceNotificationBell from '@/components/shared/InvoiceNotificationBell.vue'
+import Footer from './Footer.vue'
 import { toggleDarkMode, isDarkMode } from '@/utils/darkMode'
 
 export default {
   name: 'DefaultLayout',
-  components: { InvoiceNotificationBell },
+  components: { InvoiceNotificationBell, Footer },
   props: {
     enableI18n: { type: Boolean, default: true },
   },
