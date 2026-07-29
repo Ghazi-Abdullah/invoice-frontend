@@ -82,7 +82,7 @@
             class="px-6 py-5 border-b border-gray-100 dark:border-slate-700 bg-gradient-to-r from-gray-50/80 to-white dark:from-slate-800 dark:to-slate-800"
           >
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div class="flex items-center gap-3">
+              <div class="flex items-center gap-3 flex-wrap">
                 <span
                   class="font-mono text-sm font-bold text-gray-900 dark:text-white bg-gray-100 dark:bg-slate-700 px-3 py-1.5 rounded-lg"
                   >{{ ticket.ticket_number }}</span
@@ -91,11 +91,95 @@
                   statusLabel(ticket.status)
                 }}</span>
               </div>
-              <div class="flex items-center gap-3">
+              <div class="flex items-center gap-3 flex-wrap">
                 <span :class="priorityBadgeClass(ticket.priority)">
                   <span class="w-1.5 h-1.5 rounded-full bg-current mr-1.5 inline-block"></span>
                   {{ priorityLabel(ticket.priority) }}
                 </span>
+
+                <!-- حقل تعديل الحالة + زر الحفظ -->
+                <div class="flex items-center gap-2">
+                  <div class="relative">
+                    <select
+                      v-model="pendingStatus"
+                      :disabled="submitting"
+                      class="pl-9 pr-4 py-2 border border-gray-200 dark:border-slate-600 rounded-lg text-sm font-medium bg-white dark:bg-slate-700 text-gray-700 dark:text-slate-200 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 disabled:opacity-50 cursor-pointer appearance-none"
+                    >
+                      <option value="open">{{ $t('support.open') || 'مفتوحة' }}</option>
+                      <option value="in_progress">
+                        {{ $t('support.in_progress') || 'قيد المعالجة' }}
+                      </option>
+                      <option value="closed">{{ $t('support.closed') || 'مغلقة' }}</option>
+                    </select>
+                    <svg
+                      class="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </div>
+
+                  <!-- زر حفظ التعديلات -->
+                  <button
+                    v-if="pendingStatus !== ticket.status"
+                    @click="handleSaveStatus"
+                    :disabled="submitting"
+                    class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 flex items-center gap-1.5"
+                  >
+                    <svg
+                      v-if="submitting"
+                      class="animate-spin w-3.5 h-3.5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        class="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        stroke-width="4"
+                      ></circle>
+                      <path
+                        class="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    <svg
+                      v-else
+                      class="w-3.5 h-3.5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2.5"
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                    {{ $t('common.save') || 'حفظ' }}
+                  </button>
+
+                  <!-- زر إلغاء -->
+                  <button
+                    v-if="pendingStatus !== ticket.status"
+                    @click="pendingStatus = ticket.status"
+                    class="px-3 py-2 text-gray-500 dark:text-slate-400 hover:text-red-500 dark:hover:text-red-400 border border-gray-200 dark:border-slate-600 rounded-lg text-sm font-medium transition-colors"
+                  >
+                    {{ $t('common.cancel') || 'إلغاء' }}
+                  </button>
+                </div>
+
                 <button
                   v-if="ticket.status !== 'closed'"
                   @click="handleClose"
@@ -290,24 +374,33 @@
 </template>
 
 <script>
-import axios from 'axios'
+import { mapState, mapActions } from 'vuex'
 
 export default {
   name: 'SupportTicketDetails',
 
   data() {
     return {
-      ticket: null,
-      loading: false,
-      submitting: false,
-      error: null,
       replyMessage: '',
+      pendingStatus: '',
     }
   },
 
   computed: {
+    ...mapState('support', ['ticket', 'loading', 'submitting', 'error']),
     ticketId() {
       return parseInt(this.$route.params.id)
+    },
+  },
+
+  watch: {
+    ticket: {
+      immediate: true,
+      handler(newTicket) {
+        if (newTicket) {
+          this.pendingStatus = newTicket.status
+        }
+      },
     },
   },
 
@@ -316,62 +409,37 @@ export default {
   },
 
   methods: {
-    async fetchTicket(id) {
-      this.loading = true
-      this.error = null
-      this.ticket = null
-
-      try {
-        // ✅ axios سيرسل التوكن تلقائياً إذا ضبطت interceptor
-        const { data } = await axios.get(`/api/admin/support/tickets/${id}`)
-        this.ticket = data.data || data
-      } catch (error) {
-        console.error('Error fetching ticket:', error)
-        this.error = error.response?.data?.message || 'فشل في تحميل التذكرة'
-
-        // إذا غير مصرح، انقله للدخول
-        if (error.response?.status === 401) {
-          this.error = 'Unauthenticated.'
-        }
-      } finally {
-        this.loading = false
-      }
-    },
+    ...mapActions('support', ['fetchTicket', 'replyToTicket', 'closeTicket', 'updateTicketStatus']),
 
     async handleReply() {
       if (!this.replyMessage.trim()) return
-      this.submitting = true
       try {
-        const { data } = await axios.post(`/api/admin/support/tickets/${this.ticketId}/replies`, {
-          message: this.replyMessage,
-        })
+        await this.replyToTicket({ id: this.ticketId, message: this.replyMessage })
         this.replyMessage = ''
-        if (data.data?.replies) {
-          this.ticket.replies = data.data.replies
-        } else {
-          await this.fetchTicket(this.ticketId)
-        }
-        if (data.data?.status) {
-          this.ticket.status = data.data.status
-        }
       } catch (error) {
-        console.error('Error replying:', error)
         if (error.response?.status === 401) {
           alert('انتهت الجلسة، سيتم تحويلك لتسجيل الدخول')
           this.$router.push('/login')
         }
-      } finally {
-        this.submitting = false
       }
     },
 
     async handleClose() {
       if (!confirm(this.$t('support.confirm_close') || 'هل أنت متأكد من إغلاق التذكرة؟')) return
       try {
-        await axios.patch(`/api/admin/support/tickets/${this.ticketId}/close`)
-        this.ticket.status = 'closed'
+        await this.closeTicket(this.ticketId)
+        this.pendingStatus = 'closed'
       } catch (error) {
-        console.error('Error closing ticket:', error)
+        if (error.response?.status === 401) {
+          this.$router.push('/login')
+        }
+      }
+    },
+
+    async handleSaveStatus() {
+      try {
+        await this.updateTicketStatus({ id: this.ticketId, status: this.pendingStatus })
+      } catch (error) {
         if (error.response?.status === 401) {
           this.$router.push('/login')
         }
@@ -391,7 +459,7 @@ export default {
     formatDateTime(dateString) {
       if (!dateString) return ''
       const date = new Date(dateString)
-      return new Intl.DateTimeFormat(this.$i18n?.locale === 'ar' ? 'ar-SA' : 'en-US', {
+      return new Intl.DateTimeFormat(this.$i18n.locale === 'ar' ? 'ar-SA' : 'en-US', {
         year: 'numeric',
         month: 'short',
         day: 'numeric',

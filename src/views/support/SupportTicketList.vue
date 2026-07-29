@@ -209,6 +209,44 @@
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
       </div>
 
+      <!-- Error State -->
+      <div
+        v-else-if="error"
+        class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50 rounded-2xl p-8 text-center"
+      >
+        <svg
+          class="w-12 h-12 text-red-500 mx-auto mb-3"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="1.5"
+            d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"
+          />
+        </svg>
+        <h3 class="text-lg font-bold text-red-700 dark:text-red-400 mb-2">
+          {{ error === 'Unauthenticated.' ? 'يجب تسجيل الدخول أولاً' : 'خطأ في تحميل التذاكر' }}
+        </h3>
+        <p class="text-sm text-red-600 dark:text-red-300 mb-4">{{ error }}</p>
+        <button
+          v-if="error === 'Unauthenticated.'"
+          @click="$router.push('/login')"
+          class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+        >
+          تسجيل الدخول
+        </button>
+        <button
+          v-else
+          @click="loadTickets(pagination.current_page)"
+          class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+        >
+          إعادة المحاولة
+        </button>
+      </div>
+
       <!-- Empty State -->
       <div
         v-else-if="!hasTickets"
@@ -303,7 +341,7 @@
               class="bg-white dark:bg-slate-800 divide-y divide-gray-100 dark:divide-slate-700"
             >
               <tr
-                v-for="ticket in filteredTickets"
+                v-for="ticket in tickets"
                 :key="ticket.id"
                 class="hover:bg-gray-50/50 dark:hover:bg-slate-700/30 transition-colors group"
               >
@@ -392,7 +430,7 @@
                     </router-link>
                     <button
                       v-if="ticket.status !== 'closed'"
-                      @click="closeTicket(ticket.id)"
+                      @click="handleCloseTicket(ticket.id)"
                       class="p-2 text-gray-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all"
                       :title="$t('support.close') || 'إغلاق'"
                     >
@@ -451,23 +489,13 @@
 </template>
 
 <script>
-import axios from 'axios'
+import { mapState, mapGetters, mapActions } from 'vuex'
 
 export default {
   name: 'SupportTicketList',
 
   data() {
     return {
-      tickets: [],
-      loading: false,
-      submitting: false,
-      error: null,
-      pagination: {
-        current_page: 1,
-        last_page: 1,
-        per_page: 10,
-        total: 0,
-      },
       filters: {
         status: '',
         priority: '',
@@ -478,119 +506,36 @@ export default {
   },
 
   computed: {
-    openTickets() {
-      return this.tickets.filter((t) => t.status === 'open')
-    },
-    closedTickets() {
-      return this.tickets.filter((t) => t.status === 'closed')
-    },
-    inProgressTickets() {
-      return this.tickets.filter((t) => t.status === 'in_progress')
-    },
-    hasTickets() {
-      return this.tickets.length > 0
-    },
-    filteredTickets() {
-      let result = [...this.tickets]
-      if (this.filters.status) {
-        result = result.filter((t) => t.status === this.filters.status)
-      }
-      if (this.filters.priority) {
-        result = result.filter((t) => t.priority === this.filters.priority)
-      }
-      if (this.filters.search) {
-        const q = this.filters.search.toLowerCase()
-        result = result.filter(
-          (t) =>
-            t.ticket_number?.toLowerCase().includes(q) ||
-            t.subject?.toLowerCase().includes(q) ||
-            t.name?.toLowerCase().includes(q) ||
-            t.email?.toLowerCase().includes(q),
-        )
-      }
-      return result
-    },
+    ...mapState('support', ['tickets', 'loading', 'error', 'pagination']),
+    ...mapGetters('support', ['openTickets', 'closedTickets', 'inProgressTickets', 'hasTickets']),
     hasActiveFilters() {
       return this.filters.status || this.filters.priority || this.filters.search
     },
   },
 
   mounted() {
-    this.fetchTickets()
+    this.loadTickets()
   },
 
   methods: {
-    async fetchTickets(page = 1) {
-      this.loading = true
-      this.error = null
-      try {
-        const params = {
-          page,
-          per_page: this.pagination.per_page,
-          ...this.filters,
-        }
-        const { data } = await axios.get('/api/admin/support/tickets', { params })
-        this.tickets = data.data || data
-        if (data.meta) {
-          this.pagination = data.meta
-        }
-      } catch (error) {
-        console.error('Error fetching tickets:', error)
-        this.error = error.response?.data?.message || 'فشل في تحميل التذاكر'
-        // Fallback demo data
-        this.tickets = [
-          {
-            id: 1,
-            ticket_number: 'TKT-001',
-            name: 'أحمد محمد',
-            email: 'ahmed@example.com',
-            subject: 'مشكلة في إنشاء فاتورة',
-            message: 'لا أستطيع إضافة عناصر للفاتورة الجديدة',
-            status: 'open',
-            priority: 'high',
-            created_at: '2026-07-25T10:00:00Z',
-            replies_count: 2,
-          },
-          {
-            id: 2,
-            ticket_number: 'TKT-002',
-            name: 'سارة علي',
-            email: 'sara@example.com',
-            subject: 'استفسار عن الأقساط',
-            message: 'كيف يمكنني تعديل خطة الأقساط؟',
-            status: 'in_progress',
-            priority: 'medium',
-            created_at: '2026-07-24T14:30:00Z',
-            replies_count: 1,
-          },
-          {
-            id: 3,
-            ticket_number: 'TKT-003',
-            name: 'خالد عبدالله',
-            email: 'khaled@example.com',
-            subject: 'خطأ في الدفع',
-            message: 'ظهر خطأ أثناء معالجة الدفع عبر Stripe',
-            status: 'closed',
-            priority: 'high',
-            created_at: '2026-07-20T09:15:00Z',
-            replies_count: 4,
-          },
-        ]
-      } finally {
-        this.loading = false
-      }
+    ...mapActions('support', ['fetchTickets', 'closeTicket']),
+
+    loadTickets(page = 1) {
+      this.fetchTickets({
+        page,
+        per_page: this.pagination.per_page,
+        ...this.filters,
+      }).catch(() => {})
     },
 
-    async closeTicket(id) {
+    async handleCloseTicket(id) {
       if (!confirm(this.$t('support.confirm_close') || 'هل أنت متأكد من إغلاق التذكرة؟')) return
       try {
-        await axios.patch(`/api/admin/support/tickets/${id}/close`)
-        const index = this.tickets.findIndex((t) => t.id === id)
-        if (index !== -1) {
-          this.tickets[index].status = 'closed'
-        }
+        await this.closeTicket(id)
       } catch (error) {
-        console.error('Error closing ticket:', error)
+        if (error.response?.status === 401) {
+          this.$router.push('/login')
+        }
       }
     },
 
@@ -602,18 +547,18 @@ export default {
     },
 
     applyFilters() {
-      this.fetchTickets(1)
+      this.loadTickets(1)
     },
 
     changePage(page) {
       if (page >= 1 && page <= this.pagination.last_page) {
-        this.fetchTickets(page)
+        this.loadTickets(page)
       }
     },
 
     clearAllFilters() {
       this.filters = { status: '', priority: '', search: '' }
-      this.fetchTickets(1)
+      this.loadTickets(1)
     },
 
     getInitials(name) {
@@ -629,7 +574,7 @@ export default {
     formatDate(dateString) {
       if (!dateString) return ''
       const date = new Date(dateString)
-      return new Intl.DateTimeFormat(this.$i18n?.locale === 'ar' ? 'ar-SA' : 'en-US', {
+      return new Intl.DateTimeFormat(this.$i18n.locale === 'ar' ? 'ar-SA' : 'en-US', {
         year: 'numeric',
         month: 'short',
         day: 'numeric',
