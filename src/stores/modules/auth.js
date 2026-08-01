@@ -71,7 +71,7 @@ export default {
   },
 
   actions: {
-    // تسجيل الدخول
+    // تسجيل الدخول// تسجيل الدخول
     async login({ commit, dispatch }, credentials) {
       commit('SET_LOADING', true)
       commit('SET_LOGIN_ERROR', null)
@@ -81,20 +81,30 @@ export default {
         const response = await axios.post('/admin/login', credentials)
 
         if (response.data.status && response.data.data) {
+          // ✅ الدخول لم يعد يُصدر توكن مباشرة — الباك يرسل OTP
+          // وينتظر خطوة verifyOtp لإتمام تسجيل الدخول فعلياً
+          if (response.data.data.requires_otp) {
+            commit('SET_LOGIN_ERROR', null)
+            return {
+              success: true,
+              requiresOtp: true,
+              email: response.data.data.email,
+              message: response.data.message,
+            }
+          }
+
+          // مسار احتياطي فقط (غير متوقع الوصول له بعد تفعيل OTP الإلزامي)
           const { user, token, permissions, is_admin } = response.data.data
-
-          localStorage.setItem('token', token)
-          localStorage.setItem('user', JSON.stringify(user))
-          axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
-
-          commit('SET_USER', user)
-          commit('SET_TOKEN', token)
-          commit('SET_PERMISSIONS', permissions || [])
-          commit('SET_IS_ADMIN', is_admin || false)
-          commit('SET_LOGIN_ERROR', null)
-
-          await dispatch('loadMenus')
-
+          if (token) {
+            localStorage.setItem('token', token)
+            localStorage.setItem('user', JSON.stringify(user))
+            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+            commit('SET_USER', user)
+            commit('SET_TOKEN', token)
+            commit('SET_PERMISSIONS', permissions || [])
+            commit('SET_IS_ADMIN', is_admin || false)
+            await dispatch('loadMenus')
+          }
           return { success: true, data: response.data.data }
         } else {
           const message = response.data.message || i18n.global.t('auth.login_failed')
@@ -141,7 +151,8 @@ export default {
       return { success: true, message: i18n.global.t('auth.logout_success') }
     },
 
-    // إرسال رمز التحقق (OTP)
+
+    // إرسال/إعادة إرسال رمز التحقق (OTP) — لا يحتاج نتيجة user_id بعد الآن
     async sendOtp({ commit }, email) {
       commit('SET_LOADING', true)
       commit('SET_LOGIN_ERROR', null)
@@ -151,10 +162,9 @@ export default {
         const response = await axios.post('/admin/send-otp', { email })
 
         if (response.data.status) {
-          return {
-            success: true,
-            user_id: response.data.data.user_id
-          }
+          // ✅ الباك لا يرجّع أي بيانات (data: null دائماً) لمنع كشف
+          // وجود الحساب من عدمه — نستخدم البريد نفسه لاحقاً بـ verifyOtp
+          return { success: true, email }
         } else {
           const message = response.data.message || i18n.global.t('auth.otp_send_failed')
           commit('SET_LOGIN_ERROR', message)
@@ -170,14 +180,14 @@ export default {
       }
     },
 
-    // التحقق من رمز OTP
-    async verifyOtp({ commit, dispatch }, { user_id, otp }) {
+    // التحقق من رمز OTP — بالبريد الإلكتروني بدل user_id
+    async verifyOtp({ commit, dispatch }, { email, otp }) {
       commit('SET_LOADING', true)
       commit('SET_LOGIN_ERROR', null)
       NProgress.start()
 
       try {
-        const response = await axios.post('/admin/verify-otp', { user_id, otp })
+        const response = await axios.post('/admin/verify-otp', { email, otp })
 
         if (response.data.status && response.data.data) {
           const { user, token, permissions, is_admin } = response.data.data

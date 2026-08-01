@@ -1,13 +1,13 @@
 <template>
   <div
-    class="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 flex items-center justify-center p-4"
+    class="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center p-4"
   >
     <!-- Main Container -->
     <div class="w-full max-w-md">
       <!-- Header with Logo -->
       <div class="text-center mb-12">
         <div
-          class="inline-flex items-center justify-center w-20 h-20 bg-white rounded-2xl shadow-lg mb-6"
+          class="inline-flex items-center justify-center w-20 h-20 bg-white dark:bg-slate-800 rounded-2xl shadow-lg mb-6"
         >
           <div
             class="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center"
@@ -15,63 +15,80 @@
             <font-awesome-icon :icon="['fas', 'file-invoice-dollar']" class="text-white text-2xl" />
           </div>
         </div>
-        <h1 class="text-3xl font-bold text-gray-800 mb-3">{{ $t('auth.welcomeBack') }}</h1>
-        <p class="text-gray-600">{{ $t('auth.loginSubtitle') }}</p>
+        <h1 class="text-3xl font-bold text-gray-800 dark:text-white mb-3">
+          {{ $t('auth.welcomeBack') }}
+        </h1>
+        <p class="text-gray-600 dark:text-slate-400">{{ $t('auth.loginSubtitle') }}</p>
       </div>
 
       <!-- Login Form Card -->
-      <div class="bg-white rounded-2xl shadow-xl p-8 mb-8">
+      <div
+        class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-8 mb-8 border border-transparent dark:border-slate-700"
+      >
         <form @submit.prevent="handleLogin" class="space-y-6">
           <!-- Email Field -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
+            <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
               {{ $t('auth.email') }}
             </label>
             <div class="relative">
               <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <font-awesome-icon :icon="['fas', 'envelope']" class="text-gray-400" />
+                <font-awesome-icon
+                  :icon="['fas', 'envelope']"
+                  class="text-gray-400 dark:text-slate-500"
+                />
               </div>
               <input
                 v-model="form.email"
                 type="email"
                 required
                 placeholder="you@example.com"
-                class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                class="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white dark:bg-slate-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
               />
             </div>
-            <p v-if="errors.email" class="mt-1 text-sm text-red-600">{{ errors.email }}</p>
+            <p v-if="errors.email" class="mt-1 text-sm text-red-600 dark:text-red-400">
+              {{ errors.email }}
+            </p>
           </div>
 
           <!-- Password Field -->
           <div>
             <div class="flex items-center justify-between mb-2">
-              <label class="block text-sm font-medium text-gray-700">
+              <label class="block text-sm font-medium text-gray-700 dark:text-slate-300">
                 {{ $t('auth.password') }}
               </label>
-              <router-link to="/forgot-password" class="text-sm text-blue-600 hover:text-blue-800">
+              <router-link
+                to="/forgot-password"
+                class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
+              >
                 {{ $t('auth.forgot_password') }}
               </router-link>
             </div>
             <div class="relative">
               <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <font-awesome-icon :icon="['fas', 'lock']" class="text-gray-400" />
+                <font-awesome-icon
+                  :icon="['fas', 'lock']"
+                  class="text-gray-400 dark:text-slate-500"
+                />
               </div>
               <input
                 v-model="form.password"
                 :type="showPassword ? 'text' : 'password'"
                 required
                 placeholder="••••••••"
-                class="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                class="w-full pl-10 pr-12 py-3 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white dark:bg-slate-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
               />
               <button
                 type="button"
                 @click="showPassword = !showPassword"
-                class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300"
               >
                 <font-awesome-icon :icon="showPassword ? ['fas', 'eye-slash'] : ['fas', 'eye']" />
               </button>
             </div>
-            <p v-if="errors.password" class="mt-1 text-sm text-red-600">{{ errors.password }}</p>
+            <p v-if="errors.password" class="mt-1 text-sm text-red-600 dark:text-red-400">
+              {{ errors.password }}
+            </p>
           </div>
 
           <!-- Remember Me -->
@@ -80,21 +97,27 @@
               id="remember-me"
               v-model="rememberMe"
               type="checkbox"
-              class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-slate-600 rounded dark:bg-slate-700"
             />
-            <label for="remember-me" class="ml-2 block text-sm text-gray-900">
+            <label for="remember-me" class="ml-2 block text-sm text-gray-900 dark:text-slate-300">
               {{ $t('auth.remember_me') }}
             </label>
           </div>
 
           <!-- Error Message -->
-          <div v-if="error" class="p-4 bg-red-50 border-l-4 border-red-500 rounded">
+          <div
+            v-if="error"
+            class="p-4 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 dark:border-red-600 rounded"
+          >
             <div class="flex">
               <div class="flex-shrink-0">
-                <font-awesome-icon :icon="['fas', 'exclamation-circle']" class="text-red-500" />
+                <font-awesome-icon
+                  :icon="['fas', 'exclamation-circle']"
+                  class="text-red-500 dark:text-red-400"
+                />
               </div>
               <div class="ml-3">
-                <p class="text-sm text-red-700">{{ error }}</p>
+                <p class="text-sm text-red-700 dark:text-red-300">{{ error }}</p>
               </div>
             </div>
           </div>
@@ -103,7 +126,7 @@
           <button
             type="submit"
             :disabled="loading"
-            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            class="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <div class="flex items-center justify-center">
               <span v-if="loading">
@@ -119,25 +142,38 @@
         </form>
 
         <!-- Divider -->
-        <div class="mt-8 pt-6 border-t border-gray-200 text-center">
-          <p class="text-gray-600">
+        <div class="mt-8 pt-6 border-t border-gray-200 dark:border-slate-700 text-center">
+          <p class="text-gray-600 dark:text-slate-400">
             {{ $t('auth.noAccount') }}
-            <router-link to="/register" class="text-blue-600 hover:text-blue-800 font-medium">
+            <router-link
+              to="/register"
+              class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
+            >
               {{ $t('auth.register') }}
             </router-link>
           </p>
         </div>
       </div>
 
-      <!-- Demo Credentials -->
-      <div class="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+      <!-- Demo Credentials — ✅ تظهر فقط في بيئة التطوير، تختفي تلقائياً
+           بالبناء الإنتاجي (production build) منعاً لكشف بيانات دخول
+           حقيقية لأي زائر بصفحة الدخول العامة -->
+      <div
+        v-if="isDev"
+        class="mt-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/50 rounded-lg p-4"
+      >
         <div class="flex">
           <div class="flex-shrink-0">
-            <font-awesome-icon :icon="['fas', 'info-circle']" class="h-5 w-5 text-blue-400" />
+            <font-awesome-icon
+              :icon="['fas', 'info-circle']"
+              class="h-5 w-5 text-blue-400 dark:text-blue-300"
+            />
           </div>
           <div class="ml-3">
-            <h3 class="text-sm font-medium text-blue-800">{{ $t('auth.demoCredentials') }}</h3>
-            <div class="mt-2 text-sm text-blue-700">
+            <h3 class="text-sm font-medium text-blue-800 dark:text-blue-300">
+              {{ $t('auth.demoCredentials') }}
+            </h3>
+            <div class="mt-2 text-sm text-blue-700 dark:text-blue-400">
               <p class="font-mono">admin@invoice.com</p>
               <p class="font-mono">password123</p>
             </div>
@@ -147,7 +183,9 @@
 
       <!-- Footer -->
       <div class="mt-8 text-center">
-        <p class="text-xs text-gray-500">© 2024 InvoiceApp. All rights reserved.</p>
+        <p class="text-xs text-gray-500 dark:text-slate-500">
+          © 2024 InvoiceApp. All rights reserved.
+        </p>
       </div>
     </div>
   </div>
@@ -162,11 +200,13 @@ export default {
       error: '',
       showPassword: false,
       rememberMe: false,
+      // ✅ لم نعد نضع بيانات دخول حقيقية كقيمة افتراضية بالحقول
       form: {
-        email: 'admin@invoice.com',
-        password: 'password123',
+        email: '',
+        password: '',
       },
       errors: {},
+      isDev: import.meta.env.DEV,
     }
   },
   mounted() {
@@ -203,6 +243,14 @@ export default {
         })
 
         if (result.success) {
+          // ✅ لو الباك طلب خطوة OTP، نحوّل لصفحة التحقق مع تمرير
+          // البريد كـ query param بدل الذهاب للداشبورد مباشرة
+          if (result.requiresOtp) {
+            this.$toast.success(result.message || 'تم إرسال رمز التحقق إلى بريدك الإلكتروني')
+            this.$router.push({ path: '/login-otp', query: { email: result.email } })
+            return
+          }
+
           this.$toast.success(this.$t('auth.loginSuccess'))
           setTimeout(() => {
             this.$router.push('/dashboard')
@@ -230,7 +278,6 @@ export default {
 </script>
 
 <style scoped>
-/* Simple transitions */
 input:focus {
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
