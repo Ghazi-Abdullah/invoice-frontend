@@ -1,5 +1,3 @@
-// src/store/modules/invoiceNotifications.js
-
 import echo from '@/echo'
 import axios from '@/api/axios'
 
@@ -10,6 +8,7 @@ export default {
     unpaidCount: 0,
     overdueCount: 0,
     dueSoonCount: 0,
+    openTicketsCount: 0,
     hasNew: false,
     lastTrigger: null,
     channel: null,
@@ -19,19 +18,21 @@ export default {
     unpaidCount: state => state.unpaidCount,
     overdueCount: state => state.overdueCount,
     dueSoonCount: state => state.dueSoonCount,
-    totalCount: state => state.unpaidCount + state.overdueCount + state.dueSoonCount,
+    openTicketsCount: state => state.openTicketsCount,
+    totalCount: state => state.unpaidCount + state.overdueCount + state.dueSoonCount + state.openTicketsCount,
     hasNew: state => state.hasNew,
     lastTrigger: state => state.lastTrigger,
   },
 
   mutations: {
-    SET_COUNTS(state, { unpaid, overdue, due_soon, trigger }) {
-      const oldTotal = state.unpaidCount + state.overdueCount + state.dueSoonCount
-      const newTotal = unpaid + overdue + due_soon
+    SET_COUNTS(state, { unpaid, overdue, due_soon, open_tickets, trigger }) {
+      const oldTotal = state.unpaidCount + state.overdueCount + state.dueSoonCount + state.openTicketsCount
+      const newTotal = unpaid + overdue + due_soon + (open_tickets || 0)
 
       state.unpaidCount = unpaid
       state.overdueCount = overdue
       state.dueSoonCount = due_soon
+      state.openTicketsCount = open_tickets || 0
       state.lastTrigger = trigger || null
 
       if (newTotal !== oldTotal || trigger !== 'initial') {
@@ -55,13 +56,13 @@ export default {
   actions: {
     async fetchInitialCounts({ commit }) {
       try {
-        // ✅ التصحيح هنا
         const { data } = await axios.get('/admin/invoices/notification-counts')
         if (data.status) {
           commit('SET_COUNTS', {
             unpaid: data.data.unpaid || 0,
             overdue: data.data.overdue || 0,
             due_soon: data.data.due_soon || 0,
+            open_tickets: data.data.open_tickets || 0,
             trigger: 'initial',
           })
         }
@@ -70,7 +71,7 @@ export default {
       }
     },
 
-    startListening({ commit, dispatch /*, state */ }) {
+    startListening({ commit, dispatch }) {
       if (!echo) {
         console.warn('Echo not initialized')
         return
@@ -85,6 +86,7 @@ export default {
             unpaid: data.unpaidCount || 0,
             overdue: data.overdueCount || 0,
             due_soon: data.dueSoonCount || 0,
+            open_tickets: data.openTicketsCount || 0,
             trigger: data.trigger || 'broadcast',
           })
         })

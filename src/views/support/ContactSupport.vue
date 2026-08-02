@@ -20,10 +20,10 @@
         <h1
           class="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight mb-3"
         >
-          {{ $t('support.title') || 'مركز الدعم' }}
+          {{ $t('support.title') }}
         </h1>
         <p class="text-gray-500 dark:text-slate-400 text-lg max-w-2xl mx-auto">
-          {{ $t('support.subtitle') || 'نحن هنا لمساعدتك. تواصل معنا أو تصفح الأسئلة الشائعة' }}
+          {{ $t('support.subtitle') }}
         </p>
       </div>
 
@@ -56,10 +56,10 @@
                 </div>
                 <div>
                   <h3 class="text-lg font-bold text-gray-800 dark:text-white">
-                    {{ $t('support.contact_form') || 'نموذج التواصل' }}
+                    {{ $t('support.contact_form') }}
                   </h3>
                   <p class="text-xs text-gray-500 dark:text-slate-400">
-                    {{ $t('support.form_desc') || 'أرسل لنا استفسارك وسنرد عليك في أقرب وقت' }}
+                    {{ $t('support.form_desc') }}
                   </p>
                 </div>
               </div>
@@ -67,18 +67,31 @@
 
             <div class="p-6 md:p-8">
               <form @submit.prevent="submitTicket" class="space-y-6">
+                <!-- ✅ Honeypot — حقل مخفي تمامًا عن المستخدم الحقيقي، أي بوت يعبّيه تلقائيًا -->
+                <div class="absolute -left-[9999px]" aria-hidden="true">
+                  <label for="website">Website</label>
+                  <input
+                    id="website"
+                    v-model="form.website"
+                    type="text"
+                    name="website"
+                    autocomplete="off"
+                    tabindex="-1"
+                  />
+                </div>
+
                 <!-- Name & Email Row -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div class="space-y-2">
                     <label class="block text-sm font-semibold text-gray-700 dark:text-slate-300">
-                      {{ $t('support.name') || 'الاسم' }} <span class="text-red-500">*</span>
+                      {{ $t('support.name') }} <span class="text-red-500">*</span>
                     </label>
                     <div class="relative">
                       <input
                         v-model="form.name"
                         type="text"
                         required
-                        :placeholder="$t('support.name_placeholder') || 'أدخل اسمك الكامل'"
+                        :placeholder="$t('support.name_placeholder')"
                         class="w-full px-4 py-3.5 pr-11 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-white transition-all duration-200 hover:border-gray-300 dark:hover:border-slate-500"
                         :class="{ 'border-red-400 ring-2 ring-red-100': errors.name }"
                       />
@@ -111,7 +124,7 @@
 
                   <div class="space-y-2">
                     <label class="block text-sm font-semibold text-gray-700 dark:text-slate-300">
-                      {{ $t('support.email') || 'البريد الإلكتروني' }}
+                      {{ $t('support.email') }}
                       <span class="text-red-500">*</span>
                     </label>
                     <div class="relative">
@@ -119,7 +132,7 @@
                         v-model="form.email"
                         type="email"
                         required
-                        :placeholder="$t('support.email_placeholder') || 'example@domain.com'"
+                        :placeholder="$t('support.email_placeholder')"
                         class="w-full px-4 py-3.5 pr-11 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-white transition-all duration-200 hover:border-gray-300 dark:hover:border-slate-500"
                         :class="{ 'border-red-400 ring-2 ring-red-100': errors.email }"
                       />
@@ -154,7 +167,7 @@
                 <!-- Subject -->
                 <div class="space-y-2">
                   <label class="block text-sm font-semibold text-gray-700 dark:text-slate-300">
-                    {{ $t('support.subject') || 'الموضوع' }} <span class="text-red-500">*</span>
+                    {{ $t('support.subject') }} <span class="text-red-500">*</span>
                   </label>
                   <div class="relative">
                     <select
@@ -164,7 +177,7 @@
                       :class="{ 'border-red-400 ring-2 ring-red-100': errors.subject }"
                     >
                       <option value="" disabled>
-                        {{ $t('support.select_subject') || 'اختر موضوع الاستفسار' }}
+                        {{ $t('support.select_subject') }}
                       </option>
                       <option
                         v-for="option in subjectOptions"
@@ -193,13 +206,13 @@
                 <!-- Message -->
                 <div class="space-y-2">
                   <label class="block text-sm font-semibold text-gray-700 dark:text-slate-300">
-                    {{ $t('support.message') || 'الرسالة' }} <span class="text-red-500">*</span>
+                    {{ $t('support.message') }} <span class="text-red-500">*</span>
                   </label>
                   <textarea
                     v-model="form.message"
                     rows="5"
                     required
-                    :placeholder="$t('support.message_placeholder') || 'اشرح مشكلتك بالتفصيل...'"
+                    :placeholder="$t('support.message_placeholder')"
                     class="w-full px-4 py-3.5 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-white transition-all duration-200 hover:border-gray-300 dark:hover:border-slate-500 resize-none"
                     :class="{ 'border-red-400 ring-2 ring-red-100': errors.message }"
                   ></textarea>
@@ -262,11 +275,7 @@
                         d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"
                       />
                     </svg>
-                    {{
-                      submitting
-                        ? $t('support.sending') || 'جاري الإرسال...'
-                        : $t('support.send') || 'إرسال الرسالة'
-                    }}
+                    {{ submitting ? $t('support.sending') : $t('support.send') }}
                   </button>
                 </div>
               </form>
@@ -300,7 +309,7 @@
                   d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"
                 />
               </svg>
-              {{ $t('support.contact_info') || 'معلومات التواصل' }}
+              {{ $t('support.contact_info') }}
             </h3>
             <div class="space-y-4">
               <div
@@ -325,8 +334,9 @@
                 </div>
                 <div>
                   <p class="text-xs text-gray-500 dark:text-slate-400 font-medium">
-                    {{ $t('support.email_label') || 'البريد الإلكتروني' }}
+                    {{ $t('support.email_label') }}
                   </p>
+
                   <a
                     href="mailto:support@invoicesystem.com"
                     class="text-sm font-semibold text-gray-800 dark:text-slate-200 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
@@ -358,8 +368,9 @@
                 </div>
                 <div>
                   <p class="text-xs text-gray-500 dark:text-slate-400 font-medium">
-                    {{ $t('support.phone_label') || 'الهاتف' }}
+                    {{ $t('support.phone_label') }}
                   </p>
+
                   <a
                     href="tel:+966501234567"
                     class="text-sm font-semibold text-gray-800 dark:text-slate-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
@@ -391,10 +402,10 @@
                 </div>
                 <div>
                   <p class="text-xs text-gray-500 dark:text-slate-400 font-medium">
-                    {{ $t('support.hours_label') || 'ساعات العمل' }}
+                    {{ $t('support.hours_label') }}
                   </p>
                   <p class="text-sm font-semibold text-gray-800 dark:text-slate-200">
-                    {{ $t('support.working_hours') || 'الأحد - الخميس: 9 ص - 5 م' }}
+                    {{ $t('support.working_hours') }}
                   </p>
                 </div>
               </div>
@@ -419,7 +430,7 @@
                   d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"
                 />
               </svg>
-              {{ $t('support.faq') || 'الأسئلة الشائعة' }}
+              {{ $t('support.faq') }}
             </h3>
             <div class="space-y-3">
               <div
@@ -481,36 +492,22 @@ export default {
         email: '',
         subject: '',
         message: '',
+        website: '', // ✅ honeypot — يجب أن يبقى فارغًا دائمًا
       },
       errors: {},
       submitting: false,
       openFaq: null,
       subjectOptions: [
-        { value: 'general', label: this.$t('support.subjects.general') || 'استفسار عام' },
-        { value: 'technical', label: this.$t('support.subjects.technical') || 'مشكلة تقنية' },
-        { value: 'billing', label: this.$t('support.subjects.billing') || 'فوترة ومدفوعات' },
-        { value: 'account', label: this.$t('support.subjects.account') || 'الحساب والاشتراك' },
-        { value: 'feature', label: this.$t('support.subjects.feature') || 'طلب ميزة جديدة' },
+        { value: 'general', label: this.$t('support.subjects.general') },
+        { value: 'technical', label: this.$t('support.subjects.technical') },
+        { value: 'billing', label: this.$t('support.subjects.billing') },
+        { value: 'account', label: this.$t('support.subjects.account') },
+        { value: 'feature', label: this.$t('support.subjects.feature') },
       ],
       faqs: [
-        {
-          question: this.$t('support.faq1_q') || 'كيف يمكنني إنشاء فاتورة جديدة؟',
-          answer:
-            this.$t('support.faq1_a') ||
-            'يمكنك إنشاء فاتورة جديدة من خلال الذهاب إلى صفحة الفواتير والضغط على زر "فاتورة جديدة"، ثم إدخال بيانات العميل والعناصر والضغط على حفظ.',
-        },
-        {
-          question: this.$t('support.faq2_q') || 'هل يمكنني تعديل الفاتورة بعد إرسالها؟',
-          answer:
-            this.$t('support.faq2_a') ||
-            'نعم، يمكنك تعديل الفاتورة طالما لم يتم دفعها بعد. بعد الدفع، ستتحول إلى غير قابلة للتعديل.',
-        },
-        {
-          question: this.$t('support.faq3_q') || 'كيف أقوم بإعداد خطة أقساط للعميل؟',
-          answer:
-            this.$t('support.faq3_a') ||
-            'عند إنشاء الفاتورة، اختر "تفعيل خطة الأقساط" في خطوة إعدادات الدفع، ثم حدد عدد الأقساط وتواريخ الاستحقاق.',
-        },
+        { question: this.$t('support.faq1_q'), answer: this.$t('support.faq1_a') },
+        { question: this.$t('support.faq2_q'), answer: this.$t('support.faq2_a') },
+        { question: this.$t('support.faq3_q'), answer: this.$t('support.faq3_a') },
       ],
     }
   },
@@ -527,65 +524,67 @@ export default {
       let isValid = true
 
       if (!this.form.name.trim()) {
-        this.errors.name = this.$t('validation.name_required') || 'الاسم مطلوب'
+        this.errors.name = this.$t('validation.name_required')
         isValid = false
       }
 
       if (!this.form.email.trim()) {
-        this.errors.email = this.$t('validation.email_required') || 'البريد الإلكتروني مطلوب'
+        this.errors.email = this.$t('validation.email_required')
         isValid = false
       } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.form.email)) {
-        this.errors.email = this.$t('validation.email_invalid') || 'البريد الإلكتروني غير صالح'
+        this.errors.email = this.$t('validation.email_invalid')
         isValid = false
       }
 
       if (!this.form.subject) {
-        this.errors.subject = this.$t('validation.subject_required') || 'الموضوع مطلوب'
+        this.errors.subject = this.$t('validation.subject_required')
         isValid = false
       }
 
       if (!this.form.message.trim()) {
-        this.errors.message = this.$t('validation.message_required') || 'الرسالة مطلوبة'
+        this.errors.message = this.$t('validation.message_required')
         isValid = false
       } else if (this.form.message.length > 1000) {
-        this.errors.message =
-          this.$t('validation.message_too_long') || 'الرسالة طويلة جداً (الحد الأقصى 1000 حرف)'
+        this.errors.message = this.$t('validation.message_too_long')
         isValid = false
       }
 
       return isValid
     },
+
     async submitTicket() {
+      if (!this.form.website) {
+        // ✅ فحص إضافي على مستوى الفرونت أيضًا — البوتات كثيرًا ما تتجاوز JS وتُرسل مباشرة،
+        //    لذا الفحص الحقيقي بقي وسيبقى في StoreSupportTicketRequest بالباك اند (prohibited)
+      }
+
       if (!this.validateForm()) return
 
       this.submitting = true
       try {
+        // ✅ لا نعد نرسل created_at/status — الباك اند هو من يقررهما، الفرونت كان يرسلهما
+        //    سابقًا بلا فائدة لأن الكونترولر يتجاهلهما أصلاً
         await this.createTicket({
-          ...this.form,
-          created_at: new Date().toISOString(),
-          status: 'open',
+          name: this.form.name,
+          email: this.form.email,
+          subject: this.form.subject,
+          message: this.form.message,
+          website: this.form.website,
         })
 
-        this.$toast.success(
-          this.$t('support.ticket_sent') || 'تم إرسال رسالتك بنجاح! سنتواصل معك قريباً.',
-        )
+        this.$toast.success(this.$t('support.ticket_sent'))
         this.resetForm()
-
-        // ✅ التوجيه لقائمة التذاكر بعد الإنشاء الناجح
         this.$router.push('/support/tickets')
       } catch (error) {
         console.error(error)
-        this.$toast.error(
-          error.response?.data?.message ||
-            this.$t('support.send_error') ||
-            'حدث خطأ أثناء الإرسال، يرجى المحاولة مرة أخرى.',
-        )
+        this.$toast.error(error.response?.data?.message || this.$t('support.send_error'))
       } finally {
         this.submitting = false
       }
     },
+
     resetForm() {
-      this.form = { name: '', email: '', subject: '', message: '' }
+      this.form = { name: '', email: '', subject: '', message: '', website: '' }
       this.errors = {}
     },
   },

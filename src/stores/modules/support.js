@@ -27,8 +27,9 @@ const actions = {
     commit('SET_ERROR', null)
     try {
       const { data } = await axios.get('/admin/support/tickets', { params })
-      commit('SET_TICKETS', data.data || data)
-      if (data.meta) commit('SET_PAGINATION', data.meta)
+      // ✅ الشكل الموحّد: { status, message, data: { items, pagination } }
+      commit('SET_TICKETS', data.data.items)
+      commit('SET_PAGINATION', data.data.pagination)
     } catch (error) {
       commit('SET_ERROR', resolveErrorMessage(error, 'فشل في تحميل التذاكر'))
       throw error
@@ -37,12 +38,22 @@ const actions = {
     }
   },
 
+  async assignTicket({ commit }, { id, assigned_to }) {
+    const { data } = await axios.patch(`/admin/support/tickets/${id}/assign`, { assigned_to })
+    commit('SET_TICKET_ASSIGNEE', { id, assignedTo: data.data.assigned_to })
+    return data
+  },
+  async trackTicket(_, { ticket_number, email }) {
+    const { data } = await axios.get('/support/tickets/track', { params: { ticket_number, email } })
+    return data.data
+  },
+
   async fetchTicket({ commit }, id) {
     commit('SET_LOADING', true)
     commit('SET_ERROR', null)
     try {
       const { data } = await axios.get(`/admin/support/tickets/${id}`)
-      commit('SET_TICKET', data.data || data)
+      commit('SET_TICKET', data.data)
     } catch (error) {
       commit('SET_ERROR', resolveErrorMessage(error, 'فشل في تحميل التذكرة'))
       throw error
@@ -55,7 +66,7 @@ const actions = {
     commit('SET_SUBMITTING', true)
     try {
       const { data } = await axios.post('/support/tickets', ticketData)
-      commit('ADD_TICKET', data.ticket || data)
+      commit('ADD_TICKET', data.data)
       return data
     } catch (error) {
       commit('SET_ERROR', resolveErrorMessage(error, 'فشل في انشاء التذكرة'))
@@ -69,8 +80,9 @@ const actions = {
     commit('SET_SUBMITTING', true)
     try {
       const { data } = await axios.post(`/admin/support/tickets/${id}/replies`, { message })
-      commit('SET_TICKET_REPLIES', { id, replies: data.replies || [] })
-      if (data.status) commit('SET_TICKET_STATUS', { id, status: data.status })
+      // repository.reply() يرجّع data: { reply, replies, status }
+      commit('SET_TICKET_REPLIES', { id, replies: data.data.replies || [] })
+      if (data.data.status) commit('SET_TICKET_STATUS', { id, status: data.data.status })
       return data
     } catch (error) {
       commit('SET_ERROR', resolveErrorMessage(error, 'فشل في رد التذكرة'))
@@ -83,7 +95,8 @@ const actions = {
   async closeTicket({ commit }, id) {
     try {
       const { data } = await axios.patch(`/admin/support/tickets/${id}/close`)
-      const status = data.ticket?.status || 'closed'
+      // repository.updateStatus() يرجّع data: التذكرة كاملة
+      const status = data.data?.status || 'closed'
       commit('UPDATE_TICKET_IN_LIST', { id, status })
       commit('SET_TICKET_STATUS', { id, status })
       return data
@@ -97,7 +110,7 @@ const actions = {
     commit('SET_SUBMITTING', true)
     try {
       const { data } = await axios.patch(`/admin/support/tickets/${id}/status`, { status })
-      const newStatus = data.data?.status || data.ticket?.status || status
+      const newStatus = data.data?.status || status
       commit('UPDATE_TICKET_IN_LIST', { id, status: newStatus })
       commit('SET_TICKET_STATUS', { id, status: newStatus })
       return data
@@ -127,7 +140,7 @@ const mutations = {
   SET_LOADING(state, status) { state.loading = status },
   SET_SUBMITTING(state, status) { state.submitting = status },
   SET_ERROR(state, error) { state.error = error },
-  SET_PAGINATION(state, meta) { state.pagination = meta },
+  SET_PAGINATION(state, pagination) { state.pagination = pagination },
 }
 
 function resolveErrorMessage(error, fallback) {
