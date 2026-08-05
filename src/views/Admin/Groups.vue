@@ -1,5 +1,7 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-6 md:py-8">
+  <div
+    class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 py-6 md:py-8 transition-colors duration-300"
+  >
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <!-- Header -->
       <div class="mb-8 md:mb-10">
@@ -8,7 +10,9 @@
         >
           <div class="flex-1">
             <div class="flex items-center gap-4 mb-3">
-              <div class="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl shadow-lg">
+              <div
+                class="p-3 bg-gradient-to-br from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 rounded-2xl shadow-lg"
+              >
                 <svg
                   class="w-6 h-6 text-white"
                   fill="none"
@@ -24,17 +28,47 @@
                 </svg>
               </div>
               <div>
-                <h1 class="text-2xl md:text-3xl font-bold text-gray-900">
+                <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
                   {{ $t('groups.title') }}
                 </h1>
-                <p class="text-sm text-gray-600 mt-1">
+                <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">
                   {{ $t('groups.subtitle') }}
                 </p>
               </div>
             </div>
           </div>
 
-          <div class="flex-shrink-0">
+          <div class="flex items-center gap-3">
+            <!-- Dark Mode Toggle -->
+            <button
+              @click="toggleDarkMode"
+              class="p-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 text-gray-600 dark:text-yellow-400"
+              :title="isDark ? $t('common.light_mode') : $t('common.dark_mode')"
+            >
+              <svg
+                v-if="!isDark"
+                class="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+                />
+              </svg>
+              <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+                />
+              </svg>
+            </button>
+
             <button
               @click="openAddModal"
               class="px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2 w-full sm:w-auto"
@@ -56,10 +90,12 @@
       <!-- Stats Cards -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <!-- Total Groups -->
-        <div class="stats-card bg-gradient-to-br from-blue-50 to-blue-100">
-          <div class="stats-icon bg-blue-100">
+        <div
+          class="stats-card bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 dark:border-blue-800"
+        >
+          <div class="stats-icon bg-blue-100 dark:bg-blue-900/50">
             <svg
-              class="w-6 h-6 text-blue-600"
+              class="w-6 h-6 text-blue-600 dark:text-blue-400"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -73,16 +109,18 @@
             </svg>
           </div>
           <div>
-            <p class="stats-label">{{ $t('groups.total_groups') }}</p>
-            <p class="stats-value">{{ storeGroups.length }}</p>
+            <p class="stats-label dark:text-gray-300">{{ $t('groups.total_groups') }}</p>
+            <p class="stats-value dark:text-white">{{ storeGroups.length }}</p>
           </div>
         </div>
 
         <!-- Active Groups -->
-        <div class="stats-card bg-gradient-to-br from-green-50 to-green-100">
-          <div class="stats-icon bg-green-100">
+        <div
+          class="stats-card bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/30 dark:to-green-800/30 dark:border-green-800"
+        >
+          <div class="stats-icon bg-green-100 dark:bg-green-900/50">
             <svg
-              class="w-6 h-6 text-green-600"
+              class="w-6 h-6 text-green-600 dark:text-green-400"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -96,15 +134,22 @@
             </svg>
           </div>
           <div>
-            <p class="stats-label">{{ $t('groups.active_groups') }}</p>
-            <p class="stats-value">{{ activeGroupsCount }}</p>
+            <p class="stats-label dark:text-gray-300">{{ $t('groups.active_groups') }}</p>
+            <p class="stats-value dark:text-white">{{ activeGroupsCount }}</p>
           </div>
         </div>
 
         <!-- Inactive Groups -->
-        <div class="stats-card bg-gradient-to-br from-red-50 to-red-100">
-          <div class="stats-icon bg-red-100">
-            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div
+          class="stats-card bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/30 dark:to-red-800/30 dark:border-red-800"
+        >
+          <div class="stats-icon bg-red-100 dark:bg-red-900/50">
+            <svg
+              class="w-6 h-6 text-red-600 dark:text-red-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -114,16 +159,18 @@
             </svg>
           </div>
           <div>
-            <p class="stats-label">{{ $t('groups.inactive_groups') }}</p>
-            <p class="stats-value">{{ inactiveGroupsCount }}</p>
+            <p class="stats-label dark:text-gray-300">{{ $t('groups.inactive_groups') }}</p>
+            <p class="stats-value dark:text-white">{{ inactiveGroupsCount }}</p>
           </div>
         </div>
 
         <!-- Total Users in Groups (optional) -->
-        <div class="stats-card bg-gradient-to-br from-purple-50 to-purple-100">
-          <div class="stats-icon bg-purple-100">
+        <div
+          class="stats-card bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-800/30 dark:border-purple-800"
+        >
+          <div class="stats-icon bg-purple-100 dark:bg-purple-900/50">
             <svg
-              class="w-6 h-6 text-purple-600"
+              class="w-6 h-6 text-purple-600 dark:text-purple-400"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -137,19 +184,21 @@
             </svg>
           </div>
           <div>
-            <p class="stats-label">{{ $t('groups.total_users') }}</p>
-            <p class="stats-value">{{ totalUsersInGroups }}</p>
+            <p class="stats-label dark:text-gray-300">{{ $t('groups.total_users') }}</p>
+            <p class="stats-value dark:text-white">{{ totalUsersInGroups }}</p>
           </div>
         </div>
       </div>
 
       <!-- Filters Card -->
-      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 mb-6">
+      <div
+        class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 mb-6 transition-colors duration-300"
+      >
         <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
           <div class="flex items-center gap-3">
-            <div class="p-2 bg-blue-50 rounded-lg">
+            <div class="p-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
               <svg
-                class="w-5 h-5 text-blue-600"
+                class="w-5 h-5 text-blue-600 dark:text-blue-400"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -163,10 +212,10 @@
               </svg>
             </div>
             <div>
-              <h2 class="text-lg font-semibold text-gray-800">
+              <h2 class="text-lg font-semibold text-gray-800 dark:text-white">
                 {{ $t('common.filters') }}
               </h2>
-              <p class="text-sm text-gray-500">
+              <p class="text-sm text-gray-500 dark:text-gray-400">
                 {{ $t('groups.filter_subtitle') }}
               </p>
             </div>
@@ -189,7 +238,7 @@
             </button>
             <button
               @click="resetFilters"
-              class="px-4 py-2.5 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-lg border border-gray-300 hover:border-gray-400 transition-colors duration-200 flex items-center gap-2"
+              class="px-4 py-2.5 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-lg border border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 transition-colors duration-200 flex items-center gap-2"
             >
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -207,7 +256,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <!-- Search -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               {{ $t('common.search') }}
             </label>
             <div class="relative">
@@ -215,10 +264,10 @@
                 type="text"
                 v-model="filters.search"
                 :placeholder="$t('groups.search_placeholder')"
-                class="w-full px-4 py-2.5 pl-10 pr-10 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                class="w-full px-4 py-2.5 pl-10 pr-10 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
               />
               <svg
-                class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -233,7 +282,7 @@
               <button
                 v-if="filters.search"
                 @click="clearSearch"
-                class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
               >
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
@@ -249,20 +298,20 @@
 
           <!-- Status Filter -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               {{ $t('common.status') }}
             </label>
             <div class="relative">
               <select
                 v-model="filters.status"
-                class="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 appearance-none pr-10"
+                class="w-full px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 appearance-none pr-10 text-gray-900 dark:text-white"
               >
                 <option value="all">{{ $t('common.all') }}</option>
                 <option value="active">{{ $t('groups.status.active') }}</option>
                 <option value="inactive">{{ $t('groups.status.inactive') }}</option>
               </select>
               <svg
-                class="w-5 h-5 absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
+                class="w-5 h-5 absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -279,20 +328,20 @@
 
           <!-- System Filter -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               {{ $t('groups.system_group') }}
             </label>
             <div class="relative">
               <select
                 v-model="filters.is_system"
-                class="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 appearance-none pr-10"
+                class="w-full px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 appearance-none pr-10 text-gray-900 dark:text-white"
               >
                 <option value="">{{ $t('common.all') }}</option>
                 <option value="1">{{ $t('common.yes') }}</option>
                 <option value="0">{{ $t('common.no') }}</option>
               </select>
               <svg
-                class="w-5 h-5 absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
+                class="w-5 h-5 absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -309,17 +358,17 @@
 
           <!-- Date Filter -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               {{ $t('common.date_from') }}
             </label>
             <div class="relative">
               <input
                 type="date"
                 v-model="filters.date_from"
-                class="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 pr-10"
+                class="w-full px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 pr-10 text-gray-900 dark:text-white"
               />
               <svg
-                class="w-5 h-5 absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
+                class="w-5 h-5 absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -339,25 +388,37 @@
       <!-- Loading State -->
       <div
         v-if="storeLoading"
-        class="bg-white rounded-xl shadow-sm border border-gray-200 p-12 mb-6"
+        class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-12 mb-6 transition-colors duration-300"
       >
         <div class="text-center">
           <div class="inline-block relative">
-            <div class="w-14 h-14 border-4 border-blue-100 rounded-full"></div>
+            <div class="w-14 h-14 border-4 border-blue-100 dark:border-blue-900 rounded-full"></div>
             <div
               class="w-14 h-14 border-4 border-blue-600 border-t-transparent rounded-full animate-spin absolute top-0 left-0"
             ></div>
           </div>
-          <p class="text-gray-700 font-medium mt-4">{{ $t('common.loading') }}</p>
-          <p class="text-sm text-gray-500 mt-2">{{ $t('groups.loading_subtitle') }}</p>
+          <p class="text-gray-700 dark:text-gray-200 font-medium mt-4">
+            {{ $t('common.loading') }}
+          </p>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
+            {{ $t('groups.loading_subtitle') }}
+          </p>
         </div>
       </div>
 
       <!-- Error State -->
-      <div v-else-if="storeError" class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
+      <div
+        v-else-if="storeError"
+        class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 mb-6 transition-colors duration-300"
+      >
         <div class="flex items-start">
           <div class="flex-shrink-0 pt-0.5">
-            <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              class="w-5 h-5 text-red-500 dark:text-red-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -367,12 +428,14 @@
             </svg>
           </div>
           <div class="mr-3 flex-1">
-            <h3 class="text-sm font-medium text-red-800">{{ $t('errors.load_failed') }}</h3>
-            <p class="text-sm text-red-700 mt-1">{{ storeError }}</p>
+            <h3 class="text-sm font-medium text-red-800 dark:text-red-300">
+              {{ $t('errors.load_failed') }}
+            </h3>
+            <p class="text-sm text-red-700 dark:text-red-400 mt-1">{{ storeError }}</p>
           </div>
           <button
             @click="clearStoreError"
-            class="p-1.5 text-red-700 hover:text-red-900 rounded-lg hover:bg-red-100"
+            class="p-1.5 text-red-700 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
@@ -388,19 +451,25 @@
 
       <!-- Table Section -->
       <div v-else>
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div
+          class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden transition-colors duration-300"
+        >
           <!-- Table Header -->
-          <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+          <div
+            class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 transition-colors duration-300"
+          >
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div class="flex items-center gap-3">
-                <h3 class="text-lg font-semibold text-gray-800">
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-white">
                   {{ $t('groups.group_list') }}
                 </h3>
-                <span class="px-3 py-1 bg-blue-100 text-blue-700 text-sm font-medium rounded-full">
+                <span
+                  class="px-3 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 text-sm font-medium rounded-full"
+                >
                   {{ storeGroups.length }} {{ $t('common.total') }}
                 </span>
               </div>
-              <div class="text-sm text-gray-500">
+              <div class="text-sm text-gray-500 dark:text-gray-400">
                 {{ $t('groups.list_subtitle') }}
               </div>
             </div>
@@ -410,10 +479,10 @@
           <div v-if="storeGroups.length === 0" class="text-center py-16 px-4">
             <div class="max-w-sm mx-auto">
               <div
-                class="w-20 h-20 bg-blue-50 rounded-2xl mx-auto mb-6 flex items-center justify-center"
+                class="w-20 h-20 bg-blue-50 dark:bg-blue-900/30 rounded-2xl mx-auto mb-6 flex items-center justify-center"
               >
                 <svg
-                  class="w-10 h-10 text-blue-400"
+                  class="w-10 h-10 text-blue-400 dark:text-blue-500"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -426,10 +495,12 @@
                   />
                 </svg>
               </div>
-              <h3 class="text-xl font-semibold text-gray-900 mb-2">
+              <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                 {{ $t('groups.no_groups') }}
               </h3>
-              <p class="text-gray-600 mb-6">{{ $t('groups.start_creating_message') }}</p>
+              <p class="text-gray-600 dark:text-gray-400 mb-6">
+                {{ $t('groups.start_creating_message') }}
+              </p>
               <button
                 @click="openAddModal"
                 class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-sm hover:shadow transition-colors duration-200 flex items-center gap-2 mx-auto"
@@ -449,76 +520,83 @@
 
           <!-- Table Content -->
           <div v-else class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-              <thead class="bg-gray-50">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+              <thead class="bg-gray-50 dark:bg-gray-900/50 transition-colors duration-300">
                 <tr>
                   <th
-                    class="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider"
+                    class="px-6 py-3 text-right text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider"
                   >
                     {{ $t('groups.name_en') }}
                   </th>
                   <th
-                    class="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider"
+                    class="px-6 py-3 text-right text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider"
                   >
                     {{ $t('groups.name_ar') }}
                   </th>
                   <th
-                    class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider"
+                    class="px-6 py-3 text-center text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider"
                   >
                     {{ $t('groups.users_count') }}
                   </th>
                   <th
-                    class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider"
+                    class="px-6 py-3 text-center text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider"
                   >
                     {{ $t('groups.permissions_count') }}
                   </th>
                   <th
-                    class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider"
+                    class="px-6 py-3 text-center text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider"
                   >
                     {{ $t('common.status') }}
                   </th>
                   <th
-                    class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider"
+                    class="px-6 py-3 text-center text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider"
                   >
                     {{ $t('groups.system_group') }}
                   </th>
                   <th
-                    class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider"
+                    class="px-6 py-3 text-center text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider"
                   >
                     {{ $t('common.created_at') }}
                   </th>
                   <th
-                    class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider"
+                    class="px-6 py-3 text-center text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider"
                   >
                     {{ $t('common.actions') }}
                   </th>
                 </tr>
               </thead>
-              <tbody class="bg-white divide-y divide-gray-200">
+              <tbody
+                class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700 transition-colors duration-300"
+              >
                 <tr
                   v-for="group in filteredGroups"
                   :key="group.id"
-                  class="hover:bg-blue-50/50 transition-colors duration-150"
+                  class="hover:bg-blue-50/50 dark:hover:bg-blue-900/20 transition-colors duration-150"
                 >
                   <!-- Name English -->
                   <td class="px-6 py-4">
-                    <div class="text-sm font-semibold text-gray-900">
+                    <div class="text-sm font-semibold text-gray-900 dark:text-white">
                       {{ group.title_en }}
                     </div>
-                    <div class="text-xs text-gray-500 mt-1" v-if="group.description">
+                    <div
+                      class="text-xs text-gray-500 dark:text-gray-400 mt-1"
+                      v-if="group.description"
+                    >
                       {{ group.description }}
                     </div>
                   </td>
 
                   <!-- Name Arabic -->
                   <td class="px-6 py-4">
-                    <div class="text-sm text-gray-900 font-medium">{{ group.title_ar }}</div>
+                    <div class="text-sm text-gray-900 dark:text-gray-100 font-medium">
+                      {{ group.title_ar }}
+                    </div>
                   </td>
 
                   <!-- Users Count -->
                   <td class="px-6 py-4 text-center">
                     <span
-                      class="px-3 py-1 bg-blue-100 text-blue-700 text-sm font-medium rounded-full"
+                      class="px-3 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 text-sm font-medium rounded-full"
                     >
                       {{ group.users_count || 0 }}
                     </span>
@@ -527,7 +605,7 @@
                   <!-- Permissions Count -->
                   <td class="px-6 py-4 text-center">
                     <span
-                      class="px-3 py-1 bg-purple-100 text-purple-700 text-sm font-medium rounded-full"
+                      class="px-3 py-1 bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 text-sm font-medium rounded-full"
                     >
                       {{ group.permissions_count || 0 }}
                     </span>
@@ -538,8 +616,8 @@
                     <span
                       :class="
                         group.is_active
-                          ? 'bg-green-100 text-green-800 border-green-200'
-                          : 'bg-red-100 text-red-800 border-red-200'
+                          ? 'bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-300 border-green-200 dark:border-green-800'
+                          : 'bg-red-100 dark:bg-red-900/50 text-red-800 dark:text-red-300 border-red-200 dark:border-red-800'
                       "
                       class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold border"
                     >
@@ -557,19 +635,21 @@
                   <td class="px-6 py-4 text-center">
                     <span
                       v-if="group.is_system"
-                      class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-800 border border-gray-200"
+                      class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-600"
                     >
                       {{ $t('common.yes') }}
                     </span>
-                    <span v-else class="text-gray-400">-</span>
+                    <span v-else class="text-gray-400 dark:text-gray-500">-</span>
                   </td>
 
                   <!-- Created Date -->
                   <td class="px-6 py-4 text-center">
-                    <div class="text-sm text-gray-900 font-medium">
+                    <div class="text-sm text-gray-900 dark:text-gray-100 font-medium">
                       {{ formatDate(group.created_at) }}
                     </div>
-                    <div class="text-xs text-gray-500 mt-1">{{ $t('common.created') }}</div>
+                    <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      {{ $t('common.created') }}
+                    </div>
                   </td>
 
                   <!-- Actions -->
@@ -577,7 +657,7 @@
                     <div class="flex items-center justify-center gap-2">
                       <button
                         @click="editGroup(group)"
-                        class="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200"
+                        class="p-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-colors duration-200"
                         :title="$t('buttons.edit')"
                       >
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -591,7 +671,7 @@
                       </button>
                       <button
                         @click="managePermissions(group)"
-                        class="p-2 text-gray-600 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors duration-200"
+                        class="p-2 text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/30 rounded-lg transition-colors duration-200"
                         :title="$t('groups.manage_permissions')"
                       >
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -607,10 +687,10 @@
                         @click="toggleGroupStatus(group)"
                         :class="
                           group.is_active
-                            ? 'hover:text-yellow-600 hover:bg-yellow-50'
-                            : 'hover:text-green-600 hover:bg-green-50'
+                            ? 'hover:text-yellow-600 dark:hover:text-yellow-400 hover:bg-yellow-50 dark:hover:bg-yellow-900/30'
+                            : 'hover:text-green-600 dark:hover:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/30'
                         "
-                        class="p-2 text-gray-600 rounded-lg transition-colors duration-200"
+                        class="p-2 text-gray-600 dark:text-gray-400 rounded-lg transition-colors duration-200"
                         :title="group.is_active ? $t('groups.deactivate') : $t('groups.activate')"
                       >
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -633,7 +713,7 @@
                       <button
                         v-if="!group.is_system"
                         @click="confirmDelete(group)"
-                        class="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
+                        class="p-2 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors duration-200"
                         :title="$t('buttons.delete')"
                       >
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -656,28 +736,27 @@
     </div>
 
     <!-- Group Form Modal -->
-    <GroupForm
-      :show="showModal"
-      :group="editingGroup"
-      @close="closeModal"
-      @saved="onGroupSaved"
-    />
+    <GroupForm :show="showModal" :group="editingGroup" @close="closeModal" @saved="onGroupSaved" />
 
     <!-- Permissions Modal -->
     <transition name="modal-fade">
       <div
         v-if="showPermissionsModal"
-        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+        class="fixed inset-0 bg-black bg-opacity-50 dark:bg-opacity-70 flex items-center justify-center p-4 z-50"
         @click.self="closePermissionsModal"
       >
-        <div class="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div
+          class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-gray-200 dark:border-gray-700 transition-colors duration-300"
+        >
           <!-- Modal Header -->
-          <div class="px-6 py-5 border-b border-gray-200 bg-gray-50">
+          <div
+            class="px-6 py-5 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 transition-colors duration-300"
+          >
             <div class="flex justify-between items-center">
               <div class="flex items-center gap-3">
-                <div class="p-2.5 bg-purple-100 rounded-lg">
+                <div class="p-2.5 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
                   <svg
-                    class="w-5 h-5 text-purple-600"
+                    class="w-5 h-5 text-purple-600 dark:text-purple-400"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -691,17 +770,17 @@
                   </svg>
                 </div>
                 <div>
-                  <h3 class="text-lg font-semibold text-gray-800">
+                  <h3 class="text-lg font-semibold text-gray-800 dark:text-white">
                     {{ $t('groups.manage_permissions') }}: {{ selectedGroup?.title_ar }}
                   </h3>
-                  <p class="text-sm text-gray-500 mt-1">
+                  <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
                     {{ $t('groups.permissions_subtitle') }}
                   </p>
                 </div>
               </div>
               <button
                 @click="closePermissionsModal"
-                class="p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
+                class="p-2 text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
               >
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
@@ -719,21 +798,23 @@
           <div class="p-6">
             <div v-if="permissionsLoading" class="text-center py-8">
               <div class="inline-block relative">
-                <div class="w-10 h-10 border-4 border-purple-100 rounded-full"></div>
+                <div
+                  class="w-10 h-10 border-4 border-purple-100 dark:border-purple-900 rounded-full"
+                ></div>
                 <div
                   class="w-10 h-10 border-4 border-purple-600 border-t-transparent rounded-full animate-spin absolute top-0 left-0"
                 ></div>
               </div>
-              <p class="text-gray-600 mt-4">{{ $t('common.loading') }}</p>
+              <p class="text-gray-600 dark:text-gray-300 mt-4">{{ $t('common.loading') }}</p>
             </div>
 
             <div v-else>
               <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-2">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   {{ $t('groups.select_permissions') }}
                 </label>
                 <div
-                  class="space-y-3 max-h-96 overflow-y-auto border border-gray-200 rounded-lg p-4"
+                  class="space-y-3 max-h-96 overflow-y-auto border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800 transition-colors duration-300"
                 >
                   <div
                     v-for="permission in availablePermissions"
@@ -745,11 +826,14 @@
                       :id="'perm_' + permission.id"
                       :value="permission.id"
                       v-model="selectedPermissions"
-                      class="ml-3 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      class="ml-3 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700"
                     />
-                    <label :for="'perm_' + permission.id" class="text-sm text-gray-700">
+                    <label
+                      :for="'perm_' + permission.id"
+                      class="text-sm text-gray-700 dark:text-gray-200"
+                    >
                       {{ permission.title }}
-                      <span class="text-xs text-gray-500 block">
+                      <span class="text-xs text-gray-500 dark:text-gray-400 block">
                         {{ permission.description_ar || permission.description_en }}
                       </span>
                     </label>
@@ -761,7 +845,7 @@
                 <button
                   type="button"
                   @click="closePermissionsModal"
-                  class="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors duration-200 border border-gray-300"
+                  class="px-5 py-2.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-lg transition-colors duration-200 border border-gray-300 dark:border-gray-600"
                 >
                   {{ $t('common.cancel') }}
                 </button>
@@ -829,6 +913,7 @@ export default {
       },
       availablePermissions: [],
       selectedPermissions: [],
+      isDark: false,
     }
   },
 
@@ -875,6 +960,15 @@ export default {
   },
 
   async mounted() {
+    // التحقق من الوضع المحفوظ
+    const savedMode = localStorage.getItem('darkMode')
+    if (
+      savedMode === 'true' ||
+      (!savedMode && window.matchMedia('(prefers-color-scheme: dark)').matches)
+    ) {
+      this.isDark = true
+      document.documentElement.classList.add('dark')
+    }
     await this.loadData()
   },
 
@@ -889,6 +983,17 @@ export default {
       'updateGroupPermissions',
       'clearError',
     ]),
+
+    toggleDarkMode() {
+      this.isDark = !this.isDark
+      if (this.isDark) {
+        document.documentElement.classList.add('dark')
+        localStorage.setItem('darkMode', 'true')
+      } else {
+        document.documentElement.classList.remove('dark')
+        localStorage.setItem('darkMode', 'false')
+      }
+    },
 
     async loadData() {
       try {
@@ -1053,19 +1158,19 @@ export default {
 <style scoped>
 /* استيراد أنماط التصميم الموحدة من InvoiceReportSection */
 .stats-card {
-  @apply rounded-xl p-5 border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300;
+  @apply rounded-xl p-5 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-all duration-300;
 }
 .stats-icon {
   @apply p-3 rounded-lg w-fit mb-3;
 }
 .stats-label {
-  @apply text-sm font-medium text-gray-500 mb-1;
+  @apply text-sm font-medium text-gray-500 dark:text-gray-400 mb-1;
 }
 .stats-value {
-  @apply text-2xl font-bold text-gray-900;
+  @apply text-2xl font-bold text-gray-900 dark:text-white;
 }
 .table-header {
-  @apply px-6 py-4 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider;
+  @apply px-6 py-4 text-right text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider;
 }
 .table-cell {
   @apply px-6 py-4;
@@ -1096,11 +1201,17 @@ th {
 td {
   border-bottom: 1px solid #f3f4f6;
 }
+.dark td {
+  border-bottom-color: #374151;
+}
 tr:last-child td {
   border-bottom: none;
 }
 tr:hover {
   background-color: rgba(59, 130, 246, 0.05);
+}
+.dark tr:hover {
+  background-color: rgba(59, 130, 246, 0.1);
 }
 button {
   transition: all 0.15s ease-in-out;
@@ -1125,6 +1236,10 @@ select:focus {
   outline: 2px solid transparent;
   outline-offset: 2px;
 }
+.dark input:focus,
+.dark select:focus {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
 @media (max-width: 640px) {
   .container-padding {
     padding-left: 1rem;
@@ -1141,6 +1256,9 @@ select:focus {
 .form-input:focus {
   border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+.dark .form-input:focus {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
 }
 .icon-button {
   transition: all 0.15s ease;
@@ -1176,16 +1294,32 @@ select:focus {
     0 1px 3px 0 rgba(0, 0, 0, 0.1),
     0 1px 2px 0 rgba(0, 0, 0, 0.06);
 }
+.dark .card-shadow {
+  box-shadow:
+    0 1px 3px 0 rgba(0, 0, 0, 0.3),
+    0 1px 2px 0 rgba(0, 0, 0, 0.2);
+}
 .card-shadow-lg {
   box-shadow:
     0 10px 15px -3px rgba(0, 0, 0, 0.1),
     0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
+.dark .card-shadow-lg {
+  box-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.3),
+    0 4px 6px -2px rgba(0, 0, 0, 0.2);
+}
 .text-primary {
   color: #1f2937;
 }
+.dark .text-primary {
+  color: #f9fafb;
+}
 .text-secondary {
   color: #6b7280;
+}
+.dark .text-secondary {
+  color: #9ca3af;
 }
 .text-accent {
   color: #3b82f6;
@@ -1193,8 +1327,14 @@ select:focus {
 .bg-primary {
   background-color: #ffffff;
 }
+.dark .bg-primary {
+  background-color: #111827;
+}
 .bg-secondary {
   background-color: #f9fafb;
+}
+.dark .bg-secondary {
+  background-color: #1f2937;
 }
 .bg-accent {
   background-color: #3b82f6;
@@ -1202,8 +1342,14 @@ select:focus {
 .border-light {
   border-color: #e5e7eb;
 }
+.dark .border-light {
+  border-color: #374151;
+}
 .border-medium {
   border-color: #d1d5db;
+}
+.dark .border-medium {
+  border-color: #4b5563;
 }
 .rounded-sm {
   border-radius: 0.25rem;
@@ -1219,5 +1365,21 @@ select:focus {
 }
 .rounded-2xl {
   border-radius: 1rem;
+}
+
+/* تحسينات إضافية للوضع الداكن */
+.dark ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.dark ::-webkit-scrollbar-track {
+  background: #1f2937;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #4b5563;
+  border-radius: 4px;
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
 }
 </style>

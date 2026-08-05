@@ -1,9 +1,16 @@
 <template>
   <div class="report-filters">
-    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+    <div
+      class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-5"
+    >
       <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-5">
         <div class="flex items-center gap-2">
-          <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            class="w-5 h-5 text-gray-500 dark:text-gray-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -11,7 +18,9 @@
               d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
             />
           </svg>
-          <h2 class="text-lg font-semibold text-gray-800">{{ $t('reports.filters') }}</h2>
+          <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100">
+            {{ $t('reports.filters') }}
+          </h2>
         </div>
 
         <div class="flex gap-2">
@@ -32,7 +41,7 @@
           </button>
           <button
             @click="resetFilters"
-            class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200 flex items-center gap-2"
+            class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200 flex items-center gap-2"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
@@ -50,17 +59,17 @@
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <!-- Start Date -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             {{ $t('common.fromDate') }}
           </label>
           <div class="relative">
             <input
               type="date"
               v-model="localFilters.start_date"
-              class="w-full px-3 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              class="w-full px-3 py-2.5 pl-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             />
             <svg
-              class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+              class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -77,17 +86,17 @@
 
         <!-- End Date -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             {{ $t('common.toDate') }}
           </label>
           <div class="relative">
             <input
               type="date"
               v-model="localFilters.end_date"
-              class="w-full px-3 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              class="w-full px-3 py-2.5 pl-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             />
             <svg
-              class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+              class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -104,13 +113,13 @@
 
         <!-- Status Filter -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             {{ $t('reports.invoiceStatus') }}
           </label>
           <div class="relative">
             <select
               v-model="localFilters.status"
-              class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white appearance-none pr-10"
+              class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white appearance-none pr-10"
             >
               <option value="">{{ $t('common.all') }}</option>
               <option value="draft">{{ $t('invoices.status.draft') }}</option>
@@ -119,7 +128,7 @@
               <option value="overdue">{{ $t('invoices.status.overdue') }}</option>
             </select>
             <svg
-              class="w-5 h-5 absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
+              class="w-5 h-5 absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -136,13 +145,13 @@
 
         <!-- Client Filter -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             {{ $t('clients.title') }}
           </label>
           <div class="relative">
             <select
               v-model="localFilters.client_id"
-              class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white appearance-none pr-10"
+              class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white appearance-none pr-10"
             >
               <option value="">{{ $t('common.all') }}</option>
               <option
@@ -155,7 +164,7 @@
               </option>
             </select>
             <svg
-              class="w-5 h-5 absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
+              class="w-5 h-5 absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -177,28 +186,16 @@
 <script>
 export default {
   name: 'ReportFilters',
-
   props: {
-    filters: {
-      type: Object,
-      default: () => ({}),
-    },
-    clients: {
-      type: Array,
-      default: () => [],
-    },
-    loading: {
-      type: Boolean,
-      default: false,
-    },
+    filters: { type: Object, default: () => ({}) },
+    clients: { type: Array, default: () => [] },
+    loading: { type: Boolean, default: false },
   },
-
   data() {
     return {
       localFilters: { ...this.filters },
     }
   },
-
   watch: {
     filters: {
       immediate: true,
@@ -207,17 +204,14 @@ export default {
       },
     },
   },
-
   methods: {
     applyFilters() {
       this.$emit('apply-filters', this.localFilters)
     },
-
     resetFilters() {
       const endDate = new Date()
       const startDate = new Date()
       startDate.setDate(startDate.getDate() - 30)
-
       this.localFilters = {
         start_date: startDate.toISOString().split('T')[0],
         end_date: endDate.toISOString().split('T')[0],
@@ -227,7 +221,6 @@ export default {
         per_page: 20,
         page: 1,
       }
-
       this.$emit('apply-filters', this.localFilters)
     },
   },

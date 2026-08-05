@@ -1,8 +1,15 @@
 <template>
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-    <div class="stats-card bg-gradient-to-br from-blue-50 to-blue-100">
-      <div class="stats-icon bg-blue-100">
-        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div
+      class="stats-card bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 border-gray-200 dark:border-gray-700"
+    >
+      <div class="stats-icon bg-blue-100 dark:bg-blue-900/50">
+        <svg
+          class="w-6 h-6 text-blue-600 dark:text-blue-400"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -17,9 +24,16 @@
       </div>
     </div>
 
-    <div class="stats-card bg-gradient-to-br from-green-50 to-green-100">
-      <div class="stats-icon bg-green-100">
-        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div
+      class="stats-card bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/30 dark:to-green-800/30 border-gray-200 dark:border-gray-700"
+    >
+      <div class="stats-icon bg-green-100 dark:bg-green-900/50">
+        <svg
+          class="w-6 h-6 text-green-600 dark:text-green-400"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -34,9 +48,16 @@
       </div>
     </div>
 
-    <div class="stats-card bg-gradient-to-br from-red-50 to-red-100">
-      <div class="stats-icon bg-red-100">
-        <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div
+      class="stats-card bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/30 dark:to-red-800/30 border-gray-200 dark:border-gray-700"
+    >
+      <div class="stats-icon bg-red-100 dark:bg-red-900/50">
+        <svg
+          class="w-6 h-6 text-red-600 dark:text-red-400"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -51,9 +72,16 @@
       </div>
     </div>
 
-    <div class="stats-card bg-gradient-to-br from-purple-50 to-purple-100">
-      <div class="stats-icon bg-purple-100">
-        <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div
+      class="stats-card bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-800/30 border-gray-200 dark:border-gray-700"
+    >
+      <div class="stats-icon bg-purple-100 dark:bg-purple-900/50">
+        <svg
+          class="w-6 h-6 text-purple-600 dark:text-purple-400"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -75,37 +103,25 @@ export default {
   name: 'UsersStatsGrid',
 
   props: {
-    totalUsers: {
-      type: Number,
-      default: 0,
-    },
-    activeUsers: {
-      type: Number,
-      default: 0,
-    },
-    inactiveUsers: {
-      type: Number,
-      default: 0,
-    },
-    totalGroups: {
-      type: Number,
-      default: 0,
-    },
+    totalUsers: { type: Number, default: 0 },
+    activeUsers: { type: Number, default: 0 },
+    inactiveUsers: { type: Number, default: 0 },
+    totalGroups: { type: Number, default: 0 },
   },
 }
 </script>
 
 <style scoped>
 .stats-card {
-  @apply rounded-xl p-5 border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300;
+  @apply rounded-xl p-5 border shadow-sm hover:shadow-md transition-shadow duration-300;
 }
 .stats-icon {
   @apply p-3 rounded-lg w-fit mb-3;
 }
 .stats-label {
-  @apply text-sm font-medium text-gray-500 mb-1;
+  @apply text-sm font-medium text-gray-500 dark:text-gray-400 mb-1;
 }
 .stats-value {
-  @apply text-2xl font-bold text-gray-900;
+  @apply text-2xl font-bold text-gray-900 dark:text-white;
 }
 </style>

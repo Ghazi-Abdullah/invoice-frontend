@@ -8,7 +8,7 @@
     >
       <div class="toast-content">
         <span class="toast-message">{{ toast.message }}</span>
-        <button class="toast-close" @click="removeToast(toast.id)">×</button>
+        <button class="toast-close" @click.stop="removeToast(toast.id)">×</button>
       </div>
     </div>
   </div>
@@ -27,11 +27,7 @@ export default {
       const { type, message } = event.detail
       const id = toastId++
 
-      toasts.value.push({
-        id,
-        type,
-        message,
-      })
+      toasts.value.push({ id, type, message })
 
       setTimeout(() => {
         removeToast(id)
@@ -50,10 +46,7 @@ export default {
       window.removeEventListener('show-toast', showToast)
     })
 
-    return {
-      toasts,
-      removeToast,
-    }
+    return { toasts, removeToast }
   },
 }
 </script>
@@ -70,10 +63,12 @@ export default {
   min-width: 300px;
   margin-bottom: 10px;
   padding: 12px 16px;
-  border-radius: 4px;
+  border-radius: 8px;
   color: white;
   cursor: pointer;
-  transition: transform 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    opacity 0.3s ease;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
@@ -84,15 +79,12 @@ export default {
 .toast-success {
   background-color: #10b981;
 }
-
 .toast-error {
   background-color: #ef4444;
 }
-
 .toast-warning {
   background-color: #f59e0b;
 }
-
 .toast-info {
   background-color: #3b82f6;
 }
@@ -110,6 +102,7 @@ export default {
   font-size: 18px;
   cursor: pointer;
   padding: 0;
-  margin-left: 10px;
+  margin-right: 4px;
+  line-height: 1;
 }
 </style>

@@ -2,17 +2,21 @@
   <transition name="modal-fade">
     <div
       v-if="show"
-      class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+      class="fixed inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50"
       @click.self="$emit('close')"
     >
       <div
-        class="bg-gradient-to-br from-white to-gray-50/50 rounded-3xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto border border-white/50"
+        class="bg-gradient-to-br from-white to-gray-50/50 dark:from-gray-800 dark:to-gray-900/50 rounded-3xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto border border-white/50 dark:border-gray-700 transition-colors duration-300"
       >
         <!-- Modal Header -->
-        <div class="px-8 py-6 border-b border-gray-200/50 bg-gradient-to-r from-blue-50 to-white">
+        <div
+          class="px-8 py-6 border-b border-gray-200/50 dark:border-gray-700/50 bg-gradient-to-r from-blue-50 to-white dark:from-blue-900/20 dark:to-gray-800 transition-colors duration-300"
+        >
           <div class="flex justify-between items-center">
             <div class="flex items-center gap-3">
-              <div class="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-md">
+              <div
+                class="p-3 bg-gradient-to-br from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 rounded-xl shadow-md"
+              >
                 <svg
                   class="w-6 h-6 text-white"
                   fill="none"
@@ -28,17 +32,21 @@
                 </svg>
               </div>
               <div>
-                <h3 class="text-xl font-bold text-gray-900">
-                  {{ isEditing ? $t('permissions.edit_permission') : $t('permissions.add_permission') }}
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white">
+                  {{
+                    isEditing ? $t('permissions.edit_permission') : $t('permissions.add_permission')
+                  }}
                 </h3>
-                <p class="text-sm text-gray-600 mt-1">
-                  {{ isEditing ? $t('permissions.edit_subtitle') : $t('permissions.create_subtitle') }}
+                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  {{
+                    isEditing ? $t('permissions.edit_subtitle') : $t('permissions.create_subtitle')
+                  }}
                 </p>
               </div>
             </div>
             <button
               @click="$emit('close')"
-              class="p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-xl transition-colors"
+              class="p-2 text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors"
             >
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -57,7 +65,7 @@
           <div class="space-y-6">
             <!-- اسم الصلاحية -->
             <div class="space-y-2">
-              <label class="block text-sm font-semibold text-gray-700">
+              <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
                 {{ $t('permissions.permission_name') }}
                 <span class="text-red-500">*</span>
               </label>
@@ -65,45 +73,45 @@
                 type="text"
                 v-model="form.title"
                 required
-                class="w-full px-4 py-3.5 bg-white/80 border border-gray-300/50 rounded-xl focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-200 placeholder:text-gray-400"
+                class="w-full px-4 py-3.5 bg-white/80 dark:bg-gray-700/80 border border-gray-300/50 dark:border-gray-600/50 rounded-xl focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-200 placeholder:text-gray-400 dark:placeholder:text-gray-500 text-gray-900 dark:text-white"
                 :placeholder="$t('permissions.name_placeholder')"
               />
             </div>
 
             <!-- الوصف بالعربية -->
             <div class="space-y-2">
-              <label class="block text-sm font-semibold text-gray-700">
+              <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
                 {{ $t('permissions.description_ar') }}
               </label>
               <input
                 type="text"
                 v-model="form.description_ar"
-                class="w-full px-4 py-3.5 bg-white/80 border border-gray-300/50 rounded-xl focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-200 placeholder:text-gray-400"
+                class="w-full px-4 py-3.5 bg-white/80 dark:bg-gray-700/80 border border-gray-300/50 dark:border-gray-600/50 rounded-xl focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-200 placeholder:text-gray-400 dark:placeholder:text-gray-500 text-gray-900 dark:text-white"
                 :placeholder="$t('permissions.description_ar_placeholder')"
               />
             </div>
 
             <!-- الوصف بالإنجليزية -->
             <div class="space-y-2">
-              <label class="block text-sm font-semibold text-gray-700">
+              <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
                 {{ $t('permissions.description_en') }}
               </label>
               <input
                 type="text"
                 v-model="form.description_en"
-                class="w-full px-4 py-3.5 bg-white/80 border border-gray-300/50 rounded-xl focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-200 placeholder:text-gray-400"
+                class="w-full px-4 py-3.5 bg-white/80 dark:bg-gray-700/80 border border-gray-300/50 dark:border-gray-600/50 rounded-xl focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-200 placeholder:text-gray-400 dark:placeholder:text-gray-500 text-gray-900 dark:text-white"
                 :placeholder="$t('permissions.description_en_placeholder')"
               />
             </div>
 
             <!-- القائمة الرئيسية -->
             <div class="space-y-2">
-              <label class="block text-sm font-semibold text-gray-700">
+              <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
                 {{ $t('permissions.main_menu') }}
               </label>
               <select
                 v-model="form.admin_menu_id"
-                class="w-full px-4 py-3.5 bg-white/80 border border-gray-300/50 rounded-xl focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-200"
+                class="w-full px-4 py-3.5 bg-white/80 dark:bg-gray-700/80 border border-gray-300/50 dark:border-gray-600/50 rounded-xl focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-200 text-gray-900 dark:text-white"
               >
                 <option value="">{{ $t('common.select') }}</option>
                 <option v-for="menu in menus" :key="menu.id" :value="menu.id">
@@ -114,12 +122,12 @@
 
             <!-- القائمة الفرعية -->
             <div class="space-y-2" v-if="form.admin_menu_id">
-              <label class="block text-sm font-semibold text-gray-700">
+              <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
                 {{ $t('permissions.sub_menu') }}
               </label>
               <select
                 v-model="form.admin_sub_menu_id"
-                class="w-full px-4 py-3.5 bg-white/80 border border-gray-300/50 rounded-xl focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-200"
+                class="w-full px-4 py-3.5 bg-white/80 dark:bg-gray-700/80 border border-gray-300/50 dark:border-gray-600/50 rounded-xl focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-200 text-gray-900 dark:text-white"
               >
                 <option value="">{{ $t('common.none') }}</option>
                 <option
@@ -134,39 +142,35 @@
 
             <!-- نوع الصلاحية -->
             <div class="space-y-2">
-              <label class="block text-sm font-semibold text-gray-700">
+              <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
                 {{ $t('permissions.type') }}
               </label>
               <div
-                class="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-gray-100/30 rounded-xl border border-gray-200/50"
+                class="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-gray-100/30 dark:from-gray-900/50 dark:to-gray-800/30 rounded-xl border border-gray-200/50 dark:border-gray-700/50 transition-colors duration-300"
               >
-                <span class="text-gray-700 font-medium">
+                <span class="text-gray-700 dark:text-gray-200 font-medium">
                   {{ form.is_parent ? $t('permissions.parent') : $t('permissions.child') }}
                 </span>
                 <label class="inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    v-model="form.is_parent"
-                    class="sr-only peer"
-                  />
+                  <input type="checkbox" v-model="form.is_parent" class="sr-only peer" />
                   <div
-                    class="relative w-12 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300/50 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gradient-to-r peer-checked:from-green-500 peer-checked:to-green-600"
+                    class="relative w-12 h-6 bg-gray-300 dark:bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300/50 dark:peer-focus:ring-blue-800/50 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 dark:after:border-gray-600 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gradient-to-r peer-checked:from-green-500 peer-checked:to-green-600"
                   ></div>
                 </label>
               </div>
-              <p class="text-xs text-gray-500 mt-2">
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
                 {{ $t('permissions.parent_permission_hint') }}
               </p>
             </div>
 
             <!-- الصلاحية الأب -->
             <div class="space-y-2" v-if="!form.is_parent">
-              <label class="block text-sm font-semibold text-gray-700">
+              <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
                 {{ $t('permissions.parent_permission') }}
               </label>
               <select
                 v-model="form.parent_id"
-                class="w-full px-4 py-3.5 bg-white/80 border border-gray-300/50 rounded-xl focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-200"
+                class="w-full px-4 py-3.5 bg-white/80 dark:bg-gray-700/80 border border-gray-300/50 dark:border-gray-600/50 rounded-xl focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-200 text-gray-900 dark:text-white"
               >
                 <option value="">{{ $t('common.none') }}</option>
                 <option v-for="parent in parentPermissions" :key="parent.id" :value="parent.id">
@@ -177,27 +181,27 @@
 
             <!-- حالة التفعيل -->
             <div class="space-y-2">
-              <label class="block text-sm font-semibold text-gray-700">
+              <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
                 {{ $t('common.status') }}
               </label>
               <div class="flex items-center gap-4">
-                <label class="inline-flex items-center">
+                <label class="inline-flex items-center cursor-pointer">
                   <input
                     type="radio"
                     v-model="form.is_active"
                     :value="true"
-                    class="ml-2"
+                    class="ml-2 text-blue-600 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600"
                   />
-                  <span>{{ $t('common.active') }}</span>
+                  <span class="text-gray-700 dark:text-gray-200">{{ $t('common.active') }}</span>
                 </label>
-                <label class="inline-flex items-center">
+                <label class="inline-flex items-center cursor-pointer">
                   <input
                     type="radio"
                     v-model="form.is_active"
                     :value="false"
-                    class="ml-2"
+                    class="ml-2 text-blue-600 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600"
                   />
-                  <span>{{ $t('common.inactive') }}</span>
+                  <span class="text-gray-700 dark:text-gray-200">{{ $t('common.inactive') }}</span>
                 </label>
               </div>
             </div>
@@ -207,7 +211,7 @@
               <button
                 type="button"
                 @click="$emit('close')"
-                class="px-6 py-3 bg-gradient-to-r from-gray-100 to-gray-50 hover:from-gray-200 hover:to-gray-100 text-gray-700 rounded-xl hover:shadow transition-all duration-200 transform hover:-translate-y-0.5 border border-gray-200/50"
+                class="px-6 py-3 bg-gradient-to-r from-gray-100 to-gray-50 dark:from-gray-700 dark:to-gray-800 hover:from-gray-200 hover:to-gray-100 dark:hover:from-gray-600 dark:hover:to-gray-700 text-gray-700 dark:text-gray-200 rounded-xl hover:shadow transition-all duration-200 transform hover:-translate-y-0.5 border border-gray-200/50 dark:border-gray-600/50"
               >
                 {{ $t('common.cancel') }}
               </button>
@@ -387,3 +391,14 @@ export default {
   },
 }
 </script>
+
+<style scoped>
+.modal-fade-enter-active,
+.modal-fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+.modal-fade-enter-from,
+.modal-fade-leave-to {
+  opacity: 0;
+}
+</style>

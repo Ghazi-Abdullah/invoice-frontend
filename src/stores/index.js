@@ -4,6 +4,7 @@ import { createStore } from 'vuex'
 import auth from './modules/auth'
 import clients from './modules/clients'
 import invoices from './modules/invoices'
+import recurringInvoices from './modules/recurringInvoices'
 import users from './modules/users'
 import adminGroups from './modules/adminGroups'
 import permissions from './modules/permissions'
@@ -88,6 +89,7 @@ export default createStore({
     auth: auth,
     clients: clients,
     invoices: invoices,
+    recurringInvoices: recurringInvoices,
     users: users,
     adminGroups: adminGroups,
     permissions: permissions,

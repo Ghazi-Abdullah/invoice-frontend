@@ -30,6 +30,7 @@ export default {
       clients: { items: [], stats: {}, pagination: { current_page: 1, last_page: 1, per_page: 20, total: 0, from: 0, to: 0 } },
       revenue: { items: [], stats: {}, pagination: { current_page: 1, last_page: 1, per_page: 20, total: 0, from: 0, to: 0 } },
       overdue: { items: [], stats: {}, pagination: { current_page: 1, last_page: 1, per_page: 20, total: 0, from: 0, to: 0 } },
+      aging: { items: [], stats: {}, pagination: { current_page: 1, last_page: 1, per_page: 20, total: 0, from: 0, to: 0 } },
     },
   },
 
@@ -125,7 +126,6 @@ export default {
         const endpoint = `/admin/reports/${state.activeTab}`
         const params = { ...state.filters }
 
-        // Remove empty filters
         Object.keys(params).forEach(key => {
           if (params[key] === '' || params[key] === null || params[key] === undefined) {
             delete params[key]
@@ -134,7 +134,6 @@ export default {
 
         const response = await axios.get(endpoint, { params })
 
-        // Backend returns { success: true, data: {...} }
         if (response.data.success) {
           commit('SET_REPORT_DATA', {
             type: state.activeTab,
@@ -210,7 +209,6 @@ export default {
           { params, responseType: 'blob' }
         )
 
-        // Create download link
         const blob = new Blob([response.data])
         const url = window.URL.createObjectURL(blob)
         const link = document.createElement('a')

@@ -2,9 +2,16 @@
   <div>
     <!-- Stats Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-      <div class="stats-card bg-gradient-to-br from-blue-50 to-blue-100">
-        <div class="stats-icon bg-blue-100">
-          <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div
+        class="stats-card bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 border-gray-200 dark:border-gray-700"
+      >
+        <div class="stats-icon bg-blue-100 dark:bg-blue-900/50">
+          <svg
+            class="w-6 h-6 text-blue-600 dark:text-blue-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -19,9 +26,16 @@
         </div>
       </div>
 
-      <div class="stats-card bg-gradient-to-br from-green-50 to-green-100">
-        <div class="stats-icon bg-green-100">
-          <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div
+        class="stats-card bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/30 dark:to-green-800/30 border-gray-200 dark:border-gray-700"
+      >
+        <div class="stats-icon bg-green-100 dark:bg-green-900/50">
+          <svg
+            class="w-6 h-6 text-green-600 dark:text-green-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -36,9 +50,16 @@
         </div>
       </div>
 
-      <div class="stats-card bg-gradient-to-br from-blue-50 to-blue-100">
-        <div class="stats-icon bg-blue-100">
-          <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div
+        class="stats-card bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 border-gray-200 dark:border-gray-700"
+      >
+        <div class="stats-icon bg-blue-100 dark:bg-blue-900/50">
+          <svg
+            class="w-6 h-6 text-blue-600 dark:text-blue-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -53,9 +74,16 @@
         </div>
       </div>
 
-      <div class="stats-card bg-gradient-to-br from-red-50 to-red-100">
-        <div class="stats-icon bg-red-100">
-          <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div
+        class="stats-card bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/30 dark:to-red-800/30 border-gray-200 dark:border-gray-700"
+      >
+        <div class="stats-icon bg-red-100 dark:bg-red-900/50">
+          <svg
+            class="w-6 h-6 text-red-600 dark:text-red-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -74,17 +102,23 @@
     <!-- Invoices Table -->
     <div
       v-if="invoices.length > 0"
-      class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden "
+      class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden"
     >
-      <div class="px-6 py-4 border-b border-gray-200 bg-gray-50/50">
+      <div
+        class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/50"
+      >
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div class="flex items-center gap-3">
-            <h3 class="text-lg font-semibold text-gray-800">{{ $t('reports.invoicesList') }}</h3>
-            <span class="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
+            <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100">
+              {{ $t('reports.invoicesList') }}
+            </h3>
+            <span
+              class="px-3 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 text-xs font-medium rounded-full"
+            >
               {{ pagination.total }} {{ $t('reports.invoice') }}
             </span>
           </div>
-          <div class="text-sm text-gray-600">
+          <div class="text-sm text-gray-600 dark:text-gray-400">
             {{
               $t('pagination.showing', {
                 from: pagination.from,
@@ -97,7 +131,7 @@
       </div>
 
       <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200 ">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
           <thead>
             <tr>
               <th class="table-header text-center">{{ $t('reports.invoice_number') }}</th>
@@ -108,19 +142,22 @@
               <th class="table-header text-center">{{ $t('reports.status') }}</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-gray-200">
+          <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
             <tr
               v-for="invoice in invoices"
               :key="invoice.id"
-              class="hover:bg-blue-50/30 transition-colors"
+              class="hover:bg-blue-50/30 dark:hover:bg-gray-700/50 transition-colors"
             >
               <td class="table-cell text-center">
-                <router-link :to="`/invoices/${invoice.id}`" class="invoice-link">
+                <router-link
+                  :to="`/invoices/${invoice.id}`"
+                  class="invoice-link dark:text-white dark:hover:text-blue-400"
+                >
                   {{ invoice.invoice_number || `#${invoice.id}` }}
                 </router-link>
               </td>
               <td class="table-cell text-center">
-                <div class="client-cell ">
+                <div class="client-cell">
                   <div class="client-avatar mr-4">
                     {{ getInitials(invoice.client?.name) }}
                   </div>
@@ -157,9 +194,12 @@
       </div>
 
       <!-- Pagination -->
-      <div v-if="pagination.last_page > 1" class="px-6 py-4 border-t border-gray-200">
+      <div
+        v-if="pagination.last_page > 1"
+        class="px-6 py-4 border-t border-gray-200 dark:border-gray-700"
+      >
         <div class="flex items-center justify-between">
-          <div class="text-sm text-gray-700">
+          <div class="text-sm text-gray-700 dark:text-gray-300">
             {{
               $t('pagination.pageOf', {
                 current: pagination.current_page,
@@ -192,8 +232,13 @@
     </div>
 
     <!-- Empty State -->
-    <div v-else class="empty-state">
-      <svg class="empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div v-else class="empty-state bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+      <svg
+        class="empty-icon text-gray-400 dark:text-gray-500"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
         <path
           stroke-linecap="round"
           stroke-linejoin="round"
@@ -201,8 +246,8 @@
           d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
         />
       </svg>
-      <h3>{{ $t('reports.noInvoices') }}</h3>
-      <p>{{ $t('reports.noInvoicesMessage') }}</p>
+      <h3 class="text-gray-900 dark:text-white">{{ $t('reports.noInvoices') }}</h3>
+      <p class="text-gray-600 dark:text-gray-400">{{ $t('reports.noInvoicesMessage') }}</p>
     </div>
   </div>
 </template>
@@ -211,20 +256,10 @@
 export default {
   name: 'InvoiceReportSection',
   props: {
-    invoices: {
-      type: Array,
-      default: () => [],
-    },
-    stats: {
-      type: Object,
-      default: () => ({}),
-    },
-    pagination: {
-      type: Object,
-      default: () => ({}),
-    },
+    invoices: { type: Array, default: () => [] },
+    stats: { type: Object, default: () => ({}) },
+    pagination: { type: Object, default: () => ({}) },
   },
-
   methods: {
     formatCurrency(amount) {
       if (!amount && amount !== 0) return '0.00 ' + this.$t('common.currency')
@@ -235,7 +270,6 @@ export default {
       })
       return formatter.format(amount)
     },
-
     formatDate(dateString) {
       if (!dateString) return '-'
       const date = new Date(dateString)
@@ -245,7 +279,6 @@ export default {
         day: 'numeric',
       })
     },
-
     getInitials(name) {
       if (!name) return '؟؟'
       return name
@@ -255,28 +288,24 @@ export default {
         .toUpperCase()
         .substring(0, 2)
     },
-
     getDueDateClass(dueDate) {
-      if (!dueDate) return 'text-gray-600'
+      if (!dueDate) return 'text-gray-600 dark:text-gray-400'
       const today = new Date()
       const due = new Date(dueDate)
       const diffDays = Math.ceil((due - today) / (1000 * 60 * 60 * 24))
-
       if (diffDays < 0) return 'text-red-600 font-semibold'
       if (diffDays <= 3) return 'text-yellow-600'
       return 'text-green-600'
     },
-
     getStatusClass(status) {
       const classes = {
-        draft: 'bg-gray-100 text-gray-800',
-        sent: 'bg-blue-100 text-blue-800',
-        paid: 'bg-green-100 text-green-800',
-        overdue: 'bg-red-100 text-red-800',
+        draft: 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200',
+        sent: 'bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-300',
+        paid: 'bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-300',
+        overdue: 'bg-red-100 dark:bg-red-900/50 text-red-800 dark:text-red-300',
       }
-      return classes[status] || 'bg-gray-100 text-gray-800'
+      return classes[status] || 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'
     },
-
     getStatusDotClass(status) {
       const classes = {
         draft: 'bg-gray-500',
@@ -286,7 +315,6 @@ export default {
       }
       return classes[status] || 'bg-gray-500'
     },
-
     getStatusText(status) {
       const statuses = {
         draft: 'invoices.status.draft',
@@ -302,86 +330,66 @@ export default {
 
 <style scoped>
 .stats-card {
-  @apply rounded-xl p-5 border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300;
+  @apply rounded-xl p-5 border shadow-sm hover:shadow-md transition-shadow duration-300;
 }
-
 .stats-icon {
   @apply p-3 rounded-lg w-fit mb-3;
 }
-
 .stats-label {
-  @apply text-sm font-medium text-gray-500 mb-1;
+  @apply text-sm font-medium text-gray-500 dark:text-gray-400 mb-1;
 }
-
 .stats-value {
-  @apply text-2xl font-bold text-gray-900;
+  @apply text-2xl font-bold text-gray-900 dark:text-white;
 }
-
 .table-header {
-  @apply px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider;
+  @apply px-6 py-3 text-right text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider;
 }
-
 .table-cell {
   @apply px-6 py-4;
 }
-
 .invoice-link {
   @apply text-base font-semibold text-gray-900 hover:text-blue-600 transition-colors;
 }
-
 .client-cell {
   @apply flex items-center;
 }
-
 .client-avatar {
-  @apply w-10 h-10 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg flex items-center justify-center ml-3;
+  @apply w-10 h-10 bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900 dark:to-blue-800 rounded-lg flex items-center justify-center ml-3 text-gray-700 dark:text-gray-200 font-bold text-sm;
 }
-
 .client-name {
-  @apply text-sm font-medium text-gray-900;
+  @apply text-sm font-medium text-gray-900 dark:text-white;
 }
-
 .client-email {
-  @apply text-xs text-gray-500 mt-1;
+  @apply text-xs text-gray-500 dark:text-gray-400 mt-1;
 }
-
 .date-cell {
-  @apply text-sm text-gray-900 font-medium;
+  @apply text-sm text-gray-900 dark:text-gray-200 font-medium;
 }
-
 .due-date-cell {
   @apply text-sm font-medium;
 }
-
 .amount-cell {
-  @apply text-lg font-bold text-gray-900;
+  @apply text-lg font-bold text-gray-900 dark:text-white;
 }
-
 .status-badge {
   @apply px-3 py-1.5 rounded-full text-xs font-semibold inline-flex items-center gap-1;
 }
-
 .status-dot {
   @apply w-2 h-2 rounded-full;
 }
-
 .pagination-button {
-  @apply px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200;
+  @apply px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200;
 }
-
 .empty-state {
-  @apply bg-white rounded-xl border border-gray-200 shadow-sm p-12 text-center;
+  @apply rounded-xl border shadow-sm p-12 text-center;
 }
-
 .empty-icon {
-  @apply w-16 h-16 text-gray-400 mx-auto mb-4;
+  @apply w-16 h-16 mx-auto mb-4;
 }
-
 .empty-state h3 {
-  @apply text-lg font-semibold text-gray-900 mb-2;
+  @apply text-lg font-semibold mb-2;
 }
-
 .empty-state p {
-  @apply text-gray-600 mb-6 max-w-md mx-auto;
+  @apply mb-6 max-w-md mx-auto;
 }
 </style>

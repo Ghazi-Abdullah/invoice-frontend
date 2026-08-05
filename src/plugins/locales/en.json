@@ -7,6 +7,7 @@
     "subtitle": "Invoice System"
   },
   "nav": {
+    "recurring_invoices": "Recurring Invoices",
     "all_clients": "All Clients",
     "add_client": "Add Client",
     "all_invoices": "All Invoices",
@@ -28,8 +29,6 @@
   },
   "auth": {
     "login": "Login",
-    "register": "Register",
-    "logout": "Logout",
     "email": "Email",
     "password": "Password",
     "confirm_password": "Confirm Password",
@@ -953,7 +952,8 @@
       "invoices": "Invoices Report",
       "clients": "Clients Report",
       "revenue": "Revenue Report",
-      "overdue": "Overdue Invoices"
+      "overdue": "Overdue Invoices",
+      "aging": "Aging Report"
     },
     "type_descriptions": {
       "invoices": "View all invoices with details",
@@ -975,6 +975,13 @@
       "weekly": "Weekly",
       "monthly": "Monthly",
       "yearly": "Yearly"
+    },
+    "aging": {
+      "totalDue": "Total Due",
+      "totalClients": "Total Clients",
+      "days": "days",
+      "invoicesCount": "Invoices Count",
+      "noOverdue": "No overdue invoices currently"
     },
     "statuses": {
       "all": "All Statuses",
@@ -1260,5 +1267,60 @@
       "account": "Account & Subscription",
       "feature": "Feature Request"
     }
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "subtitle": "We are committed to protecting your personal data and ensuring your privacy",
+    "last_updated": "Last Updated",
+    "default_intro": "At Invoicing System, we take your data privacy very seriously. This policy explains how we collect, use, and protect your information.",
+    "questions": "Have questions?",
+    "contact_us": "Contact us for more information about the privacy policy"
+  },
+  "terms": {
+    "title": "Terms of Service",
+    "subtitle": "Terms and conditions governing the use of the Invoicing System",
+    "version": "Version",
+    "default_acceptance": "By using this system, you agree to comply with all the terms and conditions listed below. If you do not agree with any of these terms, please do not use the system.",
+    "acceptance": "Acceptance of Terms",
+    "questions": "Legal inquiries?",
+    "contact_legal": "For inquiries regarding the terms and conditions"
+  },
+  "footer": {
+    "support": "Support"
+  },
+  "recurringInvoices": {
+    "title": "Recurring Invoices",
+    "subtitle": "Templates that repeat automatically or manually to create new invoices",
+    "create_new": "New Template",
+    "create_first": "Create a Template",
+    "create_title": "New Recurring Invoice Template",
+    "create_subtitle": "Generates an invoice automatically on schedule, or manually with a click",
+    "create_button": "Create Template",
+    "create_success": "Template created successfully",
+    "create_failed": "Failed to create template",
+    "empty_title": "No recurring invoice templates",
+    "empty_subtitle": "Create your first template to start generating invoices automatically",
+    "frequency": "Frequency",
+    "weekly": "Weekly",
+    "monthly": "Monthly",
+    "quarterly": "Quarterly",
+    "yearly": "Yearly",
+    "start_date": "First Generation Date",
+    "next_run": "Next Generation",
+    "occurrences": "Occurrences",
+    "occurrences_total": "Number of Occurrences",
+    "occurrences_required": "Occurrences must be at least 1",
+    "due_days": "Payment Term (days)",
+    "due_days_hint": "Days after the invoice date until it becomes due",
+    "active": "Active",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "generate_now": "Generate Now",
+    "generate_success": "Invoice generated successfully",
+    "generate_failed": "Generation failed",
+    "cancel_confirm_title": "Cancel this template?",
+    "cancel_confirm_text": "No new invoices will be generated from this template after cancelling.",
+    "cancel_success": "Template cancelled",
+    "delete_confirm_text": "This action cannot be undone."
   }
 }

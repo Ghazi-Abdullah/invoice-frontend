@@ -2,9 +2,16 @@
   <div>
     <!-- Stats Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-      <div class="stats-card bg-gradient-to-br from-red-50 to-red-100">
-        <div class="stats-icon bg-red-100">
-          <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div
+        class="stats-card bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/30 dark:to-red-800/30 border-gray-200 dark:border-gray-700"
+      >
+        <div class="stats-icon bg-red-100 dark:bg-red-900/50">
+          <svg
+            class="w-6 h-6 text-red-600 dark:text-red-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -19,9 +26,16 @@
         </div>
       </div>
 
-      <div class="stats-card bg-gradient-to-br from-yellow-50 to-yellow-100">
-        <div class="stats-icon bg-yellow-100">
-          <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div
+        class="stats-card bg-gradient-to-br from-yellow-50 to-yellow-100 dark:from-yellow-900/30 dark:to-yellow-800/30 border-gray-200 dark:border-gray-700"
+      >
+        <div class="stats-icon bg-yellow-100 dark:bg-yellow-900/50">
+          <svg
+            class="w-6 h-6 text-yellow-600 dark:text-yellow-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -36,9 +50,16 @@
         </div>
       </div>
 
-      <div class="stats-card bg-gradient-to-br from-orange-50 to-orange-100">
-        <div class="stats-icon bg-orange-100">
-          <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div
+        class="stats-card bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/30 dark:to-orange-800/30 border-gray-200 dark:border-gray-700"
+      >
+        <div class="stats-icon bg-orange-100 dark:bg-orange-900/50">
+          <svg
+            class="w-6 h-6 text-orange-600 dark:text-orange-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -49,15 +70,20 @@
         </div>
         <div>
           <p class="stats-label">{{ $t('reports.averageDaysOverdue') }}</p>
-          <p class="stats-value">
-            {{ stats.average_days_overdue || 0 }} {{ $t('common.days') }}
-          </p>
+          <p class="stats-value">{{ stats.average_days_overdue || 0 }} {{ $t('common.days') }}</p>
         </div>
       </div>
 
-      <div class="stats-card bg-gradient-to-br from-purple-50 to-purple-100">
-        <div class="stats-icon bg-purple-100">
-          <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div
+        class="stats-card bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-800/30 border-gray-200 dark:border-gray-700"
+      >
+        <div class="stats-icon bg-purple-100 dark:bg-purple-900/50">
+          <svg
+            class="w-6 h-6 text-purple-600 dark:text-purple-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -76,17 +102,23 @@
     <!-- Overdue Invoices Table -->
     <div
       v-if="invoices.length > 0"
-      class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden"
+      class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden"
     >
-      <div class="px-6 py-4 border-b border-gray-200 bg-gray-50/50">
+      <div
+        class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/50"
+      >
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div class="flex items-center gap-3">
-            <h3 class="text-lg font-semibold text-gray-800">{{ $t('reports.overdueInvoicesList') }}</h3>
-            <span class="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
+            <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100">
+              {{ $t('reports.overdueInvoicesList') }}
+            </h3>
+            <span
+              class="px-3 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 text-xs font-medium rounded-full"
+            >
               {{ pagination.total }} {{ $t('reports.invoice') }}
             </span>
           </div>
-          <div class="text-sm text-gray-600">
+          <div class="text-sm text-gray-600 dark:text-gray-400">
             {{
               $t('pagination.showing', {
                 from: pagination.from,
@@ -99,7 +131,7 @@
       </div>
 
       <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
           <thead>
             <tr>
               <th class="table-header text-center">{{ $t('reports.invoice_number') }}</th>
@@ -111,14 +143,17 @@
               <th class="table-header text-center">{{ $t('reports.actions') }}</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-gray-200">
+          <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
             <tr
               v-for="invoice in invoices"
               :key="invoice.id"
-              class="hover:bg-red-50/30 transition-colors"
+              class="hover:bg-red-50/30 dark:hover:bg-gray-700/50 transition-colors"
             >
               <td class="table-cell text-center">
-                <router-link :to="`/invoices/${invoice.id}`" class="invoice-link">
+                <router-link
+                  :to="`/invoices/${invoice.id}`"
+                  class="invoice-link dark:text-white dark:hover:text-blue-400"
+                >
                   {{ invoice.invoice_number || `#${invoice.id}` }}
                 </router-link>
               </td>
@@ -144,20 +179,20 @@
               </td>
               <td class="table-cell text-right">
                 <div class="amount-cell">{{ formatCurrency(invoice.total_amount) }}</div>
-                <div v-if="invoice.paid_amount" class="text-xs text-green-600 mt-1">
+                <div
+                  v-if="invoice.paid_amount"
+                  class="text-xs text-green-600 dark:text-green-400 mt-1"
+                >
                   {{ $t('reports.paid') }}: {{ formatCurrency(invoice.paid_amount) }}
                 </div>
               </td>
               <td class="table-cell text-right">
-                <div class="text-xl font-bold text-red-600">
+                <div class="text-xl font-bold text-red-600 dark:text-red-400">
                   {{ formatCurrency(invoice.due_amount) }}
                 </div>
               </td>
               <td class="table-cell text-center">
-                <span
-                  :class="getDaysOverdueClass(invoice.days_overdue)"
-                  class="status-badge"
-                >
+                <span :class="getDaysOverdueClass(invoice.days_overdue)" class="status-badge">
                   <span
                     :class="getDaysOverdueDotClass(invoice.days_overdue)"
                     class="status-dot"
@@ -167,10 +202,9 @@
               </td>
               <td class="table-cell text-center">
                 <div class="flex items-center justify-center gap-2">
-
                   <button
                     @click="sendReminder(invoice)"
-                    class="px-3 py-1.5 bg-yellow-100 text-yellow-700 hover:bg-yellow-200 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center gap-1"
+                    class="px-3 py-1.5 bg-yellow-100 dark:bg-yellow-900/50 text-yellow-700 dark:text-yellow-300 hover:bg-yellow-200 dark:hover:bg-yellow-900 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center gap-1"
                   >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
@@ -182,10 +216,9 @@
                     </svg>
                     {{ $t('reports.sendReminder') }}
                   </button>
-
                   <button
                     @click="markAsPaid(invoice)"
-                    class="px-3 py-1.5 bg-green-100 text-green-700 hover:bg-green-200 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center gap-1"
+                    class="px-3 py-1.5 bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-900 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center gap-1"
                   >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
@@ -197,7 +230,6 @@
                     </svg>
                     {{ $t('reports.markAsPaid') }}
                   </button>
-
                 </div>
               </td>
             </tr>
@@ -206,9 +238,12 @@
       </div>
 
       <!-- Pagination -->
-      <div v-if="pagination.last_page > 1" class="px-6 py-4 border-t border-gray-200">
+      <div
+        v-if="pagination.last_page > 1"
+        class="px-6 py-4 border-t border-gray-200 dark:border-gray-700"
+      >
         <div class="flex items-center justify-between">
-          <div class="text-sm text-gray-700">
+          <div class="text-sm text-gray-700 dark:text-gray-300">
             {{
               $t('pagination.pageOf', {
                 current: pagination.current_page,
@@ -241,8 +276,13 @@
     </div>
 
     <!-- Empty State -->
-    <div v-else class="empty-state">
-      <svg class="empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div v-else class="empty-state bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+      <svg
+        class="empty-icon text-gray-400 dark:text-gray-500"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
         <path
           stroke-linecap="round"
           stroke-linejoin="round"
@@ -250,8 +290,8 @@
           d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
         />
       </svg>
-      <h3>{{ $t('reports.noOverdue') }}</h3>
-      <p>{{ $t('reports.noOverdueMessage') }}</p>
+      <h3 class="text-gray-900 dark:text-white">{{ $t('reports.noOverdue') }}</h3>
+      <p class="text-gray-600 dark:text-gray-400">{{ $t('reports.noOverdueMessage') }}</p>
     </div>
   </div>
 </template>
@@ -305,19 +345,20 @@ export default {
       })
     },
     getDueDateClass(dueDate) {
-      if (!dueDate) return 'text-gray-600'
+      if (!dueDate) return 'text-gray-600 dark:text-gray-400'
       const today = new Date()
       const due = new Date(dueDate)
       const diffDays = Math.ceil((due - today) / (1000 * 60 * 60 * 24))
-
       if (diffDays < 0) return 'text-red-600 font-semibold'
       if (diffDays <= 3) return 'text-yellow-600'
       return 'text-green-600'
     },
     getDaysOverdueClass(days) {
-      if (days <= 7) return 'bg-yellow-100 text-yellow-800'
-      if (days <= 30) return 'bg-orange-100 text-orange-800'
-      return 'bg-red-100 text-red-800'
+      if (days <= 7)
+        return 'bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-300'
+      if (days <= 30)
+        return 'bg-orange-100 dark:bg-orange-900/50 text-orange-800 dark:text-orange-300'
+      return 'bg-red-100 dark:bg-red-900/50 text-red-800 dark:text-red-300'
     },
     getDaysOverdueDotClass(days) {
       if (days <= 7) return 'bg-yellow-500'
@@ -338,21 +379,20 @@ export default {
 </script>
 
 <style scoped>
-/* استخدم نفس الأنماط من InvoiceReportSection */
 .stats-card {
-  @apply rounded-xl p-5 border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300;
+  @apply rounded-xl p-5 border shadow-sm hover:shadow-md transition-shadow duration-300;
 }
 .stats-icon {
   @apply p-3 rounded-lg w-fit mb-3;
 }
 .stats-label {
-  @apply text-sm font-medium text-gray-500 mb-1;
+  @apply text-sm font-medium text-gray-500 dark:text-gray-400 mb-1;
 }
 .stats-value {
-  @apply text-2xl font-bold text-gray-900;
+  @apply text-2xl font-bold text-gray-900 dark:text-white;
 }
 .table-header {
-  @apply px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider;
+  @apply px-6 py-3 text-right text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider;
 }
 .table-cell {
   @apply px-6 py-4;
@@ -364,22 +404,22 @@ export default {
   @apply flex items-center;
 }
 .client-avatar {
-  @apply w-10 h-10 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg flex items-center justify-center ml-3;
+  @apply w-10 h-10 bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900 dark:to-blue-800 rounded-lg flex items-center justify-center ml-3 text-gray-700 dark:text-gray-200 font-bold text-sm;
 }
 .client-name {
-  @apply text-sm font-medium text-gray-900;
+  @apply text-sm font-medium text-gray-900 dark:text-white;
 }
 .client-email {
-  @apply text-xs text-gray-500 mt-1;
+  @apply text-xs text-gray-500 dark:text-gray-400 mt-1;
 }
 .date-cell {
-  @apply text-sm text-gray-900 font-medium;
+  @apply text-sm text-gray-900 dark:text-gray-200 font-medium;
 }
 .due-date-cell {
   @apply text-sm font-medium;
 }
 .amount-cell {
-  @apply text-lg font-bold text-gray-900;
+  @apply text-lg font-bold text-gray-900 dark:text-white;
 }
 .status-badge {
   @apply px-3 py-1.5 rounded-full text-xs font-semibold inline-flex items-center gap-1;
@@ -388,18 +428,19 @@ export default {
   @apply w-2 h-2 rounded-full;
 }
 .pagination-button {
-  @apply px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200;
+  @apply px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200;
 }
 .empty-state {
-  @apply bg-white rounded-xl border border-gray-200 shadow-sm p-12 text-center;
+  @apply rounded-xl border shadow-sm p-12 text-center;
 }
 .empty-icon {
-  @apply w-16 h-16 text-gray-400 mx-auto mb-4;
+  @apply w-16 h-16 mx-auto mb-4;
 }
 .empty-state h3 {
-  @apply text-lg font-semibold text-gray-900 mb-2;
+  @apply text-lg font-semibold mb-2;
 }
 .empty-state p {
-  @apply text-gray-600 mb-6 max-w-md mx-auto;
+  @apply mb-6 max-w-md mx-auto;
 }
 </style>
+

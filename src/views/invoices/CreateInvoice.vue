@@ -264,6 +264,31 @@
                             </div>
                           </div>
                         </div>
+
+                        <!-- الرصيد الائتماني للعميل المختار -->
+                        <div
+                          v-if="hasCreditLimit"
+                          class="mt-3 pt-3 border-t border-blue-200 flex items-center justify-between text-sm"
+                        >
+                          <span class="text-gray-600">
+                            {{ $t('clients.form.creditLimit') }}:
+                            <span class="font-semibold text-gray-800">{{ formatCurrency(selectedClient.credit_limit) }}</span>
+                          </span>
+                          <span :class="remainingCreditClass" class="font-semibold">
+                            {{ $t('invoices.create.remaining_credit') || 'المتبقي' }}: {{ formatCurrency(remainingCredit) }}
+                          </span>
+                        </div>
+                        <div
+                          v-if="creditLimitWarning"
+                          class="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm flex items-start gap-2"
+                        >
+                          <svg class="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          <span>
+                            {{ $t('invoices.create.credit_limit_warning') || 'إجمالي هذه الفاتورة يتجاوز الرصيد الائتماني المتبقي للعميل. قد يتم رفض إنشاء الفاتورة من الخادم.' }}
+                          </span>
+                        </div>
                       </div>
                     </div>
                     <div>
@@ -847,6 +872,27 @@ export default {
     ...mapGetters('clients', ['clients']),
     selectedClient() {
       return this.clients.find((c) => c.id == this.invoiceData.client_id)
+    },
+    hasCreditLimit() {
+      return (
+        this.selectedClient &&
+        this.selectedClient.credit_limit !== null &&
+        this.selectedClient.credit_limit !== undefined
+      )
+    },
+    remainingCredit() {
+      if (!this.hasCreditLimit) return null
+      const limit = parseFloat(this.selectedClient.credit_limit) || 0
+      const due = parseFloat(this.selectedClient.total_due) || 0
+      return limit - due
+    },
+    remainingCreditClass() {
+      if (this.remainingCredit === null) return 'text-gray-600'
+      return this.remainingCredit < 0 ? 'text-red-600' : 'text-green-600'
+    },
+    creditLimitWarning() {
+      if (!this.hasCreditLimit) return false
+      return this.invoiceData.total > this.remainingCredit
     },
     isFormValid() {
       return (

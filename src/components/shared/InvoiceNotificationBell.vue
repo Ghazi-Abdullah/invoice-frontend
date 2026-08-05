@@ -88,7 +88,7 @@
           <!-- تذاكر مفتوحة -->
           <button
             v-if="openTicketsCount > 0"
-            @click="goTo('SupportTickets')"
+            @click="$router.push({ path: '/support/tickets', query: { status: 'open' } })"
             class="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors group"
           >
             <span class="flex items-center gap-3 min-w-0">

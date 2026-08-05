@@ -380,6 +380,30 @@
                   </div>
                 </div>
 
+                <!-- Credit Limit -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    {{ $t('clients.form.creditLimit') }}
+                  </label>
+                  <input
+                    v-model="form.credit_limit"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    :placeholder="$t('clients.form.creditLimitPlaceholder')"
+                    :class="[
+                      'w-full px-3 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors',
+                      errors.credit_limit ? 'border-red-300' : 'border-gray-300',
+                    ]"
+                  />
+                  <p class="mt-1 text-xs text-gray-500">
+                    {{ $t('clients.form.creditLimitHint') }}
+                  </p>
+                  <div v-if="errors.credit_limit" class="mt-1 text-sm text-red-600">
+                    {{ errors.credit_limit }}
+                  </div>
+                </div>
+
                 <!-- Status -->
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -641,6 +665,7 @@ export default {
         company_name: '',
         tax_number: '',
         payment_terms: 'net_30',
+        credit_limit: '',
         currency: 'SAR',
         notes: '',
         status: 'active',
@@ -669,6 +694,7 @@ export default {
           company_name: client.company_name || '',
           tax_number: client.tax_number || '',
           payment_terms: client.payment_terms || 'net_30',
+          credit_limit: client.credit_limit ?? '',
           currency: client.currency || 'SAR',
           notes: client.notes || '',
           status: client.is_active ? 'active' : 'inactive',
@@ -710,6 +736,7 @@ export default {
           company_name: this.form.company_name || '',
           tax_number: this.form.tax_number || '',
           payment_terms: this.form.payment_terms,
+          credit_limit: this.form.credit_limit === '' ? null : Number(this.form.credit_limit),
           currency: this.form.currency,
           notes: this.form.notes || '',
           status: this.form.status,

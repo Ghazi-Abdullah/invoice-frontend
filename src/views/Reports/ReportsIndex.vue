@@ -409,38 +409,7 @@
             </div>
           </div>
 
-          <!-- Client Filter -->
-         <!-- <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">{{
-              $t('clients.title')
-            }}</label>
-            <div class="relative">
-              <select
-                v-model="filters.client_id"
-                class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white appearance-none pr-10"
-              >
-                <option value="">{{ $t('common.all') }}</option>
-                <option v-for="client in clients" :key="client.id" :value="client.id">
-                  {{ client.name }}
-                </option>
-              </select>
-              <svg
-                class="w-5 h-5 absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
-            </div>
-          </div>-->
-
-           <!-- Search -->
+          <!-- Search -->
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">{{
               $t('common.search')
@@ -453,7 +422,6 @@
                 :placeholder="$t('invoices.searchPlaceholder')"
                 class="w-full px-3 py-2.5 pr-10 pl-8 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
-              <!-- أيقونة البحث على اليمين (مناسبة للعربية) -->
               <svg
                 class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
                 fill="none"
@@ -467,7 +435,6 @@
                   d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                 />
               </svg>
-              <!-- زر المسح على اليسار -->
               <button
                 v-if="filters.search"
                 @click="clearSearch"
@@ -558,6 +525,21 @@
                 stroke-linejoin="round"
                 stroke-width="2"
                 d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <!-- Aging Icon -->
+            <svg
+              v-else-if="tab.id === 'aging'"
+              class="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 7h6m-6 4h6m-6 4h4m-9 5h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"
               />
             </svg>
             {{ tab.label }}
@@ -655,6 +637,14 @@
             @page-change="handlePageChange"
           />
         </div>
+
+        <!-- Aging Report -->
+        <div v-if="activeTab === 'aging'">
+          <AgingReportSection
+            :clients="reports.aging.items"
+            :stats="reports.aging.stats"
+          />
+        </div>
       </div>
     </div>
 
@@ -676,6 +666,7 @@ import InvoiceReportSection from '@/components/reports/InvoiceReportSection.vue'
 import ClientReportSection from '@/components/reports/ClientReportSection.vue'
 import RevenueReportSection from '@/components/reports/RevenueReportSection.vue'
 import OverdueReportSection from '@/components/reports/OverdueReportSection.vue'
+import AgingReportSection from '@/components/reports/AgingReportSection.vue'
 import ExportModal from '@/components/reports/ExportModal.vue'
 
 export default {
@@ -685,6 +676,7 @@ export default {
     ClientReportSection,
     RevenueReportSection,
     OverdueReportSection,
+    AgingReportSection,
     ExportModal,
   },
 
@@ -707,6 +699,7 @@ export default {
         { id: 'clients', label: this.$t('reports.types.clients') },
         { id: 'revenue', label: this.$t('reports.types.revenue') },
         { id: 'overdue', label: this.$t('reports.types.overdue') },
+        { id: 'aging', label: this.$t('reports.types.aging') },
       ]
     },
     filters: {
@@ -744,7 +737,6 @@ export default {
       'deleteExportedFile',
       'clearError',
     ]),
-    // استخدام كائن لإعادة تسمية الإجراءات لتتناسب مع الأحداث في القالب
     ...mapActions('report', {
       handleSendReminder: 'sendReminder',
       handleMarkAsPaid: 'markAsPaid',
@@ -753,7 +745,6 @@ export default {
     async confirmDeleteFile(fileName) {
       let confirmed = false
 
-      // التحقق من وجود SweetAlert
       if (this.$swal) {
         const result = await this.$swal({
           title: this.$t('common.delete_confirm_title'),

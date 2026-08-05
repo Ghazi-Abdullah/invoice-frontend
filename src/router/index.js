@@ -92,6 +92,19 @@ const routes = [
         component: () => import('@/views/invoices/EditInvoice.vue'),
         meta: { permission: 'edit_invoice' },
       },
+      // Recurring Invoices
+      {
+        path: 'recurring-invoices',
+        name: 'RecurringInvoices',
+        component: () => import('@/views/invoices/RecurringInvoicesIndex.vue'),
+        meta: { permission: 'view_invoices' },
+      },
+      {
+        path: 'recurring-invoices/create',
+        name: 'CreateRecurringInvoice',
+        component: () => import('@/views/invoices/CreateRecurringInvoice.vue'),
+        meta: { permission: 'create_invoice' },
+      },
       // Clients
       {
         path: 'clients',

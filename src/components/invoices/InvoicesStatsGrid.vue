@@ -1,13 +1,22 @@
 <template>
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-    <div class="bg-white rounded-xl p-5 border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300">
+    <div
+      class="bg-white dark:bg-gray-800 rounded-xl p-5 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow duration-300"
+    >
       <div class="flex items-center justify-between">
         <div>
-          <p class="text-sm font-medium text-gray-500 mb-1">{{ $t('invoices.stats.total') }}</p>
-          <p class="text-2xl font-bold text-gray-900">{{ stats.total || 0 }}</p>
+          <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
+            {{ $t('invoices.stats.total') }}
+          </p>
+          <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ stats.total || 0 }}</p>
         </div>
-        <div class="p-3 bg-blue-50 rounded-lg">
-          <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="p-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
+          <svg
+            class="w-6 h-6 text-blue-500 dark:text-blue-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -17,17 +26,26 @@
           </svg>
         </div>
       </div>
-      <div class="mt-3 text-xs text-gray-400">📈 Total invoices</div>
+      <div class="mt-3 text-xs text-gray-400 dark:text-gray-500">📈 Total invoices</div>
     </div>
 
-    <div class="bg-white rounded-xl p-5 border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300">
+    <div
+      class="bg-white dark:bg-gray-800 rounded-xl p-5 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow duration-300"
+    >
       <div class="flex items-center justify-between">
         <div>
-          <p class="text-sm font-medium text-gray-500 mb-1">{{ $t('invoices.stats.paid') }}</p>
-          <p class="text-2xl font-bold text-gray-900">{{ stats.paid || 0 }}</p>
+          <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
+            {{ $t('invoices.stats.paid') }}
+          </p>
+          <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ stats.paid || 0 }}</p>
         </div>
-        <div class="p-3 bg-green-50 rounded-lg">
-          <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="p-3 bg-green-50 dark:bg-green-900/30 rounded-lg">
+          <svg
+            class="w-6 h-6 text-green-500 dark:text-green-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -37,17 +55,26 @@
           </svg>
         </div>
       </div>
-      <div class="mt-3 text-xs text-gray-400">💰 {{ paidRate }}% paid rate</div>
+      <div class="mt-3 text-xs text-gray-400 dark:text-gray-500">💰 {{ paidRate }}% paid rate</div>
     </div>
 
-    <div class="bg-white rounded-xl p-5 border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300">
+    <div
+      class="bg-white dark:bg-gray-800 rounded-xl p-5 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow duration-300"
+    >
       <div class="flex items-center justify-between">
         <div>
-          <p class="text-sm font-medium text-gray-500 mb-1">{{ $t('invoices.stats.sent') }}</p>
-          <p class="text-2xl font-bold text-gray-900">{{ stats.sent || 0 }}</p>
+          <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
+            {{ $t('invoices.stats.sent') }}
+          </p>
+          <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ stats.sent || 0 }}</p>
         </div>
-        <div class="p-3 bg-yellow-50 rounded-lg">
-          <svg class="w-6 h-6 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="p-3 bg-yellow-50 dark:bg-yellow-900/30 rounded-lg">
+          <svg
+            class="w-6 h-6 text-yellow-500 dark:text-yellow-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -57,17 +84,26 @@
           </svg>
         </div>
       </div>
-      <div class="mt-3 text-xs text-gray-400">✉️ Sent to clients</div>
+      <div class="mt-3 text-xs text-gray-400 dark:text-gray-500">✉️ Sent to clients</div>
     </div>
 
-    <div class="bg-white rounded-xl p-5 border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300">
+    <div
+      class="bg-white dark:bg-gray-800 rounded-xl p-5 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow duration-300"
+    >
       <div class="flex items-center justify-between">
         <div>
-          <p class="text-sm font-medium text-gray-500 mb-1">{{ $t('invoices.stats.overdue') }}</p>
-          <p class="text-2xl font-bold text-gray-900">{{ stats.overdue || 0 }}</p>
+          <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
+            {{ $t('invoices.stats.overdue') }}
+          </p>
+          <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ stats.overdue || 0 }}</p>
         </div>
-        <div class="p-3 bg-red-50 rounded-lg">
-          <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="p-3 bg-red-50 dark:bg-red-900/30 rounded-lg">
+          <svg
+            class="w-6 h-6 text-red-500 dark:text-red-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -77,7 +113,7 @@
           </svg>
         </div>
       </div>
-      <div class="mt-3 text-xs text-gray-400">⚠️ Requires attention</div>
+      <div class="mt-3 text-xs text-gray-400 dark:text-gray-500">⚠️ Requires attention</div>
     </div>
   </div>
 </template>
@@ -85,16 +121,9 @@
 <script>
 export default {
   name: 'InvoicesStatsGrid',
-
   props: {
-    stats: {
-      type: Object,
-      required: true,
-    },
-    paidRate: {
-      type: [Number, String],
-      default: 0,
-    },
+    stats: { type: Object, required: true },
+    paidRate: { type: [Number, String], default: 0 },
   },
 }
 </script>
