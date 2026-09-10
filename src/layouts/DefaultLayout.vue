@@ -161,7 +161,6 @@
                 :class="$i18n.locale === 'ar' ? 'right-0' : 'left-0'"
               ></div>
             </router-link>
-
           </div>
 
           <div v-if="sidebarOpen" class="pt-4 mt-2 border-t border-slate-700/50"></div>
@@ -241,7 +240,7 @@
             ></div>
           </router-link>
 
-           <!-- âœ… Support Tickets -->
+          <!-- âœ… Support Tickets -->
           <router-link
             v-if="hasPermission('administration')"
             to="/support/tickets"
@@ -309,7 +308,9 @@
               {{ t('nav.invoices') }}
             </span>
             <div
-              v-if="$route.path.includes('/invoices') && !$route.path.includes('/recurring-invoices')"
+              v-if="
+                $route.path.includes('/invoices') && !$route.path.includes('/recurring-invoices')
+              "
               class="absolute top-1/2 -translate-y-1/2 w-1 h-6 rounded-full bg-blue-500"
               :class="$i18n.locale === 'ar' ? 'right-0' : 'left-0'"
             ></div>
@@ -327,7 +328,9 @@
                 ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20 shadow-sm shadow-blue-500/10'
                 : 'text-slate-400 hover:bg-slate-800/60 hover:text-white',
             ]"
-            :title="!sidebarOpen && !isMobile ? (t('nav.recurring_invoices') || 'Ø§Ù„ÙÙˆØ§ØªÙŠØ± Ø§Ù„Ù…ØªÙƒØ±Ø±Ø©') : ''"
+            :title="
+              !sidebarOpen && !isMobile ? t('nav.recurring_invoices') || 'Recurring Invoices' : ''
+            "
           >
             <svg
               class="w-5 h-5 flex-shrink-0"
@@ -345,11 +348,48 @@
               />
             </svg>
             <span v-if="sidebarOpen" class="text-sm font-medium transition-colors">
-              {{ t('nav.recurring_invoices') || 'Ø§Ù„ÙÙˆØ§ØªÙŠØ± Ø§Ù„Ù…ØªÙƒØ±Ø±Ø©' }}
+              {{ t('nav.recurring_invoices') || 'Recurring Invoices' }}
             </span>
             <div
               v-if="$route.path.includes('/recurring-invoices')"
               class="absolute top-1/2 -translate-y-1/2 w-1 h-6 rounded-full bg-blue-500"
+              :class="$i18n.locale === 'ar' ? 'right-0' : 'left-0'"
+            ></div>
+          </router-link>
+
+          <!-- branches -->
+          <router-link
+            v-if="hasPermission('administration')"
+            to="/admin/branches"
+            @click="closeSidebarOnMobile"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative"
+            :class="[
+              !sidebarOpen && !isMobile ? 'justify-center' : '',
+              $route.path.includes('/admin/branches')
+                ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20 shadow-sm shadow-purple-500/10'
+                : 'text-slate-400 hover:bg-slate-800/60 hover:text-white',
+            ]"
+            :title="!sidebarOpen && !isMobile ? t('nav.branches') : ''"
+          >
+            <svg
+              class="w-5 h-5 flex-shrink-0"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21"
+              />
+            </svg>
+            <span v-if="sidebarOpen" class="text-sm font-medium transition-colors">
+              {{ t('nav.branches') }}
+            </span>
+            <div
+              v-if="$route.path.includes('/admin/branches')"
+              class="absolute top-1/2 -translate-y-1/2 w-1 h-6 rounded-full bg-purple-500"
               :class="$i18n.locale === 'ar' ? 'right-0' : 'left-0'"
             ></div>
           </router-link>
@@ -544,32 +584,6 @@
               ></div>
             </router-link>
 
-            <router-link
-              v-if="hasPermission('administration')"
-              to="/admin/branches"
-              @click="closeSidebarOnMobile"
-              class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative"
-              :class="[
-                !sidebarOpen && !isMobile ? 'justify-center' : '',
-                $route.path.includes('/admin/branches')
-                  ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20 shadow-sm shadow-purple-500/10'
-                  : 'text-slate-400 hover:bg-slate-800/60 hover:text-white',
-              ]"
-              :title="!sidebarOpen && !isMobile ? (t('nav.branches') || 'Ø§Ù„ÙØ±ÙˆØ¹') : ''"
-            >
-              <svg class="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
-              </svg>
-              <span v-if="sidebarOpen" class="text-sm font-medium transition-colors">
-                {{ t('nav.branches') || 'Ø§Ù„ÙØ±ÙˆØ¹' }}
-              </span>
-              <div
-                v-if="$route.path.includes('/admin/branches')"
-                class="absolute top-1/2 -translate-y-1/2 w-1 h-6 rounded-full bg-purple-500"
-                :class="$i18n.locale === 'ar' ? 'right-0' : 'left-0'"
-              ></div>
-            </router-link>
-
             <div v-if="sidebarOpen" class="pt-4 mt-4 border-t border-slate-700/50"></div>
             <div v-else class="pt-2 mt-2 border-t border-slate-700/50 mx-2"></div>
 
@@ -741,7 +755,7 @@
                   d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418"
                 />
               </svg>
-              <span class="font-medium">{{ $i18n.locale === 'ar' ? 'English' : 'Ø§Ù„Ø¹Ø±Ø¨ÙŠØ©' }}</span>
+              <span class="font-medium">{{ $i18n.locale === 'ar' ? 'English' : 'العربية' }}</span>
             </button>
 
             <!-- User Dropdown -->

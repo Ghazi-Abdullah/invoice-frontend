@@ -47,7 +47,9 @@ export function initDarkMode() {
   const stored = getStoredPreference()
   // إذا المستخدم اختار سابقاً (فعّل/عطّل الزر يدوياً) نحترم اختياره؛
   // غير ذلك نتبع تفضيل نظام التشغيل كقيمة افتراضية معقولة
-  const enabled = stored === null ? systemPrefersDark() : stored
+  // const enabled = stored === null ? systemPrefersDark() : stored
+
+  const enabled = stored === null ? false : stored
   applyDarkMode(enabled)
 }
 
