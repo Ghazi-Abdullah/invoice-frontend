@@ -190,8 +190,12 @@ const routes = [
           permission: 'manage_settings'
         }
       },
-
-
+      {
+        path: 'admin/branches',
+        name: 'AdminBranches',
+        component: () => import('@/views/Admin/BranchesManagement.vue'),
+        meta: { requiresAdmin: true, permission: 'administration' },
+      },
     ],
   },
 

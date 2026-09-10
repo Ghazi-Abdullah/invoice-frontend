@@ -7,6 +7,7 @@
     "subtitle": "Invoice System"
   },
   "nav": {
+    "branches": "Branches",
     "recurring_invoices": "Recurring Invoices",
     "all_clients": "All Clients",
     "add_client": "Add Client",
@@ -1322,5 +1323,12 @@
     "cancel_confirm_text": "No new invoices will be generated from this template after cancelling.",
     "cancel_success": "Template cancelled",
     "delete_confirm_text": "This action cannot be undone."
-  }
+  },
+  "branch": {
+  "select_branch": "Select Branch",
+  "your_branches": "Your Branches",
+  "select_to_filter": "Select a branch to filter data",
+  "manage_branches": "Manage Branches",
+  "branch_changed": "Branch changed to {branch}"
+}
 }

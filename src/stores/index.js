@@ -21,6 +21,7 @@ import installments from './modules/installments'
 import paymentLinks from './modules/paymentLinks'
 import support from './modules/support'
 import content from './modules/content'
+import branch from './modules/branch'
 
 
 
@@ -105,6 +106,7 @@ export default createStore({
     installments: installments,
     paymentLinks: paymentLinks,
     support: support,
-    content: content
+    content: content,
+    branch: branch
   }
 })
