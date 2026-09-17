@@ -80,7 +80,7 @@
         </h3>
         <form @submit.prevent="submitForm" class="space-y-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('branch.name') || 'الاسم' }} *</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('branch.name_ar') || 'الاسم (عربي)' }} *</label>
             <input v-model="form.name" required class="w-full px-3 py-2 border border-gray-300 rounded-lg" />
           </div>
           <div>

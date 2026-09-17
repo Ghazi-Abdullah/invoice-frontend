@@ -1,15 +1,17 @@
 import axios from 'axios'
+import i18n from '@/plugins/i18n' // عدّل المسار حسب مكان ملف i18n عندك
 
 const state = {
-  privacyData: {},
-  termsData: {},
+  privacyData: { ar: null, en: null },
+  termsData: { ar: null, en: null },
   loading: false,
   error: null,
 }
 
 const getters = {
-  privacyData: (state) => state.privacyData,
-  termsData: (state) => state.termsData,
+  currentLocale: () => i18n.global.locale.value,
+  privacyData: (state) => state.privacyData[i18n.global.locale.value] || {},
+  termsData: (state) => state.termsData[i18n.global.locale.value] || {},
   loading: (state) => state.loading,
   error: (state) => state.error,
 }
@@ -235,48 +237,65 @@ const getPrivacyFallback = (locale) => (locale === 'en' ? privacyFallbackEn : pr
 const getTermsFallback = (locale) => (locale === 'en' ? termsFallbackEn : termsFallbackAr)
 
 const actions = {
-  // locale: 'ar' | 'en' - pass this.$i18n.locale from the component
-  async fetchPrivacyData({ commit }, locale = 'ar') {
+  // locale اختياري الآن — لو ما انمرر، ياخذ اللغة الحالية تلقائيًا من i18n
+  async fetchPrivacyData({ commit, state }, locale) {
+    const targetLocale = locale || i18n.global.locale.value
+
+    // ما نعيد الطلب لو عندنا بيانات هذي اللغة محفوظة أصلاً بالـ cache
+    if (state.privacyData[targetLocale]) return
+
     commit('SET_LOADING', true)
     commit('SET_ERROR', null)
     try {
-      // Replace with your actual API endpoint
       const response = await axios.get('/api/content/privacy', {
-        params: { lang: locale },
+        params: { lang: targetLocale },
       })
-      commit('SET_PRIVACY_DATA', response.data)
+      commit('SET_PRIVACY_DATA', { locale: targetLocale, data: response.data })
     } catch (error) {
       console.error('Error fetching privacy data:', error)
-      // Fallback data for demo, localized
-      commit('SET_PRIVACY_DATA', getPrivacyFallback(locale))
+      commit('SET_PRIVACY_DATA', { locale: targetLocale, data: getPrivacyFallback(targetLocale) })
     } finally {
       commit('SET_LOADING', false)
     }
   },
 
-  async fetchTermsData({ commit }, locale = 'ar') {
+  async fetchTermsData({ commit, state }, locale) {
+    const targetLocale = locale || i18n.global.locale.value
+
+    if (state.termsData[targetLocale]) return
+
     commit('SET_LOADING', true)
     commit('SET_ERROR', null)
     try {
       const response = await axios.get('/api/content/terms', {
-        params: { lang: locale },
+        params: { lang: targetLocale },
       })
-      commit('SET_TERMS_DATA', response.data)
+      commit('SET_TERMS_DATA', { locale: targetLocale, data: response.data })
     } catch (error) {
       console.error('Error fetching terms data:', error)
-      commit('SET_TERMS_DATA', getTermsFallback(locale))
+      commit('SET_TERMS_DATA', { locale: targetLocale, data: getTermsFallback(targetLocale) })
     } finally {
       commit('SET_LOADING', false)
     }
   },
+
+  // ينادى عند تبديل اللغة يدويًا لإجبار إعادة الجلب حتى لو كانت محفوظة بالـ cache
+  async refreshForLocale({ commit }, locale) {
+    const targetLocale = locale || i18n.global.locale.value
+    commit('CLEAR_LOCALE_CACHE', targetLocale)
+  },
 }
 
 const mutations = {
-  SET_PRIVACY_DATA(state, data) {
-    state.privacyData = data
+  SET_PRIVACY_DATA(state, { locale, data }) {
+    state.privacyData = { ...state.privacyData, [locale]: data }
   },
-  SET_TERMS_DATA(state, data) {
-    state.termsData = data
+  SET_TERMS_DATA(state, { locale, data }) {
+    state.termsData = { ...state.termsData, [locale]: data }
+  },
+  CLEAR_LOCALE_CACHE(state, locale) {
+    state.privacyData = { ...state.privacyData, [locale]: null }
+    state.termsData = { ...state.termsData, [locale]: null }
   },
   SET_LOADING(state, status) {
     state.loading = status

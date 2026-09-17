@@ -26,7 +26,7 @@
           </svg>
         </div>
       </div>
-      <div class="mt-3 text-xs text-gray-400 dark:text-gray-500">📈 Total invoices</div>
+      <div class="mt-3 text-xs text-gray-400 dark:text-gray-500"> Total invoices</div>
     </div>
 
     <div
@@ -55,7 +55,7 @@
           </svg>
         </div>
       </div>
-      <div class="mt-3 text-xs text-gray-400 dark:text-gray-500">💰 {{ paidRate }}% paid rate</div>
+      <div class="mt-3 text-xs text-gray-400 dark:text-gray-500"> {{ paidRate }}% paid rate</div>
     </div>
 
     <div
@@ -84,7 +84,7 @@
           </svg>
         </div>
       </div>
-      <div class="mt-3 text-xs text-gray-400 dark:text-gray-500">✉️ Sent to clients</div>
+      <div class="mt-3 text-xs text-gray-400 dark:text-gray-500">Sent to clients</div>
     </div>
 
     <div
@@ -113,7 +113,7 @@
           </svg>
         </div>
       </div>
-      <div class="mt-3 text-xs text-gray-400 dark:text-gray-500">⚠️ Requires attention</div>
+      <div class="mt-3 text-xs text-gray-400 dark:text-gray-500"> Requires attention</div>
     </div>
   </div>
 </template>

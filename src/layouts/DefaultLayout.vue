@@ -240,43 +240,6 @@
             ></div>
           </router-link>
 
-          <!-- âœ… Support Tickets -->
-          <router-link
-            v-if="hasPermission('administration')"
-            to="/support/tickets"
-            @click="closeSidebarOnMobile"
-            class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative"
-            :class="[
-              !sidebarOpen && !isMobile ? 'justify-center' : '',
-              $route.path.includes('/support/tickets')
-                ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-sm shadow-emerald-500/10'
-                : 'text-slate-400 hover:bg-slate-800/60 hover:text-white',
-            ]"
-            :title="!sidebarOpen && !isMobile ? t('nav.support_tickets') : ''"
-          >
-            <svg
-              class="w-5 h-5 flex-shrink-0"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.5"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path
-                d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155"
-              />
-            </svg>
-            <span v-if="sidebarOpen" class="text-sm font-medium transition-colors">
-              {{ t('nav.support_tickets') }}
-            </span>
-            <div
-              v-if="$route.path.includes('/support/tickets')"
-              class="absolute top-1/2 -translate-y-1/2 w-1 h-6 rounded-full bg-emerald-500"
-              :class="$i18n.locale === 'ar' ? 'right-0' : 'left-0'"
-            ></div>
-          </router-link>
-
           <!-- Invoices -->
           <router-link
             v-if="hasPermission('view_invoices')"
@@ -357,7 +320,44 @@
             ></div>
           </router-link>
 
-          <!-- branches -->
+          <!-- Reports -->
+          <router-link
+            v-if="hasPermission('view_sales_report')"
+            to="/reports"
+            @click="closeSidebarOnMobile"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative"
+            :class="[
+              !sidebarOpen && !isMobile ? 'justify-center' : '',
+              $route.path === '/reports'
+                ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20 shadow-sm shadow-blue-500/10'
+                : 'text-slate-400 hover:bg-slate-800/60 hover:text-white',
+            ]"
+            :title="!sidebarOpen && !isMobile ? t('nav.reports') : ''"
+          >
+            <svg
+              class="w-5 h-5 flex-shrink-0"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"
+              />
+            </svg>
+            <span v-if="sidebarOpen" class="text-sm font-medium transition-colors">
+              {{ t('nav.reports') }}
+            </span>
+            <div
+              v-if="$route.path === '/reports'"
+              class="absolute top-1/2 -translate-y-1/2 w-1 h-6 rounded-full bg-blue-500"
+              :class="$i18n.locale === 'ar' ? 'right-0' : 'left-0'"
+            ></div>
+          </router-link>
+
+          <!-- Branches -->
           <router-link
             v-if="hasPermission('administration')"
             to="/admin/branches"
@@ -394,19 +394,19 @@
             ></div>
           </router-link>
 
-          <!-- Reports -->
+          <!-- Properties -->
           <router-link
-            v-if="hasPermission('view_sales_report')"
-            to="/reports"
+            v-if="hasPermission('view_properties')"
+            to="/properties/browse"
             @click="closeSidebarOnMobile"
             class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative"
             :class="[
               !sidebarOpen && !isMobile ? 'justify-center' : '',
-              $route.path === '/reports'
+              $route.path === '/properties/browse'
                 ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20 shadow-sm shadow-blue-500/10'
                 : 'text-slate-400 hover:bg-slate-800/60 hover:text-white',
             ]"
-            :title="!sidebarOpen && !isMobile ? t('nav.reports') : ''"
+            :title="!sidebarOpen && !isMobile ? t('nav.properties') : ''"
           >
             <svg
               class="w-5 h-5 flex-shrink-0"
@@ -418,14 +418,51 @@
               stroke-linejoin="round"
             >
               <path
-                d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"
+                d="M2.25 21h19.5M4.5 3h6v18M13.5 9h6v12M6 6.75h1.5M6 9.75h1.5M6 12.75h1.5M15.75 12h1.5M15.75 15h1.5M15.75 18h1.5"
               />
             </svg>
             <span v-if="sidebarOpen" class="text-sm font-medium transition-colors">
-              {{ t('nav.reports') }}
+              {{ t('nav.properties') }}
             </span>
             <div
-              v-if="$route.path === '/reports'"
+              v-if="$route.path === '/properties/browse'"
+              class="absolute top-1/2 -translate-y-1/2 w-1 h-6 rounded-full bg-blue-500"
+              :class="$i18n.locale === 'ar' ? 'right-0' : 'left-0'"
+            ></div>
+          </router-link>
+
+          <!-- Contracts -->
+          <router-link
+            v-if="hasPermission('view_contracts')"
+            to="/contracts"
+            @click="closeSidebarOnMobile"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative"
+            :class="[
+              !sidebarOpen && !isMobile ? 'justify-center' : '',
+              $route.path.includes('/contracts')
+                ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20 shadow-sm shadow-blue-500/10'
+                : 'text-slate-400 hover:bg-slate-800/60 hover:text-white',
+            ]"
+            :title="!sidebarOpen && !isMobile ? t('nav.contracts') : ''"
+          >
+            <svg
+              class="w-5 h-5 flex-shrink-0"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z"
+              />
+            </svg>
+            <span v-if="sidebarOpen" class="text-sm font-medium transition-colors">
+              {{ t('nav.contracts') }}
+            </span>
+            <div
+              v-if="$route.path.includes('/contracts')"
               class="absolute top-1/2 -translate-y-1/2 w-1 h-6 rounded-full bg-blue-500"
               :class="$i18n.locale === 'ar' ? 'right-0' : 'left-0'"
             ></div>
@@ -620,6 +657,43 @@
                 :class="$i18n.locale === 'ar' ? 'right-0' : 'left-0'"
               ></div>
             </router-link>
+
+            <!-- Support Tickets -->
+            <router-link
+              v-if="hasPermission('administration')"
+              to="/support/tickets"
+              @click="closeSidebarOnMobile"
+              class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative"
+              :class="[
+                !sidebarOpen && !isMobile ? 'justify-center' : '',
+                $route.path.includes('/support/tickets')
+                  ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-sm shadow-emerald-500/10'
+                  : 'text-slate-400 hover:bg-slate-800/60 hover:text-white',
+              ]"
+              :title="!sidebarOpen && !isMobile ? t('nav.support_tickets') : ''"
+            >
+              <svg
+                class="w-5 h-5 flex-shrink-0"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155"
+                />
+              </svg>
+              <span v-if="sidebarOpen" class="text-sm font-medium transition-colors">
+                {{ t('nav.support_tickets') }}
+              </span>
+              <div
+                v-if="$route.path.includes('/support/tickets')"
+                class="absolute top-1/2 -translate-y-1/2 w-1 h-6 rounded-full bg-emerald-500"
+                :class="$i18n.locale === 'ar' ? 'right-0' : 'left-0'"
+              ></div>
+            </router-link>
           </template>
         </nav>
       </div>
@@ -698,7 +772,6 @@
             <BranchSelector v-if="!isMobile" />
             <InvoiceNotificationBell v-if="!isMobile" />
 
-            <!-- âœ… Ø²Ø± ØªØ¨Ø¯ÙŠÙ„ Ø§Ù„ÙˆØ¶Ø¹ Ø§Ù„Ø¯Ø§ÙƒÙ†/Ø§Ù„ÙØ§ØªØ­ -->
             <button
               @click="handleToggleDarkMode"
               class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-800 rounded-xl transition-all duration-200"
@@ -929,7 +1002,7 @@ export default {
       sidebarOpen: true,
       userDropdownOpen: false,
       isMobile: false,
-      darkModeEnabled: false, // âœ… Ø­Ø§Ù„Ø© Ø§Ù„ÙˆØ¶Ø¹ Ø§Ù„Ø¯Ø§ÙƒÙ† Ø§Ù„Ø­Ø§Ù„ÙŠØ© â€” ØªÙÙ‡ÙŠÙ‘Ø£ ÙØ¹Ù„ÙŠØ§Ù‹ Ø¨Ù€ mounted()
+      darkModeEnabled: false,
     }
   },
   computed: {
@@ -1019,7 +1092,6 @@ export default {
       localStorage.setItem('userLanguage', newLang)
       window.location.reload()
     },
-    // âœ… ÙŠØ¨Ø¯Ù‘Ù„ Ø§Ù„ÙˆØ¶Ø¹ Ø§Ù„Ø¯Ø§ÙƒÙ†/Ø§Ù„ÙØ§ØªØ­ ÙˆÙŠØ­ÙØ¸ Ø§Ù„Ø§Ø®ØªÙŠØ§Ø± ÙÙŠ localStorage Ø¹Ø¨Ø± utils/darkMode.js
     handleToggleDarkMode() {
       this.darkModeEnabled = toggleDarkMode()
     },
@@ -1051,7 +1123,6 @@ export default {
     window.addEventListener('resize', this.checkMobile)
     document.addEventListener('click', this.handleClickOutside)
 
-    // âœ… Ù…Ø²Ø§Ù…Ù†Ø© Ø­Ø§Ù„Ø© Ø§Ù„Ø²Ø± Ù…Ø¹ Ø§Ù„ÙˆØ¶Ø¹ Ø§Ù„ÙØ¹Ù„ÙŠ Ø§Ù„Ù…Ø·Ø¨Ù‘Ù‚ Ø£ØµÙ„Ø§Ù‹ Ø¨Ù€ utils/darkMode.js Ø¹Ù†Ø¯ ØªØ­Ù…ÙŠÙ„ Ø§Ù„ØµÙØ­Ø©
     this.darkModeEnabled = isDarkMode()
 
     if (!this.user) this.$store.dispatch('auth/checkAuth')
@@ -1133,7 +1204,6 @@ export default {
   background: #94a3b8;
 }
 
-/* Ø¸Ù‡ÙˆØ±/Ø§Ø®ØªÙØ§Ø¡ Ø§Ø³Ù… Ø§Ù„Ø¹Ù„Ø§Ù…Ø© Ø§Ù„ØªØ¬Ø§Ø±ÙŠØ© Ø¹Ù†Ø¯ Ø·ÙŠ/ÙØªØ­ Ø§Ù„Ø³Ø§ÙŠØ¯Ø¨Ø§Ø± */
 .fade-slide-enter-active,
 .fade-slide-leave-active {
   transition:
@@ -1153,10 +1223,7 @@ export default {
 }
 </style>
 
-<!-- ØºÙŠØ± scoped Ø¹Ù…Ø¯Ø§Ù‹: ÙŠØ¬Ø¨ Ø£Ù† ÙŠØ·Ø§Ù„ Ù‡Ø°Ø§ Ø§Ù„Ø£Ø³Ù„ÙˆØ¨ Ù…Ø­ØªÙˆÙ‰ Ø§Ù„ØµÙØ­Ø§Øª Ø§Ù„Ù…Ø¹Ø±ÙˆØ¶Ø©
-     Ø¯Ø§Ø®Ù„ router-view (Ù…ÙƒÙˆÙ‘Ù†Ø§Øª Ø£Ø®Ø±Ù‰)ØŒ ÙˆÙ‡Ùˆ Ù…Ø§ Ù„Ø§ ØªØ³Ù…Ø­ Ø¨Ù‡ scoped styles -->
 <style>
-/* Ø§Ù†ØªÙ‚Ø§Ù„ Ù†Ø§Ø¹Ù… Ø¨ÙŠÙ† Ø§Ù„ØµÙØ­Ø§Øª Ø¹Ù†Ø¯ Ø§Ù„ØªÙ†Ù‚Ù„ */
 .page-fade-enter-active,
 .page-fade-leave-active {
   transition:
@@ -1174,8 +1241,6 @@ export default {
   transform: translateY(-4px);
 }
 
-/* Ø´Ø¨ÙƒØ© Ø£Ù…Ø§Ù† Ù„Ù„Ù…ÙˆØ¨Ø§ÙŠÙ„: Ø£ÙŠ Ø¬Ø¯ÙˆÙ„ Ø¹Ø§Ø¯ÙŠ ØºÙŠØ± Ù…Ù„ÙÙˆÙ Ø¨Ù€ .table-container
-   ÙŠØµØ¨Ø­ Ù‚Ø§Ø¨Ù„Ø§Ù‹ Ù„Ù„ØªÙ…Ø±ÙŠØ± Ø£ÙÙ‚ÙŠØ§Ù‹ Ø¨Ø¯Ù„ Ø£Ù† ÙŠÙƒØ³Ø± Ø§Ù„ØªØ®Ø·ÙŠØ· Ø¹Ù„Ù‰ Ø§Ù„Ø´Ø§Ø´Ø§Øª Ø§Ù„ØµØºÙŠØ±Ø© */
 @media (max-width: 767px) {
   main table:not(.table-container table) {
     display: block;

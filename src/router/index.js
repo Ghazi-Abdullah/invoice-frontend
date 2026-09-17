@@ -196,6 +196,19 @@ const routes = [
         component: () => import('@/views/Admin/BranchesManagement.vue'),
         meta: { requiresAdmin: true, permission: 'administration' },
       },
+      {
+        path: '/properties/browse',
+        name: 'PropertyBrowse',
+        component: () => import('@/views/Properties/PropertyBrowsePage.vue'),
+        meta: { requiresAuth: true },
+      },
+      {
+        path: 'contracts',
+        name: 'Contracts',
+        component: () => import('@/views/Properties/ContractsIndex.vue'),
+        meta: { requiresAuth: true, permission: 'view_contracts' },
+      },
+
     ],
   },
 

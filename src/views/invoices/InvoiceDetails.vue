@@ -1164,9 +1164,7 @@ export default {
       const baseText =
         this.$t('invoices.deleteConfirm', { number: this.invoice.invoice_number }) ||
         `سيتم حذف الفاتورة رقم ${this.invoice.invoice_number}`
-      const paidWarn = isPaid
-        ? `<br><span style="color:#dc2626;font-weight:600;">⚠️ تنبيه: هذه الفاتورة مدفوعة — تأكد من الاحتفاظ بسجل خارجي قبل الحذف.</span>`
-        : ''
+      const paidWarn = isPaid ? this.$t('invoices.paidDeleteWarning') || '' : ''
 
       this.$swal
         .fire({

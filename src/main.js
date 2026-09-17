@@ -58,6 +58,10 @@ import {
   faExclamationCircle,
   faExclamationTriangle,
   faInfoCircle,
+  faPen,
+  faHashtag,
+  faLayerGroup,
+  faRulerCombined,    
   faCheckCircle as faCheckCircleSolid,
   faSort as faSortSolid
 } from '@fortawesome/free-solid-svg-icons'
@@ -109,6 +113,10 @@ library.add(
   faInfoCircle,
   faCheckCircleSolid,
   faSortSolid,
+  faPen,
+  faHashtag,
+  faLayerGroup,
+  faRulerCombined,
 )
 
 // استيراد المكونات المشتركة

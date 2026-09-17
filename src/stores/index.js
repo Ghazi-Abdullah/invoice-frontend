@@ -22,6 +22,11 @@ import paymentLinks from './modules/paymentLinks'
 import support from './modules/support'
 import content from './modules/content'
 import branch from './modules/branch'
+import properties from './modules/properties'
+import floors from './modules/floors'
+import units from './modules/units'
+import contracts from './modules/contracts'
+import tenants from './modules/tenants'
 
 
 
@@ -74,7 +79,7 @@ export default createStore({
       const newTheme = state.theme === 'light' ? 'dark' : 'light'
       commit('SET_THEME', newTheme)
     },
-    initTheme({ commit, state }) {
+    initTheme({ commit, /*state*/ }) {
       const savedTheme = localStorage.getItem('theme')
       const theme = savedTheme || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
       commit('SET_THEME', theme)
@@ -107,6 +112,11 @@ export default createStore({
     paymentLinks: paymentLinks,
     support: support,
     content: content,
-    branch: branch
+    branch: branch,
+    properties: properties,
+    floors: floors,
+    units: units,
+    contracts: contracts,
+    tenants: tenants
   }
 })

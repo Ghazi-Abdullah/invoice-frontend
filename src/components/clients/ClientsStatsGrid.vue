@@ -17,7 +17,7 @@
           </svg>
         </div>
       </div>
-      <div class="mt-3 text-xs text-gray-400">📈 +12% from last month</div>
+      <div class="mt-3 text-xs text-gray-400">+12% from last month</div>
     </div>
 
     <div class="bg-white rounded-xl p-5 border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300">
@@ -57,7 +57,7 @@
           </svg>
         </div>
       </div>
-      <div class="mt-3 text-xs text-gray-400">📄 Total invoices issued</div>
+      <div class="mt-3 text-xs text-gray-400"> Total invoices issued</div>
     </div>
 
     <div class="bg-white rounded-xl p-5 border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300">
@@ -77,7 +77,7 @@
           </svg>
         </div>
       </div>
-      <div class="mt-3 text-xs text-gray-400">💰 Lifetime value</div>
+      <div class="mt-3 text-xs text-gray-400">Lifetime value</div>
     </div>
   </div>
 </template>

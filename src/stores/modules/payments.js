@@ -70,6 +70,10 @@ const mutations = {
       page: 1,
       per_page: 15
     }
+  },
+  // ✅ يضيف سند القبض الجديد في أول القائمة الحالية بدل ما نعمل fetchPayments كاملة من جديد
+  PREPEND_PAYMENT(state, payment) {
+    state.payments = [payment, ...state.payments]
   }
 }
 
@@ -96,6 +100,36 @@ const actions = {
       const message = error.response?.data?.message || error.message || i18n.global.t('payments.create_session_failed')
       commit('SET_ERROR', message)
       throw new Error(message)
+    } finally {
+      NProgress.done()
+      commit('SET_LOADING', false)
+    }
+  },
+
+  // ✅ تسجيل دفعة يدوية (نقدي / تحويل بنكي / شيك) وإصدار سند قبض
+  // ملاحظة: على عكس باقي الـ actions هنا، نرمي الـ error الأصلي (axios error) كما هو
+  // بدل تغليفه بـ new Error(message) — لأن الكومبوننت يحتاج error.response.data.errors
+  // لعرض أخطاء التحقق (422) بجانب كل حقل في الفورم.
+  async recordManualPayment({ commit }, { invoiceId, payload }) {
+    commit('SET_LOADING', true)
+    commit('CLEAR_ERROR')
+    NProgress.start()
+
+    try {
+      const response = await axios.post(`/admin/payments/${invoiceId}/record`, payload)
+
+      if (response.data.status) {
+        commit('PREPEND_PAYMENT', response.data.data)
+        return response.data.data
+      } else {
+        const message = response.data.message || i18n.global.t('payments.record_failed')
+        commit('SET_ERROR', message)
+        throw new Error(message)
+      }
+    } catch (error) {
+      const message = error.response?.data?.message || error.message || i18n.global.t('payments.record_failed')
+      commit('SET_ERROR', message)
+      throw error
     } finally {
       NProgress.done()
       commit('SET_LOADING', false)
