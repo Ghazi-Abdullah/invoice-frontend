@@ -196,6 +196,25 @@ const routes = [
         component: () => import('@/views/Admin/BranchesManagement.vue'),
         meta: { requiresAdmin: true, permission: 'administration' },
       },
+      // Property & Facility Management
+      {
+        path: 'admin/properties',
+        name: 'AdminProperties',
+        component: () => import('@/views/Admin/PropertiesManagement.vue'),
+        meta: { requiresAdmin: true, permission: 'administration' },
+      },
+      {
+        path: 'admin/properties/:propertyId/floors',
+        name: 'AdminPropertyFloors',
+        component: () => import('@/views/Admin/FloorsManagement.vue'),
+        meta: { requiresAdmin: true, permission: 'administration' },
+      },
+      {
+        path: 'admin/floors/:floorId/units',
+        name: 'AdminFloorUnits',
+        component: () => import('@/views/Admin/UnitsManagement.vue'),
+        meta: { requiresAdmin: true, permission: 'administration' },
+      },
     ],
   },
 
